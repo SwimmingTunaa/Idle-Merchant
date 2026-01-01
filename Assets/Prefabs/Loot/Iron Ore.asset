@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b18e6bffce50d4ef994b448cf7f127a4, type: 3}
+  m_Name: Iron Ore
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDef
+  prefab: {fileID: 6567793289746966387, guid: f92b37987da254b76ae2600bd11e980f, type: 3}
+  animatorOverrideController: {fileID: 0}
+  spriteVisual: {fileID: 21300000, guid: edcbd57032ccbd44e9f228cdd323ab50, type: 3}
+  visualPrefab: {fileID: 5717543623832770981, guid: 50135360410c7457aba748dbd5331fec, type: 3}
+  icon: {fileID: 21300000, guid: edcbd57032ccbd44e9f228cdd323ab50, type: 3}
+  id: Iron Ore
+  displayName: Iron Ore
+  description: 
+  hireCost: 50
+  assignedLayer: 1
+  sortingType: 0
+  spawnWeight: 1
+  moveSpeed: 0
+  stopDistance: 0.05
+  idleTimeRange: {x: 0, y: 0}
+  deathAnimationDuration: 0.5
+  colliderSize: {x: 1, y: 1}
+  colliderOffset: {x: 0, y: 0}
+  itemCategory: 0
+  chance: 1
+  sellPrice: 2

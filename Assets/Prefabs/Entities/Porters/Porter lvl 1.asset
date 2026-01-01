@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b0b08aa3052c45b79fe9f531035d443, type: 3}
+  m_Name: Porter lvl 1
+  m_EditorClassIdentifier: Assembly-CSharp::PorterDef
+  prefab: {fileID: 440394158813992520, guid: 00cf57871f2814f4da16e08b492cd541, type: 3}
+  animatorOverrideController: {fileID: 22100000, guid: b127bc034a64c40f6b1cd7e7915b1834, type: 2}
+  spriteVisual: {fileID: -8029374031438669788, guid: 1d33467dd7dfb4ad69876ada74cbb30d, type: 3}
+  icon: {fileID: -8029374031438669788, guid: 1d33467dd7dfb4ad69876ada74cbb30d, type: 3}
+  id: 
+  displayName: Lowley Porter
+  description: 
+  hireCost: 0
+  assignedLayer: 1
+  sortingType: 3
+  spawnWeight: 1
+  moveSpeed: 4
+  stopDistance: 0.05
+  idleTimeRange: {x: 0, y: 0}
+  deathAnimationDuration: 0.5
+  colliderSize: {x: 0, y: 0}
+  colliderOffset: {x: 0, y: 0}
+  porterType: Porter
+  carryCapacity: 5
+  scanRange: 10
+  pickupTime: 0.5
+  depositTime: 0.5
+  startingState: 0
+  wanderTimeRange: {x: 3, y: 6}
+  returnToSpawn: 1
+  idleColor: {r: 1, g: 1, b: 1, a: 1}
+  wanderColor: {r: 0, g: 1, b: 1, a: 1}
+  seekColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  carryingColor: {r: 0, g: 1, b: 0, a: 1}
+  travelColor: {r: 0, g: 1, b: 1, a: 1}

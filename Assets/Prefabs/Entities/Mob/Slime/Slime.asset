@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0999ef5a8c034406c9a0621aa4e76692, type: 3}
+  m_Name: Slime
+  m_EditorClassIdentifier: Assembly-CSharp::MobDef
+  prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
+  animatorOverrideController: {fileID: 22100000, guid: 7eddcac4bae0641ccb8b228e50402e89, type: 2}
+  visualPrefab: {fileID: 8189028764084212112, guid: 72af4f667bbf54c2d90edc59bfe37d54, type: 3}
+  icon: {fileID: 0}
+  id: Slime
+  displayName: Slime
+  description: 
+  hireCost: 50
+  assignedLayer: 1
+  sortingType: 1
+  spawnWeight: 0.7
+  moveSpeed: 1
+  stopDistance: 0.05
+  idleTimeRange: {x: 2, y: 4}
+  deathAnimationDuration: 0.9
+  colliderSize: {x: 1.75, y: 1}
+  colliderOffset: {x: 0, y: 0.5}
+  startingState: 0
+  isBoss: 0
+  baseHealth: 4
+  hpMultiplierByLayer:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0.22222222
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 10
+      value: 3
+      inSlope: 0.22222222
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  stunTime: 0.3
+  maxSimultaneousAttackers: 0
+  loot:
+  - {fileID: 11400000, guid: 558583e88384442edb1bc534a807b96c, type: 2}
+  lootDropAmount: {x: 1, y: 2}

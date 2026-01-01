@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5417fa8c6571343d0863f261c60a3e08, type: 3}
+  m_Name: Villager Man
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerDef
+  prefab: {fileID: 5389948795088366679, guid: 474d6c90a41a14c17ba845b6b1dc8f6c, type: 3}
+  animatorOverrideController: {fileID: 22100000, guid: da36e69b1ab8146f985bcd6812f81567, type: 2}
+  visualPrefab: {fileID: 8297219698280480267, guid: 539d212c42a844aeeba2adb086a433e4, type: 3}
+  icon: {fileID: 0}
+  id: Villager Man
+  displayName: Villager
+  description: 
+  hireCost: 50
+  assignedLayer: 1
+  sortingType: 1
+  spawnWeight: 0.5
+  moveSpeed: 4
+  stopDistance: 0.05
+  idleTimeRange: {x: 1, y: 3}
+  startingState: 1
+  itemPreferance: 0
+  baseWeight: 1
+  budget: {x: 2, y: 8}
+  batchRange: {x: 1, y: 5}

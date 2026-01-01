@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b0a2a9274ccaa4b988ce6073bb3db4, type: 3}
+  m_Name: EntitySortingConfig
+  m_EditorClassIdentifier: Assembly-CSharp::EntitySortingConfig
+  sortingRanges:
+  - entityType: 0
+    minOrder: 2000
+    maxOrder: 3000
+    warningThreshold: 900
+  - entityType: 1
+    minOrder: 3000
+    maxOrder: 4000
+    warningThreshold: 900
+  - entityType: 2
+    minOrder: 4000
+    maxOrder: 5000
+    warningThreshold: 900
+  - entityType: 3
+    minOrder: 5000
+    maxOrder: 6000
+    warningThreshold: 900
+  - entityType: 4
+    minOrder: 6000
+    maxOrder: 7000
+    warningThreshold: 900
+  - entityType: 5
+    minOrder: 7000
+    maxOrder: 8000
+    warningThreshold: 900

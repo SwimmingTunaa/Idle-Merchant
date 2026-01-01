@@ -1,0 +1,126 @@
+#CoinLabel {
+    font-size: 64px;
+    -unity-font-definition: url("project://database/Assets/SPUM/Core/Basic_Resources/Font/PixelFont.ttf?fileID=12800000&guid=3e53c1bee5e5e43219f0342dc04f5be0&type=3#PixelFont");
+    -unity-text-outline-width: 0;
+    -unity-text-outline-color: rgb(255, 255, 255);
+    -unity-font-style: normal;
+    -unity-text-align: upper-right;
+}
+
+.containers {
+    padding-top: 16px;
+    padding-right: 64px;
+    padding-bottom: 16px;
+    padding-left: 64px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+}
+
+.shopButton {
+    padding-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    padding-left: 16px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 0;
+    font-size: 250%;
+    -unity-font-definition: url("project://database/Assets/SPUM/Core/Basic_Resources/Font/PixelFont.ttf?fileID=12800000&guid=3e53c1bee5e5e43219f0342dc04f5be0&type=3#PixelFont");
+    color: rgb(120, 66, 0);
+    -unity-font-style: normal;
+    -unity-text-outline-width: 0;
+    border-left-color: rgb(120, 66, 0);
+    border-right-color: rgb(120, 66, 0);
+    border-top-color: rgb(120, 66, 0);
+    border-bottom-color: rgb(120, 66, 0);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.levelHeader {
+    font-size: 200%;
+    -unity-font-definition: url("project://database/Assets/SPUM/Core/Basic_Resources/Font/PixelFont.ttf?fileID=12800000&guid=3e53c1bee5e5e43219f0342dc04f5be0&type=3#PixelFont");
+    color: rgb(255, 255, 255);
+    background-color: rgba(58, 121, 187, 0);
+    padding-top: 1%;
+    padding-right: 2%;
+    padding-left: 2%;
+    padding-bottom: 1%;
+}
+
+.hireButton {
+    padding-top: 8px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 0;
+    font-size: 32px;
+    -unity-font-definition: url("project://database/Assets/SPUM/Core/Basic_Resources/Font/PixelFont.ttf?fileID=12800000&guid=3e53c1bee5e5e43219f0342dc04f5be0&type=3#PixelFont");
+    color: rgb(120, 66, 0);
+    -unity-font-style: normal;
+    -unity-text-outline-width: 0;
+    border-left-color: rgb(120, 66, 0);
+    border-right-color: rgb(120, 66, 0);
+    border-top-color: rgb(120, 66, 0);
+    border-bottom-color: rgb(120, 66, 0);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    background-color: rgb(218, 165, 32);
+    flex-grow: 0;
+    max-width: 150px;
+}
+
+.unitIconContainer {
+    background-color: rgb(142, 118, 78);
+    background-image: none;
+    -unity-background-scale-mode: scale-to-fit;
+    padding-top: 1%;
+    padding-right: 1%;
+    padding-bottom: 1%;
+    padding-left: 1%;
+    margin-top: 0;
+    margin-right: 16px;
+    margin-bottom: 0;
+    margin-left: 0;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: row;
+}
+
+.hireContainer {
+    background-color: rgb(89, 53, 10);
+}
+
+/* Pulse Animation - Generic for any icon/element */
+.pulse-target {
+    transition-property: scale;
+    transition-duration: 0.18s;
+    transition-timing-function: ease-out;
+    scale: 1 1;
+}
+
+.pulse-target.pulsing {
+    scale: 1.3 1.3;
+}

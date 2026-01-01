@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0999ef5a8c034406c9a0621aa4e76692, type: 3}
+  m_Name: Iron Golem
+  m_EditorClassIdentifier: Assembly-CSharp::MobDef
+  prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
+  animatorOverrideController: {fileID: 22100000, guid: c732528d7b10345838655205b3dcd4d4, type: 2}
+  visualPrefab: {fileID: 8189028764084212112, guid: 97a61fcd0457c4619b27c62b633b190f, type: 3}
+  icon: {fileID: 0}
+  id: 
+  displayName: 
+  description: 
+  hireCost: 50
+  assignedLayer: 1
+  animatorController: {fileID: 0}
+  sortingType: 1
+  spawnWeight: 0.3
+  moveSpeed: 1
+  stopDistance: 0.05
+  idleTimeRange: {x: 0, y: 0}
+  deathAnimationDuration: 1.2
+  colliderSize: {x: 2.5, y: 1.875}
+  colliderOffset: {x: 0, y: 0.9375}
+  startingState: 0
+  isBoss: 1
+  baseHealth: 3
+  hpMultiplierByLayer:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0.22222222
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 10
+      value: 3
+      inSlope: 0.22222222
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  stunTime: 0.5
+  maxSimultaneousAttackers: 0
+  loot:
+  - {fileID: 11400000, guid: dff09048b2c4547dd9ad572acca40380, type: 2}
+  lootDropAmount: {x: 1, y: 5}
