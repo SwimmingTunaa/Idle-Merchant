@@ -2,14 +2,28 @@ using UnityEngine;
 
 public class CounterService : MonoBehaviour
 {
+    [Header("Service Settings")]
     public float serveTime = 1.5f;
     public Transform exitPoint;
+
+    [Header("Gold VFX Settings")]
+    [Tooltip("Position to spawn gold VFX (usually counter position)")]
+    public Transform goldSpawnPoint;
 
     private CustomerAgent currentCustomer;
     private float t;
     private QueueController queue;
 
-    void Start() => queue = QueueController.Instance;
+    void Start()
+    {
+        queue = QueueController.Instance;
+        
+        // Default to counter point if goldSpawnPoint not assigned
+        if (goldSpawnPoint == null && queue != null)
+        {
+            goldSpawnPoint = queue.counterPoint;
+        }
+    }
 
     void Update()
     {
@@ -27,7 +41,7 @@ public class CounterService : MonoBehaviour
             {
                 if (!IsPurchasableNow(head, out _, out _))
                 {
-                    LeaveNow(head);                 // â† no stock / no budget â†’ leave with no purchase
+                    LeaveNow(head);  // No stock / no budget → leave with no purchase
                     queue.DequeueHeadAndShift();
                     return;
                 }
@@ -47,7 +61,7 @@ public class CounterService : MonoBehaviour
         currentCustomer = null;
     }
 
-    // ---- Helpers ----
+    // ===== HELPERS =====
 
     bool IsPurchasableNow(CustomerAgent c, out int maxAffordable, out float unitPrice)
     {
@@ -60,7 +74,7 @@ public class CounterService : MonoBehaviour
         int stock = Inventory.Instance.Get(inv, c.desiredItem);
         if (stock <= 0) return false;
 
-        unitPrice = c.desiredItem.sellPrice; // or MarketPricing.PriceFor(c.desiredItem)
+        unitPrice = c.desiredItem.sellPrice;
         if (unitPrice > c.budget + 0.001f) return false;
 
         maxAffordable = Mathf.Min(
@@ -95,10 +109,50 @@ public class CounterService : MonoBehaviour
         {
             int goldGain = Mathf.RoundToInt(unit * toBuy);
             Inventory.Instance.AddGold(goldGain);
+
+            // ADDED: Spawn gold VFX when customer purchases
+            SpawnGoldVFX(c.transform.position, goldGain);
         }
 
-        Inventory.Instance.InventoryDebugUi();   // debug view if you want
+        Inventory.Instance.InventoryDebugUi();
         LeaveNow(c);
         queue.DequeueHeadAndShift();
     }
+
+    /// <summary>
+    /// Spawn gold coin VFX that flies to UI.
+    /// Scales number of coins with gold amount (1 coin per 10 gold, max 15).
+    /// </summary>
+    private void SpawnGoldVFX(Vector3 customerPosition, int goldAmount)
+    {
+        if (ItemExplosionVFX.Instance == null)
+        {
+            Debug.LogWarning("[CounterService] ItemExplosionVFX.Instance is null - can't spawn gold VFX");
+            return;
+        }
+
+        // Determine spawn position (prefer goldSpawnPoint, fallback to customer)
+        Vector3 spawnPos = goldSpawnPoint != null ? goldSpawnPoint.position : customerPosition;
+
+        // Calculate number of coins (1 coin per 10 gold, min 1, max 15)
+        int coinCount = Mathf.Clamp(goldAmount / 10, 1, 15);
+
+        // Spawn coin explosion (null sprite uses default coin sprite)
+        ItemExplosionVFX.Instance.SpawnExplosion(
+            sprite: null,  // Uses defaultCoinSprite from ItemExplosionVFX
+            worldPosition: spawnPos,
+            count: coinCount,
+            maxCount: 15
+        );
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Debug: Test Gold VFX")]
+    private void DebugTestGoldVFX()
+    {
+        Vector3 testPos = goldSpawnPoint != null ? goldSpawnPoint.position : transform.position;
+        SpawnGoldVFX(testPos, 50);
+        Debug.Log("[CounterService] Spawned test gold VFX (50g = 5 coins)");
+    }
+#endif
 }
