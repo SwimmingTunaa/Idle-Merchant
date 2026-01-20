@@ -73,9 +73,6 @@ public class CustomerWantBubble : MonoBehaviour
     {
         if (!customer || !bubbleRoot) return;
 
-        // Keep bubble anchored above head (in case sprite height differs)
-        bubbleRoot.position = customer.transform.position + worldOffset;
-
         // Only refresh content when something changed
         if (_lastItem != customer.desiredItem || _lastQty != customer.desiredQty)
         {

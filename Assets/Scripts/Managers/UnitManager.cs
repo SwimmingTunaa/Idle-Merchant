@@ -2,6 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
+/// OPTIMIZED: Periodic cleanup instead of every-frame cleanup.
+/// OLD: Dictionary iteration every frame (60 FPS × N managers = 180+ iterations/sec)
+/// NEW: Dictionary iteration every 2 seconds (0.5 Hz × N managers = 1.5 iterations/sec)
+/// 
+/// Performance gain: 99% reduction in cleanup overhead
+/// 
 /// Generic base class for managing units on a layer.
 /// Handles spawning, tracking, and per-type limits.
 /// Derived classes (AdventurerManager, PorterManager) only need to implement type-specific initialization.
@@ -13,7 +19,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     [Tooltip("Which dungeon layer this manager controls (1-10)")]
     [SerializeField] private int _layerIndex = 1;
     
-    // Property to implement IUnitManager interface
     public int LayerIndex 
     { 
         get => _layerIndex; 
@@ -27,7 +32,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     [Tooltip("Define max count for each unit type on this layer")]
     public List<UnitTypeLimit> unitLimits = new List<UnitTypeLimit>();
     
-    // Expose unitLimits for IUnitManager interface
     List<UnitTypeLimit> IUnitManager.UnitLimits => unitLimits;
     
     [Header("Debug")]
@@ -36,6 +40,10 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     // Track spawned units by their definition
     protected Dictionary<EntityDef, List<T>> spawnedByType = new Dictionary<EntityDef, List<T>>();
     protected Vector3 spawnPoint;
+
+    // OPTIMIZATION: Periodic cleanup instead of every frame
+    private float cleanupTimer = 0f;
+    private const float CLEANUP_INTERVAL = 2f;
 
     protected virtual void Awake()
     {
@@ -49,8 +57,13 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
 
     protected virtual void Update()
     {
-        // Clean up null references periodically
-        CleanupNullReferences();
+        // OPTIMIZED: Cleanup only every 2 seconds instead of every frame
+        cleanupTimer += Time.deltaTime;
+        if (cleanupTimer >= CLEANUP_INTERVAL)
+        {
+            cleanupTimer = 0f;
+            CleanupNullReferences();
+        }
     }
 
     // ===== VALIDATION =====
@@ -67,7 +80,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] No unit limits defined!");
         }
 
-        // Validate all unit defs are assigned to this layer
         foreach (var limit in unitLimits)
         {
             if (limit.unitDef != null && limit.unitDef.assignedLayer != LayerIndex)
@@ -82,6 +94,7 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     /// <summary>
     /// Check if a specific unit type can be hired on this layer.
     /// Returns false if: wrong layer, no gold, or at type limit.
+    /// Implements IUnitManager.CanHire
     /// </summary>
     public virtual bool CanHire(EntityDef def)
     {
@@ -100,7 +113,7 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
 
-        // Check gold
+        // Check gold (using your actual Inventory API)
         if (Inventory.Instance.Gold < def.hireCost)
         {
             if (showDebugLogs)
@@ -125,13 +138,14 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     /// <summary>
     /// Hire and spawn a unit of the specified type.
     /// Deducts gold and adds to tracked units.
+    /// Implements IUnitManager.HireUnit
     /// </summary>
     public virtual bool HireUnit(EntityDef def)
     {
         if (!CanHire(def))
             return false;
 
-        // Deduct gold
+        // Deduct gold (using your actual Inventory API)
         Inventory.Instance.AddGold(-def.hireCost);
 
         // Spawn the unit
@@ -140,8 +154,7 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         if (unit == null)
         {
             Debug.LogError($"[{GetType().Name}] Failed to spawn {def.displayName}!");
-            // Refund gold
-            Inventory.Instance.AddGold(def.hireCost);
+            Inventory.Instance.AddGold(def.hireCost); // Refund
             return false;
         }
 
@@ -263,10 +276,11 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     /// </summary>
     protected abstract T SpawnUnitWithCandidate(HiringCandidate candidate);
 
-    // ===== QUERIES =====
+    // ===== QUERIES (Implements IUnitManager interface) =====
 
     /// <summary>
-    /// Get current count of a specific unit type
+    /// Get current count of a specific unit type.
+    /// Implements IUnitManager.GetUnitCount
     /// </summary>
     public int GetUnitCount(EntityDef def)
     {
@@ -279,7 +293,8 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     }
 
     /// <summary>
-    /// Get max allowed count for a specific unit type
+    /// Get max allowed count for a specific unit type.
+    /// Implements IUnitManager.GetUnitLimit
     /// </summary>
     public int GetUnitLimit(EntityDef def)
     {
@@ -293,6 +308,15 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
 
         // Not found in limits - assume 0 (can't hire)
         return 0;
+    }
+
+    /// <summary>
+    /// Check if a specific unit type is at its limit.
+    /// Implements IUnitManager.IsTypeFull
+    /// </summary>
+    public bool IsTypeFull(EntityDef def)
+    {
+        return GetUnitCount(def) >= GetUnitLimit(def);
     }
 
     /// <summary>
@@ -352,14 +376,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     }
 
     /// <summary>
-    /// Check if a specific unit type is at its limit
-    /// </summary>
-    public bool IsTypeFull(EntityDef def)
-    {
-        return GetUnitCount(def) >= GetUnitLimit(def);
-    }
-
-    /// <summary>
     /// Check if all unit slots are filled
     /// </summary>
     public bool IsFull()
@@ -369,6 +385,10 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
 
     // ===== CLEANUP =====
 
+    /// <summary>
+    /// OPTIMIZED: Only runs every 2 seconds instead of every frame.
+    /// Removes null references from spawned units tracking.
+    /// </summary>
     protected virtual void CleanupNullReferences()
     {
         foreach (var list in spawnedByType.Values)
@@ -407,6 +427,13 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             RemoveUnit(unit);
         }
         Debug.Log($"[{GetType().Name}] Removed all units from layer {LayerIndex}");
+    }
+
+    [ContextMenu("Debug: Force Cleanup")]
+    protected virtual void DebugForceCleanup()
+    {
+        CleanupNullReferences();
+        Debug.Log($"[{GetType().Name}] Forced cleanup complete");
     }
 
 #if UNITY_EDITOR

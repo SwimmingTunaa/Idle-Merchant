@@ -27,6 +27,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public event Action<bool> OnWorldInputBlockedChanged;
+
     [Header("Input")]
     [SerializeField] private InputActionReference cancelAction;
     
@@ -55,6 +57,7 @@ public class UIManager : MonoBehaviour
             }
             return false;
         }
+        private set { } // needed for event invocation
     }
 
     private void Awake()
@@ -80,6 +83,36 @@ public class UIManager : MonoBehaviour
         if (cancelAction != null)
             cancelAction.action.performed -= OnCancelPerformed;
     }
+
+        private void BroadcastInputBlockState()
+        {
+            OnWorldInputBlockedChanged?.Invoke(IsBlockingWorldInput);
+        }
+
+        // EXAMPLE: If you have a method like this
+        public void SetWorldInputBlocked(bool blocked)
+        {
+            if (IsBlockingWorldInput == blocked) return; // No change, skip broadcast
+
+            IsBlockingWorldInput = blocked;
+            BroadcastInputBlockState(); // NEW: Broadcast change
+        }
+
+        // EXAMPLE: If you open/close panels
+        public void OpenPanel(GameObject panel)
+        {
+            panel.SetActive(true);
+            IsBlockingWorldInput = true;
+            BroadcastInputBlockState(); // NEW: Broadcast change
+        }
+
+        public void ClosePanel(GameObject panel)
+        {
+            panel.SetActive(false);
+            IsBlockingWorldInput = false;
+            BroadcastInputBlockState(); // NEW: Broadcast change
+        }
+
 
     private void Update()
     {

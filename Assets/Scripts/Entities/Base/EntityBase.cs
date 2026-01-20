@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 
 public class EntityBase : MonoBehaviour
 {
-    protected EntityDef def;
+    public EntityDef def;
     public int layerIndex = 1;
     public bool overriderAnimatorController = true;
     public CharacterAppearanceManager appearanceManager;
