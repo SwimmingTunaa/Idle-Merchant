@@ -14,18 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDef
   prefab: {fileID: 5389948795088366679, guid: 474d6c90a41a14c17ba845b6b1dc8f6c, type: 3}
   animatorOverrideController: {fileID: 22100000, guid: da36e69b1ab8146f985bcd6812f81567, type: 2}
-  visualPrefab: {fileID: 8297219698280480267, guid: 539d212c42a844aeeba2adb086a433e4, type: 3}
+  spriteVisual: {fileID: 0}
   icon: {fileID: 0}
   id: Villager Man
   displayName: Villager
   description: 
   hireCost: 50
   assignedLayer: 1
+  startingSkills: []
   sortingType: 1
   spawnWeight: 0.5
   moveSpeed: 4
   stopDistance: 0.05
   idleTimeRange: {x: 1, y: 3}
+  deathAnimationDuration: 0.5
+  colliderSize: {x: 0, y: 0}
+  colliderOffset: {x: 0, y: 0}
   startingState: 1
   itemPreferance: 0
   baseWeight: 1

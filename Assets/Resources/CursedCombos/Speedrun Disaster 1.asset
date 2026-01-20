@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f37ab150fe73742d59e48be30ddc9cce, type: 3}
+  m_Name: Speedrun Disaster 1
+  m_EditorClassIdentifier: Assembly-CSharp::CursedComboDef
+  comboName: Chaos Porter
+  description: Carries everything but drops half of it
+  traitA: {fileID: 11400000, guid: 64b13f1bf8f5147538c2b4ab7b04ad5a, type: 2}
+  traitB: {fileID: 11400000, guid: fa6b3977ff93b482f9df72440838893b, type: 2}
+  spawnChance: 0.04
+  costMultiplier: 1.6
+  icon: {fileID: 0}
+  highlightColor: {r: 0.6641802, g: 0.003915994, b: 0.8301887, a: 1}

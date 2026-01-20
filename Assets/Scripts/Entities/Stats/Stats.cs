@@ -49,7 +49,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.AttackInterval];
+            return cache[StatType.AttackSpeed];
         }
     }
 
@@ -138,7 +138,7 @@ public class Stats
     {
         cache[StatType.MoveSpeed] = ComputeStat(StatType.MoveSpeed);
         cache[StatType.AttackDamage] = ComputeStat(StatType.AttackDamage);
-        cache[StatType.AttackInterval] = ComputeStat(StatType.AttackInterval);
+        cache[StatType.AttackSpeed] = ComputeStat(StatType.AttackSpeed);
         cache[StatType.AttackRange] = ComputeStat(StatType.AttackRange);
         cache[StatType.ChaseBreakRange] = ComputeStat(StatType.ChaseBreakRange);
         cache[StatType.ScanRange] = ComputeStat(StatType.ScanRange);
@@ -199,7 +199,7 @@ public class Stats
         Debug.Log($"=== Stats (Base → Modified) ===");
         Debug.Log($"MoveSpeed: {BaseStats.moveSpeed} → {MoveSpeed}");
         Debug.Log($"AttackDamage: {BaseStats.attackDamage} → {AttackDamage}");
-        Debug.Log($"AttackInterval: {BaseStats.attackInterval} → {AttackInterval}");
+        Debug.Log($"AttackInterval: {BaseStats.attackSpeed} → {AttackInterval}");
         Debug.Log($"AttackRange: {BaseStats.attackRange} → {AttackRange}");
         Debug.Log($"ScanRange: {BaseStats.scanRange} → {ScanRange}");
         Debug.Log($"CarryCapacity: {BaseStats.carryCapacity} → {CarryCapacity}");

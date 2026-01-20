@@ -1,0 +1,173 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.2D.Animation.Runtime::UnityEngine.U2D.Animation.SpriteLibrarySourceAsset
+  m_Library:
+  - m_Name: Idle
+    m_Hash: 1008081451
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: pants_0
+      m_Hash: 1035897459
+      m_Sprite: {fileID: -1346933203, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1346933203, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_1
+      m_Hash: 179944165
+      m_Sprite: {fileID: 1496123846, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1496123846, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_2
+      m_Hash: 330361695
+      m_Sprite: {fileID: -2011461208, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -2011461208, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_3
+      m_Hash: 616029129
+      m_Sprite: {fileID: -480801018, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -480801018, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 4
+  - m_Name: Walk
+    m_Hash: 765711723
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: pants_4
+      m_Hash: 986926698
+      m_Sprite: {fileID: -2014064594, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -2014064594, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_5
+      m_Hash: 232029948
+      m_Sprite: {fileID: -1860808097, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1860808097, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_6
+      m_Hash: 350039878
+      m_Sprite: {fileID: 1171217920, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1171217920, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_7
+      m_Hash: 601497552
+      m_Sprite: {fileID: 4495691, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 4495691, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_8
+      m_Hash: 862257729
+      m_Sprite: {fileID: 2012748443, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 2012748443, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_9
+      m_Hash: 73544407
+      m_Sprite: {fileID: 877030978, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 877030978, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 6
+  - m_Name: Slash
+    m_Hash: 101673205
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: pants_10
+      m_Hash: 619802732
+      m_Sprite: {fileID: -920615643, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -920615643, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_11
+      m_Hash: 334905594
+      m_Sprite: {fileID: 524112513, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 524112513, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_12
+      m_Hash: 184488256
+      m_Sprite: {fileID: -1200627019, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1200627019, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_13
+      m_Hash: 1039671766
+      m_Sprite: {fileID: -1807851433, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1807851433, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_14
+      m_Hash: 597472373
+      m_Sprite: {fileID: -664690351, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -664690351, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_15
+      m_Hash: 345736419
+      m_Sprite: {fileID: 1714563599, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1714563599, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_16
+      m_Hash: 227726681
+      m_Sprite: {fileID: -1359807396, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1359807396, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 7
+  - m_Name: Hit
+    m_Hash: 580870305
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: pants_17
+      m_Hash: 982902223
+      m_Sprite: {fileID: -1483639603, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1483639603, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_18
+      m_Hash: 707459166
+      m_Sprite: {fileID: -1817311651, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1817311651, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_19
+      m_Hash: 489539784
+      m_Sprite: {fileID: 1484354847, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1484354847, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 3
+  - m_Name: Death
+    m_Hash: 646380074
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: pants_20
+      m_Hash: 266085295
+      m_Sprite: {fileID: 1742195191, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1742195191, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_21
+      m_Hash: 953881401
+      m_Sprite: {fileID: 1277896704, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1277896704, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_22
+      m_Hash: 567427715
+      m_Sprite: {fileID: -399530769, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -399530769, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_23
+      m_Hash: 383087125
+      m_Sprite: {fileID: 1412393083, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1412393083, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    - m_Name: pants_24
+      m_Hash: 145876918
+      m_Sprite: {fileID: 751277989, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 751277989, guid: 9b44b06be29eb436483e4e2cb814c1b9, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 5
+  m_PrimaryLibraryGUID: 
+  m_ModificationHash: 639042846047762150
+  m_Version: 1

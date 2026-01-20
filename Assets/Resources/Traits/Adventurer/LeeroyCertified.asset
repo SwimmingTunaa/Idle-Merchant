@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977383f58ad5247648d8b6cbf9eb18af, type: 3}
+  m_Name: LeeroyCertified
+  m_EditorClassIdentifier: Assembly-CSharp::TraitDef
+  traitId: leeroy_certified
+  displayName: Leeroy Certified
+  description: Charges in with reckless abandon
+  epithets:
+  - the Unstoppable
+  - the Reckless
+  - the Fearless
+  descriptionsTier1:
+  - Charges first, thinks never.
+  - Has a personal vendetta against tactical planning.
+  - Believes retreat is just a myth told to scare children.
+  - Subtlety is for people who don't hit hard enough.
+  - Asks "What could go wrong?" and genuinely expects an answer.
+  hireCostMultiplier: 1.05
+  role: 0
+  maxTier: 3
+  tiers:
+  - modifiers:
+    - stat: 1
+      operation: 1
+      value: 1.3
+    - stat: 0
+      operation: 1
+      value: 0.8
+  - modifiers:
+    - stat: 1
+      operation: 1
+      value: 1.6
+    - stat: 0
+      operation: 1
+      value: 0.65
+  - modifiers:
+    - stat: 1
+      operation: 1
+      value: 2
+    - stat: 0
+      operation: 1
+      value: 0.5
+  conflictsWith:
+  - {fileID: 11400000, guid: f0a46929464c343e4ad1a971bcc1b19d, type: 2}
+  - {fileID: 11400000, guid: 8fa03c9f2b7fc4ad6bd67427338990c7, type: 2}

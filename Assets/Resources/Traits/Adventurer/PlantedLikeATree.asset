@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977383f58ad5247648d8b6cbf9eb18af, type: 3}
+  m_Name: PlantedLikeATree
+  m_EditorClassIdentifier: Assembly-CSharp::TraitDef
+  traitId: planted_like_a_tree
+  epithets:
+  - the Immovable
+  - the Steadfast
+  - the Rooted
+  descriptionsTier1:
+  - Once picked a spot and hasn't left since breakfast.
+  - Movement is optional when you hit this hard.
+  - Believes mobility is overrated. So far, so good.
+  - Turns "standing your ground" into an art form.
+  - Might be stuck, might be strategic. Probably both.
+  displayName: Planted Like a Tree
+  description: Immovable but deadly
+  role: 0
+  maxTier: 2
+  tiers:
+  - modifiers:
+    - stat: 1
+      operation: 1
+      value: 1.25
+    - stat: 0
+      operation: 1
+      value: 0.7
+  - modifiers:
+    - stat: 1
+      operation: 1
+      value: 1.5
+    - stat: 0
+      operation: 1
+      value: 0.5
+  conflictsWith:
+  - {fileID: 11400000, guid: f0a46929464c343e4ad1a971bcc1b19d, type: 2}
+  - {fileID: 11400000, guid: f7f08277b99c6499697b53f7dbf515d2, type: 2}

@@ -9,7 +9,7 @@ public enum StatType
     
     // Combat stats (Adventurers)
     AttackDamage,
-    AttackInterval,
+    AttackSpeed,
     AttackRange,
     ChaseBreakRange,
     ScanRange,

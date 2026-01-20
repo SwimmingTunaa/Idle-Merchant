@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 4025115015234122161}
   - component: {fileID: 1540882235668203691}
   - component: {fileID: 7375621186704459788}
+  - component: {fileID: 5723866545378058263}
+  - component: {fileID: -3001349853325712702}
   m_Layer: 8
   m_Name: Simple Mob
   m_TagString: Untagged
@@ -93,11 +95,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleEnemy
   layerIndex: 1
+  overriderAnimatorController: 1
+  appearanceManager: {fileID: 0}
+  traitComponent: {fileID: 0}
   animator: {fileID: 4809339570123766158}
   lootPrefab: {fileID: 8962333313403252011, guid: f92b37987da254b76ae2600bd11e980f, type: 3}
   mobDef: {fileID: 0}
-  damagedColour: {r: 1, g: 1, b: 1, a: 1}
-  damageFlashTime: 0.25
+  stunTime: 0.5
+  showDebugLogs: 0
+--- !u!114 &5723866545378058263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1251085265138332734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8114ee1fc55e4a15a0386e66b936446, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  baseMaxHP: 10
+  startAtMaxHP: 1
+  enableDamageFlash: 1
+  damageFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  damageFlashDuration: 0.1
+  isInvulnerable: 0
+--- !u!114 &-3001349853325712702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1251085265138332734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aa36abfd1d724fcab27cc61d669dcf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatBehavior
+  config:
+    canAttack: 0
+    behaviorType: 0
+    hostileTo: 0
+    territorialRadius: 0
+  animator: {fileID: 4809339570123766158}
+  showDebugLogs: 0
 --- !u!1 &5542627876890328137
 GameObject:
   m_ObjectHideFlags: 0

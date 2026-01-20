@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977383f58ad5247648d8b6cbf9eb18af, type: 3}
+  m_Name: AllGasNoBrakes
+  m_EditorClassIdentifier: Assembly-CSharp::TraitDef
+  traitId: all_gas_no_brakes
+  displayName: All Gas, No Brakes
+  description: Lightning fast but fragile
+  epithets:
+  - the Swift
+  - the Hasty
+  - the Blur
+  descriptionsTier1:
+  - Somewhere between "fast" and "lawsuit waiting to happen."
+  - 'Has two speeds: full sprint and sleep.'
+  - Thinks "slow and steady" is what losers tell themselves.
+  - Arrives before you finish asking.
+  - ' Speed over accuracy. Accuracy is for second place.'
+  hireCostMultiplier: 1.08
+  role: 0
+  maxTier: 3
+  tiers:
+  - modifiers:
+    - stat: 0
+      operation: 1
+      value: 1.4
+    - stat: 2
+      operation: 1
+      value: 1.2
+  - modifiers:
+    - stat: 2
+      operation: 1
+      value: 1.4
+    - stat: 0
+      operation: 1
+      value: 1.8
+  - modifiers:
+    - stat: 2
+      operation: 1
+      value: 1.6
+    - stat: 0
+      operation: 1
+      value: 2.2
+  conflictsWith:
+  - {fileID: 11400000, guid: 797dbab3f3d7e4c86a2ef64133c56275, type: 2}
+  - {fileID: 11400000, guid: 09a6e9a1d5ec14178acb14b11d733d84, type: 2}

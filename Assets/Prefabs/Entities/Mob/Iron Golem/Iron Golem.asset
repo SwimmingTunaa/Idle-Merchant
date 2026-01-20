@@ -13,26 +13,43 @@ MonoBehaviour:
   m_Name: Iron Golem
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
+  useModularCharacter: 0
   animatorOverrideController: {fileID: 22100000, guid: c732528d7b10345838655205b3dcd4d4, type: 2}
-  visualPrefab: {fileID: 8189028764084212112, guid: 97a61fcd0457c4619b27c62b633b190f, type: 3}
-  icon: {fileID: 0}
-  id: 
-  displayName: 
+  spriteDrop: {fileID: 0}
+  shopSprite: {fileID: 0}
+  id: Iron Golem
+  displayName: Iron Golem
   description: 
   hireCost: 50
   assignedLayer: 1
-  animatorController: {fileID: 0}
+  startingSkills: []
   sortingType: 1
   spawnWeight: 0.3
   moveSpeed: 1
   stopDistance: 0.05
   idleTimeRange: {x: 0, y: 0}
+  attackDamage: 1
+  attackInterval: 1
+  attackRange: 1.5
+  chaseBreakRange: 2.5
+  scanRange: 10
   deathAnimationDuration: 1.2
   colliderSize: {x: 2.5, y: 1.875}
   colliderOffset: {x: 0, y: 0.9375}
+  baseBodySpriteLibraries: []
+  shirtSpriteLibraries: []
+  pantsSpriteLibraries: []
+  hairTopSpriteLibraries: []
+  hairBackSpriteLibraries: []
+  frontWeaponSpriteLibraries: []
+  backWeaponSpriteLibraries: []
+  skinColourPalette: {fileID: 0}
+  ShirtColourPalette: {fileID: 0}
+  PantsColourPalette: {fileID: 0}
+  HairColourPalette: {fileID: 0}
   startingState: 0
   isBoss: 1
-  baseHealth: 3
+  baseHealth: 8
   hpMultiplierByLayer:
     serializedVersion: 2
     m_Curve:
@@ -58,7 +75,12 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   stunTime: 0.5
-  maxSimultaneousAttackers: 0
+  combatConfig:
+    canAttack: 1
+    behaviorType: 2
+    hostileTo: 2
+    territorialRadius: 0
+  maxSimultaneousAttackers: 2
   loot:
   - {fileID: 11400000, guid: dff09048b2c4547dd9ad572acca40380, type: 2}
   lootDropAmount: {x: 1, y: 5}

@@ -436,7 +436,7 @@ GameObject:
   - component: {fileID: 115620251}
   - component: {fileID: 115620252}
   m_Layer: 0
-  m_Name: Adventerer Manager
+  m_Name: Adventurer Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -766,7 +766,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 15
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3396,6 +3396,50 @@ Transform:
   - {fileID: 236654695}
   m_Father: {fileID: 1374742544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &848474646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 848474647}
+  - component: {fileID: 848474648}
+  m_Layer: 0
+  m_Name: Game Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &848474647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848474646}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945178581}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &848474648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848474646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33b505612aac443b9bc18133f7c137e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
 --- !u!1 &851355543
 GameObject:
   m_ObjectHideFlags: 0
@@ -3946,7 +3990,6 @@ GameObject:
   m_Component:
   - component: {fileID: 937235291}
   - component: {fileID: 937235290}
-  - component: {fileID: 937235292}
   m_Layer: 0
   m_Name: DungeonManager
   m_TagString: Untagged
@@ -3983,21 +4026,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 945178581}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &937235292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 937235289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f8f9c214e848e844969095d4ae2da37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EntitySortingManager
-  config: {fileID: 11400000, guid: da66642f9b6d554429b73fed5e91c099, type: 2}
-  showDebugLogs: 0
-  showWarnings: 1
 --- !u!1 &945178580
 GameObject:
   m_ObjectHideFlags: 0
@@ -4028,6 +4056,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 848474647}
   - {fileID: 937235291}
   - {fileID: 1889394126}
   - {fileID: 1898013001}
@@ -4424,22 +4453,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da9e196f870b04e518af7eba6abf2ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HireMenuController
-  uiDocument: {fileID: 0}
-  hireButtonTemplate: {fileID: 0}
-  adventurerManagers: []
-  porterManagers: []
-  biomeNames:
-  - Slime Caverns
-  - Goblin Mines
-  - Darkwood Thicket
-  - Flooded Crypt
-  - Crystal Gardens
-  - Ancient Library
-  - Forge Depths
-  - Frozen Wastes
-  - Shadow Realm
-  - Dragon's Hoard
-  showDebugLogs: 1
 --- !u!114 &1004820752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6808,10 +6821,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1433364563}
   - component: {fileID: 1433364562}
-  - component: {fileID: 1433364564}
+  - component: {fileID: 1433364570}
   - component: {fileID: 1433364565}
   - component: {fileID: 1433364566}
   - component: {fileID: 1433364567}
+  - component: {fileID: 1433364568}
+  - component: {fileID: 1433364569}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -6854,39 +6869,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1875925580}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1433364564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1433364561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9e196f870b04e518af7eba6abf2ce4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HireMenuController
-  uiDocument: {fileID: 1433364562}
-  hireButtonTemplate: {fileID: 9197481963319205126, guid: 40b7a40e8dd3705468beecaaa3b84700, type: 3}
-  adventurerManagers:
-  - {fileID: 115620252}
-  porterManagers:
-  - {fileID: 311339224}
-  biomeNames:
-  - Slime Caverns
-  - Goblin Mines
-  - Darkwood Thicket
-  - Flooded Crypt
-  - Crystal Gardens
-  - Ancient Library
-  - Forge Depths
-  - Frozen Wastes
-  - Shadow Realm
-  - Dragon's Hoard
-  showDebugLogs: 0
 --- !u!114 &1433364565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6935,6 +6921,64 @@ MonoBehaviour:
   elementName: Coin
   pulseClassName: pulsing
   pulseDurationMs: 50
+--- !u!114 &1433364568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433364561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d67278d195b6c43739c3dae8ecdd8d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameVariableReaderUITK
+  variable: {fileID: 11400000, guid: 2e09e42d81fdc40c0a9c95e28cd918f3, type: 2}
+  labelName: CoinLabel
+  prefix: 
+  suffix: 
+  format: N0
+--- !u!114 &1433364569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433364561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a67850f785f3044de81007d8ed15eaf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HireController
+  uiDocument: {fileID: 1433364562}
+  hirePanelAsset: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
+  candidateSlotAsset: {fileID: 9197481963319205126, guid: 40b7a40e8dd3705468beecaaa3b84700, type: 3}
+  adventurerManagers:
+  - {fileID: 115620252}
+  porterManagers:
+  - {fileID: 311339224}
+  refreshIntervalSeconds: 300
+  traitChance: 0.7
+  stackRotationMax: 3
+  stackScaleFactor: 0.025
+  openCloseDuration: 0
+  hireAnimationDuration: 0.5
+  blocksWorldInput: 1
+  showDebugLogs: 0
+--- !u!114 &1433364570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433364561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5892c5f69fed34cb181199bad501512f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  cancelAction: {fileID: 7727032971491509709, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  inputCooldown: 0.2
 --- !u!1 &1467460987
 GameObject:
   m_ObjectHideFlags: 0
@@ -8237,6 +8281,54 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1875925579
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1875925580}
+  - component: {fileID: 1875925581}
+  m_Layer: 5
+  m_Name: Pause Menu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1875925580
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875925579}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1875925581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875925579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88875dc7c6a804209a7e02031d811f17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenuController
+  uiDocument: {fileID: 1433364562}
+  pausePanelAsset: {fileID: 9197481963319205126, guid: d86de3818b09844edb6036a25b22e634, type: 3}
+  mainMenuSceneName: MainMenu
+  openCloseDuration: 0
 --- !u!1 &1889394125
 GameObject:
   m_ObjectHideFlags: 0
@@ -8401,6 +8493,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1933434790}
+  - component: {fileID: 1933434791}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -8425,6 +8518,18 @@ Transform:
   - {fileID: 311339225}
   m_Father: {fileID: 1374742544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1933434791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933434789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a2939b1ea533471fa5f0f94fa7f5d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TraitManager
 --- !u!1 &1968884199
 GameObject:
   m_ObjectHideFlags: 0

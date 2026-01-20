@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/pause_styles.uss?fileID=7433441132597879392&amp;guid=79324d611df2a4e7686726032c96d01a&amp;type=3#pause_styles" />
+    <ui:VisualElement name="pause-panel" class="pause-overlay" style="flex-grow: 0; position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center; top: 0; left: 0; right: 0; bottom: 0; -unity-background-image-tint-color: rgb(0, 0, 0);">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/pause_styles.uss?fileID=7433441132597879392&amp;guid=79324d611df2a4e7686726032c96d01a&amp;type=3#pause_styles" />
+        <ui:VisualElement name="board-container" class="pause-board" style="width: 600px; height: 800px; background-color: rgb(139, 90, 60); border-radius: 12px; padding: 40px; align-items: center; justify-content: center; border-width: 8px; border-color: rgb(101, 67, 33);">
+            <ui:VisualElement name="content-container" style="flex-grow: 0; align-items: center; justify-content: center; width: 100%;">
+                <ui:Label text="PAUSED" name="pause-header" class="pause-header" style="font-size: 64px; color: rgb(50, 30, 10); margin-bottom: 40px; -unity-font-style: bold; -unity-text-align: upper-center;" />
+                <ui:VisualElement name="button-container" style="align-items: center; justify-content: center; flex-grow: 0; width: 400px;">
+                    <ui:Button text="Resume" name="resume-button" class="pause-button pause-button-primary" style="margin-bottom: 20px; width: 100%; height: 80px;" />
+                    <ui:Button text="Settings (Coming Soon)" name="settings-button" class="pause-button pause-button-disabled" style="margin-bottom: 20px; width: 100%; height: 70px;" />
+                    <ui:Button text="Save Game (Coming Soon)" name="save-button" class="pause-button pause-button-disabled" style="margin-bottom: 20px; width: 100%; height: 70px;" />
+                    <ui:Button text="Load Game (Coming Soon)" name="load-button" class="pause-button pause-button-disabled" style="margin-bottom: 20px; width: 100%; height: 70px;" />
+                    <ui:Button text="Main Menu" name="mainmenu-button" class="pause-button" style="margin-bottom: 20px; width: 100%; height: 70px;" />
+                    <ui:Button text="Quit Game" name="quit-button" class="pause-button pause-button-danger" style="margin-bottom: 0; width: 100%; height: 70px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

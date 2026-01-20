@@ -58,26 +58,18 @@
     padding-right: 16px;
     padding-bottom: 8px;
     padding-left: 16px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
-    border-bottom-left-radius: 0;
-    font-size: 32px;
-    -unity-font-definition: url("project://database/Assets/SPUM/Core/Basic_Resources/Font/PixelFont.ttf?fileID=12800000&guid=3e53c1bee5e5e43219f0342dc04f5be0&type=3#PixelFont");
-    color: rgb(120, 66, 0);
-    -unity-font-style: normal;
-    -unity-text-outline-width: 0;
-    border-left-color: rgb(120, 66, 0);
-    border-right-color: rgb(120, 66, 0);
-    border-top-color: rgb(120, 66, 0);
-    border-bottom-color: rgb(120, 66, 0);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    background-color: rgb(218, 165, 32);
-    flex-grow: 0;
-    max-width: 150px;
+    font-size: 24px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
+    color: rgb(129, 122, 107);
+    -unity-font-style: bold;
+    flex-grow: 1;
+    background-image: url("project://database/Assets/Sprites/UI/Hire%20Menu/button.png?fileID=21300000&guid=4fdbc806c12a7416ab1aaf9676d28f48&type=3#button");
+    -unity-slice-type: tiled;
+    -unity-slice-left: 4;
+    -unity-slice-top: 4;
+    -unity-slice-right: 4;
+    -unity-slice-bottom: 4;
+    -unity-background-scale-mode: stretch-to-fill;
 }
 
 .unitIconContainer {
@@ -110,10 +102,11 @@
 }
 
 .hireContainer {
-    background-color: rgb(89, 53, 10);
+    background-color: rgb(129, 122, 107);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
+    color: rgb(129, 122, 107);
 }
 
-/* Pulse Animation - Generic for any icon/element */
 .pulse-target {
     transition-property: scale;
     transition-duration: 0.18s;
@@ -123,4 +116,121 @@
 
 .pulse-target.pulsing {
     scale: 1.3 1.3;
+}
+
+.divider {
+    flex-shrink: 0;
+    width: 100%;
+    height: 32px;
+    flex-grow: 0;
+    flex-direction: row;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background-image: none;
+    background-color: rgb(221, 211, 193);
+    background-repeat: repeat no-repeat;
+    background-size: contain;
+}
+
+.light-container {
+    background-color: rgb(221, 211, 193);
+}
+
+hireButton:hover {
+    padding-top: 8px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    font-size: 24px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
+    color: rgb(129, 122, 107);
+    -unity-font-style: normal;
+    border-left-color: rgb(129, 122, 107);
+    border-right-color: rgb(129, 122, 107);
+    border-top-color: rgb(129, 122, 107);
+    border-bottom-color: rgb(129, 122, 107);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    background-color: rgb(221, 211, 193);
+    flex-grow: 1;
+}
+
+.mod {
+    color: rgb(129, 122, 107);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
+    font-size: 18px;
+}
+
+.star {
+    background-image: url("project://database/Assets/Sprites/UI/Hire%20Menu/star.png?fileID=21300000&guid=98cdee2ac80114c309b5a01cefc9f242&type=3#star");
+    background-size: contain;
+    -unity-background-image-tint-color: rgb(255, 248, 131);
+    flex-shrink: 1;
+    align-self: center;
+    width: 32px;
+    height: 32px;
+    background-position-y: center;
+}
+
+.trait {
+    background-color: rgba(153, 146, 131, 0);
+    padding-top: 8px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    align-items: center;
+    justify-content: center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
+    color: rgb(129, 122, 107);
+    align-self: center;
+    flex-shrink: 1;
+    flex-direction: row;
+    background-image: url("project://database/Assets/Sprites/UI/Hire%20Menu/button.png?fileID=21300000&guid=4fdbc806c12a7416ab1aaf9676d28f48&type=3#button");
+    -unity-slice-left: 4;
+    -unity-slice-top: 4;
+    -unity-slice-right: 4;
+    -unity-slice-bottom: 4;
+    -unity-slice-type: tiled;
+    -unity-slice-scale: 1px;
+    -unity-background-image-tint-color: rgb(255, 215, 177);
+    font-size: 20px;
+    -unity-font-style: bold;
+}
+
+.card-shadow-0 {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.card-shadow-1 {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.card-shadow-2 {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.card-shadow-3 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.stack-z-0 {
+    z-index: 4;
+}
+
+.stack-z-1 {
+    z-index: 3;
+}
+
+.stack-z-2 {
+    z-index: 2;
+}
+
+.stack-z-3 {
+    z-index: 1;
 }

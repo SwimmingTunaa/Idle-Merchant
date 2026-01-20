@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977383f58ad5247648d8b6cbf9eb18af, type: 3}
+  m_Name: Bare Minimum Energy
+  m_EditorClassIdentifier: Assembly-CSharp::TraitDef
+  traitId: bare_minimum_energy
+  displayName: Bare Minimum Energy
+  description: Conserves energy for big hits
+  epithets:
+  - the Cautious
+  - the Careful
+  - the Self Preserving
+  descriptionsTier1:
+  - Knows exactly when to leave.
+  - Prefers living over winning.
+  - Has an uncanny sense for danger.
+  - Always keeps an escape in mind.
+  - Still alive for a reason.
+  hireCostMultiplier: 0.92
+  role: 0
+  maxTier: 2
+  tiers:
+  - modifiers:
+    - stat: 0
+      operation: 1
+      value: 0.9
+    - stat: 1
+      operation: 1
+      value: 1.15
+    - stat: 2
+      operation: 1
+      value: 1.25
+  - modifiers:
+    - stat: 0
+      operation: 1
+      value: 0.8
+    - stat: 1
+      operation: 1
+      value: 1.3
+    - stat: 2
+      operation: 1
+      value: 1.5
+  conflictsWith:
+  - {fileID: 11400000, guid: 797dbab3f3d7e4c86a2ef64133c56275, type: 2}

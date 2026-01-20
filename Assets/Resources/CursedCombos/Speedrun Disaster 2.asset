@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f37ab150fe73742d59e48be30ddc9cce, type: 3}
+  m_Name: Speedrun Disaster 2
+  m_EditorClassIdentifier: Assembly-CSharp::CursedComboDef
+  comboName: Turtle Porter
+  description: Carries the world at a snail's pace
+  traitA: {fileID: 11400000, guid: 64b13f1bf8f5147538c2b4ab7b04ad5a, type: 2}
+  traitB: {fileID: 11400000, guid: 4e5f8092c4edc4d0982b65e7135825cd, type: 2}
+  spawnChance: 0.03
+  costMultiplier: 1.4
+  icon: {fileID: 0}
+  highlightColor: {r: 0.049928807, g: 0.6226415, b: 0.19572374, a: 1}

@@ -1,1 +1,0 @@
-public interface IDamageable {float OnDamage(float dmg); }

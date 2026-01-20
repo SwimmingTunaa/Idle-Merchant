@@ -57,8 +57,8 @@ public class DamageNumber : MonoBehaviour
         velocity = new Vector3(randomX, floatSpeed, 0f);
         
         // Text content
-        int damageInt = Mathf.RoundToInt(damage);
-        textMesh.text = damageInt.ToString();
+        // Format damage with 1 decimal place
+        textMesh.text = damage.ToString("F1");
         
         
         // Style based on crit
@@ -124,24 +124,24 @@ public class DamageNumber : MonoBehaviour
         // Random horizontal drift
         float randomX = Random.Range(-horizontalSpread, horizontalSpread);
         velocity = new Vector3(randomX, floatSpeed, 0f);
+        textMesh.enabled = false;
+        // // Text content
+        // int goldInt = Mathf.RoundToInt(amount);
+        // textMesh.text = goldInt.ToString();
         
-        // Text content
-        int goldInt = Mathf.RoundToInt(amount);
-        textMesh.text = goldInt.ToString();
-        
-        // Style based on crit
-        if (isCrit)
-        {
-            textMesh.fontSize = critFontSize;
-            textMesh.color = critColor;
-            baseColor = critColor;
-        }
-        else
-        {
-            textMesh.fontSize = goldFontSize;
-            textMesh.color = goldColor;
-            baseColor = goldColor;
-        }
+        // // Style based on crit
+        // if (isCrit)
+        // {
+        //     textMesh.fontSize = critFontSize;
+        //     textMesh.color = critColor;
+        //     baseColor = critColor;
+        // }
+        // else
+        // {
+        //     textMesh.fontSize = goldFontSize;
+        //     textMesh.color = goldColor;
+        //     baseColor = goldColor;
+        // }
         
         // Show gold sprite if available
         if (goldSpriteRenderer != null && goldSprite != null)

@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977383f58ad5247648d8b6cbf9eb18af, type: 3}
+  m_Name: Barely Trying
+  m_EditorClassIdentifier: Assembly-CSharp::TraitDef
+  traitId: barely_trying
+  displayName: Barely Trying
+  description: Minimal effort, minimal results
+  epithets:
+  - the Uninspired
+  - the Indifferent
+  descriptionsTier1:
+  - Here for the pay, not the passion.
+  - Knows exactly how little work is required.
+  - Emotionally checked out, physically present.
+  - Somehow still part of the operation.
+  - Working hard? Never heard of it. Working vaguely? Absolutely.
+  - The job gets done, just not in a way you can prove.
+  - "If motivation was loot, they\u2019d sell it immediately."
+  hireCostMultiplier: 0.88
+  role: 1
+  maxTier: 1
+  tiers:
+  - modifiers:
+    - stat: 7
+      operation: 1
+      value: 1.3
+    - stat: 8
+      operation: 1
+      value: 1.3
+    - stat: 0
+      operation: 1
+      value: 0.9
+  conflictsWith:
+  - {fileID: 11400000, guid: fa6b3977ff93b482f9df72440838893b, type: 2}

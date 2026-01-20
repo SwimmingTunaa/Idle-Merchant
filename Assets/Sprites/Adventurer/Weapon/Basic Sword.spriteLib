@@ -1,0 +1,178 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.2D.Animation.Runtime::UnityEngine.U2D.Animation.SpriteLibrarySourceAsset
+  m_Library:
+  - m_Name: Idle
+    m_Hash: 1008081451
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Weapon_0
+      m_Hash: 599984780
+      m_Sprite: {fileID: -215567073, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -215567073, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_1
+      m_Hash: 348404250
+      m_Sprite: {fileID: -1773658969, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1773658969, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_2
+      m_Hash: 231566240
+      m_Sprite: {fileID: -477354222, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -477354222, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_3
+      m_Hash: 986340150
+      m_Sprite: {fileID: -1109207266, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1109207266, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 4
+  - m_Name: Walk
+    m_Hash: 765711723
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Weapon_4
+      m_Hash: 615435925
+      m_Sprite: {fileID: 648465768, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 648465768, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_5
+      m_Hash: 329907715
+      m_Sprite: {fileID: 2071846388, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 2071846388, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_6
+      m_Hash: 178302905
+      m_Sprite: {fileID: -93419528, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -93419528, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_7
+      m_Hash: 1034395439
+      m_Sprite: {fileID: 1794045812, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1794045812, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_8
+      m_Hash: 756581054
+      m_Sprite: {fileID: 1693255052, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1693255052, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_9
+      m_Hash: 438284840
+      m_Sprite: {fileID: 1543572532, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1543572532, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 6
+  - m_Name: Slash
+    m_Hash: 101673205
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Weapon_10
+      m_Hash: 154002017
+      m_Sprite: {fileID: 2036079963, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 2036079963, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_11
+      m_Hash: 1042993911
+      m_Sprite: {fileID: 1059215458, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1059215458, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_12
+      m_Hash: 656638797
+      m_Sprite: {fileID: -1465048747, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1465048747, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_13
+      m_Hash: 270840795
+      m_Sprite: {fileID: -2026328847, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -2026328847, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_14
+      m_Hash: 239085176
+      m_Sprite: {fileID: 1926846222, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1926846222, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_15
+      m_Hash: 960960238
+      m_Sprite: {fileID: -1568381146, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1568381146, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_16
+      m_Hash: 542000980
+      m_Sprite: {fileID: 1379467741, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1379467741, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_17
+      m_Hash: 390690754
+      m_Sprite: {fileID: -405408060, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -405408060, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 8
+  - m_Name: Hit
+    m_Hash: 580870305
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Weapon_17
+      m_Hash: 390690754
+      m_Sprite: {fileID: -405408060, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -405408060, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_18
+      m_Hash: 133589587
+      m_Sprite: {fileID: 1537103889, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1537103889, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_19
+      m_Hash: 821123781
+      m_Sprite: {fileID: -1826093841, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1826093841, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 3
+  - m_Name: Death
+    m_Hash: 646380074
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Weapon_20
+      m_Hash: 570470818
+      m_Sprite: {fileID: -1288062807, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1288062807, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_21
+      m_Hash: 352813364
+      m_Sprite: {fileID: 602317802, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 602317802, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_22
+      m_Hash: 202297486
+      m_Sprite: {fileID: 384507520, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 384507520, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_23
+      m_Hash: 990502936
+      m_Sprite: {fileID: -1446812204, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1446812204, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    - m_Name: Weapon_24
+      m_Hash: 627930555
+      m_Sprite: {fileID: -865663667, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -865663667, guid: eb16784e9017a42898dc9f4f5ca1f300, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 5
+  m_PrimaryLibraryGUID: 
+  m_ModificationHash: 639042848295184400
+  m_Version: 1

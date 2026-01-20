@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d9f7614db0d4c518743493b419717f, type: 3}
+  m_Name: Tunic Sleeve Front
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterPartAnimSet
+  idle:
+    state: 0
+    frames:
+    - {fileID: 5464423289364604119, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 2380085197385249360, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -2093927133400235397, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 7580580600788462193, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    fps: 8
+    loop: 1
+  walk:
+    state: 1
+    frames:
+    - {fileID: 271590572, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -2044690508, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -995884365, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 1557327252, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -458925160, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 514534515, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    fps: 8
+    loop: 1
+  slash:
+    state: 2
+    frames:
+    - {fileID: 1569606374, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -1373707523, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -675301061, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 604714585, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -316024229, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 1106122904, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 2088703018, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    fps: 8
+    loop: 0
+  hit:
+    state: 3
+    frames:
+    - {fileID: -1694399852, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -1552063495, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -1332523140, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 202815853, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 1280063857, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -952006643, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    fps: 8
+    loop: 0
+  death:
+    state: 4
+    frames:
+    - {fileID: -380944702, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -1904810273, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 1462162691, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: -880626664, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    - {fileID: 243416773, guid: 6f4341740662a461d861724ed47c823e, type: 3}
+    fps: 8
+    loop: 0

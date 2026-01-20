@@ -12,8 +12,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="hire-panel" enabled="true" style="flex-grow: 1; position: absolute; top: 10%; background-color: rgb(94, 74, 54); width: auto; height: 800px; bottom: auto; border-top-right-radius: 32px; border-bottom-right-radius: 32px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 0; min-width: 350px; max-width: 400px; min-height: 800px; max-height: 900px;">
-            <ui:ScrollView name="ScrollView" horizontal-scroller-visibility="Hidden" style="align-items: flex-start;" />
-        </ui:VisualElement>
+        <ui:VisualElement name="body" style="flex-grow: 1; justify-content: center; align-items: center;" />
     </ui:VisualElement>
 </ui:UXML>

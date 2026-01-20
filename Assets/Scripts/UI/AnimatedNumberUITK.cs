@@ -22,14 +22,14 @@ public class AnimatedNumberUITK : MonoBehaviour
     {
         ResolveLabel();
         // Optional: auto-bind to your gold event
-        GameEvents.GoldChanged += SetTargetValue;
+        GameSignals.GoldChanged += SetTargetValue;
         // Initialize to current gold if available
         if (Inventory.Instance != null) SetInstant(Inventory.Instance.Gold);
     }
 
     void OnDisable()
     {
-        GameEvents.GoldChanged -= SetTargetValue;
+        GameSignals.GoldChanged -= SetTargetValue;
     }
 
     void Update()
