@@ -3,7 +3,9 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 
-public class Inventory : MonoBehaviour {
+
+public class Inventory : MonoBehaviour 
+{
     public static Inventory Instance { get; private set; }
 
     [Header("Config")]
@@ -28,19 +30,23 @@ public class Inventory : MonoBehaviour {
     private readonly Dictionary<ItemDef, int> craftedInventory = new();
     private readonly Dictionary<ItemDef, int> luxuryInventory  = new();
 
-    void Awake() {
+    void Awake() 
+    {
         Instance = this;
         gold.ResetToDefault();
         InventoryDebugUi();
         GameSignals.OnGoldEarned += AddGold;
     }
 
-    void OnDestroy() {
+    void OnDestroy() 
+    {
         GameSignals.OnGoldEarned -= AddGold;
     }
 
-    // -------- Inventory Core --------
-    public Dictionary<ItemDef,int> GetInventoryType(ItemCategory itemCategory) => itemCategory switch {
+    // ===== INVENTORY CORE =====
+    
+    public Dictionary<ItemDef,int> GetInventoryType(ItemCategory itemCategory) => itemCategory switch 
+    {
         ItemCategory.Common  => commonInventory,
         ItemCategory.Crafted => craftedInventory,
         ItemCategory.Luxury  => luxuryInventory,
@@ -53,23 +59,32 @@ public class Inventory : MonoBehaviour {
     public int Get(ItemCategory cat, ItemDef item) =>
         Get(GetInventoryType(cat), item);
 
-    public void Add(Dictionary<ItemDef,int> inventory, ResourceStack stack) {
+    public void Add(Dictionary<ItemDef,int> inventory, ResourceStack stack) 
+    {
         inventory.TryGetValue(stack.itemDef, out var q);
         inventory[stack.itemDef] = q + stack.qty;
         InventoryDebugUi();
     }
 
-    public bool TryRemove(Dictionary<ItemDef,int> inventory, ItemDef item, int qty) {
+    public bool TryRemove(Dictionary<ItemDef,int> inventory, ItemDef item, int qty) 
+    {
         if (Get(inventory, item) < qty) return false;
         inventory[item] -= qty;
         return true;
     }
 
-    // -------- Gold --------
-    public void AddGoldFloat(float amount) {
+    // ===== GOLD MANAGEMENT =====
+    
+    /// <summary>
+    /// Add fractional gold (for continuous income sources like clicks).
+    /// Accumulates fractional amounts and adds whole numbers when threshold is reached.
+    /// </summary>
+    public void AddGoldFloat(float amount) 
+    {
         goldFrac += amount;
         int whole = Mathf.FloorToInt(goldFrac);
-        if (whole > 0) {
+        if (whole > 0) 
+        {
             gold.Add(whole);
             goldFrac -= whole;
             GameSignals.RaiseGoldChanged(gold.Int);
@@ -77,14 +92,59 @@ public class Inventory : MonoBehaviour {
         }
     }
 
-    public void AddGold(int amount) {
+    /// <summary>
+    /// Add integer gold amount.
+    /// Use for discrete transactions (hiring, sales, rewards).
+    /// </summary>
+    public void AddGold(int amount) 
+    {
         gold.Add(amount);
         GameSignals.RaiseGoldChanged(gold.Int);
     }
 
+    /// <summary>
+    /// Current gold balance (read-only).
+    /// </summary>
     public int Gold => gold.Int;
 
-    // -------- Inspector Helpers --------
+    /// <summary>
+    /// NEW: Check if player can afford a specific cost.
+    /// Read-only check with no side effects.
+    /// Use this for validation before attempting purchases.
+    /// </summary>
+    /// <param name="cost">Amount to check</param>
+    /// <returns>True if current gold >= cost</returns>
+    public bool CanAfford(int cost)
+    {
+        return gold.Int >= cost;
+    }
+
+    /// <summary>
+    /// NEW: Attempt to spend gold atomically.
+    /// Validates affordability and deducts in one operation.
+    /// Preferred over manual check + AddGold(-amount) for safety.
+    /// </summary>
+    /// <param name="cost">Amount to deduct</param>
+    /// <returns>True if gold was deducted, false if insufficient funds</returns>
+    public bool TrySpendGold(int cost)
+    {
+        if (cost < 0)
+        {
+            Debug.LogWarning($"[Inventory] TrySpendGold called with negative cost: {cost}. Use AddGold() for adding gold.");
+            return false;
+        }
+
+        if (gold.Int < cost)
+        {
+            return false;
+        }
+
+        gold.Add(-cost);
+        GameSignals.RaiseGoldChanged(gold.Int);
+        return true;
+    }
+
+    // ===== INSPECTOR HELPERS =====
     
     [ContextMenu("Debug/Add Items From List")]
     private void AddItemsFromList()
@@ -122,8 +182,33 @@ public class Inventory : MonoBehaviour {
         InventoryDebugUi();
     }
 
-    // -------- Debug / Snapshot --------
-    public struct InventoryRow {
+    [ContextMenu("Debug/Add 100 Gold")]
+    private void DebugAdd100Gold()
+    {
+        AddGold(100);
+        Debug.Log($"[Inventory] Added 100 gold. New total: {Gold}");
+    }
+
+    [ContextMenu("Debug/Test TrySpendGold")]
+    private void DebugTestSpendGold()
+    {
+        Debug.Log($"[Inventory] Current gold: {Gold}");
+        Debug.Log($"[Inventory] Can afford 50g? {CanAfford(50)}");
+        
+        if (TrySpendGold(50))
+        {
+            Debug.Log($"[Inventory] Successfully spent 50 gold. New total: {Gold}");
+        }
+        else
+        {
+            Debug.Log("[Inventory] Failed to spend 50 gold - insufficient funds");
+        }
+    }
+
+    // ===== DEBUG / SNAPSHOT =====
+    
+    public struct InventoryRow 
+    {
         public ItemDef item;
         public ItemCategory category;
         public int qty;
@@ -131,12 +216,14 @@ public class Inventory : MonoBehaviour {
         public float totalValue;
     }
 
-    public List<InventoryRow> SnapshotAll() {
+    public List<InventoryRow> SnapshotAll() 
+    {
         var rows = new List<InventoryRow>(64);
         AppendSnapshot(commonInventory,  ItemCategory.Common,  rows);
         AppendSnapshot(craftedInventory, ItemCategory.Crafted, rows);
         AppendSnapshot(luxuryInventory,  ItemCategory.Luxury,  rows);
-        rows.Sort((a,b) => {
+        rows.Sort((a,b) => 
+        {
             int c = a.category.CompareTo(b.category);
             if (c != 0) return c;
             return string.Compare(a.item.displayName, b.item.displayName, System.StringComparison.Ordinal);
@@ -144,12 +231,16 @@ public class Inventory : MonoBehaviour {
         return rows;
     }
 
-    private void AppendSnapshot(Dictionary<ItemDef,int> inv, ItemCategory cat, List<InventoryRow> outRows) {
-        foreach (var kv in inv) {
-            var item = kv.Key; int qty = kv.Value;
+    private void AppendSnapshot(Dictionary<ItemDef,int> inv, ItemCategory cat, List<InventoryRow> outRows) 
+    {
+        foreach (var kv in inv) 
+        {
+            var item = kv.Key; 
+            int qty = kv.Value;
             if (item == null || qty <= 0) continue;
             float price = item.sellPrice;
-            outRows.Add(new InventoryRow {
+            outRows.Add(new InventoryRow 
+            {
                 item = item,
                 category = cat,
                 qty = qty,
@@ -160,12 +251,14 @@ public class Inventory : MonoBehaviour {
     }
 
     [ContextMenu("Debug/Print Inventory To Console")]
-    public void InventoryDebugLog() {
+    public void InventoryDebugLog() 
+    {
         var rows = SnapshotAll();
         float grand = 0f;
         System.Text.StringBuilder sb = new System.Text.StringBuilder(256);
         sb.AppendLine("=== Inventory ===");
-        foreach (var r in rows) {
+        foreach (var r in rows) 
+        {
             grand += r.totalValue;
             sb.AppendLine($"{r.category,-7} | {r.item.displayName,-18} x{r.qty} @ {r.unitPrice:0.##} = {r.totalValue:0.##}");
         }
@@ -175,13 +268,20 @@ public class Inventory : MonoBehaviour {
     }
 
     [ContextMenu("Debug/Show Inventory On-Screen")]
-    public void InventoryDebugUi() {
-        if (debugText == null) { InventoryDebugLog(); return; }
+    public void InventoryDebugUi() 
+    {
+        if (debugText == null) 
+        { 
+            InventoryDebugLog(); 
+            return; 
+        }
+        
         var rows = SnapshotAll();
         float grand = 0f;
         System.Text.StringBuilder sb = new System.Text.StringBuilder(256);
         sb.AppendLine("<b>Inventory</b>");
-        foreach (var r in rows) {
+        foreach (var r in rows) 
+        {
             grand += r.totalValue;
             sb.AppendLine($"{r.category}: {r.item.displayName} x{r.qty}  <i>@{r.unitPrice:0.##}</i> = {r.totalValue:0.##}");
         }

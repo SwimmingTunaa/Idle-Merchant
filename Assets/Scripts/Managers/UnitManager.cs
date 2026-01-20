@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// OPTIMIZED: Periodic cleanup instead of every-frame cleanup.
-/// OLD: Dictionary iteration every frame (60 FPS × N managers = 180+ iterations/sec)
-/// NEW: Dictionary iteration every 2 seconds (0.5 Hz × N managers = 1.5 iterations/sec)
+/// OPTIMIZED: Periodic cleanup + uses enhanced Inventory API.
+/// 
+/// Changes from original:
+/// 1. Cleanup runs every 2 seconds instead of every frame (99% reduction)
+/// 2. Uses Inventory.CanAfford() for clearer validation
+/// 3. Uses Inventory.TrySpendGold() for atomic gold deduction (safer)
 /// 
 /// Performance gain: 99% reduction in cleanup overhead
-/// 
-/// Generic base class for managing units on a layer.
-/// Handles spawning, tracking, and per-type limits.
-/// Derived classes (AdventurerManager, PorterManager) only need to implement type-specific initialization.
+/// Code quality: More readable and less error-prone
 /// </summary>
 /// <typeparam name="T">Type of unit this manager handles (must inherit from EntityBase)</typeparam>
 public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : EntityBase
@@ -113,8 +113,8 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
 
-        // Check gold (using your actual Inventory API)
-        if (Inventory.Instance.Gold < def.hireCost)
+        // IMPROVED: Use CanAfford() helper for cleaner code
+        if (!Inventory.Instance.CanAfford(def.hireCost))
         {
             if (showDebugLogs)
                 Debug.LogWarning($"[{GetType().Name}] Not enough gold to hire {def.displayName}. Need {def.hireCost}, have {Inventory.Instance.Gold}");
@@ -145,8 +145,13 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         if (!CanHire(def))
             return false;
 
-        // Deduct gold (using your actual Inventory API)
-        Inventory.Instance.AddGold(-def.hireCost);
+        // IMPROVED: Use TrySpendGold() for atomic deduction with validation
+        // This is safer than AddGold(-cost) because it validates affordability
+        if (!Inventory.Instance.TrySpendGold(def.hireCost))
+        {
+            Debug.LogError($"[{GetType().Name}] Failed to deduct gold for {def.displayName} - this shouldn't happen after CanHire()!");
+            return false;
+        }
 
         // Spawn the unit
         T unit = SpawnUnit(def);
@@ -191,8 +196,8 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
         
-        // Check gold (candidate may have modified cost due to traits)
-        if (Inventory.Instance.Gold < candidate.hireCost)
+        // IMPROVED: Use CanAfford() helper
+        if (!Inventory.Instance.CanAfford(candidate.hireCost))
         {
             if (showDebugLogs)
                 Debug.LogWarning($"[{GetType().Name}] Not enough gold. Need {candidate.hireCost}, have {Inventory.Instance.Gold}");
@@ -210,8 +215,12 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
         
-        // Deduct gold (use candidate's cost, not base cost)
-        Inventory.Instance.AddGold(-candidate.hireCost);
+        // IMPROVED: Use TrySpendGold() for candidate's modified cost
+        if (!Inventory.Instance.TrySpendGold(candidate.hireCost))
+        {
+            Debug.LogError($"[{GetType().Name}] Failed to deduct gold for {candidate.DisplayName}!");
+            return false;
+        }
         
         // Spawn unit with candidate data
         T unit = SpawnUnitWithCandidate(candidate);
