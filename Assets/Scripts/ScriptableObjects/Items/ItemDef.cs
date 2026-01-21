@@ -3,58 +3,79 @@ using UnityEngine;
 public enum ItemCategory { Common, Crafted, Luxury }
 
 /// <summary>
-/// Item definition for loot drops.
-/// prefab = the Loot container (collider + Loot component, no visuals)
-/// visualPrefab = the visual (sprite + optional VFX)
-/// Container is pooled, visual is instantiated/destroyed.
+/// Standalone item definition for loot, crafting materials, and shop goods.
+/// Does NOT inherit from EntityDef (items aren't entities).
 /// </summary>
-[CreateAssetMenu(menuName = "Data/Item")]
-public class ItemDef : EntityDef
+[CreateAssetMenu(menuName = "Data/Item (New)", fileName = "Item_")]
+public class ItemDef : ScriptableObject
 {
-    [Header("Item Data")]
-    public ItemCategory itemCategory;
+    [Header("Identity")]
+    [Tooltip("Unique identifier for this item")]
+    public string id;
     
-    [Range(0f, 1f)] 
-    [Tooltip("Chance this item drops from a mob's loot table")]
-    public float chance;
+    [Tooltip("Display name shown in UI")]
+    public string displayName;
     
-    [Tooltip("How much this item sells for at the shop")]
-    public float sellPrice = 1f;
+    [Tooltip("Item description for tooltips")]
+    [TextArea(2, 4)]
+    public string description;
 
-    // ===== VALIDATION =====
+    [Header("Category")]
+    [Tooltip("Item category determines which inventory it goes into")]
+    public ItemCategory itemCategory = ItemCategory.Common;
 
-    private void OnEnable()
-    {
-        if (sortingType != EntitySortingType.Loot)
-        {
-            sortingType = EntitySortingType.Loot;
-        }
-    }
+    [Header("Visuals")]
+    [Tooltip("Sprite shown when loot is on the ground")]
+    public Sprite spriteDrop;
+    
+    [Tooltip("Icon shown in inventory/shop UI")]
+    public Sprite icon;
 
+    [Header("Prefab")]
+    [Tooltip("GameObject with Loot component (container + collider, NO visuals)")]
+    public GameObject prefab;
 
-#if UNITY_EDITOR
+    [Header("Drop Configuration")]
+    [Range(0f, 1f)]
+    [Tooltip("Chance this item drops from a mob's loot table (0 = never, 1 = always)")]
+    public float chance = 1f;
+
+    [Header("Economy")]
+    [Tooltip("Base sell price at shop counter")]
+    public int sellPrice = 1;
+    
+    [Tooltip("Base value used for calculations (may differ from sell price)")]
+    public int baseValue = 1;
+
     void OnValidate()
     {
-        ValidatePrefabs();
+        if (string.IsNullOrEmpty(id))
+        {
+            id = name;
+        }
+        
+        if (string.IsNullOrEmpty(displayName))
+        {
+            displayName = name;
+        }
+
+        ValidatePrefab();
     }
 
-    private void ValidatePrefabs()
+    private void ValidatePrefab()
     {
-        // Validate loot container prefab
-        if (prefab != null)
-        {
-            Loot lootComponent = prefab.GetComponent<Loot>();
-            if (lootComponent == null)
-            {
-                Debug.LogWarning($"[ItemDef: {name}] prefab missing Loot component!");
-            }
+        if (prefab == null) return;
 
-            Collider2D collider = prefab.GetComponent<Collider2D>();
-            if (collider == null)
-            {
-                Debug.LogWarning($"[ItemDef: {name}] prefab missing Collider2D!");
-            }
+        Loot lootComponent = prefab.GetComponent<Loot>();
+        if (lootComponent == null)
+        {
+            Debug.LogWarning($"[ItemDef: {name}] prefab missing Loot component!");
+        }
+
+        Collider2D collider = prefab.GetComponent<Collider2D>();
+        if (collider == null)
+        {
+            Debug.LogWarning($"[ItemDef: {name}] prefab missing Collider2D!");
         }
     }
-#endif
 }

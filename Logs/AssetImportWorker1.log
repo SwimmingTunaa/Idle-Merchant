@@ -595,3 +595,202 @@ Memory consumption went from 154.7 MB to 150.9 MB.
 Total: 6.838542 ms (FindLiveObjects: 0.465250 ms CreateObjectMapping: 0.178750 ms MarkObjects: 4.775584 ms  DeleteObjects: 1.418709 ms)
 
 Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.50 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6864 unused Assets / (3.8 MB). Loaded Objects now: 7623.
+Memory consumption went from 145.1 MB to 141.3 MB.
+Total: 16.067000 ms (FindLiveObjects: 0.408917 ms CreateObjectMapping: 0.155541 ms MarkObjects: 14.228667 ms  DeleteObjects: 1.273625 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f09b000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.492 seconds
+Refreshing native plugins compatible for Editor in 0.44 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.490 seconds
+Domain Reload Profiling: 985ms
+	BeginReloadAssembly (132ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (9ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (54ms)
+	RebuildCommonClasses (24ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (14ms)
+	LoadAllAssembliesAndSetupDomain (316ms)
+		LoadAssemblies (199ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (146ms)
+			TypeCache.Refresh (17ms)
+				TypeCache.ScanAssembly (2ms)
+			BuildScriptInfoCaches (119ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (490ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (407ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (81ms)
+			ProcessInitializeOnLoadAttributes (290ms)
+			ProcessInitializeOnLoadMethodAttributes (32ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.52 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6875 unused Assets / (4.0 MB). Loaded Objects now: 7625.
+Memory consumption went from 154.7 MB to 150.7 MB.
+Total: 6.116791 ms (FindLiveObjects: 0.366250 ms CreateObjectMapping: 0.134333 ms MarkObjects: 4.429083 ms  DeleteObjects: 1.186584 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 1.78 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6865 unused Assets / (3.3 MB). Loaded Objects now: 7626.
+Memory consumption went from 145.1 MB to 141.8 MB.
+Total: 5.828250 ms (FindLiveObjects: 0.344750 ms CreateObjectMapping: 0.140084 ms MarkObjects: 4.189959 ms  DeleteObjects: 1.152791 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 49940.723288 seconds.
+  path: Assets/Prefabs/Entities/Adventurers/Adventuer Agent.prefab
+  artifactKey: Guid(dd81956239e5c433cbde7b31c8976a97) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Adventurers/Adventuer Agent.prefab using Guid(dd81956239e5c433cbde7b31c8976a97) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '46916e1e9f6ded1b6f8848d2e47b745f') in 0.140423417 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 295
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000040 seconds.
+  path: Assets/Sprites/Adventurer/Hair/Hair Classic.spriteLib
+  artifactKey: Guid(42ce6245e6554441eb2a4b4301bab1fd) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Sprites/Adventurer/Hair/Hair Classic.spriteLib using Guid(42ce6245e6554441eb2a4b4301bab1fd) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '0e7d7375c05e0a239f819ffe9b530a3d') in 0.004565125 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 25
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000031 seconds.
+  path: Assets/Sprites/Adventurer/Hair/Hair Classic.png
+  artifactKey: Guid(b4a6808f283974535ae580a41f123227) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Sprites/Adventurer/Hair/Hair Classic.png using Guid(b4a6808f283974535ae580a41f123227) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '7edba62c7c0cc1d8628df72567f1695f') in 0.0466805 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 26
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000030 seconds.
+  path: Assets/Scripts/Shop/CounterService.cs
+  artifactKey: Guid(a86ba1d737b16408e8d390dbb5b5aa15) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Shop/CounterService.cs using Guid(a86ba1d737b16408e8d390dbb5b5aa15) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '7ca89bd3581a723ee73db27d6e75bf34') in 0.002288542 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000032 seconds.
+  path: Assets/Scripts/Managers/UnitManager.cs
+  artifactKey: Guid(a98ce8e00879a402d9fccd8fe44f7abc) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Managers/UnitManager.cs using Guid(a98ce8e00879a402d9fccd8fe44f7abc) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '6f1444b88e96b83d37965eecb4e644a6') in 0.001744333 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000036 seconds.
+  path: Assets/Scripts/Entities/Customers/CustomerWantBubble.cs
+  artifactKey: Guid(77597475d0c70d9428c92e774a2e3f15) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Entities/Customers/CustomerWantBubble.cs using Guid(77597475d0c70d9428c92e774a2e3f15) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '5b62e6195c36f13dd8fd3f43eae038a4') in 0.001893208 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000041 seconds.
+  path: Assets/Scripts/ScriptableObjects/Items/ItemDefold.cs
+  artifactKey: Guid(b18e6bffce50d4ef994b448cf7f127a4) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/ScriptableObjects/Items/ItemDefold.cs using Guid(b18e6bffce50d4ef994b448cf7f127a4) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '6e23671edcc4ff9c183bced756238d5a') in 0.001905209 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000057 seconds.
+  path: Assets/Materials/skin.mat
+  artifactKey: Guid(7ae87ae179f52455399dcce19e40036b) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Materials/skin.mat using Guid(7ae87ae179f52455399dcce19e40036b) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'aa7115b7341a77ac52b8754575a1516c') in 0.004092875 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000032 seconds.
+  path: Assets/Scripts/Entities/Base/EntityBase.cs
+  artifactKey: Guid(9faf79d9f937d4cdbaa4219ff60f85df) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Entities/Base/EntityBase.cs using Guid(9faf79d9f937d4cdbaa4219ff60f85df) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '3718e5a3c6806235dcec679139d93765') in 0.001985291 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.66 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6865 unused Assets / (4.0 MB). Loaded Objects now: 7626.
+Memory consumption went from 145.6 MB to 141.6 MB.
+Total: 10.939166 ms (FindLiveObjects: 0.437917 ms CreateObjectMapping: 0.186041 ms MarkObjects: 9.094292 ms  DeleteObjects: 1.220541 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.64 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6865 unused Assets / (2.8 MB). Loaded Objects now: 7626.
+Memory consumption went from 145.6 MB to 142.9 MB.
+Total: 6.689041 ms (FindLiveObjects: 0.374375 ms CreateObjectMapping: 0.182750 ms MarkObjects: 4.923291 ms  DeleteObjects: 1.208334 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
+AssetImportWorker is now disconnected from the server
+Process exiting

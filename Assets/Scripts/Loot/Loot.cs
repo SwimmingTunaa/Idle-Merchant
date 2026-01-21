@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Loot data container that instantiates its visual (matches mob/customer pattern).
-/// The loot container itself is pooled, but visuals are instantiated/destroyed.
+/// Loot data container for items dropped by mobs.
+/// Works with standalone ItemDef (no EntityDef inheritance).
 /// </summary>
 public class Loot : MonoBehaviour, IClickableLoot
 {
@@ -12,7 +12,6 @@ public class Loot : MonoBehaviour, IClickableLoot
     [SerializeField] private int sellValue;
 
     private SpriteRenderer spriteRenderer;
-    private GameObject visualInstance;
     private PorterAgent reservedBy;
     private int layerIndex;
 
@@ -32,10 +31,8 @@ public class Loot : MonoBehaviour, IClickableLoot
         layerIndex = layer;
         reservedBy = null;
         
-        // Instantiate visual (matches EntityBase.CreateVisuals pattern)
-        CreateVisual(itemDef);
+        SetupVisual(itemDef);
 
-        // Register with LootManager
         if (LootManager.Instance != null)
         {
             LootManager.Instance.RegisterLoot(this, layerIndex);
@@ -52,52 +49,26 @@ public class Loot : MonoBehaviour, IClickableLoot
 
     void OnDisable()
     {
-        // Unregister from LootManager
         if (LootManager.Instance != null)
         {
             LootManager.Instance.UnregisterLoot(this, layerIndex);
         }
-
-        // Cleanup visual when returning to pool
-       // CleanupVisual();
     }
 
-    // ===== VISUAL MANAGEMENT =====
-
-    /// <summary>
-    /// Instantiate the visual prefab as a child (matches EntityBase pattern).
-    /// Supports nested hierarchy (collider on parent, sprite on child).
-    /// </summary>
-    private void CreateVisual(ItemDef itemDef)
+    private void SetupVisual(ItemDef itemDef)
     {
         if (itemDef == null || itemDef.spriteDrop == null)
         {
-            Debug.LogWarning($"[Loot] ItemDef or visualPrefab is null!");
+            Debug.LogWarning($"[Loot] ItemDef or spriteDrop is null!");
             return;
         }
 
-        // Instantiate visual as child
         spriteRenderer.sprite = itemDef.spriteDrop;
-        //visualInstance = Instantiate(itemDef.visualPrefab, transform.position, Quaternion.identity, transform);
-
-        // Setup collider from visual
+        
         ResizeCollider(spriteRenderer.sprite.bounds.size);
-        SetupCollider(itemDef);
 
         if (showDebugLogs)
-            Debug.Log($"[Loot] Created visual for {itemDef.displayName}");
-    }
-
-    /// <summary>
-    /// Destroy the visual instance before returning to pool.
-    /// </summary>
-    private void CleanupVisual()
-    {
-        if (visualInstance != null)
-        {
-            Destroy(visualInstance);
-            visualInstance = null;
-        }
+            Debug.Log($"[Loot] Setup visual for {itemDef.displayName}");
     }
 
     private void ResizeCollider(Vector2 size)
@@ -107,139 +78,38 @@ public class Loot : MonoBehaviour, IClickableLoot
 
         if (size != Vector2.zero)
         {
-            // Use cached size and offset from EntityDef
             parentCollider.size = size;
-            parentCollider.offset = def.colliderOffset;
+            parentCollider.offset = Vector2.zero;
         }
         else if (spriteRenderer != null)
         {
-            // Fallback: use sprite renderer bounds (may be incorrect if animator hasn't updated)
             parentCollider.size = spriteRenderer.bounds.size;
-            Debug.LogWarning($"[{name}] EntityDef.colliderSize not set, using fallback bounds. Right-click EntityDef → 'Auto-Calculate Collider Size From Sprite'");
+            Debug.LogWarning($"[{name}] Sprite bounds zero, using fallback");
         }
     }
 
-    /// <summary>
-    /// Setup this loot's collider to match the visual's collider shape.
-    /// Searches for collider in visual hierarchy (supports nested structure).
-    /// </summary>
-    private void SetupCollider(ItemDef itemDef)
+    public bool IsReserved => reservedBy != null;
+    public PorterAgent ReservedBy => reservedBy;
+
+    public bool TryReserve(PorterAgent porter)
     {
-        if (visualInstance == null) return;
-
-        // Search for collider on visual root or children
-        Collider2D visualCollider = visualInstance.GetComponentInChildren<Collider2D>();
-        Collider2D lootCollider = GetComponent<Collider2D>();
-
-        if (visualCollider != null && lootCollider != null)
-        {
-            // Disable visual's collider (loot's collider handles clicks)
-            visualCollider.enabled = false;
-
-            // Copy shape from visual to loot
-            lootCollider.CopyShapeFrom(visualCollider);
-        }
-        else if (visualCollider == null)
-        {
-            Debug.LogWarning($"[Loot] Visual for '{itemDef.displayName}' has no Collider2D in hierarchy!");
-        }
-        else if (lootCollider == null)
-        {
-            Debug.LogWarning($"[Loot] Loot GameObject has no Collider2D component!");
-        }
+        if (IsReserved) return false;
+        reservedBy = porter;
+        return true;
     }
 
-    // ===== MANUAL COLLECTION (Click) =====
-
-    public void OnManualCollect()
+    public void ReleaseReservation()
     {
-        // Manual pickup gives +25% bonus
-        int bonusQty = Mathf.FloorToInt(qty * 0.25f);
-        int totalQty = qty + bonusQty;
-        
-        Inventory.Instance.Add(
-            Inventory.Instance.GetInventoryType(def.itemCategory), 
-            new ResourceStack(def, totalQty, sellValue)
-        );
-
-        // Show floating multiplier (always show for manual collection)
-        if (DamageNumberManager.Instance != null)
-        {
-            DamageNumberManager.Instance.ShowLootMultiplier(1.25f, transform);
-        }
-
-        if (showDebugLogs)
-            Debug.Log($"[Loot] Manual collect: {def.displayName} x{totalQty} (bonus: +{bonusQty})");
-        
-        // Return to pool
-        ReturnToPool();
-    }
-
-    // ===== PORTER COLLECTION =====
-
-    /// <summary>
-    /// Called by PorterAgent when collecting loot.
-    /// Returns the resource stack and returns loot to pool.
-    /// </summary>
-    public ResourceStack CollectByPorter(PorterAgent porter)
-    {
-        if (reservedBy != porter)
-        {
-            Debug.LogWarning($"[Loot] {porter.name} tried to collect {name} but it's reserved by {reservedBy?.name ?? "null"}");
-            return default;
-        }
-
-        // Create resource stack (no bonus for porter collection)
-        ResourceStack stack = new ResourceStack(def, qty, sellValue);
-
-        if (showDebugLogs)
-            Debug.Log($"[Loot] Porter collect: {def.displayName} x{qty}");
-
-        // Return to pool
-        ReturnToPool();
-
-        return stack;
-    }
-
-    // ===== POOLING =====
-
-    private void ReturnToPool()
-    {
-        // Unregister from LootManager
-        if (LootManager.Instance != null)
-        {
-            LootManager.Instance.UnregisterLoot(this, layerIndex);
-        }
-
-        // Visual cleanup happens in OnDisable
-        
-        // Reset state
-        ResetState();
-
-        // Return loot container to pool
-        ObjectPoolManager.Instance.ReturnObjectToPool(gameObject);
-    }
-
-    private void ResetState()
-    {
-        def = null;
-        lootId = null;
-        qty = 0;
-        sellValue = 0;
         reservedBy = null;
-        layerIndex = 0;
     }
 
-    // ===== RESERVATION SYSTEM =====
+    public ItemDef GetItemDef() => def;
+    public int GetQuantity() => qty;
+    public int GetLayer() => layerIndex;
 
     public void SetReservedBy(PorterAgent porter)
     {
         reservedBy = porter;
-    }
-
-    public bool IsReserved()
-    {
-        return reservedBy != null;
     }
 
     public bool IsReservedBy(PorterAgent porter)
@@ -252,9 +122,33 @@ public class Loot : MonoBehaviour, IClickableLoot
         return reservedBy;
     }
 
-    // ===== GETTERS =====
+    public ResourceStack CollectByPorter(PorterAgent porter)
+    {
+        if (reservedBy != porter)
+        {
+            Debug.LogWarning($"[Loot] {porter.name} tried to collect {name} but it's reserved by {reservedBy?.name ?? "null"}");
+            return default;
+        }
 
-    public ItemDef GetItemDef() => def;
-    public int GetQuantity() => qty;
-    public int GetLayer() => layerIndex;
+        ResourceStack stack = new ResourceStack(def, qty, sellValue);
+
+        if (showDebugLogs)
+            Debug.Log($"[Loot] Porter collect: {def.displayName} x{qty}");
+
+        ObjectPoolManager.Instance.ReturnObjectToPool(gameObject);
+        return stack;
+    }
+
+    public void OnManualCollect()
+    {
+        if (showDebugLogs)
+            Debug.Log($"[Loot] Clicked {def.displayName} x{qty}");
+
+        ResourceStack stack = new ResourceStack(def, qty, sellValue);
+        Inventory.Instance.Add(Inventory.Instance.GetInventoryType(def.itemCategory), stack);
+
+        GameSignals.RaiseLootCollected(stack);
+
+        ObjectPoolManager.Instance.ReturnObjectToPool(gameObject);
+    }
 }
