@@ -30,13 +30,22 @@ public class CraftingManager : MonoBehaviour
 
     void Update()
     {
-        
+        foreach (var kvp in craftingTimers)
+        {
+            RecipeDef recipe = kvp.Key;
+            craftingTimers[recipe] += Time.deltaTime;
+
+            if (craftingTimers[recipe] >= recipe.CraftSeconds)
+            {
+                CompleteCraft(recipe);
+            }
+        }
     }
 
     public bool CanCraft(RecipeDef recipe)
     {
         // Check if player has required ingredients available in inventory considering reserves
-        foreach (var ingredient in recipe.Inputs)
+        foreach (var ingredient in recipe.Ingredients)
         {
             int availableQty = inventory.Get(ingredient.Item.itemCategory, ingredient.Item);
             int reserveQty = materialReserves.ContainsKey(ingredient.Item) ? materialReserves[ingredient.Item] : 0;
@@ -46,6 +55,51 @@ public class CraftingManager : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void StartCraft(RecipeDef recipe)
+    {
+        if (!CanCraft(recipe))
+        {
+            Debug.LogWarning($"Cannot start crafting {recipe.Output.name}: insufficient ingredients.");
+            //TODO: Feedback to player
+            return;
+        }
+
+        //try remove ingredients from inventory
+        foreach (var ingredient in recipe.Ingredients)
+        {
+            if(!inventory.TryRemove(inventory.GetInventoryType(ingredient.Item.itemCategory), ingredient.Item, ingredient.Qty))
+            {
+                Debug.LogError($"Failed to remove {ingredient.Qty}x {ingredient.Item.displayName} from inventory despite CanCraft check.");
+                return;
+            }
+        }
+
+        // add output to crafting timers
+        if (!craftingTimers.ContainsKey(recipe))
+        {
+            craftingTimers[recipe] = 0f;
+        }
+    }
+
+    public void CompleteCraft(RecipeDef recipe)
+    {
+        if (!craftingTimers.ContainsKey(recipe))
+        {
+            return;
+        }
+
+        // Add crafted item to inventory
+        inventory.Add(inventory.GetInventoryType(recipe.Output.itemCategory), new ResourceStack(recipe.Output, recipe.OutputQty, 0));
+
+        // Remove from crafting timers
+        craftingTimers.Remove(recipe);
+
+        // Notify game signals of crafted product
+        GameSignals.RaiseProductCrafted(new ResourceStack(recipe.Output, recipe.OutputQty,0));
+
+        Debug.Log($"Crafted {recipe.OutputQty}x {recipe.Output.displayName}.");
     }
 
     public void SetReserve(ItemDef material, int qty)
@@ -74,7 +128,7 @@ public class CraftingManager : MonoBehaviour
     {
         foreach (var recipe in craftingRecipes)
         {
-            foreach (var ingredient in recipe.Inputs)
+            foreach (var ingredient in recipe.Ingredients)
             {
                 SetReserve(ingredient.Item, 10);
                 Debug.Log($"Set reserve of {ingredient.Item.name} to 10");
@@ -82,34 +136,13 @@ public class CraftingManager : MonoBehaviour
         }
     }
 
-
     [ContextMenu("Debug/Craft All Recipes and remove ingredients")]
     public void DebugCraftAllRecipes()
     {
-        foreach (var recipe in craftingRecipes)
-        {
-            if (CanCraft(recipe))
-            {
-                Debug.Log($"Can craft {recipe.Output.name}");
-                // Remove ingredients
-                foreach (var ingredient in recipe.Inputs)
-                {
-                    if(inventory.TryRemove(inventory.GetInventoryType(ingredient.Item.itemCategory), ingredient.Item, ingredient.Qty))
-                    {
-                        inventory.Add(inventory.GetInventoryType(recipe.Output.itemCategory), new ResourceStack(ingredient.Item , -ingredient.Qty, 0));
-                        Debug.Log($"Crafted {recipe.Output.name} and removed {ingredient.Qty}x {ingredient.Item.displayName} from inventory");
-                        Debug.Log($"Current {ingredient.Item.displayName} qty: {inventory.Get(ingredient.Item.itemCategory, ingredient.Item)}");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Failed to remove {ingredient.Qty}x {ingredient.Item.displayName}");
-                    }
-                }
-            }
-            else
-            {
-                Debug.Log($"Cannot craft {recipe.Output.name}");
-            }
-        }
+         foreach (var recipe in craftingRecipes)
+         {
+              StartCraft(recipe);
+              Debug.Log($"Started crafting {recipe.Output.name}");
+         }
     }
 }

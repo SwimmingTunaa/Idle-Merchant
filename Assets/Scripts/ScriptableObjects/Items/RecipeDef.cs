@@ -16,7 +16,7 @@ public class RecipeDef : ScriptableObject
     }
 
     [Header("Inputs")]
-    [SerializeField] private List<Ingredient> inputs = new();
+    [SerializeField] private List<Ingredient> ingredients = new();
 
     [Header("Outputs")]
     [SerializeField] private ItemDef output;
@@ -25,7 +25,7 @@ public class RecipeDef : ScriptableObject
     [Header("Crafting")]
     [Min(0.01f)][SerializeField] private float craftSeconds = 5f;
 
-    public IReadOnlyList<Ingredient> Inputs => inputs;
+    public IReadOnlyList<Ingredient> Ingredients => ingredients;
     public ItemDef Output => output;
     public int OutputQty => outputQty;
     public float CraftSeconds => craftSeconds;
