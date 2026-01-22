@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/CraftingPanelStyle.uss?fileID=7433441132597879392&amp;guid=1f55b20e0fbeb4ea98827c037085e89a&amp;type=3#CraftingPanelStyle" />
+    <ui:VisualElement name="crafting-panel" class="crafting-overlay" style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7);">
+        <ui:VisualElement name="recipe-book" class="recipe-book" style="width: 1200px; height: 800px; background-color: rgb(139, 90, 60); border-radius: 8px; padding: 24px; border-width: 6px; border-color: rgb(101, 67, 33);">
+            <ui:VisualElement name="book-header" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom-width: 2px; border-color: rgb(101, 67, 33);">
+                <ui:Label text="Crafting Recipes" name="header-title" class="book-title" style="font-size: 32px; -unity-font-style: bold; color: rgb(250, 240, 220); -unity-text-align: middle-left;" />
+                <ui:Button name="close-button" text="✕" class="close-button" style="width: 40px; height: 40px; font-size: 24px; background-color: rgba(101, 67, 33, 0.5); border-radius: 4px; color: rgb(250, 240, 220);" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pages-container" style="flex-grow: 1; flex-direction: row;">
+                <ui:VisualElement name="left-page" class="page" style="flex-grow: 1; margin-right: 8px; background-color: rgb(250, 240, 220); border-radius: 4px; padding: 16px; border-width: 2px; border-color: rgb(139, 90, 60);">
+                    <ui:Label text="Available Recipes" class="page-header" style="font-size: 20px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 12px; -unity-text-align: upper-center;" />
+                    <ui:VisualElement name="controls-row" style="flex-direction: row; margin-bottom: 8px; justify-content: space-between;">
+                        <ui:DropdownField name="filter-dropdown" label="Filter:" class="control-dropdown" style="flex-grow: 1; margin-right: 8px;" />
+                        <ui:DropdownField name="sort-dropdown" label="Sort:" class="control-dropdown" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:ScrollView name="recipe-scroll" class="recipe-list" style="flex-grow: 1; background-color: rgba(139, 90, 60, 0.1); border-radius: 4px; padding: 4px;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="right-page" class="page" style="flex-grow: 1; margin-left: 8px; background-color: rgb(250, 240, 220); border-radius: 4px; padding: 16px; border-width: 2px; border-color: rgb(139, 90, 60);">
+                    <ui:Label text="Material Reserves" class="page-header" style="font-size: 20px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 12px; -unity-text-align: upper-center;" />
+                    <ui:Label text="Set minimum materials to keep in stock" class="instruction-text" style="font-size: 12px; color: rgb(90, 60, 40); margin-bottom: 8px; white-space: normal; -unity-text-align: upper-center;" />
+                    <ui:ScrollView name="reserve-scroll" class="reserve-list" style="flex-grow: 1; background-color: rgba(139, 90, 60, 0.1); border-radius: 4px; padding: 8px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="book-footer" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 8px; border-top-width: 2px; border-color: rgb(101, 67, 33);">
+                <ui:Label name="active-crafts-label" text="Active Crafts: 0" style="font-size: 14px; color: rgb(250, 240, 220);" />
+                <ui:Label name="status-label" text="Ready to craft" style="font-size: 14px; color: rgb(250, 240, 220);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

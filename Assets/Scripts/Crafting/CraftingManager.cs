@@ -167,6 +167,21 @@ public class CraftingManager : MonoBehaviour
         return false;
     }
 
+    public List<RecipeDef> GetAllRecipes()
+    {
+        return new List<RecipeDef>(craftingRecipes);
+    }
+
+    public float GetCraftingProgress(RecipeDef recipe)
+    {
+        foreach (var job in activeCrafts)
+        {
+            if (job.recipe == recipe)
+                return 1f - (job.timeRemaining / recipe.CraftSeconds);
+        }
+        return 0f;
+    }
+
     public void CompleteCraft(RecipeDef recipe)
     {
         // Add crafted item to inventory

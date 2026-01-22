@@ -1,0 +1,189 @@
+/* ===== OVERLAY ===== */
+.crafting-overlay {
+    transition-property: opacity;
+    transition-duration: 0.3s;
+}
+
+/* ===== RECIPE BOOK ===== */
+.recipe-book {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.book-title {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== PAGES ===== */
+.page {
+    /* Subtle paper texture effect */
+    background-image: none; /* Add paper texture asset if available */
+}
+
+.page-header {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    border-bottom-width: 1px;
+    border-color: rgba(139, 90, 60, 0.3);
+    padding-bottom: 4px;
+}
+
+/* ===== RECIPE CARD ===== */
+.recipe-card {
+    transition-property: background-color;
+    transition-duration: 0.2s;
+}
+
+.recipe-card:hover {
+    background-color: rgba(139, 90, 60, 0.15);
+}
+
+.recipe-card.crafting {
+    background-color: rgba(139, 180, 90, 0.2);
+    border-left-width: 3px;
+    border-left-color: rgb(139, 180, 90);
+}
+
+.recipe-card.cannot-craft {
+    opacity: 0.5;
+}
+
+/* ===== ITEM ICONS ===== */
+.item-icon {
+    border-width: 1px;
+    border-color: rgba(50, 30, 10, 0.3);
+}
+
+/* ===== RECIPE NAME ===== */
+.recipe-name {
+    /* Handwritten font style */
+    -unity-font-style: bold;
+}
+
+/* ===== CONTROLS ===== */
+.control-dropdown {
+    background-color: rgba(139, 90, 60, 0.2);
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.control-dropdown > Label {
+    color: rgb(50, 30, 10);
+    font-size: 12px;
+    min-width: 40px;
+}
+
+/* ===== RECIPE TOGGLE ===== */
+.recipe-toggle {
+    /* Unity default toggle styling */
+}
+
+.recipe-toggle:checked {
+    background-color: rgba(139, 180, 90, 0.3);
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar {
+    transition-property: width;
+    transition-duration: 0.1s;
+}
+
+/* ===== SCROLLVIEW ===== */
+.recipe-list,
+.reserve-list {
+    /* Scrollbar styling */
+}
+
+.recipe-list > #unity-content-container {
+    padding: 4px;
+}
+
+.reserve-list > #unity-content-container {
+    padding: 4px;
+}
+
+/* ===== CLOSE BUTTON ===== */
+.close-button {
+    transition-property: background-color;
+    transition-duration: 0.2s;
+}
+
+.close-button:hover {
+    background-color: rgba(180, 90, 60, 0.7);
+}
+
+.close-button:active {
+    background-color: rgba(160, 70, 40, 0.9);
+}
+
+/* ===== MATERIAL RESERVE ITEM ===== */
+.reserve-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 4px;
+    background-color: rgba(250, 240, 220, 0.5);
+    border-radius: 4px;
+    border-bottom-width: 1px;
+    border-color: rgba(139, 90, 60, 0.2);
+}
+
+.reserve-item-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    background-color: rgba(139, 90, 60, 0.2);
+    border-radius: 4px;
+}
+
+.reserve-item-name {
+    flex-grow: 1;
+    font-size: 14px;
+    color: rgb(50, 30, 10);
+}
+
+.reserve-item-stock {
+    font-size: 12px;
+    color: rgb(90, 60, 40);
+    margin-right: 8px;
+    min-width: 60px;
+    -unity-text-align: middle-right;
+}
+
+.reserve-slider {
+    width: 120px;
+}
+
+/* ===== INGREDIENT SLOT (dynamically created) ===== */
+.ingredient-slot {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 12px;
+    margin-bottom: 4px;
+}
+
+.ingredient-icon {
+    width: 32px;
+    height: 32px;
+    background-color: rgba(139, 90, 60, 0.2);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgba(50, 30, 10, 0.2);
+    margin-right: 4px;
+}
+
+.ingredient-quantity {
+    font-size: 12px;
+    color: rgb(50, 30, 10);
+}
+
+/* ===== ANIMATIONS ===== */
+.flash-complete {
+    background-color: rgba(139, 180, 90, 0.5);
+    transition-property: background-color;
+    transition-duration: 0.3s;
+}
+
+/* ===== INSTRUCTION TEXT ===== */
+.instruction-text {
+    opacity: 0.7;
+    font-style: italic;
+}

@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="recipe-card" class="recipe-card" style="flex-direction: row; padding: 8px; margin-bottom: 4px; background-color: rgba(250, 240, 220, 0.8); border-bottom-width: 1px; border-color: rgba(139, 90, 60, 0.3);">
+        
+        <!-- Left: Recipe Info -->
+        <ui:VisualElement name="recipe-info" style="flex-grow: 1; flex-direction: row; align-items: center;">
+            
+            <!-- Output Item -->
+            <ui:VisualElement name="output-section" style="flex-direction: row; align-items: center; margin-right: 16px;">
+                <ui:VisualElement name="output-icon" class="item-icon" style="width: 48px; height: 48px; background-color: rgba(139, 90, 60, 0.2); border-radius: 4px; margin-right: 8px;" />
+                <ui:VisualElement name="output-details" style="flex-direction: column;">
+                    <ui:Label name="recipe-name" text="Iron Sword" class="recipe-name" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10);" />
+                    <ui:Label name="output-quantity" text="x1" class="output-quantity" style="font-size: 14px; color: rgb(90, 60, 40);" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Arrow -->
+            <ui:Label text="←" name="arrow" style="font-size: 24px; margin-right: 8px; margin-left: 8px; color: rgb(139, 90, 60);" />
+            
+            <!-- Input Ingredients -->
+            <ui:VisualElement name="ingredients-container" style="flex-direction: row; align-items: center; flex-wrap: wrap;">
+                <!-- Populated dynamically with ingredient slots -->
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+        <!-- Right: Craft Time & Toggle -->
+        <ui:VisualElement name="recipe-controls" style="flex-direction: row; align-items: center; margin-left: 16px;">
+            
+            <!-- Craft Time -->
+            <ui:Label name="craft-time" text="5.0s" class="craft-time" style="font-size: 14px; color: rgb(90, 60, 40); margin-right: 16px; min-width: 50px; -unity-text-align: middle-right;" />
+            
+            <!-- Progress Bar (shown when crafting) -->
+            <ui:VisualElement name="progress-container" style="width: 100px; height: 16px; background-color: rgba(139, 90, 60, 0.3); border-radius: 8px; margin-right: 16px; display: none;">
+                <ui:VisualElement name="progress-bar" style="height: 100%; background-color: rgb(139, 90, 60); border-radius: 8px; width: 0%;" />
+            </ui:VisualElement>
+            
+            <!-- Enable Toggle -->
+            <ui:Toggle name="enable-toggle" class="recipe-toggle" style="margin-right: 0;" />
+            
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+</ui:UXML>

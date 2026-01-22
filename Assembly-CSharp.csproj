@@ -54,7 +54,7 @@
     <Compile Include="Assets/Scripts/ScriptableObjects/Skills/Passive/RegenerationSkillDef.cs" />
     <Compile Include="Assets/Data/InputSystem_Actions.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Skills/Passive/AOEDamageSkillDef.cs" />
-    <Compile Include="Assets/Scripts/UI/Panels/HireController.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingController.cs" />
     <Compile Include="Assets/Scripts/Identity/TraitDefIdentityExtensions.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Items/CategoryShelfDef.cs" />
     <Compile Include="Assets/Scripts/Core/GameSignals.cs" />
@@ -91,6 +91,7 @@
     <Compile Include="Assets/Scripts/UI/HireRoster.cs" />
     <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_CustomStyleData.cs" />
     <Compile Include="Assets/Scripts/Entities/Porters/PorterDef.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Hiring/HireController.cs" />
     <Compile Include="Assets/Scripts/Utility/Animation/AnimParem.cs" />
     <Compile Include="Assets/Scripts/Skills/Passive/GoldGenerationEffect.cs" />
     <Compile Include="Assets/Scripts/UI/IPanelController.cs" />
@@ -171,14 +172,15 @@
     <Compile Include="Assets/Scripts/UI/UITargetMarker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets/UI/style.uss" />
+    <None Include="Assets/Scripts/UI/Panels/style.uss" />
     <None Include="Assets/Sprites/Pixel Art Icon Pack - RPG/Shader/SH UI Icon Outline Color.shader" />
-    <None Include="Assets/UI/Candidate.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanel.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Hiring/Candidate.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets/SPUM/ReadMe - 3.1.0.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
-    <None Include="Assets/UI/Hire Panel.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Hiring/Hire Panel.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" />
     <None Include="Assets/Sprites/Pixel Art Icon Pack - RPG/Shader/SH Sprite Icon Outline Color.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" />
@@ -194,15 +196,17 @@
     <None Include="Assets/Scripts/UI/Panels/Pause Menu/Pause_Panel.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc" />
     <None Include="Assets/Scripts/UI/Panels/Pause Menu/pause_styles.uss" />
-    <None Include="Assets/UI/Main.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Main.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" />
     <None Include="Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt" />
+    <None Include="Assets/Scripts/UI/Panels/Crafting Menu/RecipeCard.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets/BigManJD/readme.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader" />
     <None Include="Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanelStyle.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
