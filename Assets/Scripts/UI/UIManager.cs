@@ -4,129 +4,239 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Centralized UI management system.
-/// - Manages panel lifecycle (open/close/focus)
-/// - Handles ESC navigation via stack
-/// - Blocks world input when modal panels are open
-/// - Prevents edge cases with animation states and queued requests
+/// Central UI management system.
+/// Handles panel lifecycle, navigation stack, ESC behavior, and hotkey panel opening.
+/// Supports new Input System for panel hotkeys.
 /// </summary>
 public class UIManager : MonoBehaviour
 {
-    private static UIManager _instance;
-    public static UIManager Instance
+    public static UIManager Instance { get; private set; }
+
+    [Header("Input System")]
+    [SerializeField] private InputActionAsset inputActions;
+    
+    [Header("ESC Navigation")]
+    [Tooltip("Action map name for cancel/ESC (e.g., 'UI')")]
+    [SerializeField] private string cancelActionMapName = "UI";
+    
+    [Tooltip("Action name for cancel/ESC (e.g., 'Cancel')")]
+    [SerializeField] private string cancelActionName = "Cancel";
+    
+    [Tooltip("Panel ID to open when ESC pressed with no panels open (e.g., 'PauseMenu')")]
+    [SerializeField] private string pauseMenuPanelID = "PauseMenu";
+    
+    [Tooltip("Cooldown between ESC presses to prevent spam")]
+    [SerializeField] private float inputCooldown = 0.2f;
+
+    [Header("Panel Hotkey Bindings")]
+    [Tooltip("Map action names to panel IDs (e.g., 'Crafting Menu' → 'CraftingPanel')")]
+    [SerializeField] private List<PanelHotkeyBinding> panelHotkeys = new List<PanelHotkeyBinding>();
+
+    [Serializable]
+    public class PanelHotkeyBinding
     {
-        get
-        {
-            if (_instance == null)
-            {
-                var go = new GameObject("[UIManager]");
-                _instance = go.AddComponent<UIManager>();
-                DontDestroyOnLoad(go);
-            }
-            return _instance;
-        }
+        [Tooltip("Action map name (e.g., 'UI')")]
+        public string actionMapName = "UI";
+        
+        [Tooltip("Action name (e.g., 'Crafting Menu')")]
+        public string actionName;
+        
+        [Tooltip("Panel ID to open/toggle (e.g., 'CraftingPanel')")]
+        public string panelID;
+        
+        [Tooltip("If true, pressing again closes the panel")]
+        public bool allowToggle = true;
     }
 
+    [Header("World Input Blocking")]
+    [Tooltip("If true, world input is blocked when any modal panel is open")]
+    public bool IsBlockingWorldInput { get; private set; }
+
+    // Event for WorldInputBlocker components
     public event Action<bool> OnWorldInputBlockedChanged;
 
-    [Header("Input")]
-    [SerializeField] private InputActionReference cancelAction;
-    
-    [Header("Settings")]
-    [SerializeField] private float inputCooldown = 0.2f;
-    
-    // Panel registry: all panels by ID
-    private readonly Dictionary<string, IPanelController> panels = new();
-    
-    // Modal panel stack: panels that participate in ESC navigation
-    private readonly Stack<IPanelController> modalStack = new();
-    
-    // Queued requests during transitions
-    private readonly Queue<PanelRequest> requestQueue = new();
-    
-    private float lastInputTime;
+    // Panel registry
+    private Dictionary<string, IPanelController> panels = new Dictionary<string, IPanelController>();
+    private Stack<IPanelController> modalStack = new Stack<IPanelController>();
+    private Queue<PanelRequest> requestQueue = new Queue<PanelRequest>();
 
-    public bool IsBlockingWorldInput
-    {
-        get
-        {
-            foreach (var panel in modalStack)
-            {
-                if (panel.BlocksWorldInput && (panel.State == PanelState.Open || panel.State == PanelState.Opening))
-                    return true;
-            }
-            return false;
-        }
-        private set { } // needed for event invocation
-    }
+    // Input System
+    private InputAction cancelAction;
+    private Dictionary<string, InputAction> boundActions = new Dictionary<string, InputAction>();
+    private float lastCancelTime;
 
-    private void Awake()
+    void Awake()
     {
-        if (_instance != null && _instance != this)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        
-        _instance = this;
+
+        Instance = this;
         DontDestroyOnLoad(gameObject);
+        
+        SetupInputActions();
     }
 
-    private void OnEnable()
+    void OnDestroy()
     {
-        if (cancelAction != null)
-            cancelAction.action.performed += OnCancelPerformed;
+        CleanupInputActions();
     }
 
-    private void OnDisable()
-    {
-        if (cancelAction != null)
-            cancelAction.action.performed -= OnCancelPerformed;
-    }
-
-        private void BroadcastInputBlockState()
-        {
-            OnWorldInputBlockedChanged?.Invoke(IsBlockingWorldInput);
-        }
-
-        // EXAMPLE: If you have a method like this
-        public void SetWorldInputBlocked(bool blocked)
-        {
-            if (IsBlockingWorldInput == blocked) return; // No change, skip broadcast
-
-            IsBlockingWorldInput = blocked;
-            BroadcastInputBlockState(); // NEW: Broadcast change
-        }
-
-        // EXAMPLE: If you open/close panels
-        public void OpenPanel(GameObject panel)
-        {
-            panel.SetActive(true);
-            IsBlockingWorldInput = true;
-            BroadcastInputBlockState(); // NEW: Broadcast change
-        }
-
-        public void ClosePanel(GameObject panel)
-        {
-            panel.SetActive(false);
-            IsBlockingWorldInput = false;
-            BroadcastInputBlockState(); // NEW: Broadcast change
-        }
-
-
-    private void Update()
+    void Update()
     {
         ProcessRequestQueue();
     }
 
-    // ─────────────────────────────────────────────
-    // PANEL REGISTRATION
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
+    // INPUT SYSTEM SETUP
+    // ═════════════════════════════════════════════
 
-    /// <summary>
-    /// Register a panel with the UIManager.
-    /// Call this in panel's Start() or Awake().
-    /// </summary>
+    private void SetupInputActions()
+    {
+        if (inputActions == null)
+        {
+            Debug.LogError("[UIManager] InputActionAsset not assigned!");
+            return;
+        }
+
+        // Setup Cancel/ESC action
+        SetupCancelAction();
+
+        // Bind panel hotkeys
+        foreach (var binding in panelHotkeys)
+        {
+            if (string.IsNullOrEmpty(binding.actionMapName) || string.IsNullOrEmpty(binding.actionName))
+            {
+                Debug.LogWarning($"[UIManager] Invalid hotkey binding: empty action map or action name");
+                continue;
+            }
+
+            var actionMap = inputActions.FindActionMap(binding.actionMapName);
+            if (actionMap == null)
+            {
+                Debug.LogWarning($"[UIManager] Action map '{binding.actionMapName}' not found!");
+                continue;
+            }
+
+            var action = actionMap.FindAction(binding.actionName);
+            if (action == null)
+            {
+                Debug.LogWarning($"[UIManager] Action '{binding.actionName}' not found in map '{binding.actionMapName}'!");
+                continue;
+            }
+
+            // Subscribe to action
+            action.performed += ctx => OnPanelHotkeyPressed(binding);
+            action.Enable();
+
+            boundActions[binding.actionName] = action;
+
+            Debug.Log($"[UIManager] Bound '{binding.actionName}' → '{binding.panelID}'");
+        }
+    }
+
+    private void SetupCancelAction()
+    {
+        var actionMap = inputActions.FindActionMap(cancelActionMapName);
+        if (actionMap == null)
+        {
+            Debug.LogWarning($"[UIManager] Cancel action map '{cancelActionMapName}' not found!");
+            return;
+        }
+
+        cancelAction = actionMap.FindAction(cancelActionName);
+        if (cancelAction == null)
+        {
+            Debug.LogWarning($"[UIManager] Cancel action '{cancelActionName}' not found!");
+            return;
+        }
+
+        cancelAction.performed += OnCancelPressed;
+        
+        // CRITICAL: Enable action map with unscaled time for pause compatibility
+        actionMap.Enable();
+
+        Debug.Log($"[UIManager] Bound ESC/Cancel action: {cancelActionMapName}/{cancelActionName}");
+    }
+
+    private void OnCancelPressed(InputAction.CallbackContext context)
+    {
+        // Cooldown to prevent spam (use unscaledTime for pause compatibility)
+        if (Time.unscaledTime - lastCancelTime < inputCooldown)
+            return;
+
+        lastCancelTime = Time.unscaledTime;
+
+        Debug.Log($"[UIManager] ESC pressed. Modal stack count: {modalStack.Count}");
+
+        // Close top modal panel if any
+        if (modalStack.Count > 0)
+        {
+            var topPanel = modalStack.Peek();
+            Debug.Log($"[UIManager] Top panel: {topPanel.PanelID}, State: {topPanel.State}");
+            
+            if (topPanel.State == PanelState.Open)
+            {
+                Debug.Log($"[UIManager] Closing panel: {topPanel.PanelID}");
+                ClosePanel(topPanel);
+            }
+        }
+        // Open pause menu if no panels are open
+        else if (!string.IsNullOrEmpty(pauseMenuPanelID))
+        {
+            Debug.Log($"[UIManager] Opening pause menu: {pauseMenuPanelID}");
+            OpenPanel(pauseMenuPanelID);
+        }
+    }
+
+    private void CleanupInputActions()
+    {
+        // Cleanup cancel action
+        if (cancelAction != null)
+        {
+            cancelAction.performed -= OnCancelPressed;
+            cancelAction.Disable();
+        }
+
+        // Cleanup hotkey actions
+        foreach (var action in boundActions.Values)
+        {
+            action.Disable();
+        }
+        boundActions.Clear();
+    }
+
+    private void OnPanelHotkeyPressed(PanelHotkeyBinding binding)
+    {
+        if (string.IsNullOrEmpty(binding.panelID))
+        {
+            Debug.LogWarning($"[UIManager] Hotkey action '{binding.actionName}' has no panel ID assigned");
+            return;
+        }
+
+        if (!panels.TryGetValue(binding.panelID, out var panel))
+        {
+            Debug.LogWarning($"[UIManager] Panel '{binding.panelID}' not registered for hotkey '{binding.actionName}'");
+            return;
+        }
+
+        // Toggle behavior
+        if (binding.allowToggle && panel.State == PanelState.Open)
+        {
+            ClosePanel(panel);
+        }
+        else if (panel.State == PanelState.Closed)
+        {
+            OpenPanel(panel);
+        }
+    }
+
+    // ═════════════════════════════════════════════
+    // PANEL REGISTRATION
+    // ═════════════════════════════════════════════
+
     public void RegisterPanel(IPanelController panel)
     {
         if (panel == null)
@@ -143,14 +253,12 @@ public class UIManager : MonoBehaviour
 
         panels[panel.PanelID] = panel;
         
-        // Subscribe to completion events
         panel.OnOpenComplete += OnPanelOpenComplete;
         panel.OnCloseComplete += OnPanelCloseComplete;
+
+        Debug.Log($"[UIManager] Registered panel: {panel.PanelID}");
     }
 
-    /// <summary>
-    /// Unregister a panel (call in OnDestroy)
-    /// </summary>
     public void UnregisterPanel(IPanelController panel)
     {
         if (panel == null) return;
@@ -160,7 +268,6 @@ public class UIManager : MonoBehaviour
             panel.OnOpenComplete -= OnPanelOpenComplete;
             panel.OnCloseComplete -= OnPanelCloseComplete;
             
-            // Remove from stack if present
             if (modalStack.Contains(panel))
             {
                 var tempStack = new Stack<IPanelController>();
@@ -174,16 +281,15 @@ public class UIManager : MonoBehaviour
                 while (tempStack.Count > 0)
                     modalStack.Push(tempStack.Pop());
             }
+
+            Debug.Log($"[UIManager] Unregistered panel: {panel.PanelID}");
         }
     }
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // PANEL OPERATIONS
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
-    /// <summary>
-    /// Open a panel by ID
-    /// </summary>
     public void OpenPanel(string panelID)
     {
         if (!panels.TryGetValue(panelID, out var panel))
@@ -195,25 +301,19 @@ public class UIManager : MonoBehaviour
         OpenPanel(panel);
     }
 
-    /// <summary>
-    /// Open a panel by reference
-    /// </summary>
     public void OpenPanel(IPanelController panel)
     {
         if (panel == null) return;
 
-        // Already open or opening
         if (panel.State == PanelState.Open || panel.State == PanelState.Opening)
             return;
 
-        // Currently closing - queue the open
         if (panel.State == PanelState.Closing)
         {
             requestQueue.Enqueue(new PanelRequest(PanelRequestType.Open, panel));
             return;
         }
 
-        // Lose focus on current top panel
         if (panel.IsModal && modalStack.Count > 0)
         {
             var currentTop = modalStack.Peek();
@@ -221,17 +321,24 @@ public class UIManager : MonoBehaviour
                 currentTop.OnLoseFocus();
         }
 
-        // Execute open
-        if (panel.Open())
+        // Push to stack BEFORE opening so it's there when OnOpenComplete fires
+        if (panel.IsModal)
         {
-            if (panel.IsModal)
-                modalStack.Push(panel);
+            modalStack.Push(panel);
+            Debug.Log($"[UIManager] Pushed {panel.PanelID} to modal stack. Stack count: {modalStack.Count}");
+        }
+
+        if (!panel.Open())
+        {
+            // Open failed, remove from stack
+            if (panel.IsModal && modalStack.Count > 0 && modalStack.Peek() == panel)
+            {
+                modalStack.Pop();
+                Debug.LogWarning($"[UIManager] Open failed for {panel.PanelID}, removed from stack");
+            }
         }
     }
 
-    /// <summary>
-    /// Close a panel by ID
-    /// </summary>
     public void ClosePanel(string panelID)
     {
         if (!panels.TryGetValue(panelID, out var panel))
@@ -243,97 +350,70 @@ public class UIManager : MonoBehaviour
         ClosePanel(panel);
     }
 
-    /// <summary>
-    /// Close a panel by reference
-    /// </summary>
     public void ClosePanel(IPanelController panel)
     {
         if (panel == null) return;
 
-        // Already closed or closing
         if (panel.State == PanelState.Closed || panel.State == PanelState.Closing)
             return;
 
-        // Check if panel allows closing
         if (!panel.CanClose())
+        {
+            Debug.Log($"[UIManager] Panel '{panel.PanelID}' vetoed close request");
             return;
+        }
 
-        // Currently opening - queue the close
         if (panel.State == PanelState.Opening)
         {
             requestQueue.Enqueue(new PanelRequest(PanelRequestType.Close, panel));
             return;
         }
 
-        // Execute close
-        panel.Close();
+        if (panel.Close())
+        {
+            // Stack cleanup happens in OnPanelCloseComplete
+        }
     }
 
-    /// <summary>
-    /// Close the top modal panel (called by ESC key)
-    /// </summary>
-    public void CloseTopPanel()
-    {
-        if (modalStack.Count == 0)
-            return;
-
-        var topPanel = modalStack.Peek();
-        ClosePanel(topPanel);
-    }
-
-    /// <summary>
-    /// Check if a specific panel is open
-    /// </summary>
-    public bool IsPanelOpen(string panelID)
+    public void TogglePanel(string panelID)
     {
         if (!panels.TryGetValue(panelID, out var panel))
-            return false;
-
-        return panel.State == PanelState.Open || panel.State == PanelState.Opening;
-    }
-
-    // ─────────────────────────────────────────────
-    // EVENT HANDLERS
-    // ─────────────────────────────────────────────
-
-    private void OnCancelPerformed(InputAction.CallbackContext context)
-    {
-        // Input cooldown to prevent spam (use unscaledTime for pause compatibility)
-        if (Time.unscaledTime - lastInputTime < inputCooldown)
+        {
+            Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
             return;
+        }
 
-        lastInputTime = Time.unscaledTime;
-        
-        // If no panels open, try to open pause menu
-        if (modalStack.Count == 0)
-        {
-            // Try to open pause menu if it exists
-            if (panels.ContainsKey("PauseMenu"))
-            {
-                OpenPanel("PauseMenu");
-            }
-        }
-        else
-        {
-            // Close top panel
-            CloseTopPanel();
-        }
+        if (panel.State == PanelState.Open)
+            ClosePanel(panel);
+        else if (panel.State == PanelState.Closed)
+            OpenPanel(panel);
     }
+
+    public bool IsPanelOpen(string panelID)
+    {
+        return panels.TryGetValue(panelID, out var panel) && panel.State == PanelState.Open;
+    }
+
+    // ═════════════════════════════════════════════
+    // PANEL LIFECYCLE CALLBACKS
+    // ═════════════════════════════════════════════
 
     private void OnPanelOpenComplete(IPanelController panel)
     {
+        Debug.Log($"[UIManager] Panel opened: {panel.PanelID}, IsModal: {panel.IsModal}, Stack count: {modalStack.Count}");
+        
+        UpdateWorldInputBlockState();
+
         if (panel.IsModal && modalStack.Count > 0 && modalStack.Peek() == panel)
             panel.OnFocus();
     }
 
     private void OnPanelCloseComplete(IPanelController panel)
     {
-        // Remove from stack
         if (panel.IsModal && modalStack.Count > 0 && modalStack.Peek() == panel)
         {
             modalStack.Pop();
             
-            // Restore focus to new top panel
             if (modalStack.Count > 0)
             {
                 var newTop = modalStack.Peek();
@@ -341,21 +421,50 @@ public class UIManager : MonoBehaviour
                     newTop.OnFocus();
             }
         }
+
+        UpdateWorldInputBlockState();
     }
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
+    // WORLD INPUT BLOCKING
+    // ═════════════════════════════════════════════
+
+    private void UpdateWorldInputBlockState()
+    {
+        bool shouldBlock = false;
+
+        foreach (var panel in panels.Values)
+        {
+            if (panel.State == PanelState.Open && panel.BlocksWorldInput)
+            {
+                shouldBlock = true;
+                break;
+            }
+        }
+
+        if (IsBlockingWorldInput != shouldBlock)
+        {
+            IsBlockingWorldInput = shouldBlock;
+            BroadcastInputBlockState();
+        }
+    }
+
+    private void BroadcastInputBlockState()
+    {
+        OnWorldInputBlockedChanged?.Invoke(IsBlockingWorldInput);
+    }
+
+    // ═════════════════════════════════════════════
     // REQUEST QUEUE
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void ProcessRequestQueue()
     {
         if (requestQueue.Count == 0)
             return;
 
-        // Process one request per frame to avoid stacking operations
         var request = requestQueue.Dequeue();
 
-        // Only process if panel is in valid state
         if (request.type == PanelRequestType.Open && request.panel.State == PanelState.Closed)
         {
             OpenPanel(request.panel);
@@ -366,9 +475,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // HELPERS
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private struct PanelRequest
     {

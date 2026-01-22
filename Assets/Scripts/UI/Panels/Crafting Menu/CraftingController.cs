@@ -69,11 +69,27 @@ public class CraftingController : MonoBehaviour, IPanelController
     {
         BuildUI();
         SubscribeToEvents();
+        
+        // Register with UIManager
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.RegisterPanel(this);
+        }
+        else
+        {
+            Debug.LogError("[CraftingController] UIManager.Instance is null!");
+        }
     }
 
     void OnDestroy()
     {
         UnsubscribeFromEvents();
+        
+        // Unregister from UIManager
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UnregisterPanel(this);
+        }
     }
 
     void Update()
