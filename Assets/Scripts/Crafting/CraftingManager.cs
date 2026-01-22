@@ -7,6 +7,7 @@ public class CraftingManager : MonoBehaviour
 
     [Header("Crafting Config")]
     [SerializeField] private List<RecipeDef> craftingRecipes = new();
+    [SerializeField] private Dictionary<ItemDef, int> materialReserves = new ();
     private Dictionary<RecipeDef, float> craftingTimers = new ();
 
     void Awake()
@@ -31,10 +32,22 @@ public class CraftingManager : MonoBehaviour
         // Check if player has required ingredients
         foreach (var ingredient in recipe.Inputs)
         {
-            if (Inventory.Instance.Get(ingredient.Item.itemCategory, ingredient.Item) < ingredient.Qty)
+            if (Inventory.Instance.Get(ingredient.Item.itemCategory, ingredient.Item) < ingredient.Qty - materialReserves.GetValueOrDefault(ingredient.Item, 0))
                 return false;
         }
         return true;
+    }
+
+    void SetReserve(ItemDef material, int qty)
+    {
+        if (materialReserves.ContainsKey(material))
+        {
+            materialReserves[material] = qty;
+        }
+        else
+        {
+            materialReserves.Add(material, qty);
+        }
     }
     
    [ContextMenu("Debug/Check Can Craft [RecipeName]")]
@@ -44,5 +57,17 @@ public class CraftingManager : MonoBehaviour
        {
            Debug.Log($"Can craft {recipe.Output.name}: {CanCraft(recipe)}");
        }
+    }
+
+    [ContextMenu("Debug/Set Material Reserve to 10")]
+    public void DebugSetMaterialReserve()
+    {
+        foreach (var recipe in craftingRecipes)
+        {
+            foreach (var ingredient in recipe.Inputs)
+            {
+                SetReserve(ingredient.Item, 10);
+            }
+        }
     }
 }
