@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -7847115483883198020}
   - component: {fileID: -3832293996571581865}
   - component: {fileID: 7291222715267556368}
+  - component: {fileID: 5506145961871513203}
   m_Layer: 0
   m_Name: Customer
   m_TagString: Untagged
@@ -94,7 +95,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 028e60da2ca88437ba850eba0c91b1aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Customer
+  def: {fileID: 0}
   layerIndex: 0
+  overriderAnimatorController: 1
+  appearanceManager: {fileID: 0}
+  traitComponent: {fileID: 0}
   animator: {fileID: 2835747563859673268}
   wanderColor: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 1}
   seekingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -103,7 +108,6 @@ MonoBehaviour:
   desiredItem: {fileID: 0}
   desiredQty: 0
   budget: 0
-  itemSpriteOffset: {x: 0, y: 2.5, z: 0}
   queueCheckInterval: 0.5
   showDebugColours: 1
   showDebugLogs: 0
@@ -123,9 +127,21 @@ MonoBehaviour:
   bubbleRoot: {fileID: 3714226272264491834}
   iconRenderer: {fileID: 6288758870100923623}
   worldOffset: {x: 0, y: 2, z: 0}
-  showInSeekingQueue: 0
+  showInSeekingQueue: 1
   showInQueueing: 1
   showInBuying: 1
+--- !u!210 &5506145961871513203
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5389948795088366679}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &8474231270722442887
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,6 +263,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3909861097001689522}
     m_Modifications:
+    - target: {fileID: 3598441802088689126, guid: 11f8195da97abba4b9d33a17eaebe95f, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6142212813334374971, guid: 11f8195da97abba4b9d33a17eaebe95f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

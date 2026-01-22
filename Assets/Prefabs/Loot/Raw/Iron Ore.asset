@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2cf7b404d2840cbab97bee936aa4ae, type: 3}
+  m_Name: Iron Ore
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDef
+  id: Iron Ore
+  displayName: Iron Ore
+  description: 
+  itemCategory: 0
+  spriteDrop: {fileID: 21300000, guid: edcbd57032ccbd44e9f228cdd323ab50, type: 3}
+  icon: {fileID: 21300000, guid: edcbd57032ccbd44e9f228cdd323ab50, type: 3}
+  prefab: {fileID: 6567793289746966387, guid: f92b37987da254b76ae2600bd11e980f, type: 3}
+  chance: 1
+  sellPrice: 5
+  baseValue: 5

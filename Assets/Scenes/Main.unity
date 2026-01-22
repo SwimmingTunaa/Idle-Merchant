@@ -1787,6 +1787,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CounterService
   serveTime: 1.5
   exitPoint: {fileID: 455401622}
+  goldSpawnPoint: {fileID: 0}
 --- !u!114 &354730532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4059,6 +4060,7 @@ Transform:
   - {fileID: 848474647}
   - {fileID: 937235291}
   - {fileID: 1889394126}
+  - {fileID: 1534917785}
   - {fileID: 1898013001}
   - {fileID: 2063551906}
   - {fileID: 155316492}
@@ -7174,6 +7176,51 @@ Transform:
   - {fileID: 452071049}
   m_Father: {fileID: 840054635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1534917784
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1534917785}
+  - component: {fileID: 1534917786}
+  m_Layer: 0
+  m_Name: Crafting Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1534917785
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534917784}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945178581}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1534917786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534917784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1c0bbd417e514484a80449648ddf47e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CraftingManager
+  craftingRecipes: []
 --- !u!1 &1537114721
 GameObject:
   m_ObjectHideFlags: 0

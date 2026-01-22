@@ -134,8 +134,8 @@ public class CounterService : MonoBehaviour
         // Determine spawn position (prefer goldSpawnPoint, fallback to customer)
         Vector3 spawnPos = goldSpawnPoint != null ? goldSpawnPoint.position : customerPosition;
 
-        // Calculate number of coins (1 coin per 10 gold, min 1, max 15)
-        int coinCount = Mathf.Clamp(goldAmount / 10, 1, 15);
+        // Calculate number of coins (1 coin per 2 gold, min 1, max 15)
+        int coinCount = Mathf.Clamp(goldAmount / 2, 1, 15);
 
         // Spawn coin explosion (null sprite uses default coin sprite)
         ItemExplosionVFX.Instance.SpawnExplosion(
