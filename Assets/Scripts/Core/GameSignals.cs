@@ -13,8 +13,8 @@ public static class GameSignals
     public static event Action<int> GoldChanged;                    // Existing - fired by Inventory
     
     // Loot & Crafting (Existing events)
-    public static event Action<ResourceStack> LootCollected;        // from dungeon/porter/click
-    public static event Action<ResourceStack> ProductCrafted;       // artisan → shelf
+    public static event Action<ResourceStack> OnLootCollected;        // from dungeon/porter/click
+    public static event Action<ResourceStack> OnProductCrafted;       // artisan → shelf
 
     // Combat
     public static event Action<GameObject, float, GameObject> OnDamageTaken;
@@ -32,8 +32,8 @@ public static class GameSignals
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
     public static void RaiseGoldSpent(int amount) => OnGoldSpent?.Invoke(amount);
     public static void RaiseGoldChanged(int total) => GoldChanged?.Invoke(total);
-    public static void RaiseLootCollected(ResourceStack stack) => LootCollected?.Invoke(stack);
-    public static void RaiseProductCrafted(ResourceStack stack) => ProductCrafted?.Invoke(stack);
+    public static void RaiseLootCollected(ResourceStack stack) => OnLootCollected?.Invoke(stack);
+    public static void RaiseProductCrafted(ResourceStack stack) => OnProductCrafted?.Invoke(stack);
     public static void RaiseDamageTaken(GameObject entity, float damage, GameObject source) => OnDamageTaken?.Invoke(entity, damage, source);
     public static void RaiseEntityDeath(GameObject deadEntity, GameObject killer) => OnEntityDeath?.Invoke(deadEntity, killer);
     public static void RaiseSkillActivated(EntityBase caster, string skillName) => OnSkillActivated?.Invoke(caster, skillName);
@@ -50,8 +50,8 @@ public static class GameSignals
         OnGoldEarned = null;
         OnGoldSpent = null;
         GoldChanged = null;
-        LootCollected = null;
-        ProductCrafted = null;
+        OnLootCollected = null;
+        OnProductCrafted = null;
         OnDamageTaken = null;
         OnEntityDeath = null;
         OnSkillActivated = null;
@@ -69,8 +69,8 @@ public static class GameSignals
         Debug.Log($"OnGoldEarned: {OnGoldEarned?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnGoldSpent: {OnGoldSpent?.GetInvocationList().Length ?? 0}");
         Debug.Log($"GoldChanged: {GoldChanged?.GetInvocationList().Length ?? 0}");
-        Debug.Log($"LootCollected: {LootCollected?.GetInvocationList().Length ?? 0}");
-        Debug.Log($"ProductCrafted: {ProductCrafted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"LootCollected: {OnLootCollected?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"ProductCrafted: {OnProductCrafted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnDamageTaken: {OnDamageTaken?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnEntityDeath: {OnEntityDeath?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnSkillActivated: {OnSkillActivated?.GetInvocationList().Length ?? 0}");
