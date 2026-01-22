@@ -170,7 +170,7 @@ public class Inventory : MonoBehaviour
         }
 
         InventoryDebugUi();
-    }
+    }  
 
     [ContextMenu("Debug/Clear All Items")]
     private void ClearAllItems()

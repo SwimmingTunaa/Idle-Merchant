@@ -968,3 +968,658 @@ Memory consumption went from 158.1 MB to 154.0 MB.
 Total: 6.589000 ms (FindLiveObjects: 0.368000 ms CreateObjectMapping: 0.166333 ms MarkObjects: 4.831375 ms  DeleteObjects: 1.222833 ms)
 
 Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.544 seconds
+Refreshing native plugins compatible for Editor in 0.35 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.459 seconds
+Domain Reload Profiling: 1005ms
+	BeginReloadAssembly (162ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (21ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (69ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (37ms)
+	LoadAllAssembliesAndSetupDomain (315ms)
+		LoadAssemblies (214ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (129ms)
+			TypeCache.Refresh (12ms)
+				TypeCache.ScanAssembly (2ms)
+			BuildScriptInfoCaches (106ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (459ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (379ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (79ms)
+			ProcessInitializeOnLoadAttributes (267ms)
+			ProcessInitializeOnLoadMethodAttributes (29ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.50 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.4 MB). Loaded Objects now: 7688.
+Memory consumption went from 158.1 MB to 153.7 MB.
+Total: 5.551833 ms (FindLiveObjects: 0.341416 ms CreateObjectMapping: 0.136209 ms MarkObjects: 3.857667 ms  DeleteObjects: 1.216042 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.487 seconds
+Refreshing native plugins compatible for Editor in 0.37 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.494 seconds
+Domain Reload Profiling: 985ms
+	BeginReloadAssembly (142ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (18ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (54ms)
+	RebuildCommonClasses (24ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (12ms)
+	LoadAllAssembliesAndSetupDomain (303ms)
+		LoadAssemblies (199ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (133ms)
+			TypeCache.Refresh (13ms)
+				TypeCache.ScanAssembly (2ms)
+			BuildScriptInfoCaches (107ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (494ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (406ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (84ms)
+			ProcessInitializeOnLoadAttributes (287ms)
+			ProcessInitializeOnLoadMethodAttributes (31ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.50 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.3 MB). Loaded Objects now: 7690.
+Memory consumption went from 158.1 MB to 153.9 MB.
+Total: 5.609334 ms (FindLiveObjects: 0.350459 ms CreateObjectMapping: 0.138042 ms MarkObjects: 4.046083 ms  DeleteObjects: 1.074417 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.417 seconds
+Refreshing native plugins compatible for Editor in 0.38 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.515 seconds
+Domain Reload Profiling: 934ms
+	BeginReloadAssembly (108ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (44ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (11ms)
+	LoadAllAssembliesAndSetupDomain (268ms)
+		LoadAssemblies (172ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (119ms)
+			TypeCache.Refresh (7ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (103ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (515ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (426ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (81ms)
+			ProcessInitializeOnLoadAttributes (307ms)
+			ProcessInitializeOnLoadMethodAttributes (34ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (10ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.46 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.2 MB). Loaded Objects now: 7692.
+Memory consumption went from 158.2 MB to 153.9 MB.
+Total: 6.678125 ms (FindLiveObjects: 0.398750 ms CreateObjectMapping: 0.170000 ms MarkObjects: 4.722709 ms  DeleteObjects: 1.386333 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.501 seconds
+Refreshing native plugins compatible for Editor in 0.32 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.511 seconds
+Domain Reload Profiling: 1015ms
+	BeginReloadAssembly (136ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (12ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (54ms)
+	RebuildCommonClasses (25ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (13ms)
+	LoadAllAssembliesAndSetupDomain (321ms)
+		LoadAssemblies (212ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (137ms)
+			TypeCache.Refresh (12ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (116ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (511ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (428ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (93ms)
+			ProcessInitializeOnLoadAttributes (300ms)
+			ProcessInitializeOnLoadMethodAttributes (31ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.46 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.3 MB). Loaded Objects now: 7694.
+Memory consumption went from 158.2 MB to 153.9 MB.
+Total: 5.412791 ms (FindLiveObjects: 0.336334 ms CreateObjectMapping: 0.125833 ms MarkObjects: 3.863667 ms  DeleteObjects: 1.086625 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.434 seconds
+Refreshing native plugins compatible for Editor in 0.43 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.492 seconds
+Domain Reload Profiling: 929ms
+	BeginReloadAssembly (113ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (46ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (12ms)
+	LoadAllAssembliesAndSetupDomain (281ms)
+		LoadAssemblies (183ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (122ms)
+			TypeCache.Refresh (11ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (102ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (492ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (408ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (86ms)
+			ProcessInitializeOnLoadAttributes (288ms)
+			ProcessInitializeOnLoadMethodAttributes (30ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.51 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.3 MB). Loaded Objects now: 7696.
+Memory consumption went from 158.3 MB to 154.0 MB.
+Total: 5.537667 ms (FindLiveObjects: 0.338959 ms CreateObjectMapping: 0.134875 ms MarkObjects: 3.957167 ms  DeleteObjects: 1.106458 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.394 seconds
+Refreshing native plugins compatible for Editor in 0.38 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.512 seconds
+Domain Reload Profiling: 908ms
+	BeginReloadAssembly (110ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (46ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (12ms)
+	LoadAllAssembliesAndSetupDomain (243ms)
+		LoadAssemblies (147ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (118ms)
+			TypeCache.Refresh (6ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (104ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (512ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (427ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (84ms)
+			ProcessInitializeOnLoadAttributes (306ms)
+			ProcessInitializeOnLoadMethodAttributes (33ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.40 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (3.9 MB). Loaded Objects now: 7698.
+Memory consumption went from 158.3 MB to 154.4 MB.
+Total: 5.098458 ms (FindLiveObjects: 0.308000 ms CreateObjectMapping: 0.156500 ms MarkObjects: 3.709167 ms  DeleteObjects: 0.924333 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.513 seconds
+Refreshing native plugins compatible for Editor in 0.48 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.514 seconds
+Domain Reload Profiling: 1031ms
+	BeginReloadAssembly (158ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (10ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (71ms)
+	RebuildCommonClasses (25ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (15ms)
+	LoadAllAssembliesAndSetupDomain (309ms)
+		LoadAssemblies (202ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (139ms)
+			TypeCache.Refresh (11ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (110ms)
+			ResolveRequiredComponents (8ms)
+	FinalizeReload (515ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (425ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (84ms)
+			ProcessInitializeOnLoadAttributes (304ms)
+			ProcessInitializeOnLoadMethodAttributes (32ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.50 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.3 MB). Loaded Objects now: 7700.
+Memory consumption went from 158.3 MB to 154.0 MB.
+Total: 6.182166 ms (FindLiveObjects: 0.362875 ms CreateObjectMapping: 0.249708 ms MarkObjects: 4.360584 ms  DeleteObjects: 1.208542 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.412 seconds
+Refreshing native plugins compatible for Editor in 0.41 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.488 seconds
+Domain Reload Profiling: 902ms
+	BeginReloadAssembly (126ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (61ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (12ms)
+	LoadAllAssembliesAndSetupDomain (244ms)
+		LoadAssemblies (151ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (117ms)
+			TypeCache.Refresh (5ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (103ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (488ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (407ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (80ms)
+			ProcessInitializeOnLoadAttributes (292ms)
+			ProcessInitializeOnLoadMethodAttributes (30ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.56 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.2 MB). Loaded Objects now: 7702.
+Memory consumption went from 158.4 MB to 154.2 MB.
+Total: 5.901459 ms (FindLiveObjects: 0.356833 ms CreateObjectMapping: 0.144000 ms MarkObjects: 4.271708 ms  DeleteObjects: 1.128709 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.432 seconds
+Refreshing native plugins compatible for Editor in 0.36 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.524 seconds
+Domain Reload Profiling: 959ms
+	BeginReloadAssembly (114ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (48ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (12ms)
+	LoadAllAssembliesAndSetupDomain (276ms)
+		LoadAssemblies (174ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (125ms)
+			TypeCache.Refresh (8ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (106ms)
+			ResolveRequiredComponents (8ms)
+	FinalizeReload (525ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (440ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (86ms)
+			ProcessInitializeOnLoadAttributes (316ms)
+			ProcessInitializeOnLoadMethodAttributes (34ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.55 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.2 MB). Loaded Objects now: 7704.
+Memory consumption went from 158.4 MB to 154.2 MB.
+Total: 5.620959 ms (FindLiveObjects: 0.359833 ms CreateObjectMapping: 0.136541 ms MarkObjects: 3.990000 ms  DeleteObjects: 1.134167 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.510 seconds
+Refreshing native plugins compatible for Editor in 0.40 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.498 seconds
+Domain Reload Profiling: 1011ms
+	BeginReloadAssembly (152ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (14ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (69ms)
+	RebuildCommonClasses (25ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (13ms)
+	LoadAllAssembliesAndSetupDomain (313ms)
+		LoadAssemblies (206ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (135ms)
+			TypeCache.Refresh (12ms)
+				TypeCache.ScanAssembly (2ms)
+			BuildScriptInfoCaches (114ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (499ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (411ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (85ms)
+			ProcessInitializeOnLoadAttributes (290ms)
+			ProcessInitializeOnLoadMethodAttributes (32ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.49 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.3 MB). Loaded Objects now: 7706.
+Memory consumption went from 158.4 MB to 154.1 MB.
+Total: 5.664209 ms (FindLiveObjects: 0.340542 ms CreateObjectMapping: 0.137292 ms MarkObjects: 4.078166 ms  DeleteObjects: 1.108000 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f717000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.397 seconds
+Refreshing native plugins compatible for Editor in 0.37 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.511 seconds
+Domain Reload Profiling: 911ms
+	BeginReloadAssembly (110ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (46ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (12ms)
+	LoadAllAssembliesAndSetupDomain (246ms)
+		LoadAssemblies (145ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (123ms)
+			TypeCache.Refresh (6ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (108ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (511ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (428ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (83ms)
+			ProcessInitializeOnLoadAttributes (306ms)
+			ProcessInitializeOnLoadMethodAttributes (35ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.62 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6876 unused Assets / (4.0 MB). Loaded Objects now: 7708.
+Memory consumption went from 158.5 MB to 154.4 MB.
+Total: 6.865541 ms (FindLiveObjects: 0.438084 ms CreateObjectMapping: 0.178083 ms MarkObjects: 4.849500 ms  DeleteObjects: 1.399541 ms)
+
+Prepare: number of updated asset objects reloaded= 0
