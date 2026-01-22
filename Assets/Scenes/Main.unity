@@ -1539,6 +1539,65 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &266967777
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 266967778}
+  - component: {fileID: 266967779}
+  m_Layer: 5
+  m_Name: Hiring Menu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &266967778
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266967777}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &266967779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266967777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a67850f785f3044de81007d8ed15eaf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HireController
+  uiDocument: {fileID: 1433364562}
+  hirePanelAsset: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
+  candidateSlotAsset: {fileID: 9197481963319205126, guid: 40b7a40e8dd3705468beecaaa3b84700, type: 3}
+  adventurerManagers:
+  - {fileID: 115620252}
+  porterManagers:
+  - {fileID: 311339224}
+  refreshIntervalSeconds: 300
+  traitChance: 0.7
+  stackRotationMax: 3
+  stackScaleFactor: 0.025
+  openCloseDuration: 0
+  hireAnimationDuration: 0.5
+  blocksWorldInput: 1
+  showDebugLogs: 0
 --- !u!1 &267594680
 GameObject:
   m_ObjectHideFlags: 0
@@ -3361,6 +3420,55 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &811366029
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 811366030}
+  - component: {fileID: 811366031}
+  m_Layer: 5
+  m_Name: Crafting Menu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &811366030
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811366029}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &811366031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811366029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00039495394b54332a5cbd28b3bfa49f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CraftingController
+  uiDocument: {fileID: 1433364562}
+  craftingPanelAsset: {fileID: 9197481963319205126, guid: 2078ccd3555ce4493866577e7049d5e0, type: 3}
+  recipeCardAsset: {fileID: 9197481963319205126, guid: 8c0eb7c24e6444fa79063a13c9241ba2, type: 3}
+  blocksWorldInput: 1
+  showDebugLogs: 0
 --- !u!1 &840054634
 GameObject:
   m_ObjectHideFlags: 0
@@ -6828,7 +6936,6 @@ GameObject:
   - component: {fileID: 1433364566}
   - component: {fileID: 1433364567}
   - component: {fileID: 1433364568}
-  - component: {fileID: 1433364569}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -6872,7 +6979,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 266967778}
   - {fileID: 1875925580}
+  - {fileID: 811366030}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1433364565
@@ -6940,33 +7049,6 @@ MonoBehaviour:
   prefix: 
   suffix: 
   format: N0
---- !u!114 &1433364569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1433364561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a67850f785f3044de81007d8ed15eaf3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HireController
-  uiDocument: {fileID: 1433364562}
-  hirePanelAsset: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
-  candidateSlotAsset: {fileID: 9197481963319205126, guid: 40b7a40e8dd3705468beecaaa3b84700, type: 3}
-  adventurerManagers:
-  - {fileID: 115620252}
-  porterManagers:
-  - {fileID: 311339224}
-  refreshIntervalSeconds: 300
-  traitChance: 0.7
-  stackRotationMax: 3
-  stackScaleFactor: 0.025
-  openCloseDuration: 0
-  hireAnimationDuration: 0.5
-  blocksWorldInput: 1
-  showDebugLogs: 0
 --- !u!114 &1433364570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6979,8 +7061,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5892c5f69fed34cb181199bad501512f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  cancelAction: {fileID: 7727032971491509709, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  cancelActionMapName: UI
+  cancelActionName: Cancel
+  pauseMenuPanelID: PauseMenu
   inputCooldown: 0.2
+  panelHotkeys:
+  - actionMapName: UI
+    actionName: Crafting Menu
+    panelID: CraftingPanel
+    allowToggle: 1
+  - actionMapName: UI
+    actionName: Hiring Board
+    panelID: HirePanel
+    allowToggle: 1
 --- !u!1 &1467460987
 GameObject:
   m_ObjectHideFlags: 0
@@ -7222,7 +7316,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CraftingManager
   craftingRecipes:
   - {fileID: 11400000, guid: efc034d4598554e85baca718b3f69911, type: 2}
-  enableRecipes: []
+  safetyPollInterval: 2
+  showDebugLogs: 0
 --- !u!1 &1537114721
 GameObject:
   m_ObjectHideFlags: 0
@@ -8429,7 +8524,7 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 3bdb892dfe97241b3acaef188a896fba, type: 2}
     quantity: 15
   - item: {fileID: 11400000, guid: b78b9d8fc7c414f2b847061059c7e01f, type: 2}
-    quantity: 14
+    quantity: 20
 --- !u!1 &1898013000
 GameObject:
   m_ObjectHideFlags: 0
