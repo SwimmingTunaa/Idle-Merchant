@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CraftingManager : MonoBehaviour
@@ -8,6 +9,8 @@ public class CraftingManager : MonoBehaviour
     [Header("Crafting Config")]
     [SerializeField] private List<RecipeDef> craftingRecipes = new();
     [SerializeField] private Dictionary<ItemDef, int> materialReserves = new ();
+    [SerializeField] private List<RecipeDef> enableRecipes = new ();
+
     private Dictionary<RecipeDef, float> craftingTimers = new ();
     private Inventory inventory;
 
@@ -40,7 +43,19 @@ public class CraftingManager : MonoBehaviour
                 CompleteCraft(recipe);
             }
         }
+
+         //start autocrafting if recipe is enabled
+        foreach(var recipe in enableRecipes)
+        {
+            if(CanCraft(recipe) && !IsCrafting(recipe))
+            {
+                StartCraft(recipe);
+            }
+        }
+        
     }
+
+    // ===== CRAFTING LOGIC =====
 
     public bool CanCraft(RecipeDef recipe)
     {
@@ -83,6 +98,16 @@ public class CraftingManager : MonoBehaviour
         }
     }
 
+    public bool IsCrafting(RecipeDef recipe)
+    {
+        if(!craftingTimers.ContainsKey(recipe))
+            return false;       
+            
+        if(craftingTimers[recipe] <= 0) return false;
+
+        return true;
+    }
+
     public void CompleteCraft(RecipeDef recipe)
     {
         if (!craftingTimers.ContainsKey(recipe))
@@ -102,6 +127,20 @@ public class CraftingManager : MonoBehaviour
         Debug.Log($"Crafted {recipe.OutputQty}x {recipe.Output.displayName}.");
     }
 
+    // ===== CONFIGURATION METHODS =====
+
+    public void EnableRecipe(RecipeDef recipeDef)
+    {
+        if(!enableRecipes.Contains(recipeDef))
+            enableRecipes.Add(recipeDef);   
+    }
+
+    public void DisableRecipe(RecipeDef recipeDef)
+    {
+        if(enableRecipes.Contains(recipeDef))
+            enableRecipes.Remove(recipeDef);
+    }
+
     public void SetReserve(ItemDef material, int qty)
     {
         if (materialReserves.ContainsKey(material))
@@ -113,6 +152,8 @@ public class CraftingManager : MonoBehaviour
             materialReserves.Add(material, qty);
         }
     }
+
+    // ===== DEBUG METHODS =====
     
    [ContextMenu("Debug/Check Can Craft [RecipeName]")]
     public void DebugCheckCanCraft()

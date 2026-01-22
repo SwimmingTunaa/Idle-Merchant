@@ -7222,6 +7222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CraftingManager
   craftingRecipes:
   - {fileID: 11400000, guid: efc034d4598554e85baca718b3f69911, type: 2}
+  enableRecipes: []
 --- !u!1 &1537114721
 GameObject:
   m_ObjectHideFlags: 0
@@ -8426,9 +8427,9 @@ MonoBehaviour:
   debugText: {fileID: 230074849}
   itemsToAdd:
   - item: {fileID: 11400000, guid: 3bdb892dfe97241b3acaef188a896fba, type: 2}
-    quantity: 100
+    quantity: 15
   - item: {fileID: 11400000, guid: b78b9d8fc7c414f2b847061059c7e01f, type: 2}
-    quantity: 100
+    quantity: 14
 --- !u!1 &1898013000
 GameObject:
   m_ObjectHideFlags: 0
