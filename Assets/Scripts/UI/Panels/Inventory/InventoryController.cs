@@ -39,6 +39,9 @@ public class InventoryController : BasePanelController
     private SliderInt reserveSlider;
     private Toggle forsaleToggle;
 
+    private VisualElement detailContent;
+    private VisualElement emptyDetailMessage;
+
     private enum CategoryFilter { All, ForSale, Materials, Crafted, Luxury }
     private CategoryFilter currentCategory = CategoryFilter.All;
     private ItemDef selectedItem = null;
@@ -50,19 +53,6 @@ public class InventoryController : BasePanelController
             uiDocument = GetComponent<UIDocument>();
         
         BuildUI();
-    }
-
-    void Update()
-    {
-        if (State == PanelState.Open)
-        {
-            UpdateHeaderLabels();
-            
-            if (selectedItem != null && detailPanel != null && detailPanel.style.display == DisplayStyle.Flex)
-            {
-                UpdateDetailPanel(selectedItem);
-            }
-        }
     }
 
     protected override void Start()
@@ -89,6 +79,7 @@ public class InventoryController : BasePanelController
     {
         UpdateHeaderLabels();
         RefreshGrid();
+        
         if (showDebugLogs)
             Debug.Log("[InventoryController] Panel opened");
     }
@@ -128,6 +119,8 @@ public class InventoryController : BasePanelController
         reserveSlider = panel.Q<SliderInt>("reserve-slider");
         forsaleToggle = panel.Q<Toggle>("forsale-toggle");
 
+        SetupDetailPanel();
+
         if (tabAll != null) tabAll.clicked += () => OnCategoryTabClicked(CategoryFilter.All);
         if (tabForSale != null) tabForSale.clicked += () => OnCategoryTabClicked(CategoryFilter.ForSale);
         if (tabMaterials != null) tabMaterials.clicked += () => OnCategoryTabClicked(CategoryFilter.Materials);
@@ -141,6 +134,45 @@ public class InventoryController : BasePanelController
         panel.style.opacity = 0f;
         
         UpdateCategoryTabStates();
+    }
+
+    private void SetupDetailPanel()
+    {
+        if (detailPanel == null) return;
+
+        detailPanel.style.display = DisplayStyle.Flex;
+
+        detailContent = detailPanel.Q<VisualElement>("detail-icon-container")?.parent;
+        if (detailContent == null)
+        {
+            detailContent = new VisualElement();
+            detailContent.name = "detail-content-wrapper";
+        }
+
+        emptyDetailMessage = new VisualElement();
+        emptyDetailMessage.name = "empty-detail-message";
+        emptyDetailMessage.style.position = Position.Absolute;
+        emptyDetailMessage.style.top = 0;
+        emptyDetailMessage.style.left = 0;
+        emptyDetailMessage.style.right = 0;
+        emptyDetailMessage.style.bottom = 0;
+        emptyDetailMessage.style.alignItems = Align.Center;
+        emptyDetailMessage.style.justifyContent = Justify.Center;
+
+        var emptyLabel = new Label("No items available\n\nAdd items to your inventory to see details here");
+        emptyLabel.style.fontSize = 18;
+        emptyLabel.style.color = new Color(0.3f, 0.2f, 0.1f, 0.7f);
+        emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        emptyLabel.style.whiteSpace = WhiteSpace.Normal;
+        emptyLabel.style.paddingTop = 40;
+        emptyLabel.style.paddingBottom = 40;
+        emptyLabel.style.paddingLeft = 20;
+        emptyLabel.style.paddingRight = 20;
+
+        emptyDetailMessage.Add(emptyLabel);
+        emptyDetailMessage.style.display = DisplayStyle.None;
+
+        detailPanel.Add(emptyDetailMessage);
     }
 
     private void OnCategoryTabClicked(CategoryFilter category)
@@ -212,6 +244,66 @@ public class InventoryController : BasePanelController
         for (int i = 0; i < emptySlots; i++)
         {
             CreateEmptySlot();
+        }
+
+        if (itemCount > 0)
+        {
+            SelectFirstItem(allItems[0]);
+        }
+        else
+        {
+            ShowEmptyDetailPanel();
+        }
+    }
+
+    private void IncrementalUpdateItem(ItemDef item)
+    {
+        if (!itemSlots.TryGetValue(item, out var slot))
+            return;
+
+        int quantity = Inventory.Instance.Get(item.itemCategory, item);
+        var quantityLabel = slot.Q<Label>("slot-quantity");
+        if (quantityLabel != null)
+            quantityLabel.text = $"x{quantity}";
+
+        UpdateSlotBadges(slot, item);
+
+        if (currentCategory == CategoryFilter.ForSale)
+        {
+            int available = SalesManager.Instance.GetAvailableForSale(item);
+            slot.style.opacity = available > 0 ? 1f : 0.5f;
+        }
+
+        if (selectedItem == item)
+        {
+            UpdateDetailPanel(item);
+        }
+    }
+
+    private void SelectFirstItem(ItemDef item)
+    {
+        selectedItem = item;
+        ShowDetailPanel(item);
+        
+        if (itemSlots.TryGetValue(item, out var slot))
+        {
+            slot.AddToClassList("item-slot-selected");
+        }
+    }
+
+    private void ShowEmptyDetailPanel()
+    {
+        selectedItem = null;
+
+        if (detailContent != null)
+            detailContent.style.display = DisplayStyle.None;
+
+        if (emptyDetailMessage != null)
+            emptyDetailMessage.style.display = DisplayStyle.Flex;
+
+        foreach (var kvp in itemSlots)
+        {
+            kvp.Value.RemoveFromClassList("item-slot-selected");
         }
     }
 
@@ -385,11 +477,15 @@ public class InventoryController : BasePanelController
 
     private void ShowDetailPanel(ItemDef item)
     {
-        if (detailPanel != null)
-        {
-            detailPanel.style.display = DisplayStyle.Flex;
-            UpdateDetailPanel(item);
-        }
+        if (detailPanel == null) return;
+
+        if (detailContent != null)
+            detailContent.style.display = DisplayStyle.Flex;
+
+        if (emptyDetailMessage != null)
+            emptyDetailMessage.style.display = DisplayStyle.None;
+
+        UpdateDetailPanel(item);
     }
 
     private void UpdateDetailPanel(ItemDef item)
@@ -436,9 +532,7 @@ public class InventoryController : BasePanelController
         if (selectedItem == null) return;
 
         CraftingManager.Instance.SetReserve(selectedItem, evt.newValue);
-        
-        if (itemSlots.TryGetValue(selectedItem, out var slot))
-            UpdateSlotBadges(slot, selectedItem);
+        IncrementalUpdateItem(selectedItem);
 
         if (showDebugLogs)
             Debug.Log($"[InventoryController] Reserve for {selectedItem.displayName} set to {evt.newValue}");
@@ -453,9 +547,6 @@ public class InventoryController : BasePanelController
         if (currentCategory == CategoryFilter.ForSale && !evt.newValue)
         {
             RefreshGrid();
-            if (detailPanel != null)
-                detailPanel.style.display = DisplayStyle.None;
-            selectedItem = null;
             return;
         }
 
@@ -466,6 +557,11 @@ public class InventoryController : BasePanelController
             var forsaleSticker = slot.Q<VisualElement>("forsale-sticker");
             if (forsaleSticker != null)
                 forsaleSticker.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        if (selectedItem != null)
+        {
+            UpdateDetailPanel(selectedItem);
         }
 
         if (showDebugLogs)
@@ -486,18 +582,25 @@ public class InventoryController : BasePanelController
 
     private void OnGoldChanged(int newTotal)
     {
-        if (State == PanelState.Open && goldLabel != null)
+        if (State != PanelState.Open) return;
+
+        if (goldLabel != null)
             goldLabel.text = $"💰 {newTotal}";
     }
 
     private void OnInventoryChanged(ResourceStack stack)
     {
-        if (State == PanelState.Open)
+        if (State != PanelState.Open) return;
+
+        if (stack.itemDef != null && itemSlots.ContainsKey(stack.itemDef))
+        {
+            IncrementalUpdateItem(stack.itemDef);
+            UpdateHeaderLabels();
+        }
+        else
         {
             RefreshGrid();
-            
-            if (selectedItem == stack.itemDef)
-                UpdateDetailPanel(selectedItem);
+            UpdateHeaderLabels();
         }
     }
 }

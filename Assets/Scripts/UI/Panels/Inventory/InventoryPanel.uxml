@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="inventory-panel" class="inventory-overlay" style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center;">
+    <ui:VisualElement name="inventory-panel" style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center; top: auto; left: auto;">
         <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
         <ui:VisualElement name="inventory-container" class="inventory-ledger" style="width: 1400px; height: 900px; background-color: rgb(139, 90, 60); border-radius: 8px; border-width: 6px; border-color: rgb(101, 67, 33); flex-direction: row;">
             <ui:VisualElement name="category-tabs" style="width: 90px; padding: 16px; justify-content: flex-start; align-items: stretch; row-gap: 12px;">
@@ -22,7 +22,7 @@
                     <ui:VisualElement name="item-grid" class="item-grid" style="flex-wrap: wrap; flex-direction: row;" />
                 </ui:ScrollView>
             </ui:VisualElement>
-            <ui:VisualElement name="detail-panel" class="detail-panel" style="width: 400px; background-color: rgb(250, 240, 220); border-left-width: 3px; border-color: rgb(139, 90, 60); padding: 24px; display: none;">
+            <ui:VisualElement name="detail-panel" class="detail-panel" style="width: 400px; background-color: rgb(250, 240, 220); border-left-width: 3px; border-color: rgb(139, 90, 60); padding: 24px; display: flex;">
                 <ui:VisualElement name="detail-icon-container" style="align-items: center; margin-bottom: 16px;">
                     <ui:VisualElement name="detail-icon" style="width: 150px; height: 150px; background-color: rgba(139, 90, 60, 0.2); border-radius: 8px; border-width: 2px; border-color: rgb(139, 90, 60);" />
                 </ui:VisualElement>
