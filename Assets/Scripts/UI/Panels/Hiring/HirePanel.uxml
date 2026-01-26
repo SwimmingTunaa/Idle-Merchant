@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/style.uss?fileID=7433441132597879392&amp;guid=00116f07995c56c448c9e35309a91b23&amp;type=3#style" />
-    <ui:VisualElement name="hire-panel" style="flex-grow: 0; flex-direction: row; justify-content: center; width: 100%; align-items: center;">
+    <Style src="project://database/Assets/Scripts/UI/Panels/style.uss?fileID=7433441132597879392&amp;guid=00116f07995c56c448c9e35309a91b23&amp;type=3#style" />
+    <ui:VisualElement name="hire-panel" style="flex-grow: 0; flex-direction: row; justify-content: center; width: auto; align-items: center; position: absolute;">
         <ui:Button text="&lt;" name="previous-button" class="hireButton" style="align-self: center; flex-grow: 0; background-color: rgba(188, 188, 188, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 48px;" />
         <ui:VisualElement name="newspaper-stand" style="flex-grow: 0; justify-content: center; width: auto; height: auto; background-color: rgb(149, 99, 75); min-width: 800px; min-height: 1000px;">
             <ui:TabView name="unit-type-tabs" style="flex-grow: 0;">

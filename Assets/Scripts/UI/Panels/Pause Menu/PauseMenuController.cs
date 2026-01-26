@@ -5,35 +5,20 @@ using System.Collections;
 
 /// <summary>
 /// Pause menu controller with bulletin board aesthetic.
-/// Manages time scaling, button interactions, and scene transitions.
+/// Inherits from BasePanelController, overrides for pause/unpause and unscaled time animations.
 /// Accessed via ESC key through UIManager.
 /// </summary>
-public class PauseMenuController : MonoBehaviour, IPanelController
+public class PauseMenuController : BasePanelController
 {
-    [Header("UXML")]
-    [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private VisualTreeAsset pausePanelAsset;
-
     [Header("Scene Management")]
     [Tooltip("Name of main menu scene (hookup later when scene exists)")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
-    [Header("Animation")]
-    [SerializeField] private float openCloseDuration = 0.3f;
-    
+    // IPanelController implementation
+    public override string PanelID => "PauseMenu";
+   // public override VisualElement RootElement => panel;
 
-
-    // IPanelController
-    public string PanelID => "PauseMenu";
-    public VisualElement RootElement => pausePanel;
-    public PanelState State { get; private set; } = PanelState.Closed;
-    public bool BlocksWorldInput => true;
-    public bool IsModal => true;
-
-    public event System.Action<IPanelController> OnOpenComplete;
-    public event System.Action<IPanelController> OnCloseComplete;
-
-    private VisualElement pausePanel;
+    // UI Elements
     private Button resumeButton;
     private Button settingsButton;
     private Button saveButton;
@@ -41,57 +26,174 @@ public class PauseMenuController : MonoBehaviour, IPanelController
     private Button mainMenuButton;
     private Button quitButton;
 
+    // Time management
     private float previousTimeScale = 1f;
     private bool didPauseTime = false;
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // LIFECYCLE
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
-    private void Awake()
+    void Awake()
     {
+        if (uiDocument == null)
+            uiDocument = GetComponent<UIDocument>();
+        
         BuildUI();
     }
 
-    private void Start()
+    protected override void OnDestroy()
     {
-        UIManager.Instance.RegisterPanel(this);
-        pausePanel.style.display = DisplayStyle.None;
-        State = PanelState.Closed;
-    }
-
-    private void OnDestroy()
-    {
-        UIManager.Instance.UnregisterPanel(this);
-        
         // Safety: restore time if destroyed while paused
         if (didPauseTime)
         {
             Time.timeScale = previousTimeScale;
             didPauseTime = false;
         }
+        
+        base.OnDestroy();
     }
 
+    // ═════════════════════════════════════════════
+    // OVERRIDE OPEN/CLOSE FOR PAUSE LOGIC
+    // ═════════════════════════════════════════════
 
-    // ─────────────────────────────────────────────
-    // UI SETUP
-    // ─────────────────────────────────────────────
-
-    private void BuildUI()
+    public override bool Open()
     {
-        var root = uiDocument.rootVisualElement;
-        
-        // Add directly to root for full-screen overlay
-        pausePanel = pausePanelAsset.CloneTree().Q<VisualElement>("pause-panel");
-        root.Add(pausePanel);
+        if (State != PanelState.Closed)
+            return false;
+
+        State = PanelState.Opening;
+        PauseGame();
+        OnOpenStart();
+        StartCoroutine(OpenAnimation());
+        return true;
+    }
+
+    public override bool Close()
+    {
+        if (State != PanelState.Open)
+            return false;
+
+        State = PanelState.Closing;
+        UnpauseGame();
+        OnCloseStart();
+        StartCoroutine(CloseAnimation());
+        return true;
+    }
+
+    // ═════════════════════════════════════════════
+    // OVERRIDE FOR UNSCALED TIME
+    // ═════════════════════════════════════════════
+
+    protected override float GetDeltaTime() => Time.unscaledDeltaTime;
+
+    // ═════════════════════════════════════════════
+    // OVERRIDE ANIMATIONS FOR SCALE EFFECT
+    // ═════════════════════════════════════════════
+
+    protected override IEnumerator OpenAnimation()
+    {
+        if (RootElement == null)
+        {
+            State = PanelState.Open;
+            InvokeOnOpenComplete();
+            yield break;
+        }
+
+        // Show elements
+        panel.style.display = DisplayStyle.Flex;
+        if (hasOverlay && overlayElement != null)
+            overlayElement.style.display = DisplayStyle.Flex;
+
+        // Fade + scale up
+        float elapsed = 0f;
+        while (elapsed < openCloseDuration)
+        {
+            elapsed += GetDeltaTime();
+            float t = Mathf.Clamp01(elapsed / openCloseDuration);
+
+            panel.style.opacity = t;
+            float scale = Mathf.Lerp(0.9f, 1f, t);
+            panel.style.scale = new Scale(new Vector3(scale, scale, 1f));
+
+            if (hasOverlay && overlayElement != null)
+                overlayElement.style.opacity = t * overlayColor.a;
+
+            yield return null;
+        }
+
+        panel.style.opacity = 1f;
+        panel.style.scale = new Scale(Vector3.one);
+        if (hasOverlay && overlayElement != null)
+            overlayElement.style.opacity = overlayColor.a;
+
+        State = PanelState.Open;
+        InvokeOnOpenComplete();
+
+        if (showDebugLogs)
+            Debug.Log("[PauseMenu] Open animation complete");
+    }
+
+    protected override IEnumerator CloseAnimation()
+    {
+        if (RootElement == null)
+        {
+            State = PanelState.Closed;
+            InvokeOnCloseComplete();
+            yield break;
+        }
+
+        // Fade + scale down
+        float elapsed = 0f;
+        while (elapsed < openCloseDuration)
+        {
+            elapsed += GetDeltaTime();
+            float t = 1f - Mathf.Clamp01(elapsed / openCloseDuration);
+
+            panel.style.opacity = t;
+            float scale = Mathf.Lerp(1f, 0.9f, 1f - t);
+            panel.style.scale = new Scale(new Vector3(scale, scale, 1f));
+
+            if (hasOverlay && overlayElement != null)
+                overlayElement.style.opacity = t * overlayColor.a;
+
+            yield return null;
+        }
+
+        // Hide elements
+        panel.style.opacity = 0f;
+        panel.style.display = DisplayStyle.None;
+        panel.style.scale = new Scale(new Vector3(0.9f, 0.9f, 1f));
+
+        if (hasOverlay && overlayElement != null)
+        {
+            overlayElement.style.opacity = 0f;
+            overlayElement.style.display = DisplayStyle.None;
+        }
+
+        State = PanelState.Closed;
+        InvokeOnCloseComplete();
+
+        if (showDebugLogs)
+            Debug.Log("[PauseMenu] Close animation complete");
+    }
+
+    // ═════════════════════════════════════════════
+    // UI SETUP
+    // ═════════════════════════════════════════════
+
+    protected override void BuildUI()
+    {
+        base.BuildUI();  
 
         // Query buttons
-        resumeButton = pausePanel.Q<Button>("resume-button");
-        settingsButton = pausePanel.Q<Button>("settings-button");
-        saveButton = pausePanel.Q<Button>("save-button");
-        loadButton = pausePanel.Q<Button>("load-button");
-        mainMenuButton = pausePanel.Q<Button>("mainmenu-button");
-        quitButton = pausePanel.Q<Button>("quit-button");
+        resumeButton = panel.Q<Button>("resume-button");
+        settingsButton = panel.Q<Button>("settings-button");
+        saveButton = panel.Q<Button>("save-button");
+        loadButton = panel.Q<Button>("load-button");
+        mainMenuButton = panel.Q<Button>("mainmenu-button");
+        quitButton = panel.Q<Button>("quit-button");
 
         // Hook up callbacks
         resumeButton.clicked += OnResumeClicked;
@@ -105,59 +207,24 @@ public class PauseMenuController : MonoBehaviour, IPanelController
         settingsButton.SetEnabled(false);
         saveButton.SetEnabled(false);
         loadButton.SetEnabled(false);
+
+        // Initial visibility
+        panel.style.display = DisplayStyle.None;
+        panel.style.opacity = 0f;
     }
 
-    // ─────────────────────────────────────────────
-    // IPANELCONTROLLER IMPLEMENTATION
-    // ─────────────────────────────────────────────
-
-    public bool Open()
-    {
-        if (State != PanelState.Closed)
-            return false;
-
-        State = PanelState.Opening;
-        PauseGame();
-        StartCoroutine(OpenAnimation());
-        return true;
-    }
-
-    public bool Close()
-    {
-        if (State != PanelState.Open)
-            return false;
-
-        State = PanelState.Closing;
-        UnpauseGame();
-        StartCoroutine(CloseAnimation());
-        return true;
-    }
-
-    public void OnFocus()
-    {
-        // Could highlight resume button here
-    }
-
-    public void OnLoseFocus()
-    {
-        // Another panel opened on top (like settings submenu)
-    }
-
-    public bool CanClose()
-    {
-        // Always closeable
-        return true;
-    }
-
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // TIME MANAGEMENT
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void PauseGame()
     {
         previousTimeScale = Time.timeScale;
         Time.timeScale = 0f;
         didPauseTime = true;
+
+        if (showDebugLogs)
+            Debug.Log("[PauseMenu] Game paused");
     }
 
     private void UnpauseGame()
@@ -166,65 +233,15 @@ public class PauseMenuController : MonoBehaviour, IPanelController
         {
             Time.timeScale = previousTimeScale;
             didPauseTime = false;
+
+            if (showDebugLogs)
+                Debug.Log("[PauseMenu] Game unpaused");
         }
     }
 
-    // ─────────────────────────────────────────────
-    // ANIMATIONS (using unscaledDeltaTime for pause compatibility)
-    // ─────────────────────────────────────────────
-
-    private IEnumerator OpenAnimation()
-    {
-        pausePanel.style.display = DisplayStyle.Flex;
-        
-        float elapsed = 0f;
-        while (elapsed < openCloseDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / openCloseDuration);
-            
-            // Fade + scale up
-            pausePanel.style.opacity = t;
-            float scale = Mathf.Lerp(0.9f, 1f, t);
-            pausePanel.style.scale = new Scale(new Vector3(scale, scale, 1f));
-            
-            yield return null;
-        }
-
-        pausePanel.style.opacity = 1f;
-        pausePanel.style.scale = new Scale(Vector3.one);
-        
-        State = PanelState.Open;
-        OnOpenComplete?.Invoke(this);
-    }
-
-    private IEnumerator CloseAnimation()
-    {
-        float elapsed = 0f;
-        
-        while (elapsed < openCloseDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / openCloseDuration);
-            
-            // Fade + scale down
-            pausePanel.style.opacity = 1f - t;
-            float scale = Mathf.Lerp(1f, 0.9f, t);
-            pausePanel.style.scale = new Scale(new Vector3(scale, scale, 1f));
-            
-            yield return null;
-        }
-
-        pausePanel.style.opacity = 0f;
-        pausePanel.style.display = DisplayStyle.None;
-        
-        State = PanelState.Closed;
-        OnCloseComplete?.Invoke(this);
-    }
-
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // BUTTON CALLBACKS
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void OnResumeClicked()
     {
@@ -260,8 +277,7 @@ public class PauseMenuController : MonoBehaviour, IPanelController
         }
 
         // Check if scene exists before loading
-        if (SceneManager.GetSceneByName(mainMenuSceneName).IsValid() || 
-            System.Array.Exists(GetSceneNames(), scene => scene == mainMenuSceneName))
+        if (SceneManager.GetSceneByName(mainMenuSceneName).IsValid())
         {
             SceneManager.LoadScene(mainMenuSceneName);
         }
@@ -273,65 +289,20 @@ public class PauseMenuController : MonoBehaviour, IPanelController
 
     private void OnQuitClicked()
     {
-        #if UNITY_EDITOR
+        // Unpause before quitting
+        if (didPauseTime)
+        {
+            Time.timeScale = previousTimeScale;
+            didPauseTime = false;
+        }
+
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#else
         Application.Quit();
-        #endif
-    }
+#endif
 
-    // ─────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────
-
-    private string[] GetSceneNames()
-    {
-        int sceneCount = SceneManager.sceneCountInBuildSettings;
-        string[] scenes = new string[sceneCount];
-        for (int i = 0; i < sceneCount; i++)
-        {
-            scenes[i] = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i));
-        }
-        return scenes;
-    }
-
-    // ─────────────────────────────────────────────
-    // PUBLIC API (for external triggers)
-    // ─────────────────────────────────────────────
-
-    /// <summary>
-    /// Enable/disable save button when save system is ready
-    /// </summary>
-    public void SetSaveEnabled(bool enabled)
-    {
-        if (saveButton != null)
-        {
-            saveButton.SetEnabled(enabled);
-            saveButton.text = enabled ? "Save Game" : "Save Game (Coming Soon)";
-        }
-    }
-
-    /// <summary>
-    /// Enable/disable load button when save system is ready
-    /// </summary>
-    public void SetLoadEnabled(bool enabled)
-    {
-        if (loadButton != null)
-        {
-            loadButton.SetEnabled(enabled);
-            loadButton.text = enabled ? "Load Game" : "Load Game (Coming Soon)";
-        }
-    }
-
-    /// <summary>
-    /// Enable/disable settings button when settings panel is ready
-    /// </summary>
-    public void SetSettingsEnabled(bool enabled)
-    {
-        if (settingsButton != null)
-        {
-            settingsButton.SetEnabled(enabled);
-            settingsButton.text = enabled ? "Settings" : "Settings (Coming Soon)";
-        }
+        if (showDebugLogs)
+            Debug.Log("[PauseMenu] Quit game");
     }
 }
