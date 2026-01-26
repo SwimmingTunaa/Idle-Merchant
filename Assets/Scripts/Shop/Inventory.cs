@@ -63,6 +63,7 @@ public class Inventory : MonoBehaviour
     {
         inventory.TryGetValue(stack.itemDef, out var q);
         inventory[stack.itemDef] = q + stack.qty;
+        GameSignals.RaiseItemAdded(stack);
         InventoryDebugUi();
     }
 
