@@ -10,9 +10,11 @@ public static class GameSignals
     // Economy
     public static event Action<int> OnGoldEarned;
     public static event Action<int> OnGoldSpent;
-    public static event Action<int> GoldChanged;                    // Existing - fired by Inventory
+    public static event Action<int> GoldChanged;
     
-    // Loot & Crafting (Existing events)
+    // Inventory & Sales
+    public static event Action<ResourceStack> OnItemAdded;            // any item added to inventory
+    public static event Action<ResourceStack> OnItemSold;             // item sold to customer
     public static event Action<ResourceStack> OnLootCollected;        // from dungeon/porter/click
     public static event Action<ResourceStack> OnProductCrafted;       // artisan → shelf
 
@@ -32,6 +34,8 @@ public static class GameSignals
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
     public static void RaiseGoldSpent(int amount) => OnGoldSpent?.Invoke(amount);
     public static void RaiseGoldChanged(int total) => GoldChanged?.Invoke(total);
+    public static void RaiseItemAdded(ResourceStack stack) => OnItemAdded?.Invoke(stack);
+    public static void RaiseItemSold(ResourceStack stack) => OnItemSold?.Invoke(stack);
     public static void RaiseLootCollected(ResourceStack stack) => OnLootCollected?.Invoke(stack);
     public static void RaiseProductCrafted(ResourceStack stack) => OnProductCrafted?.Invoke(stack);
     public static void RaiseDamageTaken(GameObject entity, float damage, GameObject source) => OnDamageTaken?.Invoke(entity, damage, source);
@@ -41,8 +45,6 @@ public static class GameSignals
     public static void RaiseAdventurerPromoted(EntityBase adventurer, string oldRole, string newRole) => OnAdventurerPromoted?.Invoke(adventurer, oldRole, newRole);
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
 
-    // Helper methods
-
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]
     public static void ClearAllListeners()
@@ -50,6 +52,8 @@ public static class GameSignals
         OnGoldEarned = null;
         OnGoldSpent = null;
         GoldChanged = null;
+        OnItemAdded = null;
+        OnItemSold = null;
         OnLootCollected = null;
         OnProductCrafted = null;
         OnDamageTaken = null;
@@ -69,8 +73,10 @@ public static class GameSignals
         Debug.Log($"OnGoldEarned: {OnGoldEarned?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnGoldSpent: {OnGoldSpent?.GetInvocationList().Length ?? 0}");
         Debug.Log($"GoldChanged: {GoldChanged?.GetInvocationList().Length ?? 0}");
-        Debug.Log($"LootCollected: {OnLootCollected?.GetInvocationList().Length ?? 0}");
-        Debug.Log($"ProductCrafted: {OnProductCrafted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnItemAdded: {OnItemAdded?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnItemSold: {OnItemSold?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnLootCollected: {OnLootCollected?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnProductCrafted: {OnProductCrafted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnDamageTaken: {OnDamageTaken?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnEntityDeath: {OnEntityDeath?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnSkillActivated: {OnSkillActivated?.GetInvocationList().Length ?? 0}");

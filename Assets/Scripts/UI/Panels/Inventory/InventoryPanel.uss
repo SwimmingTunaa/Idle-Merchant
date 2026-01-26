@@ -1,0 +1,126 @@
+.inventory-ledger {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
+}
+
+.category-tab {
+    background-color: rgba(250, 240, 220, 0.1);
+    border-width: 2px;
+    border-color: rgb(70, 45, 20);
+    border-radius: 4px;
+    font-size: 32px;
+    color: rgb(250, 240, 220);
+    transition-duration: 0.2s;
+}
+
+.category-tab:hover {
+    background-color: rgba(250, 240, 220, 0.3);
+    scale: 1.05;
+}
+
+.category-tab:active {
+    background-color: rgb(250, 240, 220);
+    color: rgb(50, 30, 10);
+}
+
+.category-tab-selected {
+    background-color: rgb(250, 240, 220);
+    color: rgb(50, 30, 10);
+    border-color: rgb(200, 150, 0);
+    border-width: 3px;
+}
+
+.close-button {
+    background-color: rgba(200, 50, 50, 0.8);
+    border-width: 2px;
+    border-color: rgb(150, 30, 30);
+    border-radius: 4px;
+    color: white;
+    font-size: 24px;
+    transition-duration: 0.2s;
+}
+
+.close-button:hover {
+    background-color: rgb(220, 70, 70);
+    scale: 1.1;
+}
+
+.item-grid {
+}
+
+.item-slot {
+    cursor: link;
+    transition-duration: 0.15s;
+}
+
+.item-slot:hover {
+    border-color: rgb(200, 150, 0);
+    border-width: 3px;
+    scale: 1.05;
+}
+
+.item-slot-selected {
+    border-color: rgb(200, 150, 0);
+    border-width: 4px;
+    background-color: rgba(200, 150, 0, 0.2);
+}
+
+.item-slot-empty {
+    cursor: default;
+    opacity: 0.3;
+    background-color: rgba(139, 90, 60, 0.15);
+    border-style: dashed;
+}
+
+.item-slot-empty:hover {
+    border-color: rgb(139, 90, 60);
+    border-width: 2px;
+    scale: 1.0;
+}
+
+.detail-panel {
+}
+
+.detail-name {
+    -unity-font-style: bold;
+}
+
+.detail-description {
+    white-space: normal;
+}
+
+.stat-label {
+    -unity-font-style: normal;
+}
+
+.action-button {
+    cursor: link;
+    transition-duration: 0.2s;
+    -unity-font-style: bold;
+}
+
+.action-button:hover {
+    scale: 1.05;
+    border-width: 3px;
+    border-color: rgb(250, 240, 220);
+}
+
+.action-button:active {
+    scale: 0.95;
+}
+
+.quantity-badge {
+    -unity-font-style: bold;
+}
+
+.reserved-badge {
+    -unity-font-style: normal;
+}
+
+.forsale-badge {
+    -unity-font-style: normal;
+}
+
+.item-slot:hover .quantity-badge {
+    background-color: rgba(0, 0, 0, 0.9);
+    scale: 1.1;
+}

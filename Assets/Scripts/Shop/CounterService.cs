@@ -70,8 +70,11 @@ public class CounterService : MonoBehaviour
 
         if (c == null || c.desiredItem == null || c.desiredQty <= 0) return false;
 
+        if (SalesManager.Instance != null && !SalesManager.Instance.CanSell(c.desiredItem))
+            return false;
+
         var inv = Inventory.Instance.GetInventoryType(c.desiredItem.itemCategory);
-        int stock = Inventory.Instance.Get(inv, c.desiredItem);
+        int stock = SalesManager.Instance.GetAvailableForSale(c.desiredItem);
         if (stock <= 0) return false;
 
         unitPrice = c.desiredItem.sellPrice;
@@ -96,22 +99,22 @@ public class CounterService : MonoBehaviour
     void CompleteService(CustomerAgent c)
     {
         // Re-check at completion in case stock changed during the wait
-        if (!IsPurchasableNow(c, out int toBuy, out float unit)) 
+        if (!IsPurchasableNow(c, out int qty, out float price)) 
         {
             LeaveNow(c);
             queue.DequeueHeadAndShift();
             return;
         }
-
+        int totalCost = Mathf.FloorToInt(qty * price);
         var inv = Inventory.Instance.GetInventoryType(c.desiredItem.itemCategory);
 
-        if (Inventory.Instance.TryRemove(inv, c.desiredItem, toBuy))
+        if (Inventory.Instance.TryRemove(inv, c.desiredItem, qty))
         {
-            int goldGain = Mathf.RoundToInt(unit * toBuy);
-            Inventory.Instance.AddGold(goldGain);
+            Inventory.Instance.AddGold(totalCost);
 
-            // ADDED: Spawn gold VFX when customer purchases
-            SpawnGoldVFX(c.transform.position, goldGain);
+            //spawn coin vfx after purchase
+            SpawnGoldVFX(c.transform.position, totalCost);
+            GameSignals.RaiseItemSold(new ResourceStack(c.desiredItem, qty, totalCost));
         }
 
         Inventory.Instance.InventoryDebugUi();

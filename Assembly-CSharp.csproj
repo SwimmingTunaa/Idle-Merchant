@@ -53,6 +53,7 @@
     <Compile Include="Assets/Scripts/Entities/Base/IEntity.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Skills/Passive/RegenerationSkillDef.cs" />
     <Compile Include="Assets/Data/InputSystem_Actions.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Inventory/InventoryController.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Skills/Passive/AOEDamageSkillDef.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingController.cs" />
     <Compile Include="Assets/Scripts/Identity/TraitDefIdentityExtensions.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_Prefabs.cs" />
     <Compile Include="Assets/Scripts/Systems/Pooling/ObjectPoolManager.cs" />
     <Compile Include="Assets/Scripts/UI/WorldInputBlocker.cs" />
+    <Compile Include="Assets/Scripts/Shop/SalesManager.cs" />
     <Compile Include="Assets/Scripts/Effects/ItemFlyAnimation.cs" />
     <Compile Include="Assets/Scripts/Entities/Porters/PorterManager.cs" />
     <Compile Include="Assets/Scripts/Shop/Inventory.cs" />
@@ -180,12 +182,15 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets/SPUM/ReadMe - 3.1.0.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" />
     <None Include="Assets/Sprites/Pixel Art Icon Pack - RPG/Shader/SH Sprite Icon Outline Color.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Inventory/ItemSlot.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/SDFFunctions.hlsl" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface.shader" />
     <None Include="Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt" />

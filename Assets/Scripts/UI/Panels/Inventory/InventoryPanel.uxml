@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="inventory-panel" class="inventory-overlay" style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center;">
+        <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
+        <ui:VisualElement name="inventory-container" class="inventory-ledger" style="width: 1400px; height: 900px; background-color: rgb(139, 90, 60); border-radius: 8px; border-width: 6px; border-color: rgb(101, 67, 33); flex-direction: row;">
+            <ui:VisualElement name="category-tabs" style="width: 90px; padding: 16px; justify-content: flex-start; align-items: stretch; row-gap: 12px;">
+                <ui:Button name="tab-all" text="A" class="category-tab" />
+                <ui:Button name="tab-materials" text="M" class="category-tab" />
+                <ui:Button name="tab-crafted" text="C" class="category-tab" />
+                <ui:Button name="tab-luxury" text="L" class="category-tab" />
+                <ui:Button name="tab-forsale" text="$" class="category-tab" />
+            </ui:VisualElement>
+            <ui:VisualElement name="grid-container" style="flex-grow: 1; background-color: rgb(250, 240, 220); padding: 24px;">
+                <ui:VisualElement name="grid-header" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom-width: 2px; border-color: rgb(139, 90, 60);">
+                    <ui:Label name="category-title" text="All Items" class="header-title" style="font-size: 28px; color: rgb(50, 30, 10);" />
+                    <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:Label name="capacity-label" text="Capacity: 0" style="font-size: 18px; color: rgb(70, 45, 20); margin-right: 16px;" />
+                        <ui:Label name="gold-label" text="💰 0" style="font-size: 22px; color: rgb(200, 150, 0); margin-right: 16px;" />
+                        <ui:Button name="close-button" text="X" class="close-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:ScrollView name="item-grid-scroll" style="flex-grow: 1;">
+                    <ui:VisualElement name="item-grid" class="item-grid" style="flex-wrap: wrap; flex-direction: row;" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement name="detail-panel" class="detail-panel" style="width: 400px; background-color: rgb(250, 240, 220); border-left-width: 3px; border-color: rgb(139, 90, 60); padding: 24px; display: none;">
+                <ui:VisualElement name="detail-icon-container" style="align-items: center; margin-bottom: 16px;">
+                    <ui:VisualElement name="detail-icon" style="width: 150px; height: 150px; background-color: rgba(139, 90, 60, 0.2); border-radius: 8px; border-width: 2px; border-color: rgb(139, 90, 60);" />
+                </ui:VisualElement>
+                <ui:Label name="detail-name" class="detail-name" style="font-size: 24px; color: rgb(50, 30, 10); -unity-text-align: upper-center; margin-bottom: 8px; -unity-font-style: bold;" />
+                <ui:Label name="detail-description" class="detail-description" style="font-size: 16px; color: rgb(70, 45, 20); -unity-text-align: upper-left; margin-bottom: 16px; white-space: normal;" />
+                <ui:VisualElement name="stats-section" class="stats-box" style="background-color: rgba(139, 90, 60, 0.1); padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+                    <ui:Label name="stat-total" class="stat-label" style="font-size: 18px; color: rgb(50, 30, 10); margin-bottom: 4px;" />
+                    <ui:Label name="stat-reserved" class="stat-label" style="font-size: 18px; color: rgb(50, 90, 150); margin-bottom: 4px;" />
+                    <ui:Label name="stat-forsale" class="stat-label" style="font-size: 18px; color: rgb(0, 120, 60); margin-bottom: 4px;" />
+                    <ui:Label name="stat-value" class="stat-label" style="font-size: 18px; color: rgb(200, 150, 0);" />
+                </ui:VisualElement>
+                <ui:Label text="Reserve" style="font-size: 18px; color: rgb(50, 30, 10); margin-bottom: 6px;" />
+                <ui:SliderInt name="reserve-slider" style="margin-bottom: 12px;" />
+                <ui:Toggle name="forsale-toggle" text="Mark For Sale" style="font-size: 18px; color: rgb(50, 30, 10);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

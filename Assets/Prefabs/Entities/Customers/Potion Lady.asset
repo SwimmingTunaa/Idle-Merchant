@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Potion Lady
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDef
   prefab: {fileID: 5389948795088366679, guid: 474d6c90a41a14c17ba845b6b1dc8f6c, type: 3}
+  useModularCharacter: 0
   animatorOverrideController: {fileID: 22100000, guid: edd5f63b2af444bceb7de0cd1f6080e3, type: 2}
-  spriteVisual: {fileID: 0}
-  icon: {fileID: 0}
+  spriteDrop: {fileID: 0}
+  shopSprite: {fileID: 0}
   id: Potion Lady
   displayName: Potion Lady
   description: 
@@ -27,9 +28,25 @@ MonoBehaviour:
   moveSpeed: 2
   stopDistance: 0.05
   idleTimeRange: {x: 1, y: 3}
+  attackDamage: 1
+  attackInterval: 1
+  attackRange: 1.5
+  chaseBreakRange: 2.5
+  scanRange: 10
   deathAnimationDuration: 0.5
   colliderSize: {x: 0, y: 0}
   colliderOffset: {x: 0, y: 0}
+  baseBodySpriteLibraries: []
+  shirtSpriteLibraries: []
+  pantsSpriteLibraries: []
+  hairTopSpriteLibraries: []
+  hairBackSpriteLibraries: []
+  frontWeaponSpriteLibraries: []
+  backWeaponSpriteLibraries: []
+  skinColourPalette: {fileID: 0}
+  ShirtColourPalette: {fileID: 0}
+  PantsColourPalette: {fileID: 0}
+  HairColourPalette: {fileID: 0}
   startingState: 1
   itemPreferance: 0
   baseWeight: 1
