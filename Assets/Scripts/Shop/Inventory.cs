@@ -29,10 +29,14 @@ public class Inventory : MonoBehaviour
     private readonly Dictionary<ItemDef, int> commonInventory  = new();
     private readonly Dictionary<ItemDef, int> craftedInventory = new();
     private readonly Dictionary<ItemDef, int> luxuryInventory  = new();
+    private readonly Dictionary<ItemDef, int> itemReserves = new();
 
     void Awake() 
     {
-        Instance = this;
+        if(Instance == null)
+            Instance = this;
+        else Destroy(this);
+
         gold.ResetToDefault();
         InventoryDebugUi();
         GameSignals.OnGoldEarned += AddGold;
@@ -72,6 +76,18 @@ public class Inventory : MonoBehaviour
         if (Get(inventory, item) < qty) return false;
         inventory[item] -= qty;
         return true;
+    }
+
+    public void SetReserve(ItemDef item, int amount)
+    {
+        if (item == null) return;
+        itemReserves[item] = Mathf.Max(0, amount);
+    }
+
+    public int GetReserve(ItemDef item)
+    {
+        if (item == null) return 0;
+        return itemReserves.TryGetValue(item, out int qty) ? qty : 0;
     }
 
     // ===== GOLD MANAGEMENT =====

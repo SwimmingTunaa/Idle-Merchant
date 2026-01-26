@@ -531,7 +531,7 @@ public class InventoryController : BasePanelController
     {
         if (selectedItem == null) return;
 
-        CraftingManager.Instance.SetReserve(selectedItem, evt.newValue);
+        Inventory.Instance.SetReserve(selectedItem, evt.newValue);
         IncrementalUpdateItem(selectedItem);
 
         if (showDebugLogs)
@@ -571,7 +571,7 @@ public class InventoryController : BasePanelController
     private void UpdateHeaderLabels()
     {
         if (goldLabel != null)
-            goldLabel.text = $"💰 {Inventory.Instance.Gold}";
+            goldLabel.text = $"{Inventory.Instance.Gold}";
 
         if (capacityLabel != null)
         {

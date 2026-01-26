@@ -60,15 +60,14 @@ public class SalesManager : MonoBehaviour
             return 0;
 
         int totalStock = Inventory.Instance.Get(item.itemCategory, item);
-        int reserved = CraftingManager.Instance != null ? CraftingManager.Instance.GetReserve(item) : 0;
-
+        int reserved = Inventory.Instance.GetReserve(item);
         return Mathf.Max(0, totalStock - reserved);
     }
 
     public int GetReservedAmount(ItemDef item)
     {
         if (item == null) return 0;
-        return CraftingManager.Instance != null ? CraftingManager.Instance.GetReserve(item) : 0;
+        return Inventory.Instance.GetReserve(item);
     }
 
     public int GetTotalStock(ItemDef item)

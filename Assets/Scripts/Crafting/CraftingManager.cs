@@ -8,7 +8,6 @@ public class CraftingManager : MonoBehaviour
     [Header("Crafting Config")]
     [SerializeField] private List<RecipeDef> craftingRecipes = new();
 
-    private Dictionary<ItemDef, int> materialReserves = new();
     private List<RecipeDef> enabledRecipes = new();
     private List<CraftingJob> activeCrafts = new();
     private Inventory inventory;
@@ -119,7 +118,7 @@ public class CraftingManager : MonoBehaviour
         foreach (var ingredient in recipe.Ingredients)
         {
             int availableQty = inventory.Get(ingredient.Item.itemCategory, ingredient.Item);
-            int reserveQty = materialReserves.ContainsKey(ingredient.Item) ? materialReserves[ingredient.Item] : 0;
+            int reserveQty = Inventory.Instance.GetReserve(ingredient.Item);
             int neededQty = ingredient.Qty;
             
             Debug.Log($"  - {ingredient.Item.displayName}: Have {availableQty}, Need {neededQty}, Reserve {reserveQty}, Available: {availableQty - reserveQty}");
@@ -212,18 +211,6 @@ public class CraftingManager : MonoBehaviour
         }
     }
 
-    public void SetReserve(ItemDef material, int qty)
-    {
-        materialReserves[material] = qty;
-    }
-
-    // ===== QUERIES =====
-
-    public int GetReserve(ItemDef material)
-    {
-        return materialReserves.ContainsKey(material) ? materialReserves[material] : 0;
-    }
-
     public bool IsRecipeEnabled(RecipeDef recipe)
     {
         return enabledRecipes.Contains(recipe);
@@ -284,7 +271,7 @@ public class CraftingManager : MonoBehaviour
         {
             foreach (var ingredient in recipe.Ingredients)
             {
-                SetReserve(ingredient.Item, 10);
+                Inventory.Instance.SetReserve(ingredient.Item,10);
                 Debug.Log($"[CraftingManager] Set reserve of {ingredient.Item.displayName} to 10");
             }
         }

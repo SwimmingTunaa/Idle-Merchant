@@ -19,7 +19,6 @@ public class CraftingController : BasePanelController
 
     // UI Elements
     private ScrollView recipeScroll;
-    private ScrollView reserveScroll;
     private DropdownField filterDropdown;
     private DropdownField sortDropdown;
     private Button closeButton;
@@ -28,7 +27,6 @@ public class CraftingController : BasePanelController
 
     // State
     private List<RecipeCardData> recipeCards = new List<RecipeCardData>();
-    private Dictionary<ItemDef, VisualElement> reserveItems = new Dictionary<ItemDef, VisualElement>();
 
     private enum FilterMode { All, CanCraft, MissingMaterials, Enabled }
     private enum SortMode { UnlockOrder, CraftTime, OutputValue }
@@ -75,7 +73,6 @@ public class CraftingController : BasePanelController
     protected override void OnOpenStart()
     {
         PopulateRecipes();
-        PopulateReserves();
         
         if (showDebugLogs)
             Debug.Log("[CraftingController] Panel opened, data populated");
@@ -97,7 +94,6 @@ public class CraftingController : BasePanelController
 
         // Query elements
         recipeScroll = panel.Q<ScrollView>("recipe-scroll");
-        reserveScroll = panel.Q<ScrollView>("reserve-scroll");
         filterDropdown = panel.Q<DropdownField>("filter-dropdown");
         sortDropdown = panel.Q<DropdownField>("sort-dropdown");
         closeButton = panel.Q<Button>("close-button");
@@ -257,78 +253,6 @@ public class CraftingController : BasePanelController
     }
 
     // ═════════════════════════════════════════════
-    // MATERIAL RESERVES
-    // ═════════════════════════════════════════════
-
-    private void PopulateReserves()
-    {
-        reserveScroll.Clear();
-        reserveItems.Clear();
-
-        HashSet<ItemDef> materials = new HashSet<ItemDef>();
-        foreach (var cardData in recipeCards)
-        {
-            foreach (var ingredient in cardData.recipe.Ingredients)
-            {
-                materials.Add(ingredient.Item);
-            }
-        }
-
-        foreach (var material in materials)
-        {
-            CreateReserveItem(material);
-        }
-    }
-
-    private void CreateReserveItem(ItemDef material)
-    {
-        VisualElement item = new VisualElement();
-        item.AddToClassList("reserve-item");
-
-        VisualElement icon = new VisualElement();
-        icon.AddToClassList("reserve-item-icon");
-        if (material.icon != null)
-            icon.style.backgroundImage = new StyleBackground(material.icon);
-
-        Label nameLabel = new Label(material.displayName);
-        nameLabel.AddToClassList("reserve-item-name");
-
-        Label stockLabel = new Label();
-        stockLabel.AddToClassList("reserve-item-stock");
-        UpdateStockLabel(stockLabel, material);
-
-        SliderInt slider = new SliderInt(0, 100);
-        slider.AddToClassList("reserve-slider");
-        slider.value = CraftingManager.Instance.GetReserve(material);
-        slider.RegisterValueChangedCallback(evt => OnReserveChanged(material, evt.newValue));
-
-        item.Add(icon);
-        item.Add(nameLabel);
-        item.Add(stockLabel);
-        item.Add(slider);
-
-        reserveItems[material] = item;
-        reserveScroll.Add(item);
-    }
-
-    private void UpdateStockLabel(Label label, ItemDef material)
-    {
-        int stock = Inventory.Instance.Get(material.itemCategory, material);
-        int reserve = CraftingManager.Instance.GetReserve(material);
-        label.text = $"Stock: {stock} (Reserve: {reserve})";
-    }
-
-    private void RefreshReserves()
-    {
-        foreach (var kvp in reserveItems)
-        {
-            Label stockLabel = kvp.Value.Q<Label>(className: "reserve-item-stock");
-            if (stockLabel != null)
-                UpdateStockLabel(stockLabel, kvp.Key);
-        }
-    }
-
-    // ═════════════════════════════════════════════
     // FILTERING & SORTING
     // ═════════════════════════════════════════════
 
@@ -405,18 +329,9 @@ public class CraftingController : BasePanelController
             Debug.Log($"[CraftingController] Recipe {recipe.Output.displayName} {(enabled ? "enabled" : "disabled")}");
     }
 
-    private void OnReserveChanged(ItemDef material, int value)
-    {
-        CraftingManager.Instance.SetReserve(material, value);
-
-        if (showDebugLogs)
-            Debug.Log($"[CraftingController] Reserve for {material.displayName} set to {value}");
-    }
-
     private void OnProductCrafted(ResourceStack stack)
     {
         RefreshRecipeList();
-        RefreshReserves();
 
         var cardData = recipeCards.FirstOrDefault(c => c.recipe.Output == stack.itemDef);
         if (cardData != null)
