@@ -5,14 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Hire panel controller - implements IPanelController for UIManager integration.
-/// Manages candidate hiring UI with stack-based navigation and animations.
+/// Hire panel controller - manages candidate hiring UI with stack-based navigation and animations.
+/// Inherits from BasePanelController, overrides Open() for roster rebuild and animations for card stack.
 /// </summary>
-public class HireController : MonoBehaviour, IPanelController
+public class HireController : BasePanelController
 {
     [Header("UXML References")]
-    [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private VisualTreeAsset hirePanelAsset;
     [SerializeField] private VisualTreeAsset candidateSlotAsset;
 
     [Header("Manager References")]
@@ -28,28 +26,13 @@ public class HireController : MonoBehaviour, IPanelController
     [SerializeField] private float stackScaleFactor = 0.025f;
 
     [Header("Animation")]
-    [SerializeField] private float openCloseDuration = 0.3f;
     [SerializeField] private float hireAnimationDuration = 0.5f;
 
-    [Header("Panel Settings")]
-    [SerializeField] private bool blocksWorldInput = true;
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
-
     // IPanelController implementation
-    public string PanelID => "HirePanel";
-    public VisualElement RootElement => hirePanel;
-    public PanelState State { get; private set; } = PanelState.Closed;
-    public bool BlocksWorldInput => blocksWorldInput;
-    public bool IsModal => true;
+    public override string PanelID => "HirePanel";
+    //public override VisualElement RootElement => panel;
 
-    public event Action<IPanelController> OnOpenComplete;
-    public event Action<IPanelController> OnCloseComplete;
-
-    // UI
-    private VisualElement root;
-    private VisualElement hirePanel;
+    // UI Elements
     private VisualElement stackContainer;
     private VisualElement emptyState;
     private Button openButton;
@@ -109,32 +92,33 @@ public class HireController : MonoBehaviour, IPanelController
     private List<CandidatePool> CurrentPools =>
         currentTab == TabType.Adventurers ? adventurerPools : porterPools;
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // LIFECYCLE
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
-    private void OnEnable()
+    void OnEnable()
     {
         BuildUI();
     }
 
-    private void Start()
+    void Awake()
+    {
+        if (uiDocument == null)
+            uiDocument = GetComponent<UIDocument>();
+    }
+
+    protected override void Start()
     {
         InitializeCandidatePools();
-        UIManager.Instance.RegisterPanel(this);
+        base.Start(); // Registers with UIManager
         
         // Start closed
-        hirePanel.style.display = DisplayStyle.None;
-        State = PanelState.Closed;
+        panel.style.display = DisplayStyle.None;
     }
 
-    private void OnDestroy()
+    void Update()
     {
-        UIManager.Instance.UnregisterPanel(this);
-    }
-
-    private void Update()
-    {
+        // Update candidate pools
         foreach (var pool in candidatePools.Values)
             pool.Update(Time.deltaTime);
 
@@ -142,38 +126,151 @@ public class HireController : MonoBehaviour, IPanelController
             UpdateEmptyTimer();
     }
 
-    // ─────────────────────────────────────────────
-    // UI SETUP
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
+    // OVERRIDE OPEN FOR ROSTER REBUILD
+    // ═════════════════════════════════════════════
 
-    private void BuildUI()
+    public override bool Open()
     {
-        root = uiDocument.rootVisualElement;
-        openButton = root.Q<Button>("ShopButton");
+        if (State != PanelState.Closed)
+            return false;
 
-        hirePanel = hirePanelAsset.CloneTree().Q<VisualElement>("hire-panel");
-        root.Add(hirePanel);
+        State = PanelState.Opening;
+        RebuildRosters();
+        ClampViewIndexToRoster();
+        BuildStack();
+        UpdateCount();
+        
+        OnOpenStart();
+        StartCoroutine(OpenAnimation());
+        return true;
+    }
 
-        stackContainer = hirePanel.Q<VisualElement>("newspaper-container");
-        emptyState = hirePanel.Q<VisualElement>("text-container");
-        prevButton = hirePanel.Q<Button>("previous-button");
-        nextButton = hirePanel.Q<Button>("next-button");
-        countLabel = hirePanel.Q<Label>("count");
-        emptyTimerLabel = hirePanel.Q<Label>("empty-timer");
-        tabView = hirePanel.Q<TabView>("unit-type-tabs");
+    // ═════════════════════════════════════════════
+    // OVERRIDE CANCLOSE TO PREVENT CLOSE DURING HIRE
+    // ═════════════════════════════════════════════
 
-        openButton.clicked += OnOpenButtonClicked;
+    public override bool CanClose()
+    {
+        return !isHireAnimating;
+    }
+
+    // ═════════════════════════════════════════════
+    // OVERRIDE ANIMATIONS (Simple fade for now)
+    // ═════════════════════════════════════════════
+
+    protected override IEnumerator OpenAnimation()
+    {
+        if (RootElement == null)
+        {
+            State = PanelState.Open;
+            InvokeOnOpenComplete();
+            yield break;
+        }
+
+        panel.style.display = DisplayStyle.Flex;
+        if (hasOverlay && overlayElement != null)
+            overlayElement.style.display = DisplayStyle.Flex;
+
+        float elapsed = 0f;
+        while (elapsed < openCloseDuration)
+        {
+            elapsed += GetDeltaTime();
+            float t = Mathf.Clamp01(elapsed / openCloseDuration);
+            
+            panel.style.opacity = t;
+            if (hasOverlay && overlayElement != null)
+                overlayElement.style.opacity = t * overlayColor.a;
+            
+            yield return null;
+        }
+
+        panel.style.opacity = 1f;
+        if (hasOverlay && overlayElement != null)
+            overlayElement.style.opacity = overlayColor.a;
+
+        State = PanelState.Open;
+        InvokeOnOpenComplete();
+
+        if (showDebugLogs)
+            Debug.Log("[HirePanel] Open animation complete");
+    }
+
+    protected override IEnumerator CloseAnimation()
+    {
+        if (RootElement == null)
+        {
+            State = PanelState.Closed;
+            InvokeOnCloseComplete();
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < openCloseDuration)
+        {
+            elapsed += GetDeltaTime();
+            float t = 1f - Mathf.Clamp01(elapsed / openCloseDuration);
+            
+            panel.style.opacity = t;
+            if (hasOverlay && overlayElement != null)
+                overlayElement.style.opacity = t * overlayColor.a;
+            
+            yield return null;
+        }
+
+        panel.style.opacity = 0f;
+        panel.style.display = DisplayStyle.None;
+        if (hasOverlay && overlayElement != null)
+        {
+            overlayElement.style.opacity = 0f;
+            overlayElement.style.display = DisplayStyle.None;
+        }
+
+        State = PanelState.Closed;
+        InvokeOnCloseComplete();
+
+        if (showDebugLogs)
+            Debug.Log("[HirePanel] Close animation complete");
+    }
+
+    // ═════════════════════════════════════════════
+    // UI SETUP
+    // ═════════════════════════════════════════════
+
+    protected override void BuildUI()
+    {
+        base.BuildUI();
+        
+        // Query the open button (if it exists in root)
+        openButton = uiDocument.rootVisualElement.Q<Button>("ShopButton");
+
+        // Query elements
+        stackContainer = panel.Q<VisualElement>("newspaper-container");
+        emptyState = panel.Q<VisualElement>("text-container");
+        prevButton = panel.Q<Button>("previous-button");
+        nextButton = panel.Q<Button>("next-button");
+        countLabel = panel.Q<Label>("count");
+        emptyTimerLabel = panel.Q<Label>("empty-timer");
+        tabView = panel.Q<TabView>("unit-type-tabs");
+
+        // Hook up callbacks
+        if (openButton != null)
+            openButton.clicked += OnOpenButtonClicked;
         prevButton.clicked += Prev;
         nextButton.clicked += Next;
         tabView.activeTabChanged += OnTabChanged;
+
+        // Initial visibility
+        panel.style.display = DisplayStyle.None;
+        panel.style.opacity = 0f;
     }
+
+    // ═════════════════════════════════════════════
+    // POOL MANAGEMENT
+    // ═════════════════════════════════════════════
 
     private void InitializeCandidatePools()
     {
-        candidatePools.Clear();
-        adventurerPools.Clear();
-        porterPools.Clear();
-
         CreatePools(adventurerManagers, HireRole.Adventurer, adventurerPools);
         CreatePools(porterManagers, HireRole.Porter, porterPools);
     }
@@ -195,132 +292,9 @@ public class HireController : MonoBehaviour, IPanelController
         }
     }
 
-    // ─────────────────────────────────────────────
-    // IPANELCONTROLLER IMPLEMENTATION
-    // ─────────────────────────────────────────────
-
-    public bool Open()
-    {
-        if (State != PanelState.Closed)
-            return false;
-
-        State = PanelState.Opening;
-        RebuildRosters();
-        ClampViewIndexToRoster();
-        BuildStack();
-        UpdateCount();
-        
-        StartCoroutine(OpenAnimation());
-        return true;
-    }
-
-    public bool Close()
-    {
-        if (State != PanelState.Open)
-            return false;
-
-        State = PanelState.Closing;
-        StartCoroutine(CloseAnimation());
-        return true;
-    }
-
-    public void OnFocus()
-    {
-        if (showDebugLogs)
-            Debug.Log("[HirePanel] Gained focus");
-    }
-
-    public void OnLoseFocus()
-    {
-        if (showDebugLogs)
-            Debug.Log("[HirePanel] Lost focus");
-    }
-
-    public bool CanClose()
-    {
-        // Don't allow close during hire animation
-        return !isHireAnimating;
-    }
-
-    // ─────────────────────────────────────────────
-    // ANIMATIONS
-    // ─────────────────────────────────────────────
-
-    private IEnumerator OpenAnimation()
-    {
-        hirePanel.style.display = DisplayStyle.Flex;
-        
-        // Simple fade-in (you can enhance this)
-        float elapsed = 0f;
-        while (elapsed < openCloseDuration)
-        {
-            elapsed += Time.deltaTime;
-            float alpha = Mathf.Clamp01(elapsed / openCloseDuration);
-            hirePanel.style.opacity = alpha;
-            yield return null;
-        }
-
-        hirePanel.style.opacity = 1f;
-        State = PanelState.Open;
-        OnOpenComplete?.Invoke(this);
-    }
-
-    private IEnumerator CloseAnimation()
-    {
-        // Simple fade-out
-        float elapsed = 0f;
-        float startAlpha = hirePanel.resolvedStyle.opacity;
-        
-        while (elapsed < openCloseDuration)
-        {
-            elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(startAlpha, 0f, elapsed / openCloseDuration);
-            hirePanel.style.opacity = alpha;
-            yield return null;
-        }
-
-        hirePanel.style.opacity = 0f;
-        hirePanel.style.display = DisplayStyle.None;
-        State = PanelState.Closed;
-        OnCloseComplete?.Invoke(this);
-    }
-
-    // ─────────────────────────────────────────────
-    // PANEL INTERACTION
-    // ─────────────────────────────────────────────
-
-    private void OnOpenButtonClicked()
-    {
-        if (State == PanelState.Closed)
-            UIManager.Instance.OpenPanel(this);
-        else if (State == PanelState.Open)
-            UIManager.Instance.ClosePanel(this);
-    }
-
-    private void OnTabChanged(Tab _, Tab newTab)
-    {
-        currentTab = (TabType)tabView.IndexOf(newTab);
-        ClampViewIndexToRoster();
-        BuildStack();
-        UpdateCount();
-    }
-
-    private void ClampViewIndexToRoster()
-    {
-        int count = CurrentRoster.Count;
-        if (count <= 0)
-        {
-            CurrentViewIndex = 0;
-            return;
-        }
-
-        if (CurrentViewIndex < 0) CurrentViewIndex = 0;
-        if (CurrentViewIndex >= count) CurrentViewIndex = 0;
-    }
-
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // ROSTER & STACK
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void RebuildRosters()
     {
@@ -358,7 +332,6 @@ public class HireController : MonoBehaviour, IPanelController
             var card = candidateSlotAsset.CloneTree();
             rotationByCard[card] = UnityEngine.Random.Range(-stackRotationMax, stackRotationMax);
 
-            // Populate UI
             CandidateUIMapper.PopulateUI(card, CurrentRoster[i]);
             
             var hireBtn = card.Q<Button>("hire-button");
@@ -401,9 +374,9 @@ public class HireController : MonoBehaviour, IPanelController
         card.AddToClassList(ShadowClasses[clamped]);
     }
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // NAVIGATION
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void Prev()
     {
@@ -455,9 +428,9 @@ public class HireController : MonoBehaviour, IPanelController
         UpdateCount();
     }
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // HIRING
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void TryHire(VisualElement card)
     {
@@ -528,9 +501,9 @@ public class HireController : MonoBehaviour, IPanelController
         UpdateCount();
     }
 
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
     // UI UPDATES
-    // ─────────────────────────────────────────────
+    // ═════════════════════════════════════════════
 
     private void UpdateHireButtonState()
     {
@@ -575,16 +548,38 @@ public class HireController : MonoBehaviour, IPanelController
 
     private void UpdateCount()
     {
-        if (countLabel == null) return;
+        int current = CurrentViewIndex + 1;
+        int total = CurrentRoster.Count;
+        countLabel.text = total > 0 ? $"{current}/{total}" : "0/0";
+    }
 
-        if (CurrentRoster.Count == 0)
+    private void OnTabChanged(Tab _, Tab newTab)
+    {
+        currentTab = (TabType)tabView.IndexOf(newTab);
+        ClampViewIndexToRoster();
+        BuildStack();
+        UpdateCount();
+    }
+
+    private void ClampViewIndexToRoster()
+    {
+        int count = CurrentRoster.Count;
+        if (count <= 0)
         {
-            countLabel.text = "0/0";
+            CurrentViewIndex = 0;
             return;
         }
 
-        int pos = Mathf.Clamp(CurrentViewIndex, 0, CurrentRoster.Count - 1) + 1;
-        countLabel.text = $"{pos}/{CurrentRoster.Count}";
+        if (CurrentViewIndex < 0) CurrentViewIndex = 0;
+        if (CurrentViewIndex >= count) CurrentViewIndex = 0;
+    }
+
+    private void OnOpenButtonClicked()
+    {
+        if (State == PanelState.Closed)
+            UIManager.Instance.OpenPanel(this);
+        else if (State == PanelState.Open)
+            UIManager.Instance.ClosePanel(this);
     }
 
     private void UpdateEmptyTimer()

@@ -1584,7 +1584,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HireController
   uiDocument: {fileID: 1433364562}
-  hirePanelAsset: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
+  panelAsset: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
+  blocksWorldInput: 0
+  isModal: 1
+  openCloseDuration: 0
+  hasOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
   candidateSlotAsset: {fileID: 9197481963319205126, guid: 40b7a40e8dd3705468beecaaa3b84700, type: 3}
   adventurerManagers:
   - {fileID: 115620252}
@@ -1594,10 +1600,7 @@ MonoBehaviour:
   traitChance: 0.7
   stackRotationMax: 3
   stackScaleFactor: 0.025
-  openCloseDuration: 0
   hireAnimationDuration: 0.5
-  blocksWorldInput: 1
-  showDebugLogs: 0
 --- !u!1 &267594680
 GameObject:
   m_ObjectHideFlags: 0
@@ -3465,10 +3468,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CraftingController
   uiDocument: {fileID: 1433364562}
-  craftingPanelAsset: {fileID: 9197481963319205126, guid: 2078ccd3555ce4493866577e7049d5e0, type: 3}
-  recipeCardAsset: {fileID: 9197481963319205126, guid: 8c0eb7c24e6444fa79063a13c9241ba2, type: 3}
-  blocksWorldInput: 1
+  panelAsset: {fileID: 9197481963319205126, guid: 2078ccd3555ce4493866577e7049d5e0, type: 3}
+  blocksWorldInput: 0
+  isModal: 1
+  openCloseDuration: 0
+  hasOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
   showDebugLogs: 0
+  recipeCardAsset: {fileID: 9197481963319205126, guid: 8c0eb7c24e6444fa79063a13c9241ba2, type: 3}
 --- !u!1 &840054634
 GameObject:
   m_ObjectHideFlags: 0
@@ -8470,9 +8477,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseMenuController
   uiDocument: {fileID: 1433364562}
-  pausePanelAsset: {fileID: 9197481963319205126, guid: d86de3818b09844edb6036a25b22e634, type: 3}
-  mainMenuSceneName: MainMenu
+  panelAsset: {fileID: 9197481963319205126, guid: d86de3818b09844edb6036a25b22e634, type: 3}
+  blocksWorldInput: 1
+  isModal: 1
   openCloseDuration: 0
+  hasOverlay: 1
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
+  mainMenuSceneName: MainMenu
 --- !u!1 &1889394125
 GameObject:
   m_ObjectHideFlags: 0

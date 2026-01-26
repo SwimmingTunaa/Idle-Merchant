@@ -4,32 +4,20 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class CraftingController : MonoBehaviour, IPanelController
+/// <summary>
+/// Crafting panel controller - displays recipes, material reserves, and crafting progress.
+/// Inherits from BasePanelController for lifecycle and animation management.
+/// </summary>
+public class CraftingController : BasePanelController
 {
     [Header("UXML References")]
-    [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private VisualTreeAsset craftingPanelAsset;
     [SerializeField] private VisualTreeAsset recipeCardAsset;
 
-    [Header("Panel Settings")]
-    [SerializeField] private bool blocksWorldInput = true;
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
-
     // IPanelController implementation
-    public string PanelID => "CraftingPanel";
-    public VisualElement RootElement => craftingPanel;
-    public PanelState State { get; private set; } = PanelState.Closed;
-    public bool BlocksWorldInput => blocksWorldInput;
-    public bool IsModal => true;
-
-    public event Action<IPanelController> OnOpenComplete;
-    public event Action<IPanelController> OnCloseComplete;
+    public override string PanelID => "CraftingPanel";
+    //public override VisualElement RootElement => panel;
 
     // UI Elements
-    private VisualElement root;
-    private VisualElement craftingPanel;
     private ScrollView recipeScroll;
     private ScrollView reserveScroll;
     private DropdownField filterDropdown;
@@ -59,37 +47,16 @@ public class CraftingController : MonoBehaviour, IPanelController
         public Toggle enableToggle;
     }
 
+    // ═════════════════════════════════════════════
+    // LIFECYCLE
+    // ═════════════════════════════════════════════
+
     void Awake()
     {
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
-    }
-
-    void Start()
-    {
+        
         BuildUI();
-        SubscribeToEvents();
-        
-        // Register with UIManager
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.RegisterPanel(this);
-        }
-        else
-        {
-            Debug.LogError("[CraftingController] UIManager.Instance is null!");
-        }
-    }
-
-    void OnDestroy()
-    {
-        UnsubscribeFromEvents();
-        
-        // Unregister from UIManager
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.UnregisterPanel(this);
-        }
     }
 
     void Update()
@@ -101,23 +68,41 @@ public class CraftingController : MonoBehaviour, IPanelController
         }
     }
 
-    // ===== UI SETUP =====
+    // ═════════════════════════════════════════════
+    // LIFECYCLE HOOKS (Override from base)
+    // ═════════════════════════════════════════════
 
-    private void BuildUI()
+    protected override void OnOpenStart()
     {
-        root = uiDocument.rootVisualElement;
+        PopulateRecipes();
+        PopulateReserves();
+        
+        if (showDebugLogs)
+            Debug.Log("[CraftingController] Panel opened, data populated");
+    }
 
-        craftingPanel = craftingPanelAsset.CloneTree().Q<VisualElement>("crafting-panel");
-        root.Add(craftingPanel);
+    protected override void OnCloseStart()
+    {
+        if (showDebugLogs)
+            Debug.Log("[CraftingController] Panel closing");
+    }
+
+    // ═════════════════════════════════════════════
+    // UI SETUP
+    // ═════════════════════════════════════════════
+
+    protected override void BuildUI()
+    {
+        base.BuildUI();
 
         // Query elements
-        recipeScroll = craftingPanel.Q<ScrollView>("recipe-scroll");
-        reserveScroll = craftingPanel.Q<ScrollView>("reserve-scroll");
-        filterDropdown = craftingPanel.Q<DropdownField>("filter-dropdown");
-        sortDropdown = craftingPanel.Q<DropdownField>("sort-dropdown");
-        closeButton = craftingPanel.Q<Button>("close-button");
-        activeCraftsLabel = craftingPanel.Q<Label>("active-crafts-label");
-        statusLabel = craftingPanel.Q<Label>("status-label");
+        recipeScroll = panel.Q<ScrollView>("recipe-scroll");
+        reserveScroll = panel.Q<ScrollView>("reserve-scroll");
+        filterDropdown = panel.Q<DropdownField>("filter-dropdown");
+        sortDropdown = panel.Q<DropdownField>("sort-dropdown");
+        closeButton = panel.Q<Button>("close-button");
+        activeCraftsLabel = panel.Q<Label>("active-crafts-label");
+        statusLabel = panel.Q<Label>("status-label");
 
         // Setup dropdowns
         filterDropdown.choices = new List<string> { "All", "Can Craft", "Missing Materials", "Enabled" };
@@ -129,83 +114,25 @@ public class CraftingController : MonoBehaviour, IPanelController
         sortDropdown.RegisterValueChangedCallback(OnSortChanged);
 
         // Button callbacks
-        closeButton.clicked += OnCloseClicked;
+        closeButton.clicked += () => Close();
+
+        // Subscribe to events
+        GameSignals.OnProductCrafted += OnProductCrafted;
 
         // Initial visibility
-        craftingPanel.style.display = DisplayStyle.None;
+        panel.style.display = DisplayStyle.None;
+        panel.style.opacity = 0f;
     }
 
-    private void SubscribeToEvents()
-    {
-        GameSignals.OnProductCrafted += OnProductCrafted;
-    }
-
-    private void UnsubscribeFromEvents()
+    protected override void OnDestroy()
     {
         GameSignals.OnProductCrafted -= OnProductCrafted;
+        base.OnDestroy();
     }
 
-    // ===== IPANELCONTROLLER IMPLEMENTATION =====
-
-    public bool Open()
-    {
-        if (State != PanelState.Closed)
-            return false;
-
-        State = PanelState.Opening;
-        craftingPanel.style.display = DisplayStyle.Flex;
-
-        PopulateRecipes();
-        PopulateReserves();
-
-        State = PanelState.Open;
-        OnOpenComplete?.Invoke(this);
-
-        if (showDebugLogs)
-            Debug.Log("[CraftingController] Panel opened");
-
-        return true;
-    }
-
-    public bool Close()
-    {
-        if (State != PanelState.Open)
-            return false;
-
-        State = PanelState.Closing;
-        craftingPanel.style.display = DisplayStyle.None;
-
-        State = PanelState.Closed;
-        OnCloseComplete?.Invoke(this);
-
-        if (showDebugLogs)
-            Debug.Log("[CraftingController] Panel closed");
-
-        return true;
-    }
-
-    public void OnFocus()
-    {
-        // Refresh data when panel gains focus
-        if (State == PanelState.Open)
-        {
-            RefreshRecipeList();
-            RefreshReserves();
-        }
-    }
-
-    public void OnLoseFocus()
-    {
-        // Nothing needed
-    }
-
-    public bool CanClose()
-    {
-        // Always allow closing crafting panel
-        return true;
-    }
-
-    // ===== RECIPE LIST =====
+    // ═════════════════════════════════════════════
+    // RECIPE LIST
+    // ═════════════════════════════════════════════
 
     private void PopulateRecipes()
     {
@@ -218,10 +145,7 @@ public class CraftingController : MonoBehaviour, IPanelController
             return;
         }
 
-        // Get all recipes (assuming you expose this in CraftingManager)
-        // For now, we'll need to add a public getter in CraftingManager
-        // This is a placeholder - you'll need to expose craftingRecipes
-        List<RecipeDef> recipes = GetAllRecipes();
+        List<RecipeDef> recipes = CraftingManager.Instance.GetAllRecipes();
 
         foreach (var recipe in recipes)
         {
@@ -305,11 +229,9 @@ public class CraftingController : MonoBehaviour, IPanelController
         bool canCraft = CraftingManager.Instance.CanCraft(cardData.recipe);
         bool isCrafting = CraftingManager.Instance.IsCrafting(cardData.recipe);
 
-        // Update card styling
         cardData.cardElement.EnableInClassList("cannot-craft", !canCraft && !isCrafting);
         cardData.cardElement.EnableInClassList("crafting", isCrafting);
 
-        // Show/hide progress bar
         cardData.progressContainer.style.display = isCrafting ? DisplayStyle.Flex : DisplayStyle.None;
         cardData.craftTimeLabel.style.display = isCrafting ? DisplayStyle.None : DisplayStyle.Flex;
     }
@@ -320,8 +242,7 @@ public class CraftingController : MonoBehaviour, IPanelController
         {
             if (CraftingManager.Instance.IsCrafting(cardData.recipe))
             {
-                // Get progress (you'll need to expose this in CraftingManager)
-                float progress = GetCraftingProgress(cardData.recipe);
+                float progress = CraftingManager.Instance.GetCraftingProgress(cardData.recipe);
                 cardData.progressBar.style.width = Length.Percent(progress * 100f);
             }
         }
@@ -335,14 +256,15 @@ public class CraftingController : MonoBehaviour, IPanelController
         }
     }
 
-    // ===== MATERIAL RESERVES =====
+    // ═════════════════════════════════════════════
+    // MATERIAL RESERVES
+    // ═════════════════════════════════════════════
 
     private void PopulateReserves()
     {
         reserveScroll.Clear();
         reserveItems.Clear();
 
-        // Get all unique materials from recipes
         HashSet<ItemDef> materials = new HashSet<ItemDef>();
         foreach (var cardData in recipeCards)
         {
@@ -363,22 +285,18 @@ public class CraftingController : MonoBehaviour, IPanelController
         VisualElement item = new VisualElement();
         item.AddToClassList("reserve-item");
 
-        // Icon
         VisualElement icon = new VisualElement();
         icon.AddToClassList("reserve-item-icon");
         if (material.icon != null)
             icon.style.backgroundImage = new StyleBackground(material.icon);
 
-        // Name
         Label nameLabel = new Label(material.displayName);
         nameLabel.AddToClassList("reserve-item-name");
 
-        // Stock count
         Label stockLabel = new Label();
         stockLabel.AddToClassList("reserve-item-stock");
         UpdateStockLabel(stockLabel, material);
 
-        // Slider
         SliderInt slider = new SliderInt(0, 100);
         slider.AddToClassList("reserve-slider");
         slider.value = CraftingManager.Instance.GetReserve(material);
@@ -410,11 +328,12 @@ public class CraftingController : MonoBehaviour, IPanelController
         }
     }
 
-    // ===== FILTERING & SORTING =====
+    // ═════════════════════════════════════════════
+    // FILTERING & SORTING
+    // ═════════════════════════════════════════════
 
     private void ApplyFilterAndSort()
     {
-        // Filter
         List<RecipeCardData> visibleCards = recipeCards;
 
         switch (currentFilter)
@@ -430,7 +349,6 @@ public class CraftingController : MonoBehaviour, IPanelController
                 break;
         }
 
-        // Sort
         switch (currentSort)
         {
             case SortMode.CraftTime:
@@ -441,14 +359,15 @@ public class CraftingController : MonoBehaviour, IPanelController
                 break;
         }
 
-        // Update visibility
         foreach (var cardData in recipeCards)
         {
             cardData.cardElement.style.display = visibleCards.Contains(cardData) ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 
-    // ===== CALLBACKS =====
+    // ═════════════════════════════════════════════
+    // CALLBACKS
+    // ═════════════════════════════════════════════
 
     private void OnFilterChanged(ChangeEvent<string> evt)
     {
@@ -499,7 +418,6 @@ public class CraftingController : MonoBehaviour, IPanelController
         RefreshRecipeList();
         RefreshReserves();
 
-        // Flash completed recipe
         var cardData = recipeCards.FirstOrDefault(c => c.recipe.Output == stack.itemDef);
         if (cardData != null)
         {
@@ -511,11 +429,6 @@ public class CraftingController : MonoBehaviour, IPanelController
         }
     }
 
-    private void OnCloseClicked()
-    {
-        Close();
-    }
-
     private void UpdateFooter()
     {
         int activeCrafts = CraftingManager.Instance.GetActiveCraftCount();
@@ -523,23 +436,5 @@ public class CraftingController : MonoBehaviour, IPanelController
 
         int enabledCount = CraftingManager.Instance.GetEnabledRecipes().Count;
         statusLabel.text = enabledCount > 0 ? $"{enabledCount} recipes enabled" : "No recipes enabled";
-    }
-
-    // ===== HELPER METHODS =====
-
-    private List<RecipeDef> GetAllRecipes()
-    {
-        if (CraftingManager.Instance == null)
-            return new List<RecipeDef>();
-        
-        return CraftingManager.Instance.GetAllRecipes();
-    }
-
-    private float GetCraftingProgress(RecipeDef recipe)
-    {
-        if (CraftingManager.Instance == null)
-            return 0f;
-        
-        return CraftingManager.Instance.GetCraftingProgress(recipe);
     }
 }

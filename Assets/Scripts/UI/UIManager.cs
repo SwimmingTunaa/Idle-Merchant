@@ -97,7 +97,7 @@ public class UIManager : MonoBehaviour
     {
         if (inputActions == null)
         {
-            Debug.LogError("[UIManager] InputActionAsset not assigned!");
+            //Debug.LogError("[UIManager] InputActionAsset not assigned!");
             return;
         }
 
@@ -109,14 +109,14 @@ public class UIManager : MonoBehaviour
         {
             if (string.IsNullOrEmpty(binding.actionMapName) || string.IsNullOrEmpty(binding.actionName))
             {
-                Debug.LogWarning($"[UIManager] Invalid hotkey binding: empty action map or action name");
+                //Debug.LogWarning($"[UIManager] Invalid hotkey binding: empty action map or action name");
                 continue;
             }
 
             var actionMap = inputActions.FindActionMap(binding.actionMapName);
             if (actionMap == null)
             {
-                Debug.LogWarning($"[UIManager] Action map '{binding.actionMapName}' not found!");
+                //Debug.LogWarning($"[UIManager] Action map '{binding.actionMapName}' not found!");
                 continue;
             }
 
@@ -142,14 +142,14 @@ public class UIManager : MonoBehaviour
         var actionMap = inputActions.FindActionMap(cancelActionMapName);
         if (actionMap == null)
         {
-            Debug.LogWarning($"[UIManager] Cancel action map '{cancelActionMapName}' not found!");
+            //Debug.LogWarning($"[UIManager] Cancel action map '{cancelActionMapName}' not found!");
             return;
         }
 
         cancelAction = actionMap.FindAction(cancelActionName);
         if (cancelAction == null)
         {
-            Debug.LogWarning($"[UIManager] Cancel action '{cancelActionName}' not found!");
+            //Debug.LogWarning($"[UIManager] Cancel action '{cancelActionName}' not found!");
             return;
         }
 
@@ -158,7 +158,7 @@ public class UIManager : MonoBehaviour
         // CRITICAL: Enable action map with unscaled time for pause compatibility
         actionMap.Enable();
 
-        Debug.Log($"[UIManager] Bound ESC/Cancel action: {cancelActionMapName}/{cancelActionName}");
+        //Debug.Log($"[UIManager] Bound ESC/Cancel action: {cancelActionMapName}/{cancelActionName}");
     }
 
     private void OnCancelPressed(InputAction.CallbackContext context)
@@ -169,24 +169,24 @@ public class UIManager : MonoBehaviour
 
         lastCancelTime = Time.unscaledTime;
 
-        Debug.Log($"[UIManager] ESC pressed. Modal stack count: {modalStack.Count}");
+        //Debug.Log($"[UIManager] ESC pressed. Modal stack count: {modalStack.Count}");
 
         // Close top modal panel if any
         if (modalStack.Count > 0)
         {
             var topPanel = modalStack.Peek();
-            Debug.Log($"[UIManager] Top panel: {topPanel.PanelID}, State: {topPanel.State}");
+            //Debug.Log($"[UIManager] Top panel: {topPanel.PanelID}, State: {topPanel.State}");
             
             if (topPanel.State == PanelState.Open)
             {
-                Debug.Log($"[UIManager] Closing panel: {topPanel.PanelID}");
+                //Debug.Log($"[UIManager] Closing panel: {topPanel.PanelID}");
                 ClosePanel(topPanel);
             }
         }
         // Open pause menu if no panels are open
         else if (!string.IsNullOrEmpty(pauseMenuPanelID))
         {
-            Debug.Log($"[UIManager] Opening pause menu: {pauseMenuPanelID}");
+            //Debug.Log($"[UIManager] Opening pause menu: {pauseMenuPanelID}");
             OpenPanel(pauseMenuPanelID);
         }
     }
@@ -212,13 +212,13 @@ public class UIManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(binding.panelID))
         {
-            Debug.LogWarning($"[UIManager] Hotkey action '{binding.actionName}' has no panel ID assigned");
+            //Debug.LogWarning($"[UIManager] Hotkey action '{binding.actionName}' has no panel ID assigned");
             return;
         }
 
         if (!panels.TryGetValue(binding.panelID, out var panel))
         {
-            Debug.LogWarning($"[UIManager] Panel '{binding.panelID}' not registered for hotkey '{binding.actionName}'");
+            //Debug.LogWarning($"[UIManager] Panel '{binding.panelID}' not registered for hotkey '{binding.actionName}'");
             return;
         }
 
@@ -282,7 +282,7 @@ public class UIManager : MonoBehaviour
                     modalStack.Push(tempStack.Pop());
             }
 
-            Debug.Log($"[UIManager] Unregistered panel: {panel.PanelID}");
+            //Debug.Log($"[UIManager] Unregistered panel: {panel.PanelID}");
         }
     }
 
@@ -294,7 +294,7 @@ public class UIManager : MonoBehaviour
     {
         if (!panels.TryGetValue(panelID, out var panel))
         {
-            Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
+            //Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
             return;
         }
 
@@ -327,8 +327,6 @@ public class UIManager : MonoBehaviour
             if (panel.RootElement != null && panel.RootElement.parent != null)
             {
                 panel.RootElement.BringToFront();
-                Debug.Log("brought to front");
-
             }
             
             if (panel.IsModal)
@@ -350,7 +348,7 @@ public class UIManager : MonoBehaviour
             if (panel.IsModal && modalStack.Count > 0 && modalStack.Peek() == panel)
             {
                 modalStack.Pop();
-                Debug.LogWarning($"[UIManager] Open failed for {panel.PanelID}, removed from stack");
+                //Debug.LogWarning($"[UIManager] Open failed for {panel.PanelID}, removed from stack");
             }
         }
     }
@@ -359,7 +357,7 @@ public class UIManager : MonoBehaviour
     {
         if (!panels.TryGetValue(panelID, out var panel))
         {
-            Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
+            //Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
             return;
         }
 
