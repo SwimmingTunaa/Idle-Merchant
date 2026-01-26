@@ -76,7 +76,7 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
 
     protected virtual void BuildUI()
     {
-        var root = uiDocument.rootVisualElement;
+        var root = uiDocument.rootVisualElement.Q<VisualElement>("body");
 
         panel = panelAsset.CloneTree().Children().First();
         
@@ -258,7 +258,7 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
         
         // Create overlay element
         overlayElement = new VisualElement();
-        overlayElement.name = $"{PanelID}-overlay";
+        overlayElement.name = $"overlay";
         overlayElement.style.position = Position.Absolute;
         overlayElement.style.left = 0;
         overlayElement.style.top = 0;
@@ -271,11 +271,10 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
         overlayElement.style.display = DisplayStyle.None;
         
         // Insert overlay behind panel (at same parent level)
-        var parent = RootElement.parent;
-        if (parent != null)
+        var root = uiDocument.rootVisualElement.Q<VisualElement>("main-root");
+        if (root != null)
         {
-            int panelIndex = parent.IndexOf(RootElement);
-            parent.Insert(panelIndex, overlayElement);
+            root.Insert(0, overlayElement);
             
             if (showDebugLogs)
                 Debug.Log($"[{PanelID}] Overlay created");

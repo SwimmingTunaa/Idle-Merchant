@@ -1,12 +1,3 @@
-
-
-/* ===== OVERLAY ===== */
-.crafting-overlay {
-    transition-property: opacity;
-    transition-duration: 0.3s;
-}
-
-/* ===== RECIPE BOOK ===== */
 .recipe-book {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
@@ -15,10 +6,8 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* ===== PAGES ===== */
 .page {
-    /* Subtle paper texture effect */
-    background-image: none; /* Add paper texture asset if available */
+    background-image: none;
 }
 
 .page-header {
@@ -28,7 +17,6 @@
     padding-bottom: 4px;
 }
 
-/* ===== RECIPE CARD ===== */
 .recipe-card {
     transition-property: background-color;
     transition-duration: 0.2s;
@@ -48,18 +36,15 @@
     opacity: 0.5;
 }
 
-/* ===== ITEM ICONS ===== */
 .item-icon {
     border-width: 1px;
     border-color: rgba(50, 30, 10, 0.3);
 }
 
-/* ===== RECIPE NAME ===== */
 .recipe-name {
     -unity-font-style: normal;
 }
 
-/* ===== CONTROLS ===== */
 .control-dropdown {
     background-color: rgba(139, 90, 60, 0.2);
     border-radius: 4px;
@@ -72,25 +57,22 @@
     min-width: 40px;
 }
 
-/* ===== RECIPE TOGGLE ===== */
 .recipe-toggle {
-    /* Unity default toggle styling */
 }
 
 .recipe-toggle:checked {
     background-color: rgba(139, 180, 90, 0.3);
 }
 
-/* ===== PROGRESS BAR ===== */
 .progress-bar {
     transition-property: width;
     transition-duration: 0.1s;
 }
 
-/* ===== SCROLLVIEW ===== */
-.recipe-list,
+.recipe-list {
+}
+
 .reserve-list {
-    /* Scrollbar styling */
 }
 
 .recipe-list > #unity-content-container {
@@ -101,7 +83,6 @@
     padding: 4px;
 }
 
-/* ===== CLOSE BUTTON ===== */
 .close-button {
     transition-property: background-color;
     transition-duration: 0.2s;
@@ -115,7 +96,6 @@
     background-color: rgba(160, 70, 40, 0.9);
 }
 
-/* ===== MATERIAL RESERVE ITEM ===== */
 .reserve-item {
     flex-direction: row;
     align-items: center;
@@ -153,7 +133,6 @@
     width: 120px;
 }
 
-/* ===== INGREDIENT SLOT (dynamically created) ===== */
 .ingredient-slot {
     flex-direction: row;
     align-items: center;
@@ -176,14 +155,12 @@
     color: rgb(50, 30, 10);
 }
 
-/* ===== ANIMATIONS ===== */
 .flash-complete {
     background-color: rgba(139, 180, 90, 0.5);
     transition-property: background-color;
     transition-duration: 0.3s;
 }
 
-/* ===== INSTRUCTION TEXT ===== */
 .instruction-text {
     opacity: 0.7;
     font-style: italic;

@@ -71,6 +71,7 @@
     <Compile Include="Assets/Scripts/Traits/TraitUIHelper.cs" />
     <Compile Include="Assets/Scripts/Shop/CounterService.cs" />
     <Compile Include="Assets/Scripts/Systems/Spatial/SpatialGrid.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Hiring/HireRoster.cs" />
     <Compile Include="Assets/Scripts/Entities/Customers/CustomerWantBubble.cs" />
     <Compile Include="Assets/Scripts/Systems/Pooling/PoolDebugger.cs" />
     <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_AnimationData.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Assets/Scripts/Entities/Stats/Stats.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/BasicStatModifier.cs" />
     <Compile Include="Assets/Scripts/Systems/Camera/CameraScrollController.cs" />
-    <Compile Include="Assets/Scripts/UI/HireRoster.cs" />
     <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_CustomStyleData.cs" />
     <Compile Include="Assets/Scripts/Entities/Porters/PorterDef.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Hiring/HireController.cs" />
@@ -112,6 +112,7 @@
     <Compile Include="Assets/Scripts/ScriptableObjects/Entities/EntitySortingManager.cs" />
     <Compile Include="Assets/Scripts/Entities/Adventuers/AdventuererAgent.cs" />
     <Compile Include="Assets/Scripts/Entities/Porters/PorterAgent.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Hiring/CandidatePool.cs" />
     <Compile Include="Assets/Scripts/Effects/IconPulse.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Items/RecipeDef.cs" />
     <Compile Include="Assets/Scripts/CharacterGeneration/CharacterAppearanceManager.cs" />
@@ -135,12 +136,11 @@
     <Compile Include="Assets/Scripts/Traits/TraitDef.cs" />
     <Compile Include="Assets/Scripts/Managers/UnitManager.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitCompatibilityChecker.cs" />
-    <Compile Include="Assets/Scripts/UI/CandidateUIMapper.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/BaseStats.cs" />
-    <Compile Include="Assets/Scripts/UI/CandidatePool.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Pause Menu/PauseMenuController.cs" />
     <Compile Include="Assets/Scripts/Skills/Base/PassiveEffect.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitManager.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Hiring/CandidateUIMapper.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitDatabase.cs" />
     <Compile Include="Assets/SPUM/Core/Script/Data/PreviewMatchingElement.cs" />
     <Compile Include="Assets/Scripts/Identity/NamePoolDef.cs" />
