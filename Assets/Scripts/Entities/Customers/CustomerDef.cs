@@ -10,8 +10,7 @@ public class CustomerDef : EntityDef
 
   
 
-    [Header("Weights & Budget")]
-    public float baseWeight = 1f;      // baseline chance before shelf traffic
+    [Header("Budget")]
     public Vector2 budget = new Vector2(8, 16);
     public Vector2Int batchRange = new Vector2Int(1, 3); // items per visit
 
