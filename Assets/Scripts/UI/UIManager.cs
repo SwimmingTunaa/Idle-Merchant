@@ -321,6 +321,22 @@ public class UIManager : MonoBehaviour
                 currentTop.OnLoseFocus();
         }
 
+        if (panel.Open())
+        {
+            // Bring to front by moving to end of parent's children
+            if (panel.RootElement != null && panel.RootElement.parent != null)
+            {
+                panel.RootElement.BringToFront();
+                Debug.Log("brought to front");
+
+            }
+            
+            if (panel.IsModal)
+            {
+                modalStack.Push(panel);
+            }
+        }
+
         // Push to stack BEFORE opening so it's there when OnOpenComplete fires
         if (panel.IsModal)
         {

@@ -151,8 +151,8 @@ public class HireController : MonoBehaviour, IPanelController
         root = uiDocument.rootVisualElement;
         openButton = root.Q<Button>("ShopButton");
 
-        hirePanel = hirePanelAsset.CloneTree();
-        root.Q<VisualElement>("body").Add(hirePanel);
+        hirePanel = hirePanelAsset.CloneTree().Q<VisualElement>("hire-panel");
+        root.Add(hirePanel);
 
         stackContainer = hirePanel.Q<VisualElement>("newspaper-container");
         emptyState = hirePanel.Q<VisualElement>("text-container");
