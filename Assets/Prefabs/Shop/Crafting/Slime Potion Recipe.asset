@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Slime Potion Recipe
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  inputs:
+  ingredients:
   - item: {fileID: 11400000, guid: b78b9d8fc7c414f2b847061059c7e01f, type: 2}
     qty: 2
   output: {fileID: 11400000, guid: d39f042a02a2b4044aec29b9d971f86a, type: 2}

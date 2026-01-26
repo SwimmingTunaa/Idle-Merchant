@@ -114,16 +114,24 @@ public class CraftingManager : MonoBehaviour
 
     public bool CanCraft(RecipeDef recipe)
     {
+        Debug.Log($"[CanCraft] Checking recipe: {recipe.Output.displayName}");
+        
         foreach (var ingredient in recipe.Ingredients)
         {
             int availableQty = inventory.Get(ingredient.Item.itemCategory, ingredient.Item);
             int reserveQty = materialReserves.ContainsKey(ingredient.Item) ? materialReserves[ingredient.Item] : 0;
+            int neededQty = ingredient.Qty;
+            
+            Debug.Log($"  - {ingredient.Item.displayName}: Have {availableQty}, Need {neededQty}, Reserve {reserveQty}, Available: {availableQty - reserveQty}");
             
             if (availableQty - reserveQty < ingredient.Qty)
-            {
+            {      
+                Debug.Log($"  - NOT ENOUGH!");
                 return false;
             }
         }
+    
+        Debug.Log($"  - CAN CRAFT!");
         return true;
     }
 
@@ -165,21 +173,6 @@ public class CraftingManager : MonoBehaviour
                 return true;
         }
         return false;
-    }
-
-    public List<RecipeDef> GetAllRecipes()
-    {
-        return new List<RecipeDef>(craftingRecipes);
-    }
-
-    public float GetCraftingProgress(RecipeDef recipe)
-    {
-        foreach (var job in activeCrafts)
-        {
-            if (job.recipe == recipe)
-                return 1f - (job.timeRemaining / recipe.CraftSeconds);
-        }
-        return 0f;
     }
 
     public void CompleteCraft(RecipeDef recipe)
@@ -244,6 +237,21 @@ public class CraftingManager : MonoBehaviour
     public List<RecipeDef> GetEnabledRecipes()
     {
         return new List<RecipeDef>(enabledRecipes);
+    }
+
+    public List<RecipeDef> GetAllRecipes()
+    {
+        return new List<RecipeDef>(craftingRecipes);
+    }
+
+    public float GetCraftingProgress(RecipeDef recipe)
+    {
+        foreach (var job in activeCrafts)
+        {
+            if (job.recipe == recipe)
+                return 1f - (job.timeRemaining / recipe.CraftSeconds);
+        }
+        return 0f;
     }
 
     // ===== DEBUG METHODS =====
