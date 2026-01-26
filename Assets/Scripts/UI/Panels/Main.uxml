@@ -1,5 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/style.uss?fileID=7433441132597879392&amp;guid=00116f07995c56c448c9e35309a91b23&amp;type=3#style" />
+    <ui:Template name="CraftingPanel" src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/CraftingPanel.uxml?fileID=9197481963319205126&amp;guid=2078ccd3555ce4493866577e7049d5e0&amp;type=3#CraftingPanel" />
+    <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel" />
+    <ui:Template name="InventoryPanel" src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uxml?fileID=9197481963319205126&amp;guid=811e3b0d9f3fc4faa9c9650a92c164fe&amp;type=3#InventoryPanel" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/style.uss?fileID=7433441132597879392&amp;guid=00116f07995c56c448c9e35309a91b23&amp;type=3#style" />
     <ui:VisualElement name="main-root" style="flex-grow: 1;">
         <ui:VisualElement name="hud" style="flex-grow: 0; flex-basis: 8%; flex-direction: row;">
             <ui:VisualElement name="ShopContainer" class="containers" style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: flex-start; padding-left: 0;">
@@ -12,6 +15,10 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="body" style="flex-grow: 1; justify-content: center; align-items: center;" />
+        <ui:VisualElement name="body" style="flex-grow: 1; justify-content: center; align-items: center;">
+            <ui:Instance template="CraftingPanel" name="crafting-panel" style="flex-grow: 1; display: none;" />
+            <ui:Instance template="HirePanel" name="hire-panel" style="position: absolute; flex-grow: 0; height: 100%; width: auto; display: none;" />
+            <ui:Instance template="InventoryPanel" name="inventory" style="flex-grow: 1; flex-direction: row; display: none; visibility: visible;" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

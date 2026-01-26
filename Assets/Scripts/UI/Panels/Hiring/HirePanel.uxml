@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scripts/UI/Panels/style.uss?fileID=7433441132597879392&amp;guid=00116f07995c56c448c9e35309a91b23&amp;type=3#style" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
     <ui:VisualElement name="hire-panel" style="flex-grow: 0; flex-direction: row; justify-content: center; width: 100%; align-items: center; position: absolute;">
         <ui:Button text="&lt;" name="previous-button" class="hireButton" style="align-self: center; flex-grow: 0; background-color: rgba(188, 188, 188, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 48px;" />
         <ui:VisualElement name="newspaper-stand" style="flex-grow: 0; justify-content: center; width: auto; height: auto; background-color: rgb(149, 99, 75); min-width: 800px; min-height: 1000px;">
@@ -10,11 +10,11 @@
             <ui:VisualElement name="header" style="flex-grow: 0; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px;">
                 <ui:Label text="5/5" name="count" style="align-self: center; justify-content: center; align-items: center; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); font-size: 32px;" />
             </ui:VisualElement>
-            <ui:VisualElement name="background" style="flex-grow: 0; justify-content: center; align-items: center; width: 600px; height: 600px; position: absolute; align-self: center;">
+            <ui:VisualElement name="background" style="flex-grow: 0; justify-content: center; align-items: center; width: 600px; height: 600px; position: absolute; align-self: center; top: 266px; left: 92px;">
                 <ui:VisualElement name="background" style="flex-grow: 1; width: 500px; position: absolute; height: 600px; background-color: rgb(82, 59, 14); rotate: 8deg;" />
                 <ui:VisualElement name="background" style="flex-grow: 1; width: 500px; position: absolute; height: 600px; background-color: rgb(96, 88, 70); rotate: -1deg;" />
             </ui:VisualElement>
-            <ui:VisualElement name="text-container" style="flex-grow: 0; position: absolute; right: auto; top: auto; left: auto; bottom: auto; width: 100%; justify-content: center; align-items: center;">
+            <ui:VisualElement name="text-container" style="flex-grow: 0; position: absolute; right: auto; top: 487px; left: 8px; bottom: auto; width: 100%; justify-content: center; align-items: center;">
                 <ui:Label text="Check Back In" name="empty-label" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); font-size: 32%;" />
                 <ui:Label text="5:00" name="empty-timer" style="font-size: 32px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); -unity-font-style: normal;" />
             </ui:VisualElement>
