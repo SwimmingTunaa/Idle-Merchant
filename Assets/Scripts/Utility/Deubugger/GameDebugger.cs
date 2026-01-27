@@ -6,6 +6,7 @@ using System.Linq;
 /// <summary>
 /// Comprehensive debug helper EditorWindow for testing game systems.
 /// Access via Window > Game Debug Helper
+/// UPDATED: Full Guild Progression System support
 /// </summary>
 public class GameDebugger : EditorWindow
 {
@@ -37,12 +38,15 @@ public class GameDebugger : EditorWindow
     // Settings
     private GameDebugSettings settings;
     private Vector2 settingsScrollPos;
+    
+    // Main window scroll
+    private Vector2 mainScrollPos;
 
     [MenuItem("Window/Game Debug Helper")]
     public static void ShowWindow()
     {
         var window = GetWindow<GameDebugger>("Game Debug Helper");
-        window.minSize = new Vector2(400, 500);
+        window.minSize = new Vector2(400, 600);
     }
 
     void OnEnable()
@@ -58,9 +62,12 @@ public class GameDebugger : EditorWindow
             EditorGUILayout.Space(10);
         }
 
-        // Tab selection
+        // Tab selection (outside scroll)
         currentTab = (DebugTab)GUILayout.Toolbar((int)currentTab, System.Enum.GetNames(typeof(DebugTab)));
         EditorGUILayout.Space(10);
+
+        // Main scroll view wraps all tab content
+        mainScrollPos = EditorGUILayout.BeginScrollView(mainScrollPos);
 
         // Tab content
         switch (currentTab)
@@ -87,6 +94,8 @@ public class GameDebugger : EditorWindow
                 DrawSettingsTab();
                 break;
         }
+        
+        EditorGUILayout.EndScrollView();
     }
 
     // ===== ECONOMY TAB =====
@@ -186,78 +195,13 @@ public class GameDebugger : EditorWindow
                 }
                 else
                 {
-                    Debug.LogWarning($"[GameDebugger] Insufficient {selectedItem.displayName} in inventory");
+                    Debug.LogWarning($"[GameDebugger] Not enough {selectedItem.displayName} in inventory");
                 }
             }
         }
 
         GUI.enabled = true;
         EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Space(10);
-
-        // Quick add items
-        GUILayout.Label("Quick Add (All Items in Project)", EditorStyles.boldLabel);
-        
-        itemScrollPos = EditorGUILayout.BeginScrollView(itemScrollPos, GUILayout.Height(250));
-        
-        var allItems = Resources.LoadAll<ItemDef>("")
-            .OrderBy(i => i.itemCategory)
-            .ThenBy(i => i.displayName)
-            .ToArray();
-
-        GUI.enabled = Application.isPlaying;
-        foreach (var item in allItems)
-        {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"{item.displayName} ({item.itemCategory})", GUILayout.Width(200));
-            
-            if (GUILayout.Button("+1", GUILayout.Width(50)))
-            {
-                AddItemQuick(item, 1);
-            }
-            if (GUILayout.Button("+10", GUILayout.Width(50)))
-            {
-                AddItemQuick(item, 10);
-            }
-            if (GUILayout.Button("+100", GUILayout.Width(50)))
-            {
-                AddItemQuick(item, 100);
-            }
-            
-            EditorGUILayout.EndHorizontal();
-        }
-        GUI.enabled = true;
-
-        EditorGUILayout.EndScrollView();
-
-        EditorGUILayout.Space(10);
-
-        GUI.enabled = Application.isPlaying;
-        if (GUILayout.Button("Clear All Inventory", GUILayout.Height(30)))
-        {
-            if (Inventory.Instance != null && EditorUtility.DisplayDialog(
-                "Clear Inventory",
-                "Are you sure you want to clear all items?",
-                "Yes",
-                "Cancel"))
-            {
-                Inventory.Instance.GetInventoryType(ItemCategory.Common).Clear();
-                Inventory.Instance.GetInventoryType(ItemCategory.Crafted).Clear();
-                Inventory.Instance.GetInventoryType(ItemCategory.Luxury).Clear();
-                Debug.Log($"[GameDebugger] Cleared all inventory");
-            }
-        }
-        GUI.enabled = true;
-    }
-
-    void AddItemQuick(ItemDef item, int qty)
-    {
-        if (Inventory.Instance != null)
-        {
-            var inventory = Inventory.Instance.GetInventoryType(item.itemCategory);
-            Inventory.Instance.Add(inventory, new ResourceStack(item, qty, 0));
-        }
     }
 
     // ===== SPAWNING TAB =====
@@ -268,15 +212,14 @@ public class GameDebugger : EditorWindow
         EditorGUILayout.Space(5);
 
         selectedLayer = EditorGUILayout.IntSlider("Layer:", selectedLayer, 1, 10);
-
-        EditorGUILayout.Space(10);
+        EditorGUILayout.Space(5);
 
         // Adventurer/Porter spawning
-        GUILayout.Label("Hire Units (Adventurers/Porters)", EditorStyles.boldLabel);
-        selectedEntity = (EntityDef)EditorGUILayout.ObjectField("Entity:", selectedEntity, typeof(EntityDef), false);
+        GUILayout.Label("Hire Units", EditorStyles.boldLabel);
+        selectedEntity = (EntityDef)EditorGUILayout.ObjectField("Unit:", selectedEntity, typeof(EntityDef), false);
 
         GUI.enabled = Application.isPlaying && selectedEntity != null;
-        if (GUILayout.Button("Hire Unit (Free)", GUILayout.Height(30)))
+        if (GUILayout.Button("Hire Unit", GUILayout.Height(30)))
         {
             if (selectedEntity is AdventurerDef)
             {
@@ -374,23 +317,15 @@ public class GameDebugger : EditorWindow
             Debug.Log($"[GameDebugger] Disabled recipe: {selectedRecipe.Output.displayName}");
         }
 
-        EditorGUILayout.EndHorizontal();
-
-        GUI.enabled = Application.isPlaying && selectedRecipe != null && CraftingManager.Instance != null;
-        if (GUILayout.Button("Force Start Craft (Ignores Materials)"))
-        {
-            CraftingManager.Instance.StartCraft(selectedRecipe);
-            Debug.Log($"[GameDebugger] Force started craft: {selectedRecipe.Output.displayName}");
-        }
         GUI.enabled = true;
+        EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space(10);
 
-        // Recipe list
         GUILayout.Label("All Recipes", EditorStyles.boldLabel);
         
-        recipeScrollPos = EditorGUILayout.BeginScrollView(recipeScrollPos, GUILayout.Height(250));
-
+        recipeScrollPos = EditorGUILayout.BeginScrollView(recipeScrollPos, GUILayout.Height(200));
+        
         if (Application.isPlaying && CraftingManager.Instance != null)
         {
             var recipes = CraftingManager.Instance.GetAllRecipes();
@@ -440,41 +375,197 @@ public class GameDebugger : EditorWindow
         GUI.enabled = true;
     }
 
-    // ===== PROGRESSION TAB =====
+    // ===== PROGRESSION TAB (UPDATED FOR GUILD SYSTEM) =====
 
     void DrawProgressionTab()
     {
-        GUILayout.Label("Progression System", EditorStyles.boldLabel);
+        GUILayout.Label("Guild Progression System", EditorStyles.boldLabel);
         EditorGUILayout.Space(5);
 
         if (Application.isPlaying && ProgressionManager.Instance != null)
         {
-            EditorGUILayout.LabelField("Max Unlocked Layer:", ProgressionManager.Instance.maxUnlockedLayer.ToString());
-            EditorGUILayout.Space(5);
-        }
-
-        int newLayer = EditorGUILayout.IntSlider("Unlock Layer:", selectedLayer, 1, 10);
-
-        GUI.enabled = Application.isPlaying && ProgressionManager.Instance != null;
-        if (GUILayout.Button($"Unlock Layer {newLayer}", GUILayout.Height(30)))
-        {
-            ProgressionManager.Instance.UnlockLayer(newLayer);
-            Debug.Log($"[GameDebugger] Unlocked layer {newLayer}");
-        }
-
-        if (GUILayout.Button("Reset to Layer 1", GUILayout.Height(30)))
-        {
-            if (EditorUtility.DisplayDialog(
-                "Reset Progression",
-                "Reset to layer 1?",
-                "Yes",
-                "Cancel"))
+            var pm = ProgressionManager.Instance;
+            
+            // Current Status
+            GUILayout.Label("Current Status", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Guild Stars:", $"{pm.GetCurrentStars()}★");
+            EditorGUILayout.LabelField("Max Unlocked Layer:", pm.maxUnlockedLayer.ToString());
+            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.Space(10);
+            
+            // Milestone Progress
+            GUILayout.Label("Milestone Progress", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            
+            int nextStar = pm.GetCurrentStars() + 1;
+            if (nextStar <= 5)
             {
-                ProgressionManager.Instance.maxUnlockedLayer = 1;
-                Debug.Log($"[GameDebugger] Reset to layer 1");
+                var milestones = pm.GetMilestonesForStar(nextStar);
+                
+                EditorGUILayout.LabelField($"Progress Toward {nextStar}★:", EditorStyles.boldLabel);
+                EditorGUILayout.Space(3);
+                
+                if (milestones.Count > 0)
+                {
+                    foreach (var milestone in milestones)
+                    {
+                        int current = pm.GetMilestoneCurrentValue(milestone);
+                        bool complete = pm.IsMilestoneComplete(milestone);
+                        float progress = pm.GetMilestoneProgress(milestone);
+                        
+                        string status = complete ? "✓" : "✗";
+                        string progressText = $"{status} {milestone.description}: {current}/{milestone.targetValue} ({progress * 100:F0}%)";
+                        
+                        EditorGUILayout.LabelField(progressText);
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox($"No milestones defined for {nextStar}★\nCreate milestone assets in Resources/Milestones/", MessageType.Warning);
+                }
             }
+            else
+            {
+                EditorGUILayout.LabelField("Max stars reached (5★)!", EditorStyles.boldLabel);
+            }
+            
+            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.Space(10);
+            
+            // Quick Actions
+            GUILayout.Label("Grant Progress", EditorStyles.boldLabel);
+            
+            GUI.enabled = Application.isPlaying;
+            
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("1000 Gold"))
+            {
+                pm.IncrementGoldEarned(1000);
+                Debug.Log("[GameDebugger] Granted 1000 gold progress");
+            }
+            if (GUILayout.Button("100 Mobs"))
+            {
+                pm.IncrementMobsKilled(100);
+                Debug.Log("[GameDebugger] Granted 100 mob kills");
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("50 Loot"))
+            {
+                pm.IncrementLootCollected(50);
+                Debug.Log("[GameDebugger] Granted 50 loot collected");
+            }
+            if (GUILayout.Button("3 Hires"))
+            {
+                pm.IncrementUnitsHired(3);
+                Debug.Log("[GameDebugger] Granted 3 units hired");
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("10 Crafts"))
+            {
+                pm.IncrementItemsCrafted(10);
+                Debug.Log("[GameDebugger] Granted 10 items crafted");
+            }
+            if (GUILayout.Button("Complete 2★"))
+            {
+                // Use reflection to call private context menu method
+                var method = typeof(ProgressionManager).GetMethod("Debug_Complete2StarMilestones", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                    method.Invoke(pm, null);
+                else
+                    Debug.LogWarning("[GameDebugger] Debug_Complete2StarMilestones method not found");
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.Space(10);
+            
+            // Star Awards
+            GUILayout.Label("Force Award Stars", EditorStyles.boldLabel);
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("2★"))
+            {
+                var method = typeof(ProgressionManager).GetMethod("AwardStar", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                    method.Invoke(pm, new object[] { 2 });
+            }
+            if (GUILayout.Button("3★"))
+            {
+                var method = typeof(ProgressionManager).GetMethod("AwardStar", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                    method.Invoke(pm, new object[] { 3 });
+            }
+            if (GUILayout.Button("4★"))
+            {
+                var method = typeof(ProgressionManager).GetMethod("AwardStar", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                    method.Invoke(pm, new object[] { 4 });
+            }
+            if (GUILayout.Button("5★"))
+            {
+                var method = typeof(ProgressionManager).GetMethod("AwardStar", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                    method.Invoke(pm, new object[] { 5 });
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.Space(10);
+            
+            // Layer Controls
+            GUILayout.Label("Layer Controls", EditorStyles.boldLabel);
+            int newLayer = EditorGUILayout.IntSlider("Unlock Layer:", selectedLayer, 1, 10);
+            
+            if (GUILayout.Button($"Unlock Layer {newLayer}", GUILayout.Height(30)))
+            {
+                pm.UnlockLayer(newLayer);
+                Debug.Log($"[GameDebugger] Unlocked layer {newLayer}");
+            }
+            
+            EditorGUILayout.Space(5);
+            
+            // Logging
+            if (GUILayout.Button("Print Full Progress Report"))
+            {
+                var method = typeof(ProgressionManager).GetMethod("Debug_PrintMilestoneProgress", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                    method.Invoke(pm, null);
+            }
+            
+            EditorGUILayout.Space(10);
+            
+            // Reset
+            if (GUILayout.Button("RESET PROGRESSION (1★, Layer 1)", GUILayout.Height(30)))
+            {
+                if (EditorUtility.DisplayDialog(
+                    "Reset Guild Progression",
+                    "Reset to 1★ and Layer 1? This will clear all progress.",
+                    "Yes",
+                    "Cancel"))
+                {
+                    var method = typeof(ProgressionManager).GetMethod("Debug_ResetProgression", 
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (method != null)
+                        method.Invoke(pm, null);
+                }
+            }
+            
+            GUI.enabled = true;
         }
-        GUI.enabled = true;
+        else
+        {
+            EditorGUILayout.HelpBox("Enter play mode to debug progression", MessageType.Info);
+        }
     }
 
     // ===== TIME CONTROL TAB =====
@@ -507,7 +598,6 @@ public class GameDebugger : EditorWindow
 
         EditorGUILayout.Space(10);
 
-        // Quick buttons
         GUILayout.Label("Quick Time Scale", EditorStyles.boldLabel);
 
         EditorGUILayout.BeginHorizontal();
@@ -541,82 +631,111 @@ public class GameDebugger : EditorWindow
         GUILayout.Label("Persistent Debug Settings", EditorStyles.boldLabel);
         EditorGUILayout.Space(5);
 
-        settings = (GameDebugSettings)EditorGUILayout.ObjectField("Settings Asset:", settings, typeof(GameDebugSettings), false);
-
         if (settings == null)
         {
-            EditorGUILayout.HelpBox("Create a GameDebugSettings asset via Create > Debug > Game Debug Settings", MessageType.Info);
+            EditorGUILayout.HelpBox("No GameDebugSettings asset found", MessageType.Warning);
             
-            if (GUILayout.Button("Create New Settings Asset"))
+            if (GUILayout.Button("Create Settings Asset"))
             {
                 CreateSettingsAsset();
             }
             return;
         }
 
-        EditorGUILayout.Space(10);
-
         settingsScrollPos = EditorGUILayout.BeginScrollView(settingsScrollPos);
 
-        // Draw settings
-        SerializedObject so = new SerializedObject(settings);
-        SerializedProperty prop = so.GetIterator();
-        prop.NextVisible(true); // Skip script field
+        EditorGUILayout.LabelField("Settings Asset:", settings.name);
+        EditorGUILayout.Space(5);
 
-        while (prop.NextVisible(false))
+        EditorGUI.BeginChangeCheck();
+
+        settings.applyOnPlaymodeStart = EditorGUILayout.Toggle("Apply on Play Mode Start", settings.applyOnPlaymodeStart);
+
+        EditorGUILayout.Space(10);
+
+        settings.setStartingGold = EditorGUILayout.Toggle("Set Starting Gold", settings.setStartingGold);
+        if (settings.setStartingGold)
         {
-            EditorGUILayout.PropertyField(prop, true);
+            settings.startingGold = EditorGUILayout.IntField("  Amount:", settings.startingGold);
         }
 
-        so.ApplyModifiedProperties();
+        EditorGUILayout.Space(5);
+
+        settings.addStartingItems = EditorGUILayout.Toggle("Add Starting Items", settings.addStartingItems);
+        if (settings.addStartingItems)
+        {
+            // Show starting items array
+            SerializedObject so = new SerializedObject(settings);
+            SerializedProperty itemsProp = so.FindProperty("startingItems");
+            EditorGUILayout.PropertyField(itemsProp, true);
+            so.ApplyModifiedProperties();
+        }
+
+        EditorGUILayout.Space(5);
+
+        settings.setStartingLayer = EditorGUILayout.Toggle("Set Starting Layer", settings.setStartingLayer);
+        if (settings.setStartingLayer)
+        {
+            settings.startingLayer = EditorGUILayout.IntSlider("  Layer:", settings.startingLayer, 1, 10);
+        }
+
+        EditorGUILayout.Space(5);
+
+        settings.setCustomTimeScale = EditorGUILayout.Toggle("Set Custom Time Scale", settings.setCustomTimeScale);
+        if (settings.setCustomTimeScale)
+        {
+            settings.customTimeScale = EditorGUILayout.Slider("  Scale:", settings.customTimeScale, 0.1f, 10f);
+        }
+
+        EditorGUILayout.Space(5);
+
+        settings.enableAllRecipes = EditorGUILayout.Toggle("Enable All Recipes", settings.enableAllRecipes);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorUtility.SetDirty(settings);
+        }
 
         EditorGUILayout.EndScrollView();
 
         EditorGUILayout.Space(10);
 
-        GUI.enabled = Application.isPlaying && settings.applyOnPlaymodeStart;
-        if (GUILayout.Button("Apply Settings Now", GUILayout.Height(40)))
+        GUI.enabled = Application.isPlaying;
+        if (GUILayout.Button("Apply Settings Now", GUILayout.Height(30)))
         {
             ApplySettings();
         }
         GUI.enabled = true;
-
-        if (!settings.applyOnPlaymodeStart)
-        {
-            EditorGUILayout.HelpBox("Enable 'Apply On Playmode Start' to automatically apply these settings when entering play mode", MessageType.Info);
-        }
-    }
-
-    void CreateSettingsAsset()
-    {
-        settings = ScriptableObject.CreateInstance<GameDebugSettings>();
-        
-        string path = EditorUtility.SaveFilePanelInProject(
-            "Save Debug Settings",
-            "GameDebugSettings",
-            "asset",
-            "Create new debug settings asset");
-
-        if (!string.IsNullOrEmpty(path))
-        {
-            AssetDatabase.CreateAsset(settings, path);
-            AssetDatabase.SaveAssets();
-            EditorGUIUtility.PingObject(settings);
-            Debug.Log($"[GameDebugger] Created settings asset at {path}");
-        }
     }
 
     // ===== UTILITY METHODS =====
 
     void LoadSettings()
     {
-        // Try to find existing settings asset
         var guids = AssetDatabase.FindAssets("t:GameDebugSettings");
         if (guids.Length > 0)
         {
             string path = AssetDatabase.GUIDToAssetPath(guids[0]);
             settings = AssetDatabase.LoadAssetAtPath<GameDebugSettings>(path);
         }
+    }
+
+    void CreateSettingsAsset()
+    {
+        string path = EditorUtility.SaveFilePanelInProject(
+            "Create GameDebugSettings",
+            "GameDebugSettings",
+            "asset",
+            "Create a new GameDebugSettings asset");
+
+        if (string.IsNullOrEmpty(path)) return;
+
+        var newSettings = CreateInstance<GameDebugSettings>();
+        AssetDatabase.CreateAsset(newSettings, path);
+        AssetDatabase.SaveAssets();
+        settings = newSettings;
+        EditorGUIUtility.PingObject(settings);
+        Debug.Log($"[GameDebugger] Created settings asset at {path}");
     }
 
     void ApplySettings()
@@ -667,57 +786,6 @@ public class GameDebugger : EditorWindow
         }
     }
 
-    AdventurerManager FindAdventurerManager(int layer)
-    {
-        var managers = FindObjectsByType<AdventurerManager>(FindObjectsSortMode.None);
-        return managers.FirstOrDefault(m => m.LayerIndex == layer);
-    }
-
-    PorterManager FindPorterManager(int layer)
-    {
-        var managers = FindObjectsByType<PorterManager>(FindObjectsSortMode.None);
-        return managers.FirstOrDefault(m => m.LayerIndex == layer);
-    }
-
-    Spawner FindSpawner(int layer, SpawnerType type)
-    {
-        var spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
-        return spawners.FirstOrDefault(s => s.layerIndex == layer && s.spawnerType == type);
-    }
-
-    // Subscribe to play mode changes
-    [InitializeOnLoadMethod]
-    static void InitializeOnLoad()
-    {
-        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-    }
-
-    static void OnPlayModeStateChanged(PlayModeStateChange state)
-    {
-        if (state == PlayModeStateChange.EnteredPlayMode)
-        {
-            // Find settings and apply if enabled
-            var guids = AssetDatabase.FindAssets("t:GameDebugSettings");
-            if (guids.Length > 0)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                var settings = AssetDatabase.LoadAssetAtPath<GameDebugSettings>(path);
-                
-                if (settings != null && settings.applyOnPlaymodeStart)
-                {
-                    // Delay to ensure all systems are initialized
-                    EditorApplication.delayCall += () =>
-                    {
-                        if (Application.isPlaying)
-                        {
-                            ApplySettingsStatic(settings);
-                        }
-                    };
-                }
-            }
-        }
-    }
-
     static void ApplySettingsStatic(GameDebugSettings settings)
     {
         if (settings == null) return;
@@ -763,6 +831,54 @@ public class GameDebugger : EditorWindow
                 CraftingManager.Instance.EnableRecipe(recipe);
             }
             Debug.Log($"[GameDebugger] Auto-enabled all recipes");
+        }
+    }
+
+    AdventurerManager FindAdventurerManager(int layer)
+    {
+        var managers = FindObjectsByType<AdventurerManager>(FindObjectsSortMode.None);
+        return managers.FirstOrDefault(m => m.LayerIndex == layer);
+    }
+
+    PorterManager FindPorterManager(int layer)
+    {
+        var managers = FindObjectsByType<PorterManager>(FindObjectsSortMode.None);
+        return managers.FirstOrDefault(m => m.LayerIndex == layer);
+    }
+
+    Spawner FindSpawner(int layer, SpawnerType type)
+    {
+        var spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
+        return spawners.FirstOrDefault(s => s.layerIndex == layer && s.spawnerType == type);
+    }
+
+    [InitializeOnLoadMethod]
+    static void InitializeOnLoad()
+    {
+        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+    }
+
+    static void OnPlayModeStateChanged(PlayModeStateChange state)
+    {
+        if (state == PlayModeStateChange.EnteredPlayMode)
+        {
+            var guids = AssetDatabase.FindAssets("t:GameDebugSettings");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                var settings = AssetDatabase.LoadAssetAtPath<GameDebugSettings>(path);
+                
+                if (settings != null && settings.applyOnPlaymodeStart)
+                {
+                    EditorApplication.delayCall += () =>
+                    {
+                        if (Application.isPlaying)
+                        {
+                            ApplySettingsStatic(settings);
+                        }
+                    };
+                }
+            }
         }
     }
 }
