@@ -8,10 +8,8 @@ using UnityEngine.InputSystem;
 /// Handles panel lifecycle, navigation stack, ESC behavior, and hotkey panel opening.
 /// Supports new Input System for panel hotkeys.
 /// </summary>
-public class UIManager : MonoBehaviour
+public class UIManager : PersistentSingleton<UIManager>
 {
-    public static UIManager Instance { get; private set; }
-
     [Header("Input System")]
     [SerializeField] private InputActionAsset inputActions;
     
@@ -65,17 +63,9 @@ public class UIManager : MonoBehaviour
     private Dictionary<string, InputAction> boundActions = new Dictionary<string, InputAction>();
     private float lastCancelTime;
 
-    void Awake()
+    protected override void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        
+        base.Awake();   
         SetupInputActions();
     }
 

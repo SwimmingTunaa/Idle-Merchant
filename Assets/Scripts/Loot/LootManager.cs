@@ -10,10 +10,8 @@ using UnityEngine;
 /// - OLD: 50 distance checks per porter = 250 checks for 5 porters
 /// - NEW: ~8 distance checks per porter = 40 checks for 5 porters (6x faster)
 /// </summary>
-public class LootManager : MonoBehaviour
+public class LootManager : PersistentSingleton<LootManager>
 {
-    public static LootManager Instance { get; private set; }
-
     [Header("Spatial Grid Settings")]
     [Tooltip("Cell size for spatial grid. Larger = fewer cells, coarser queries")]
     [SerializeField] private float gridCellSize = 5f;
@@ -34,16 +32,6 @@ public class LootManager : MonoBehaviour
     // Cleanup timer (runs every 2 seconds instead of every frame)
     private float cleanupTimer = 0f;
     private const float CLEANUP_INTERVAL = 2f;
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
 
     void Update()
     {

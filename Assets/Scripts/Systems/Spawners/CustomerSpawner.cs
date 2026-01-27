@@ -10,12 +10,6 @@ public class CustomerSpawner : Spawner
     [SerializeField] private bool craftedUnlocked = false;
     [SerializeField] private bool luxuryUnlocked = false;
 
-    [Header("Unlock Gating")]
-    [SerializeField] private bool allowVillagers = true;
-    [SerializeField] private bool allowAdventurers = false;
-    [SerializeField] private bool allowNobles = false;
-
-
     [Header("Spawn Config")]
     [SerializeField] private int maxCommoner = 999;
     [SerializeField] private int maxAdventurer = 5;

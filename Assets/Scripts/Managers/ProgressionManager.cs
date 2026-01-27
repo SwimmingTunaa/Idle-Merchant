@@ -6,10 +6,8 @@ using UnityEngine;
 /// Optimized ProgressionManager that uses registration instead of scene scanning.
 /// Spawners register themselves on Awake - no expensive FindObjectsByType calls.
 /// </summary>
-public class ProgressionManager : MonoBehaviour
+public class ProgressionManager : PersistentSingleton<ProgressionManager>
 {
-    public static ProgressionManager Instance { get; private set; }
-
     [Header("Progression")]
     [Tooltip("Maximum dungeon layer currently unlocked (1-10)")]
     public int maxUnlockedLayer = 1;
@@ -23,17 +21,6 @@ public class ProgressionManager : MonoBehaviour
 
     // Spawner registration system (replaces FindObjectsByType)
     private static List<Spawner> registeredSpawners = new List<Spawner>();
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     void Start()
     {

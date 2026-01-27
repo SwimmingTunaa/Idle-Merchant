@@ -244,18 +244,7 @@ public class PauseMenuController : BasePanelController
 
     private void OnMainMenuClicked()
     {
-        // Unpause before scene transition
-        gameManager.UnpauseGame();
-
-        // Check if scene exists before loading
-        if (SceneManager.GetSceneByName(mainMenuSceneName).IsValid())
-        {
-            SceneManager.LoadScene(mainMenuSceneName);
-        }
-        else
-        {
-            Debug.LogWarning($"[PauseMenu] Main menu scene '{mainMenuSceneName}' not found. Create scene or update mainMenuSceneName field.");
-        }
+       GameManager.Instance.LoadScene(mainMenuSceneName);
     }
 
     private void OnQuitClicked()

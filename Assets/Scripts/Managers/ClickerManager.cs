@@ -173,10 +173,9 @@ public class ClickerManager : MonoBehaviour
         if (lootObj == null) yield break;
 
         float elapsed = 0f;
-        float duration = 0.3f;
         Vector3 startPos = lootObj.transform.position;
 
-        while (elapsed < duration && lootObj != null)
+        while (elapsed < lootVacuumSpeed && lootObj != null)
         {
             elapsed += Time.deltaTime;
             
@@ -184,7 +183,7 @@ public class ClickerManager : MonoBehaviour
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
             mouseWorldPos.z = 0f;
 
-            float t = elapsed / duration;
+            float t = elapsed / lootVacuumSpeed;
             lootObj.transform.position = Vector3.Lerp(startPos, mouseWorldPos, t);
 
             if (Vector3.Distance(lootObj.transform.position, mouseWorldPos) < 0.1f)

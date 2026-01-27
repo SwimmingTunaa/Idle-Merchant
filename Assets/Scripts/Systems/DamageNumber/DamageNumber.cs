@@ -24,7 +24,7 @@ public class DamageNumber : MonoBehaviour
     [SerializeField] private Color lootColor = Color.green;
     [SerializeField] private float lootFontSize = 5f;
     [SerializeField] private Color goldColor = new Color(1f, 0.84f, 0f); // Gold
-    [SerializeField] private float goldFontSize = 5.5f;
+    // [SerializeField] private float goldFontSize = 5.5f;
     
     [Header("Gold Sprite")]
     [SerializeField] private SpriteRenderer goldSpriteRenderer;

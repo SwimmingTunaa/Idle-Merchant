@@ -7,24 +7,11 @@ using UnityEngine.SceneManagement;
 /// 
 /// Gold is managed by Inventory.cs - use Inventory.Instance for all gold operations.
 /// </summary>
-public class GameManager : MonoBehaviour
+public class GameManager : PersistentSingleton<GameManager>
 {
-    public static GameManager Instance { get; private set; }
-
     // Time management
     private float previousTimeScale = 1f;
     private bool IsPaused {get; set;}
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     private void OnDestroy()
     {

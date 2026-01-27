@@ -1,26 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SalesManager : MonoBehaviour
+public class SalesManager : PersistentSingleton<SalesManager>
 {
-    public static SalesManager Instance { get; private set; }
-
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
 
     private Dictionary<ItemDef, bool> forSale = new();
     private HashSet<ItemDef> hasBeenSeen = new();
     private readonly List<ItemDef> _sellableBuffer = new(64);
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
 
     void Start()
     {

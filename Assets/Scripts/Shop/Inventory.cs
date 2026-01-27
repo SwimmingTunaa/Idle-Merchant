@@ -4,10 +4,8 @@ using UnityEngine;
 using TMPro;
 
 
-public class Inventory : MonoBehaviour 
+public class Inventory : PersistentSingleton<Inventory> 
 {
-    public static Inventory Instance { get; private set; }
-
     [Header("Config")]
     [SerializeField] private GameVariable gold;
     [SerializeField] private GameObject inventoryHolder;
@@ -31,12 +29,9 @@ public class Inventory : MonoBehaviour
     private readonly Dictionary<ItemDef, int> luxuryInventory  = new();
     private readonly Dictionary<ItemDef, int> itemReserves = new();
 
-    void Awake() 
+    protected override void Awake() 
     {
-        if(Instance == null)
-            Instance = this;
-        else Destroy(this);
-
+        base.Awake();
         gold.ResetToDefault();
         InventoryDebugUi();
         GameSignals.OnGoldEarned += AddGold;

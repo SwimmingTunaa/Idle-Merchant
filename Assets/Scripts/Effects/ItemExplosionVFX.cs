@@ -4,10 +4,8 @@ using UnityEngine;
 /// Singleton manager for spawning flying item explosions (coins, gems, etc.).
 /// Items fly from world positions toward UI elements in screen space.
 /// </summary>
-public class ItemExplosionVFX : MonoBehaviour
+public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
 {
-    public static ItemExplosionVFX Instance { get; private set; }
-
     [Header("Prefab")]
     [SerializeField] private GameObject itemPrefab;
 
@@ -16,20 +14,10 @@ public class ItemExplosionVFX : MonoBehaviour
     [SerializeField] private Sprite defaultGemSprite;
 
     [Header("Explosion Settings")]
-    [SerializeField] private float explosionForce = 1.5f;
-    [SerializeField] private float arcHeight = 0.8f;
-    [SerializeField] private float rotationSpeed = 540f;
+    // [SerializeField] private float explosionForce = 1.5f;
+    // [SerializeField] private float arcHeight = 0.8f;
+    // [SerializeField] private float rotationSpeed = 540f;
     [SerializeField] private float spawnStagger = 0.02f;
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
 
     public void SpawnExplosion(Sprite sprite, Vector3 worldPosition, int count, int maxCount = 15)
     {
