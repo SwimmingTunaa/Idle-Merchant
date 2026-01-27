@@ -135,6 +135,14 @@ public class Loot : MonoBehaviour, IClickableLoot
         if (showDebugLogs)
             Debug.Log($"[Loot] Porter collect: {def.displayName} x{qty}");
 
+        // Track for milestone progress
+        if (ProgressionManager.Instance != null)
+        {
+            ProgressionManager.Instance.IncrementLootCollected(qty);
+        }
+
+        GameSignals.RaiseLootCollected(stack);
+
         ObjectPoolManager.Instance.ReturnObjectToPool(gameObject);
         return stack;
     }
@@ -146,6 +154,12 @@ public class Loot : MonoBehaviour, IClickableLoot
 
         ResourceStack stack = new ResourceStack(def, qty, sellValue);
         Inventory.Instance.Add(Inventory.Instance.GetInventoryType(def.itemCategory), stack);
+
+        // Track for milestone progress
+        if (ProgressionManager.Instance != null)
+        {
+            ProgressionManager.Instance.IncrementLootCollected(qty);
+        }
 
         GameSignals.RaiseLootCollected(stack);
 

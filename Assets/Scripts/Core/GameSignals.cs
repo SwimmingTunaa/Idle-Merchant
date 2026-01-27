@@ -20,7 +20,7 @@ public static class GameSignals
 
     // Combat
     public static event Action<GameObject, float, GameObject> OnDamageTaken;
-    public static event Action<GameObject, GameObject> OnEntityDeath;
+    public static event Action<GameObject> OnEntityDeath;
 
     // Skills (Phase 2)
     public static event Action<EntityBase, string> OnSkillActivated;
@@ -29,6 +29,9 @@ public static class GameSignals
     // Progression
     public static event Action<EntityBase, string, string> OnAdventurerPromoted;
     public static event Action<int> OnLayerUnlocked;
+
+    //Hiring
+    public static event Action<EntityDef> OnUnitHired;
 
     // Public invoke methods
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
@@ -39,11 +42,12 @@ public static class GameSignals
     public static void RaiseLootCollected(ResourceStack stack) => OnLootCollected?.Invoke(stack);
     public static void RaiseProductCrafted(ResourceStack stack) => OnProductCrafted?.Invoke(stack);
     public static void RaiseDamageTaken(GameObject entity, float damage, GameObject source) => OnDamageTaken?.Invoke(entity, damage, source);
-    public static void RaiseEntityDeath(GameObject deadEntity, GameObject killer) => OnEntityDeath?.Invoke(deadEntity, killer);
+    public static void RaiseEntityDeath(GameObject deadEntity) => OnEntityDeath?.Invoke(deadEntity);
     public static void RaiseSkillActivated(EntityBase caster, string skillName) => OnSkillActivated?.Invoke(caster, skillName);
     public static void RaiseSkillCooldownStarted(EntityBase caster, string skillName, float cooldown) => OnSkillCooldownStarted?.Invoke(caster, skillName, cooldown);
     public static void RaiseAdventurerPromoted(EntityBase adventurer, string oldRole, string newRole) => OnAdventurerPromoted?.Invoke(adventurer, oldRole, newRole);
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
+    public static void RaiseUnitHired(EntityDef unitDef) => OnUnitHired?.Invoke(unitDef);
 
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]

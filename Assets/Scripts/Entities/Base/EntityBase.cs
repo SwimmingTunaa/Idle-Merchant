@@ -247,7 +247,8 @@ public class EntityBase : MonoBehaviour
         {
             spawnedFrom.RemoveFromAlive(this.gameObject);
         }
-
+        
+        GameSignals.RaiseEntityDeath(gameObject);
         ObjectPoolManager.Instance.ReturnObjectToPool(this.gameObject);
     }
 

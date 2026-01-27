@@ -54,6 +54,52 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         LoadMilestones();
     }
 
+    void OnEnable()
+    {
+        // Subscribe to game signals for automatic tracking
+        GameSignals.OnGoldEarned += IncrementGoldEarned;
+        GameSignals.OnEntityDeath += HandleEntityDeath;
+        GameSignals.OnLootCollected += HandleLootCollected;
+        GameSignals.OnProductCrafted += HandleProductCrafted;
+        GameSignals.OnUnitHired += HandleUnitHired;
+    }
+
+    void OnDisable()
+    {
+        // Unsubscribe to prevent memory leaks
+        GameSignals.OnGoldEarned -= IncrementGoldEarned;
+        GameSignals.OnEntityDeath -= HandleEntityDeath;
+        GameSignals.OnLootCollected -= HandleLootCollected;
+        GameSignals.OnProductCrafted -= HandleProductCrafted;
+        GameSignals.OnUnitHired -= HandleUnitHired;
+    }
+
+    // Signal handlers
+    private void HandleEntityDeath(GameObject deadEntity)
+    {
+        // Check if dead entity was a mob
+        deadEntity.TryGetComponent<MobAgent>(out var mobAgent);
+        if (mobAgent != null)
+        {
+            IncrementMobsKilled(1);
+        }
+    }
+
+    private void HandleLootCollected(ResourceStack stack)
+    {
+        IncrementLootCollected(stack.qty);
+    }
+
+    private void HandleProductCrafted(ResourceStack stack)
+    {
+        IncrementItemsCrafted(stack.qty);
+    }
+
+    private void HandleUnitHired(EntityDef def)
+    {
+        IncrementUnitsHired(1);
+    }
+
     // ===== MILESTONE LOADING =====
 
     private void LoadMilestones()

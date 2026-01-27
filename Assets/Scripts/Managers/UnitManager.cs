@@ -145,8 +145,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         if (!CanHire(def))
             return false;
 
-        // IMPROVED: Use TrySpendGold() for atomic deduction with validation
-        // This is safer than AddGold(-cost) because it validates affordability
         if (!Inventory.Instance.TrySpendGold(def.hireCost))
         {
             Debug.LogError($"[{GetType().Name}] Failed to deduct gold for {def.displayName} - this shouldn't happen after CanHire()!");
@@ -169,6 +167,7 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             spawnedByType[def] = new List<T>();
         }
         spawnedByType[def].Add(unit);
+
 
         if (showDebugLogs)
             Debug.Log($"[{GetType().Name}] Hired {def.displayName} on layer {LayerIndex}. Count: {GetUnitCount(def)}/{GetUnitLimit(def)}");

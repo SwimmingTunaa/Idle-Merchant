@@ -97,10 +97,8 @@ public class Inventory : PersistentSingleton<Inventory>
         int whole = Mathf.FloorToInt(goldFrac);
         if (whole > 0) 
         {
-            gold.Add(whole);
-            ProgressionManager.Instance?.IncrementGoldEarned(whole);
             goldFrac -= whole;
-            // Track for milestone progress
+            gold.Add(gold.Int);
             GameSignals.RaiseGoldChanged(gold.Int);
             InventoryDebugUi();
         }
@@ -114,9 +112,6 @@ public class Inventory : PersistentSingleton<Inventory>
     {
         gold.Add(amount);
         GameSignals.RaiseGoldChanged(gold.Int);
-        
-        // Track for milestone progress
-        ProgressionManager.Instance?.IncrementGoldEarned(amount);
     }
 
     /// <summary>
