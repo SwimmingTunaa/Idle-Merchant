@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GameManager : PersistentSingleton<GameManager>
 {
+
+    [Header("Scene Management")]
+    public string mainMenuSceneName = "MainMenu";
     // Time management
     private float previousTimeScale = 1f;
     private bool IsPaused {get; set;}
@@ -64,7 +67,6 @@ public class GameManager : PersistentSingleton<GameManager>
     public void QuitGame()
     {
         UnpauseGame();
-        OnApplicationQuit();
     #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
     #else

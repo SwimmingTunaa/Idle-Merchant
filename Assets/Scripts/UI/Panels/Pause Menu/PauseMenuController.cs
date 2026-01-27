@@ -11,9 +11,6 @@ using UnityEngine.Rendering;
 /// </summary>
 public class PauseMenuController : BasePanelController
 {
-    [Header("Scene Management")]
-    [Tooltip("Name of main menu scene (hookup later when scene exists)")]
-    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     // IPanelController implementation
     public override string PanelID => "PauseMenu";
@@ -244,6 +241,6 @@ public class PauseMenuController : BasePanelController
 
     private void OnMainMenuClicked()
     {
-       GameManager.Instance.LoadScene(mainMenuSceneName);
+       GameManager.Instance.LoadScene(GameManager.Instance.mainMenuSceneName);
     }
 }
