@@ -1,16 +1,25 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// Optimized ProgressionManager that uses registration instead of scene scanning.
-/// Spawners register themselves on Awake - no expensive FindObjectsByType calls.
+/// Manages guild progression: stars, milestones, upgrades, and layer unlocks.
+/// Uses registration instead of scene scanning for performance.
+/// Single source of truth for all progression state.
 /// </summary>
 public class ProgressionManager : PersistentSingleton<ProgressionManager>
 {
-    [Header("Progression")]
+    [Header("Layer Progression")]
     [Tooltip("Maximum dungeon layer currently unlocked (1-10)")]
     public int maxUnlockedLayer = 1;
+
+    [Header("Star Progression")]
+    [Tooltip("Current guild star rating (1-5)")]
+    [SerializeField] private int currentStars = 1;
+    
+    [Tooltip("All milestone definitions (loaded from Resources)")]
+    [SerializeField] private List<StarMilestoneDef> allMilestones = new List<StarMilestoneDef>();
 
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
@@ -22,17 +31,49 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     // Spawner registration system (replaces FindObjectsByType)
     private static List<Spawner> registeredSpawners = new List<Spawner>();
 
+    // Owned upgrades tracking
+    private HashSet<GuildUpgradeDef> ownedUpgrades = new HashSet<GuildUpgradeDef>();
+
+    // Milestone counters (accumulative from game start)
+    private int totalGoldEarned = 0;
+    private int totalMobsKilled = 0;
+    private int totalUnitsHired = 0;
+    private int totalLootCollected = 0;
+    private int totalItemsCrafted = 0;
+    private int totalCraftedItemsSold = 0;
+    private int totalCustomersServed = 0;
+
+    // Events for decoupling
+    public static event Action<int> OnStarEarned;
+    public static event Action<GuildUpgradeDef> OnUpgradePurchased;
+    public static event Action<int> OnLayerUnlocked;
+
     void Start()
     {
         RebuildAvailableItemsCache();
+        LoadMilestones();
     }
 
-    // ===== SPAWNER REGISTRATION (replaces scene scanning) =====
+    // ===== MILESTONE LOADING =====
 
-    /// <summary>
-    /// Called by Spawner.Awake() to register itself.
-    /// Replaces expensive FindObjectsByType scene scan.
-    /// </summary>
+    private void LoadMilestones()
+    {
+        // Load all milestone definitions from Resources folder
+        var loadedMilestones = Resources.LoadAll<StarMilestoneDef>("Milestones");
+        allMilestones = new List<StarMilestoneDef>(loadedMilestones);
+
+        if (showDebugLogs)
+        {
+            Debug.Log($"[ProgressionManager] Loaded {allMilestones.Count} milestones");
+            foreach (var milestone in allMilestones.GroupBy(m => m.starLevel))
+            {
+                Debug.Log($"  {milestone.Key}★: {milestone.Count()} milestones");
+            }
+        }
+    }
+
+    // ===== SPAWNER REGISTRATION (existing system) =====
+
     public static void RegisterSpawner(Spawner spawner)
     {
         if (spawner != null && !registeredSpawners.Contains(spawner))
@@ -41,15 +82,293 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         }
     }
 
-    /// <summary>
-    /// Called by Spawner.OnDestroy() to unregister.
-    /// </summary>
     public static void UnregisterSpawner(Spawner spawner)
     {
         registeredSpawners.Remove(spawner);
     }
 
-    // ===== PUBLIC API =====
+    // ===== STAR SYSTEM =====
+
+    /// <summary>
+    /// Get current star rating (1-5).
+    /// </summary>
+    public int GetCurrentStars()
+    {
+        return currentStars;
+    }
+
+    /// <summary>
+    /// Award a star and unlock corresponding layer.
+    /// Fires OnStarEarned and OnLayerUnlocked events.
+    /// </summary>
+    private void AwardStar(int star)
+    {
+        if (star <= currentStars)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[ProgressionManager] Attempted to award {star}★ but already at {currentStars}★");
+            return;
+        }
+
+        if (star > 5)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[ProgressionManager] Attempted to award {star}★ but max is 5★");
+            return;
+        }
+
+        currentStars = star;
+
+        // Unlock corresponding layer (2★ = Layer 2, etc.)
+        if (star <= 10 && star > maxUnlockedLayer)
+        {
+            UnlockLayer(star);
+        }
+
+        // Fire events
+        OnStarEarned?.Invoke(star);
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] ★ Earned {star}★! Layer {star} unlocked.");
+    }
+
+    // ===== MILESTONE SYSTEM =====
+
+    /// <summary>
+    /// Get all milestones for a specific star tier.
+    /// </summary>
+    public List<StarMilestoneDef> GetMilestonesForStar(int star)
+    {
+        return allMilestones.Where(m => m.starLevel == star).ToList();
+    }
+
+    /// <summary>
+    /// Check if a milestone is complete.
+    /// </summary>
+    public bool IsMilestoneComplete(StarMilestoneDef milestone)
+    {
+        if (milestone == null) return false;
+
+        return milestone.milestoneType switch
+        {
+            MilestoneType.GoldEarned => totalGoldEarned >= milestone.targetValue,
+            MilestoneType.MobsKilled => totalMobsKilled >= milestone.targetValue,
+            MilestoneType.UnitsHired => totalUnitsHired >= milestone.targetValue,
+            MilestoneType.LootCollected => totalLootCollected >= milestone.targetValue,
+            MilestoneType.ItemsCrafted => totalItemsCrafted >= milestone.targetValue,
+            MilestoneType.CraftedItemsSold => totalCraftedItemsSold >= milestone.targetValue,
+            MilestoneType.CustomersServed => totalCustomersServed >= milestone.targetValue,
+            MilestoneType.UpgradePurchased => milestone.requiredUpgrade != null && ownedUpgrades.Contains(milestone.requiredUpgrade),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Get milestone progress (0.0 to 1.0) for UI display.
+    /// </summary>
+    public float GetMilestoneProgress(StarMilestoneDef milestone)
+    {
+        if (milestone == null) return 0f;
+
+        int current = milestone.milestoneType switch
+        {
+            MilestoneType.GoldEarned => totalGoldEarned,
+            MilestoneType.MobsKilled => totalMobsKilled,
+            MilestoneType.UnitsHired => totalUnitsHired,
+            MilestoneType.LootCollected => totalLootCollected,
+            MilestoneType.ItemsCrafted => totalItemsCrafted,
+            MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
+            MilestoneType.CustomersServed => totalCustomersServed,
+            MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
+            _ => 0
+        };
+
+        if (milestone.milestoneType == MilestoneType.UpgradePurchased)
+            return ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1f : 0f;
+
+        return Mathf.Clamp01((float)current / milestone.targetValue);
+    }
+
+    /// <summary>
+    /// Get current counter value for a milestone (for UI display).
+    /// </summary>
+    public int GetMilestoneCurrentValue(StarMilestoneDef milestone)
+    {
+        if (milestone == null) return 0;
+
+        return milestone.milestoneType switch
+        {
+            MilestoneType.GoldEarned => totalGoldEarned,
+            MilestoneType.MobsKilled => totalMobsKilled,
+            MilestoneType.UnitsHired => totalUnitsHired,
+            MilestoneType.LootCollected => totalLootCollected,
+            MilestoneType.ItemsCrafted => totalItemsCrafted,
+            MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
+            MilestoneType.CustomersServed => totalCustomersServed,
+            MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
+            _ => 0
+        };
+    }
+
+    /// <summary>
+    /// Check if all milestones for next star are complete.
+    /// Awards star if true.
+    /// </summary>
+    private void CheckMilestones()
+    {
+        if (currentStars >= 5) return; // Already max stars
+
+        int targetStar = currentStars + 1;
+        var milestones = GetMilestonesForStar(targetStar);
+
+        if (milestones.Count == 0)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[ProgressionManager] No milestones defined for {targetStar}★");
+            return;
+        }
+
+        bool allComplete = milestones.All(m => IsMilestoneComplete(m));
+
+        if (allComplete)
+        {
+            AwardStar(targetStar);
+        }
+    }
+
+    // ===== MILESTONE INCREMENT METHODS =====
+
+    public void IncrementGoldEarned(int amount)
+    {
+        totalGoldEarned += amount;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Gold earned: +{amount} (total: {totalGoldEarned})");
+    }
+
+    public void IncrementMobsKilled(int count)
+    {
+        totalMobsKilled += count;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Mobs killed: +{count} (total: {totalMobsKilled})");
+    }
+
+    public void IncrementUnitsHired(int count)
+    {
+        totalUnitsHired += count;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Units hired: +{count} (total: {totalUnitsHired})");
+    }
+
+    public void IncrementLootCollected(int count)
+    {
+        totalLootCollected += count;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Loot collected: +{count} (total: {totalLootCollected})");
+    }
+
+    public void IncrementItemsCrafted(int count)
+    {
+        totalItemsCrafted += count;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Items crafted: +{count} (total: {totalItemsCrafted})");
+    }
+
+    public void IncrementCraftedItemsSold(int count)
+    {
+        totalCraftedItemsSold += count;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Crafted items sold: +{count} (total: {totalCraftedItemsSold})");
+    }
+
+    public void IncrementCustomersServed(int count)
+    {
+        totalCustomersServed += count;
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Customers served: +{count} (total: {totalCustomersServed})");
+    }
+
+    // ===== UPGRADE SYSTEM =====
+
+    /// <summary>
+    /// Check if player can purchase an upgrade (gold + stars).
+    /// </summary>
+    public bool CanPurchaseUpgrade(GuildUpgradeDef upgrade)
+    {
+        if (upgrade == null) return false;
+        if (ownedUpgrades.Contains(upgrade)) return false; // Already owned
+        if (currentStars < upgrade.starRequirement) return false; // Insufficient stars
+        if (!Inventory.Instance.CanAfford(upgrade.goldCost)) return false; // Insufficient gold
+
+        return true;
+    }
+
+    /// <summary>
+    /// Purchase an upgrade (deducts gold, adds to owned, checks milestones).
+    /// Returns true if successful.
+    /// </summary>
+    public bool PurchaseUpgrade(GuildUpgradeDef upgrade)
+    {
+        if (!CanPurchaseUpgrade(upgrade))
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[ProgressionManager] Cannot purchase {upgrade.upgradeName} - requirements not met");
+            return false;
+        }
+
+        // Deduct gold via Inventory
+        if (!Inventory.Instance.TrySpendGold(upgrade.goldCost))
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[ProgressionManager] Failed to spend gold for {upgrade.upgradeName}");
+            return false;
+        }
+
+        // Add to owned
+        ownedUpgrades.Add(upgrade);
+
+        // Fire event (CraftingManager, etc. can listen)
+        OnUpgradePurchased?.Invoke(upgrade);
+
+        // Check if this completes any milestones
+        CheckMilestones();
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Purchased: {upgrade.upgradeName} ({upgrade.goldCost}g)");
+
+        return true;
+    }
+
+    /// <summary>
+    /// Check if an upgrade is owned.
+    /// </summary>
+    public bool IsUpgradeOwned(GuildUpgradeDef upgrade)
+    {
+        return upgrade != null && ownedUpgrades.Contains(upgrade);
+    }
+
+    /// <summary>
+    /// Check if a layer-specific upgrade is owned (e.g., Elevator on Layer 2).
+    /// </summary>
+    public bool IsUpgradeOwned(UpgradeType type, int layer)
+    {
+        return ownedUpgrades.Any(u => u.upgradeType == type && u.layerSpecific && u.targetLayer == layer);
+    }
+
+    // ===== LAYER SYSTEM (existing, preserved) =====
 
     public List<ItemDef> GetAvailableItems(ItemCategory category, float maxBudget)
     {
@@ -86,7 +405,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
             return null;
         }
 
-        return available[Random.Range(0, available.Count)];
+        return available[UnityEngine.Random.Range(0, available.Count)];
     }
 
     public void UnlockLayer(int layer)
@@ -99,18 +418,13 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
         maxUnlockedLayer = layer;
         RebuildAvailableItemsCache();
+        
+        OnLayerUnlocked?.Invoke(layer);
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Unlocked layer {layer}! Rebuilding available items cache.");
     }
 
-    // ===== CACHE MANAGEMENT =====
-
-    /// <summary>
-    /// Optimized cache rebuild using registered spawners (no scene scan).
-    /// OLD: FindObjectsByType (5-50ms spike)
-    /// NEW: Iterate registered list (0.1-0.5ms)
-    /// </summary>
     private void RebuildAvailableItemsCache()
     {
         availableItemsCache.Clear();
@@ -123,12 +437,10 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
         HashSet<ItemDef> collectedItems = new HashSet<ItemDef>();
 
-        // Only iterate registered spawners (no scene scan)
         foreach (var spawner in registeredSpawners)
         {
             if (spawner == null) continue;
 
-            // Only include spawners from unlocked layers
             if (spawner.layerIndex <= maxUnlockedLayer && spawner.layerIndex > 0)
             {
                 foreach (var candidate in spawner.candidates)
@@ -150,7 +462,6 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
             }
         }
 
-        // Organize by category
         foreach (var item in collectedItems)
         {
             if (!availableItemsCache.ContainsKey(item.itemCategory))
@@ -174,10 +485,77 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         }
     }
 
-    // ===== DEBUG =====
+    // ===== DEBUG CONTEXT MENU =====
+
+    [ContextMenu("Debug: Award 2★")]
+    private void Debug_Award2Star()
+    {
+        AwardStar(2);
+    }
+
+    [ContextMenu("Debug: Grant 1000 Gold Progress")]
+    private void Debug_Grant1000Gold()
+    {
+        IncrementGoldEarned(1000);
+    }
+
+    [ContextMenu("Debug: Complete All 2★ Milestones")]
+    private void Debug_Complete2StarMilestones()
+    {
+        var milestones = GetMilestonesForStar(2);
+        foreach (var milestone in milestones)
+        {
+            switch (milestone.milestoneType)
+            {
+                case MilestoneType.GoldEarned:
+                    totalGoldEarned = milestone.targetValue;
+                    break;
+                case MilestoneType.MobsKilled:
+                    totalMobsKilled = milestone.targetValue;
+                    break;
+                case MilestoneType.UnitsHired:
+                    totalUnitsHired = milestone.targetValue;
+                    break;
+                case MilestoneType.LootCollected:
+                    totalLootCollected = milestone.targetValue;
+                    break;
+                case MilestoneType.ItemsCrafted:
+                    totalItemsCrafted = milestone.targetValue;
+                    break;
+                case MilestoneType.UpgradePurchased:
+                    if (milestone.requiredUpgrade != null && !ownedUpgrades.Contains(milestone.requiredUpgrade))
+                    {
+                        // Force add upgrade without gold cost for debug
+                        ownedUpgrades.Add(milestone.requiredUpgrade);
+                        OnUpgradePurchased?.Invoke(milestone.requiredUpgrade);
+                    }
+                    break;
+            }
+        }
+        CheckMilestones();
+        Debug.Log("[ProgressionManager] Completed all 2★ milestones");
+    }
+
+    [ContextMenu("Debug: Print Milestone Progress")]
+    private void Debug_PrintMilestoneProgress()
+    {
+        int targetStar = currentStars + 1;
+        var milestones = GetMilestonesForStar(targetStar);
+
+        Debug.Log($"=== Milestone Progress ({targetStar}★) ===");
+        foreach (var milestone in milestones)
+        {
+            bool complete = IsMilestoneComplete(milestone);
+            float progress = GetMilestoneProgress(milestone);
+            int current = GetMilestoneCurrentValue(milestone);
+            
+            string status = complete ? "✓" : "✗";
+            Debug.Log($"  {status} {milestone.description}: {current}/{milestone.targetValue} ({progress * 100:F0}%)");
+        }
+    }
 
     [ContextMenu("Debug: Print Available Items")]
-    private void DebugPrintAvailableItems()
+    private void Debug_PrintAvailableItems()
     {
         Debug.Log($"=== Available Items (Layers 1-{maxUnlockedLayer}) ===");
         
@@ -192,7 +570,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     }
 
     [ContextMenu("Debug: Unlock Next Layer")]
-    private void DebugUnlockNextLayer()
+    private void Debug_UnlockNextLayer()
     {
         if (maxUnlockedLayer < 10)
         {
@@ -206,15 +584,24 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     }
 
     [ContextMenu("Debug: Reset to Layer 1")]
-    private void DebugResetProgression()
+    private void Debug_ResetProgression()
     {
         maxUnlockedLayer = 1;
+        currentStars = 1;
+        ownedUpgrades.Clear();
+        totalGoldEarned = 0;
+        totalMobsKilled = 0;
+        totalUnitsHired = 0;
+        totalLootCollected = 0;
+        totalItemsCrafted = 0;
+        totalCraftedItemsSold = 0;
+        totalCustomersServed = 0;
         RebuildAvailableItemsCache();
-        Debug.Log("[ProgressionManager] Reset to layer 1");
+        Debug.Log("[ProgressionManager] Reset to 1★, layer 1");
     }
 
     [ContextMenu("Debug: Print Registered Spawners")]
-    private void DebugPrintSpawners()
+    private void Debug_PrintSpawners()
     {
         Debug.Log($"=== Registered Spawners ({registeredSpawners.Count}) ===");
         foreach (var spawner in registeredSpawners)

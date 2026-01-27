@@ -1247,3 +1247,170 @@ Memory consumption went from 158.6 MB to 154.6 MB.
 Total: 5.571291 ms (FindLiveObjects: 0.340791 ms CreateObjectMapping: 0.130208 ms MarkObjects: 3.987500 ms  DeleteObjects: 1.112584 ms)
 
 Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16b7eb000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.515 seconds
+Refreshing native plugins compatible for Editor in 0.38 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.502 seconds
+Domain Reload Profiling: 1019ms
+	BeginReloadAssembly (171ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (11ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (1ms)
+		CreateAndSetChildDomain (61ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (13ms)
+	LoadAllAssembliesAndSetupDomain (301ms)
+		LoadAssemblies (195ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (135ms)
+			TypeCache.Refresh (15ms)
+				TypeCache.ScanAssembly (2ms)
+			BuildScriptInfoCaches (109ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (502ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (416ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (87ms)
+			ProcessInitializeOnLoadAttributes (294ms)
+			ProcessInitializeOnLoadMethodAttributes (31ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.51 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6884 unused Assets / (3.9 MB). Loaded Objects now: 7684.
+Memory consumption went from 158.7 MB to 154.8 MB.
+Total: 5.834917 ms (FindLiveObjects: 0.351667 ms CreateObjectMapping: 0.141708 ms MarkObjects: 4.126833 ms  DeleteObjects: 1.214334 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 30249.911421 seconds.
+  path: Assets/Scripts/Systems/Spawners/CustomerSpawner.cs
+  artifactKey: Guid(af219a9c859684365a471da50930cf3b) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Systems/Spawners/CustomerSpawner.cs using Guid(af219a9c859684365a471da50930cf3b) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '4da5900372cab223e8a31b6eccc0ece1') in 0.128173958 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000061 seconds.
+  path: Assets/Scripts/UI/UIManager.cs
+  artifactKey: Guid(5892c5f69fed34cb181199bad501512f) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/UI/UIManager.cs using Guid(5892c5f69fed34cb181199bad501512f) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '619a929b5e30c7603f60bb3b14577c64') in 0.002428917 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000030 seconds.
+  path: Assets/Scripts/Loot/LootManager.cs
+  artifactKey: Guid(d11c06c9d91474046ab4556097e72685) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Loot/LootManager.cs using Guid(d11c06c9d91474046ab4556097e72685) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '8ff3b4cb9247276395c1841b1e9b107a') in 0.002433792 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000034 seconds.
+  path: Assets/Scripts/Shop/SalesManager.cs
+  artifactKey: Guid(c9cc45901f75d4631a47884e03cad889) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Shop/SalesManager.cs using Guid(c9cc45901f75d4631a47884e03cad889) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'd6c0ade3bd58948e0d64b99c2ddd60a6') in 0.002223167 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000033 seconds.
+  path: Assets/Scripts/Managers/ClickerManager.cs
+  artifactKey: Guid(9bef504b6d7780b4297c3bc2aef32cdc) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Managers/ClickerManager.cs using Guid(9bef504b6d7780b4297c3bc2aef32cdc) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '9b8f9492054390c2aeb14a0c43bde03e') in 0.002377792 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000045 seconds.
+  path: Assets/Prefabs/Entities/Mob/Iron Golem/Iron Golem.asset
+  artifactKey: Guid(95cadcd8073b840e6929f8dc26116b8c) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Mob/Iron Golem/Iron Golem.asset using Guid(95cadcd8073b840e6929f8dc26116b8c) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '717e32bd77cda542d8851442c2bf29e9') in 0.03606125 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 57
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000029 seconds.
+  path: Assets/_Recovery/0 (3).unity
+  artifactKey: Guid(37ea43e7610c345a589c4e4520a49f35) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/_Recovery/0 (3).unity using Guid(37ea43e7610c345a589c4e4520a49f35) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '6a0504baa5d06e6ece5bac11bc2ba21f') in 0.0146125 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000036 seconds.
+  path: Assets/Scripts/Systems/Spawners/Spawner.cs
+  artifactKey: Guid(57bf17b55e3c04aeeae2a734bd240716) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Systems/Spawners/Spawner.cs using Guid(57bf17b55e3c04aeeae2a734bd240716) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'ede1aa4cb67d360b977ba7f9141d9e0b') in 0.001926166 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000031 seconds.
+  path: Assets/Scripts/ScriptableObjects/Guild
+  artifactKey: Guid(bb67583bf9ecb414c8ab834bbe679385) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/ScriptableObjects/Guild using Guid(bb67583bf9ecb414c8ab834bbe679385) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '12c92797eb50664239b34d845b5e48e0') in 0.001702459 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000042 seconds.
+  path: Assets/Prefabs/Entities/Mob/Slime/Slime.asset
+  artifactKey: Guid(1f630e5ddcfde4f76b4de5c085136176) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Mob/Slime/Slime.asset using Guid(1f630e5ddcfde4f76b4de5c085136176) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '6c77392aef93b99d47b2cdd6797282ab') in 0.009033917 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 58
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000040 seconds.
+  path: Assets/_Recovery/0 (4).unity
+  artifactKey: Guid(c0e966407ec194e60a8815b1c07d0617) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/_Recovery/0 (4).unity using Guid(c0e966407ec194e60a8815b1c07d0617) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'e7b852bbe8ca6b5c69e77b5d1e0dce72') in 0.009720209 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000039 seconds.
+  path: Assets/Scripts/Managers/ProgressionManager.cs
+  artifactKey: Guid(8fa2f0a097817497cbd39ad6a78ce00f) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Managers/ProgressionManager.cs using Guid(8fa2f0a097817497cbd39ad6a78ce00f) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '079fe70d9e74d3fc5d4069f010269ea4') in 0.002008375 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000031 seconds.
+  path: Assets/Scripts/ScriptableObjects/Guild/GuildUpgradeDef.cs
+  artifactKey: Guid(d104bfc79eea6439390eebc84fc7f607) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/ScriptableObjects/Guild/GuildUpgradeDef.cs using Guid(d104bfc79eea6439390eebc84fc7f607) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'c2f868aa78a4e54896bd46c6ae73b8a9') in 0.002130584 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
+AssetImportWorker is now disconnected from the server
+Process exiting
