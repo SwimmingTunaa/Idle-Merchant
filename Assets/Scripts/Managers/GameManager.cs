@@ -61,5 +61,16 @@ public class GameManager : PersistentSingleton<GameManager>
         CharacterSpriteGenerator.Cleanup();
     }
 
+    public void QuitGame()
+    {
+        UnpauseGame();
+        OnApplicationQuit();
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #else
+        Application.Quit();
+    #endif
+    }
+
     // Future: Game state, pause, save/load, scene management, etc.
 }

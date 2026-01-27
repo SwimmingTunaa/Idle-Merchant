@@ -202,7 +202,7 @@ public class PauseMenuController : BasePanelController
         saveButton.clicked += OnSaveClicked;
         loadButton.clicked += OnLoadClicked;
         mainMenuButton.clicked += OnMainMenuClicked;
-        quitButton.clicked += OnQuitClicked;
+        quitButton.clicked += GameManager.Instance.QuitGame;
 
         // Disable future buttons
         settingsButton.SetEnabled(false);
@@ -245,20 +245,5 @@ public class PauseMenuController : BasePanelController
     private void OnMainMenuClicked()
     {
        GameManager.Instance.LoadScene(mainMenuSceneName);
-    }
-
-    private void OnQuitClicked()
-    {
-        // Unpause before quitting
-       gameManager.UnpauseGame();
-
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-
-        if (showDebugLogs)
-            Debug.Log("[PauseMenu] Quit game");
     }
 }
