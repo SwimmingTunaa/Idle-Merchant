@@ -3,9 +3,9 @@ using UnityEditor.Animations;
 using UnityEngine;
 
 /// <summary>
-/// Custom editor for EntityDef and all subclasses (AdventurerDef, MobDef, etc.)
+/// Custom editor for EntityDef and all subclasses (AdventurerDef, MobDef, PorterDef, CustomerDef)
 /// Provides tabbed interface, auto-calculate collider utility, and validation warnings.
-/// Now supports CombatConfig for both adventurers and mobs.
+/// Supports all entity types with type-specific behavior tabs.
 /// </summary>
 [CustomEditor(typeof(EntityDef), true)]
 public class EntityDefEditor : Editor
@@ -62,9 +62,9 @@ public class EntityDefEditor : Editor
 
     // Combat - AdventurerDef specific
     private SerializedProperty adventurerTypeProp;
-    private SerializedProperty startingStateProp;
-    private SerializedProperty wanderTimeRangeProp;
-    private SerializedProperty returnToSpawnProp;
+    private SerializedProperty adventurerStartingStateProp;
+    private SerializedProperty adventurerWanderTimeRangeProp;
+    private SerializedProperty adventurerReturnToSpawnProp;
     private SerializedProperty leashRangeProp;
     
     // Combat - MobDef specific
@@ -77,13 +77,40 @@ public class EntityDefEditor : Editor
     private SerializedProperty lootProp;
     private SerializedProperty lootDropAmountProp;
 
+    // Porter-specific
+    private SerializedProperty porterTypeProp;
+    private SerializedProperty carryCapacityProp;
+    private SerializedProperty pickupTimeProp;
+    private SerializedProperty depositTimeProp;
+    private SerializedProperty porterStartingStateProp;
+    private SerializedProperty porterWanderTimeRangeProp;
+    private SerializedProperty porterReturnToSpawnProp;
+    private SerializedProperty idleColorProp;
+    private SerializedProperty wanderColorProp;
+    private SerializedProperty seekColorProp;
+    private SerializedProperty carryingColorProp;
+    private SerializedProperty travelColorProp;
+
+    // Customer-specific
+    private SerializedProperty customerStartingStateProp;
+    private SerializedProperty itemPreferenceProp;
+    private SerializedProperty budgetProp;
+    private SerializedProperty batchRangeProp;
+
     private bool isAdventurer;
     private bool isMob;
+    private bool isPorter;
+    private bool isCustomer;
 
     private void OnEnable()
     {
         isAdventurer = target is AdventurerDef;
         isMob = target is MobDef;
+        isPorter = target is PorterDef;
+        isCustomer = target is CustomerDef;
+
+        // Debug: Log what type we detected
+        Debug.Log($"[EntityDefEditor] OnEnable for {target.name} - Type: {target.GetType().Name} | isAdventurer: {isAdventurer}, isMob: {isMob}, isPorter: {isPorter}, isCustomer: {isCustomer}");
 
         // Core
         prefabProp = serializedObject.FindProperty("prefab");
@@ -133,9 +160,9 @@ public class EntityDefEditor : Editor
         if (isAdventurer)
         {
             adventurerTypeProp = serializedObject.FindProperty("adventurerType");
-            startingStateProp = serializedObject.FindProperty("startingState");
-            wanderTimeRangeProp = serializedObject.FindProperty("wanderTimeRange");
-            returnToSpawnProp = serializedObject.FindProperty("returnToSpawn");
+            adventurerStartingStateProp = serializedObject.FindProperty("startingState");
+            adventurerWanderTimeRangeProp = serializedObject.FindProperty("wanderTimeRange");
+            adventurerReturnToSpawnProp = serializedObject.FindProperty("returnToSpawn");
             leashRangeProp = serializedObject.FindProperty("leashRange");
         }
         
@@ -150,6 +177,50 @@ public class EntityDefEditor : Editor
             maxSimultaneousAttackersProp = serializedObject.FindProperty("maxSimultaneousAttackers");
             lootProp = serializedObject.FindProperty("loot");
             lootDropAmountProp = serializedObject.FindProperty("lootDropAmount");
+        }
+
+        // Porter-specific
+        if (isPorter)
+        {
+            try
+            {
+                porterTypeProp = serializedObject.FindProperty("porterType");
+                carryCapacityProp = serializedObject.FindProperty("carryCapacity");
+                pickupTimeProp = serializedObject.FindProperty("pickupTime");
+                depositTimeProp = serializedObject.FindProperty("depositTime");
+                porterStartingStateProp = serializedObject.FindProperty("startingState");
+                porterWanderTimeRangeProp = serializedObject.FindProperty("wanderTimeRange");
+                porterReturnToSpawnProp = serializedObject.FindProperty("returnToSpawn");
+                idleColorProp = serializedObject.FindProperty("idleColor");
+                wanderColorProp = serializedObject.FindProperty("wanderColor");
+                seekColorProp = serializedObject.FindProperty("seekColor");
+                carryingColorProp = serializedObject.FindProperty("carryingColor");
+                travelColorProp = serializedObject.FindProperty("travelColor");
+                
+                Debug.Log($"[EntityDefEditor] Successfully bound {(porterStartingStateProp != null ? "all" : "SOME")} Porter properties");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[EntityDefEditor] Failed to bind Porter properties: {e.Message}");
+            }
+        }
+
+        // Customer-specific
+        if (isCustomer)
+        {
+            try
+            {
+                customerStartingStateProp = serializedObject.FindProperty("startingState");
+                itemPreferenceProp = serializedObject.FindProperty("itemPreferance"); // Note: typo in CustomerDef
+                budgetProp = serializedObject.FindProperty("budget");
+                batchRangeProp = serializedObject.FindProperty("batchRange");
+                
+                Debug.Log($"[EntityDefEditor] Successfully bound {(customerStartingStateProp != null ? "all" : "SOME")} Customer properties");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[EntityDefEditor] Failed to bind Customer properties: {e.Message}");
+            }
         }
     }
 
@@ -171,7 +242,7 @@ public class EntityDefEditor : Editor
             case 0: DrawCoreTab(); break;
             case 1: DrawStatsTab(); break;
             case 2: DrawVisualTab(); break;
-            case 3: DrawCombatTab(); break;
+            case 3: DrawBehaviourTab(); break;
         }
 
         serializedObject.ApplyModifiedProperties();
@@ -184,10 +255,16 @@ public class EntityDefEditor : Editor
         EditorGUILayout.PropertyField(idProp);
         EditorGUILayout.PropertyField(displayNameProp);
         EditorGUILayout.PropertyField(descriptionProp);
+        
         if (isAdventurer)
         {
             EditorGUILayout.PropertyField(adventurerTypeProp);
         }
+        if (isPorter)
+        {
+            EditorGUILayout.PropertyField(porterTypeProp);
+        }
+        
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
@@ -203,87 +280,117 @@ public class EntityDefEditor : Editor
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Systems", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(sortingTypeProp);
+        EditorGUILayout.LabelField("Skills", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(startingSkillsProp, true);
-        EditorGUILayout.EndVertical();
-    }
-
-    private void DrawStatsTab()
-    {
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Health", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(healthProp);
-        
-        // Mob-specific: HP multiplier curve
-        if (isMob && hpMultiplierProp != null)
-        {
-            EditorGUILayout.PropertyField(hpMultiplierProp, new GUIContent("HP Multiplier by Layer"));
-        }
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Rendering", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(sortingTypeProp);
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawStatsTab()
+    {
+        // Only show health for entities that have it (Adventurer and Mob)
+        if (healthProp != null && (isAdventurer || isMob))
+        {
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Health", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(healthProp);
+            
+            if (isMob)
+            {
+                EditorGUILayout.PropertyField(hpMultiplierProp, new GUIContent("HP Multiplier By Layer"));
+                
+                MobDef mobDef = target as MobDef;
+                if (mobDef != null)
+                {
+                    EditorGUILayout.Space(3);
+                    EditorGUILayout.LabelField("HP Preview:", EditorStyles.miniLabel);
+                    for (int layer = 1; layer <= 10; layer++)
+                    {
+                        float hp = mobDef.baseHealth * mobDef.hpMultiplierByLayer.Evaluate(layer);
+                        EditorGUILayout.LabelField($"  Layer {layer}: {hp:F1} HP", EditorStyles.miniLabel);
+                    }
+                }
+            }
+            
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(5);
+        }
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("Movement", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(moveSpeedProp);
-        EditorGUILayout.PropertyField(stopDistanceProp);
-        EditorGUILayout.PropertyField(idleTimeRangeProp);
+        if (moveSpeedProp != null) EditorGUILayout.PropertyField(moveSpeedProp);
+        if (stopDistanceProp != null) EditorGUILayout.PropertyField(stopDistanceProp);
+        if (idleTimeRangeProp != null) EditorGUILayout.PropertyField(idleTimeRangeProp);
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Combat Stats", EditorStyles.boldLabel);
+        if (attackDamageProp != null) EditorGUILayout.PropertyField(attackDamageProp);
+        if (attackIntervalProp != null) EditorGUILayout.PropertyField(attackIntervalProp);
+        if (attackRangeProp != null) EditorGUILayout.PropertyField(attackRangeProp);
+        if (chaseBreakRangeProp != null) EditorGUILayout.PropertyField(chaseBreakRangeProp);
+        if (scanRangeProp != null) EditorGUILayout.PropertyField(scanRangeProp);
+        
+        if (isAdventurer)
+        {
+            AdventurerDef advDef = target as AdventurerDef;
+            if (advDef != null)
+            {
+                EditorGUILayout.Space(3);
+                EditorGUILayout.LabelField($"DPS: {advDef.DPS:F2}", EditorStyles.boldLabel);
+            }
+        }
+        
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("Animation", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(deathAnimationDurationProp);
+        if (deathAnimationDurationProp != null) EditorGUILayout.PropertyField(deathAnimationDurationProp);
+        
+        if (isMob && stunTimeProp != null)
+        {
+            EditorGUILayout.PropertyField(stunTimeProp);
+        }
+        
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("Collider", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(colliderSizeProp);
-        EditorGUILayout.PropertyField(colliderOffsetProp);
+        if (colliderSizeProp != null) EditorGUILayout.PropertyField(colliderSizeProp);
+        if (colliderOffsetProp != null) EditorGUILayout.PropertyField(colliderOffsetProp);
         
-        if (GUILayout.Button("Auto-Calculate Collider From Sprite"))
+        if (GUILayout.Button("Auto-Calculate Collider From Sprite", GUILayout.Height(30)))
         {
             AutoCalculateCollider();
         }
-        EditorGUILayout.EndVertical();
         
-        // Mob-specific: damage response
-        if (isMob && stunTimeProp != null)
-        {
-            EditorGUILayout.Space(5);
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("Damage Response", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(stunTimeProp, new GUIContent("Stun Time (when hit)"));
-            EditorGUILayout.EndVertical();
-        }
+        EditorGUILayout.HelpBox(
+            "Right-click this ScriptableObject → 'Auto-Calculate Collider Size From Sprite' to set collider based on sprite bounds.",
+            MessageType.Info
+        );
         
-        EditorGUILayout.Space(5);
-        
-        // Combat Stats (all entities have these, but not all use them)
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Combat Stats", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(attackDamageProp);
-        EditorGUILayout.PropertyField(attackIntervalProp);
-        EditorGUILayout.PropertyField(attackRangeProp);
-        EditorGUILayout.PropertyField(chaseBreakRangeProp);
-        EditorGUILayout.PropertyField(scanRangeProp);
-        
-        if (attackDamageProp.floatValue > 0 && attackIntervalProp.floatValue > 0)
-        {
-            float dps = attackDamageProp.floatValue / attackIntervalProp.floatValue;
-            EditorGUILayout.LabelField($"DPS: {dps:F2}");
-        }
         EditorGUILayout.EndVertical();
     }
 
     private void DrawVisualTab()
     {
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Visual System", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Character Type", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(useModularCharacterProp);
         EditorGUILayout.EndVertical();
 
@@ -294,7 +401,7 @@ public class EntityDefEditor : Editor
         if (!useModular)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("Simple Visual", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Simple Sprite (Non-Modular)", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(spriteDropProp);
             EditorGUILayout.PropertyField(shopSpriteProp);
             EditorGUILayout.PropertyField(animatorOverrideProp);
@@ -303,125 +410,96 @@ public class EntityDefEditor : Editor
         else
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("Modular Character", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Modular Character System", EditorStyles.boldLabel);
             
             selectedLibraryTab = GUILayout.Toolbar(selectedLibraryTab, libraryTabNames);
-            
             EditorGUILayout.Space(5);
 
             switch (selectedLibraryTab)
             {
-                case 0:
-                    EditorGUILayout.PropertyField(baseBodySpriteLibrariesProp, new GUIContent("Base Body Libraries"), true);
-                    EditorGUILayout.PropertyField(skinColourPaletteProp, new GUIContent("Skin Colour Palette"), true);
-                    break;
-                case 1:
-                    EditorGUILayout.PropertyField(shirtSpriteLibrariesProp, new GUIContent("Shirt Libraries"), true);
-                    EditorGUILayout.PropertyField(shirtColourPaletteProp, new GUIContent("Shirt Colour Palette"), true);
-                    break;
-                case 2:
-                    EditorGUILayout.PropertyField(pantsSpriteLibrariesProp, new GUIContent("Pants Libraries"), true);
-                    EditorGUILayout.PropertyField(pantsColourPaletteProp, new GUIContent("Pants Colour Palette"), true);
-                    break;
-                case 3:
-                    EditorGUILayout.PropertyField(hairTopSpriteLibrariesProp, new GUIContent("Hair Top Libraries"), true);
-                    EditorGUILayout.PropertyField(hairColourPaletteProp, new GUIContent("Hair Colour Palette"), true);
-                    break;
-                case 4:
-                    EditorGUILayout.PropertyField(hairBackSpriteLibrariesProp, new GUIContent("Hair Back Libraries"), true);
-                    break;
-                case 5:
-                    EditorGUILayout.PropertyField(frontWeaponSpriteLibrariesProp, new GUIContent("Front Weapon Libraries"), true);
-                    break;
-                case 6:
-                    EditorGUILayout.PropertyField(backWeaponSpriteLibrariesProp, new GUIContent("Back Weapon Libraries"), true);
-                    break;
+                case 0: EditorGUILayout.PropertyField(baseBodySpriteLibrariesProp, true); break;
+                case 1: EditorGUILayout.PropertyField(shirtSpriteLibrariesProp, true); break;
+                case 2: EditorGUILayout.PropertyField(pantsSpriteLibrariesProp, true); break;
+                case 3: EditorGUILayout.PropertyField(hairTopSpriteLibrariesProp, true); break;
+                case 4: EditorGUILayout.PropertyField(hairBackSpriteLibrariesProp, true); break;
+                case 5: EditorGUILayout.PropertyField(frontWeaponSpriteLibrariesProp, true); break;
+                case 6: EditorGUILayout.PropertyField(backWeaponSpriteLibrariesProp, true); break;
             }
             
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(5);
+
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Color Palettes", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(skinColourPaletteProp);
+            EditorGUILayout.PropertyField(shirtColourPaletteProp);
+            EditorGUILayout.PropertyField(pantsColourPaletteProp);
+            EditorGUILayout.PropertyField(hairColourPaletteProp);
             EditorGUILayout.EndVertical();
         }
     }
 
-    private void DrawCombatTab()
+    private void DrawBehaviourTab()
     {
+        // Debug header
+        EditorGUILayout.HelpBox($"Entity Type: {target.GetType().Name} | Porter: {isPorter} | Customer: {isCustomer} | Adventurer: {isAdventurer} | Mob: {isMob}", MessageType.Info);
+        
         if (isAdventurer)
         {
-            DrawAdventurerCombatTab();
+            DrawAdventurerBehaviourTab();
         }
         else if (isMob)
         {
-            DrawMobCombatTab();
+            DrawMobBehaviourTab();
+        }
+        else if (isPorter)
+        {
+            DrawPorterBehaviourTab();
+        }
+        else if (isCustomer)
+        {
+            DrawCustomerBehaviourTab();
         }
         else
         {
-            EditorGUILayout.HelpBox("Combat stats only available for AdventurerDef and MobDef.", MessageType.Info);
+            EditorGUILayout.HelpBox("Base EntityDef has no behavior-specific settings", MessageType.Info);
         }
     }
 
-    private void DrawAdventurerCombatTab()
+    private void DrawAdventurerBehaviourTab()
     {
-        AdventurerDef adventurer = target as AdventurerDef;
-
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Calculated Stats", EditorStyles.boldLabel);
-        EditorGUILayout.LabelField($"DPS: {adventurer.DPS:F2} ({attackDamageProp.floatValue} dmg / {attackIntervalProp.floatValue}s)");
-        EditorGUILayout.HelpBox("Combat stats (damage, range, etc.) are now in the Stats tab.", MessageType.Info);
+        EditorGUILayout.LabelField("Adventurer Behavior", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(adventurerStartingStateProp, new GUIContent("Starting State"));
+        EditorGUILayout.PropertyField(adventurerWanderTimeRangeProp, new GUIContent("Wander Time Range"));
+        EditorGUILayout.PropertyField(adventurerReturnToSpawnProp, new GUIContent("Return to Spawn"));
+        EditorGUILayout.PropertyField(leashRangeProp, new GUIContent("Leash Range"));
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
 
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Starting State", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(startingStateProp);
-        EditorGUILayout.EndVertical();
-
-        EditorGUILayout.Space(5);
-
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Behavior", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(wanderTimeRangeProp);
-        EditorGUILayout.PropertyField(returnToSpawnProp);
-        EditorGUILayout.PropertyField(leashRangeProp);
-        EditorGUILayout.EndVertical();
-    }
-
-    private void DrawMobCombatTab()
-    {
-        MobDef mob = target as MobDef;
-
-        // Quick toggle buttons
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Make Passive", GUILayout.Height(30)))
-        {
-            SetMobPassive();
-        }
-        if (GUILayout.Button("Make Aggressive", GUILayout.Height(30)))
-        {
-            SetMobAggressive();
-        }
-        if (GUILayout.Button("Make Defensive", GUILayout.Height(30)))
-        {
-            SetMobDefensive();
-        }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Space(5);
-
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Starting State", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(mobStartingStateProp);
-        EditorGUILayout.PropertyField(isBossProp);
-        EditorGUILayout.EndVertical();
-
-        EditorGUILayout.Space(5);
-        
-        EditorGUILayout.HelpBox("Combat stats (damage, range, etc.) are in the Stats tab.", MessageType.Info);
-        
-        EditorGUILayout.Space(5);
-
-        // Combat Configuration
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("Combat Configuration", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("Adventurers use EntityDef base combat stats (see Stats tab)", MessageType.Info);
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawMobBehaviourTab()
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Mob Behavior", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(mobStartingStateProp, new GUIContent("Starting State"));
+        EditorGUILayout.PropertyField(isBossProp);
+        EditorGUILayout.PropertyField(maxSimultaneousAttackersProp, new GUIContent("Max Attackers (0 = default)"));
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Combat Configuration", EditorStyles.boldLabel);
+        
+        EditorGUILayout.PropertyField(combatConfigProp, new GUIContent("Combat Config"));
         
         if (combatConfigProp != null)
         {
@@ -429,53 +507,100 @@ public class EntityDefEditor : Editor
             SerializedProperty behaviorTypeProp = combatConfigProp.FindPropertyRelative("behaviorType");
             SerializedProperty hostileToProp = combatConfigProp.FindPropertyRelative("hostileTo");
             SerializedProperty territorialRadiusProp = combatConfigProp.FindPropertyRelative("territorialRadius");
+
+            EditorGUILayout.Space(5);
             
-            EditorGUILayout.PropertyField(canAttackProp, new GUIContent("Can Attack"));
+            CombatBehaviorType behaviorType = (CombatBehaviorType)behaviorTypeProp.enumValueIndex;
+            EditorGUILayout.HelpBox(GetBehaviorDescription(behaviorType), MessageType.Info);
             
-            if (canAttackProp.boolValue)
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("Quick Presets:", EditorStyles.boldLabel);
+            
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Passive"))
             {
-                EditorGUI.indentLevel++;
-                
-                EditorGUILayout.PropertyField(behaviorTypeProp, new GUIContent("Behavior Type"));
-                EditorGUILayout.PropertyField(hostileToProp, new GUIContent("Hostile To"));
-                
-                // Show territorial radius only if behavior is Territorial
-                if (behaviorTypeProp.enumValueIndex == (int)CombatBehaviorType.Territorial)
-                {
-                    EditorGUILayout.PropertyField(territorialRadiusProp, new GUIContent("Territorial Radius"));
-                }
-                
-                EditorGUI.indentLevel--;
-                
-                // Combat guidance
-                EditorGUILayout.Space(3);
-                string behaviorDesc = GetBehaviorDescription((CombatBehaviorType)behaviorTypeProp.enumValueIndex);
-                EditorGUILayout.HelpBox(behaviorDesc, MessageType.Info);
+                SetMobPassive();
             }
-            else
+            if (GUILayout.Button("Defensive"))
             {
-                EditorGUILayout.HelpBox("This mob will not attack. It will only Wander/Idle/Damaged.", MessageType.Info);
+                SetMobDefensive();
             }
+            if (GUILayout.Button("Aggressive"))
+            {
+                SetMobAggressive();
+            }
+            EditorGUILayout.EndHorizontal();
         }
         
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
 
-        // Targeting
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Targeting (Adventurer → Mob)", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(maxSimultaneousAttackersProp, new GUIContent("Max Simultaneous Attackers"));
-        EditorGUILayout.HelpBox("How many adventurers can target this mob at once. 0 = use MobManager default (3).", MessageType.Info);
+        EditorGUILayout.LabelField("Loot Table", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(lootProp, true);
+        EditorGUILayout.PropertyField(lootDropAmountProp);
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawPorterBehaviourTab()
+    {
+        // Debug: Check if properties were found
+        if (porterStartingStateProp == null)
+        {
+            EditorGUILayout.HelpBox("ERROR: porterStartingStateProp is null! Property binding failed.", MessageType.Error);
+            return;
+        }
+        
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Porter Behavior", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(porterStartingStateProp, new GUIContent("Starting State"));
+        EditorGUILayout.PropertyField(porterWanderTimeRangeProp, new GUIContent("Wander Time Range"));
+        EditorGUILayout.PropertyField(porterReturnToSpawnProp, new GUIContent("Return to Spawn"));
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space(5);
 
-        // Loot
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        EditorGUILayout.LabelField("Loot", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(lootProp, true);
-        EditorGUILayout.PropertyField(lootDropAmountProp);
+        EditorGUILayout.LabelField("Porter Stats", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(carryCapacityProp);
+        EditorGUILayout.PropertyField(pickupTimeProp);
+        EditorGUILayout.PropertyField(depositTimeProp);
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("State Colors (Visual Debug)", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(idleColorProp, new GUIContent("Idle Color"));
+        EditorGUILayout.PropertyField(wanderColorProp, new GUIContent("Wander Color"));
+        EditorGUILayout.PropertyField(seekColorProp, new GUIContent("Seek Color"));
+        EditorGUILayout.PropertyField(carryingColorProp, new GUIContent("Carrying Color"));
+        EditorGUILayout.PropertyField(travelColorProp, new GUIContent("Travel Color"));
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawCustomerBehaviourTab()
+    {
+        // Debug: Check if properties were found
+        if (customerStartingStateProp == null)
+        {
+            EditorGUILayout.HelpBox("ERROR: customerStartingStateProp is null! Property binding failed.", MessageType.Error);
+            return;
+        }
+        
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Customer Behavior", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(customerStartingStateProp, new GUIContent("Starting State"));
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Shopping Preferences", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(itemPreferenceProp, new GUIContent("Item Preference"));
+        EditorGUILayout.PropertyField(budgetProp);
+        EditorGUILayout.PropertyField(batchRangeProp, new GUIContent("Items Per Visit"));
         EditorGUILayout.EndVertical();
     }
 
@@ -497,7 +622,7 @@ public class EntityDefEditor : Editor
         
         combatConfigProp.FindPropertyRelative("canAttack").boolValue = false;
         combatConfigProp.FindPropertyRelative("behaviorType").enumValueIndex = (int)CombatBehaviorType.Passive;
-        combatConfigProp.FindPropertyRelative("hostileTo").enumValueFlag = 0;
+        combatConfigProp.FindPropertyRelative("hostileTo").intValue = 0;
         combatConfigProp.FindPropertyRelative("territorialRadius").floatValue = 0f;
         
         serializedObject.ApplyModifiedProperties();
@@ -510,7 +635,7 @@ public class EntityDefEditor : Editor
         
         combatConfigProp.FindPropertyRelative("canAttack").boolValue = true;
         combatConfigProp.FindPropertyRelative("behaviorType").enumValueIndex = (int)CombatBehaviorType.Aggressive;
-        combatConfigProp.FindPropertyRelative("hostileTo").enumValueFlag = (int)HostilityTargets.Adventurers;
+        combatConfigProp.FindPropertyRelative("hostileTo").intValue = (int)HostilityTargets.Adventurers;
         combatConfigProp.FindPropertyRelative("territorialRadius").floatValue = 0f;
         
         serializedObject.ApplyModifiedProperties();
@@ -523,7 +648,7 @@ public class EntityDefEditor : Editor
         
         combatConfigProp.FindPropertyRelative("canAttack").boolValue = true;
         combatConfigProp.FindPropertyRelative("behaviorType").enumValueIndex = (int)CombatBehaviorType.Defensive;
-        combatConfigProp.FindPropertyRelative("hostileTo").enumValueFlag = (int)HostilityTargets.Adventurers;
+        combatConfigProp.FindPropertyRelative("hostileTo").intValue = (int)HostilityTargets.Adventurers;
         combatConfigProp.FindPropertyRelative("territorialRadius").floatValue = 0f;
         
         serializedObject.ApplyModifiedProperties();
@@ -597,10 +722,7 @@ public class EntityDefEditor : Editor
             return entityDef.spriteDrop;
         }
 
-        if (entityDef.animatorOverrideController != null)
-        {
-            return ExtractIdleSpriteFromAnimator(entityDef.animatorOverrideController);
-        }
+       
 
         return null;
     }

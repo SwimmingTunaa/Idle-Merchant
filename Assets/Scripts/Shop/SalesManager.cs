@@ -10,6 +10,7 @@ public class SalesManager : MonoBehaviour
 
     private Dictionary<ItemDef, bool> forSale = new();
     private HashSet<ItemDef> hasBeenSeen = new();
+    private readonly List<ItemDef> _sellableBuffer = new(64);
 
     void Awake()
     {
@@ -63,6 +64,7 @@ public class SalesManager : MonoBehaviour
         int reserved = Inventory.Instance.GetReserve(item);
         return Mathf.Max(0, totalStock - reserved);
     }
+
 
     public int GetReservedAmount(ItemDef item)
     {
@@ -122,6 +124,89 @@ public class SalesManager : MonoBehaviour
         return true;
     }
 
+    public bool TryPickDesiredForCustomer(
+        Inventory inventory,
+        ItemCategory preference,
+        int budget,
+        Vector2Int batchRange,
+        out ItemDef desiredItem,
+        out int desiredQty)
+    {
+        desiredItem = null;
+        desiredQty = 0;
+
+        if (inventory == null) return false;
+
+        _sellableBuffer.Clear();
+
+        // Pull the right inventory dictionary (same mapping your Inventory already uses).
+        var dict = inventory.GetInventoryType(preference);
+        if (dict == null || dict.Count == 0) return false;
+
+        // Build candidate list from *sellable* stock, not raw inventory.
+        foreach (var kvp in dict)
+        {
+            var item = kvp.Key;
+            if (item == null) continue;
+
+            if (!CanSell(item)) continue;                 // your existing rule
+            int available = GetAvailableForSale(item);    // your existing rule
+            if (available <= 0) continue;
+
+            if (item.sellPrice <= 0) continue;
+            if (item.sellPrice > budget) continue;
+
+            _sellableBuffer.Add(item);
+        }
+
+        if (_sellableBuffer.Count == 0) return false;
+
+        // Pick 1 item. Simple approach: "best value I can afford" but only among sellables.
+        // You can swap this to weighted random later if you want variety.
+        ItemDef best = null;
+        int bestPrice = int.MinValue;
+
+        for (int i = 0; i < _sellableBuffer.Count; i++)
+        {
+            var item = _sellableBuffer[i];
+            if (item.sellPrice > bestPrice)
+            {
+                bestPrice = item.sellPrice;
+                best = item;
+            }
+        }
+
+        if (best == null) return false;
+
+        // Qty must be affordable AND in available-for-sale.
+        int maxByBudget = budget / best.sellPrice;
+        if (maxByBudget <= 0) return false;
+
+        int maxByStock = GetAvailableForSale(best);
+        int max = Mathf.Min(maxByBudget, maxByStock);
+        if (max <= 0) return false;
+
+        // IMPORTANT: don’t clamp up to batchMin if you can’t afford it.
+        int min = Mathf.Max(1, batchRange.x);
+        int qty = Mathf.Clamp(max, 1, batchRange.y);
+
+        if (qty < min)
+        {
+            // If you want: allow "buy less than batchMin" as fallback, or fail.
+            // I recommend failing, so customers don't constantly do tiny buys if your design expects batches.
+            //may add an ability or stat in the future, to upsell cusomters
+            return false;
+        }
+
+        // If you want a bit of randomness inside range:
+        // qty = Random.Range(min, Mathf.Min(batchRange.y, max) + 1);
+
+        desiredItem = best;
+        desiredQty = qty;
+        return true;
+    }
+
+
     public bool SellAllNow(ItemDef item)
     {
         int available = GetAvailableForSale(item);
@@ -144,6 +229,7 @@ public class SalesManager : MonoBehaviour
                 Debug.Log($"[SalesManager] First time seeing {stack.itemDef.displayName}, auto-marked for sale");
         }
     }
+    
 
     [System.Serializable]
     public class SalesManagerSaveData

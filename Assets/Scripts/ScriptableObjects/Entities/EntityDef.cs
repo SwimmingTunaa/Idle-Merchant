@@ -9,7 +9,7 @@ public class EntityDef : ScriptableObject
 {
     public GameObject prefab;
     public bool useModularCharacter = false;
-    public AnimatorOverrideController animatorOverrideController;
+    public AnimatorOverrideController[] animatorOverrideController;
     public Sprite spriteDrop; 
     public Sprite shopSprite;
     public string id;

@@ -125,9 +125,9 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
 
     public void PickWantFromInventory()
     {
-        if (Inventory.Instance == null)
+        if (SalesManager.Instance == null)
         {
-            Debug.LogError($"[CustomerAgent] {name} Inventory.Instance is null!");
+            Debug.LogError($"[CustomerAgent] {name} SalesManager.Instance is null!");
             return;
         }
         
@@ -137,37 +137,27 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
             return;
         }
         
+        SalesManager salesManager = SalesManager.Instance;
         Inventory inventory = Inventory.Instance;
-        var inventoryType = inventory.GetInventoryType(customerDef.itemPreferance);
-        
-        if (inventoryType == null)
-        {
-            Debug.LogError($"[CustomerAgent] {name} inventoryType is null for preference: {customerDef.itemPreferance}");
-            return;
-        }
-        
-        ItemDef pick = null;
-        
-        float bestPrice = -1f;
-        foreach (var it in inventoryType.Keys)
-        {
-            int stock = Inventory.Instance.Get(inventoryType, it);
-            if (stock <= 0) continue;
+        int budget = (int)Random.Range(customerDef.budget.x, customerDef.budget.y);
 
-            float unitPrice = it.sellPrice;
-            if (unitPrice <= budget && unitPrice > bestPrice)
-            {
-                bestPrice = unitPrice;
-                pick = it;
-            }
+        if (salesManager.TryPickDesiredForCustomer(
+        inventory,
+        customerDef.itemPreferance,
+        budget,
+        customerDef.batchRange,
+        out var item,
+        out var qty))
+        {
+            desiredItem = item;
+            desiredQty = Mathf.Max(1, qty);
+   
+        }
+        else
+        {
+            // Optional: leave immediately, or wander a bit then leave.
         }
 
-        if (pick == null) return;
-
-        desiredItem = pick;
-        int maxByBudget = Mathf.FloorToInt(budget / Mathf.Max(0.01f, bestPrice));
-        int plan = Mathf.Clamp(maxByBudget, customerDef.batchRange.x, customerDef.batchRange.y);
-        desiredQty = Mathf.Max(1, plan);
     }
 
     protected override void OnEnterState(CustomerState newState)
@@ -194,7 +184,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 queueCheckTimer = new CountdownTimer(queueCheckInterval);
                 queueCheckTimer.Start();
                 
-                seekingTimeoutTimer = new CountdownTimer(5f);
+                seekingTimeoutTimer = new CountdownTimer(100f);
                 seekingTimeoutTimer.Start();
                 break;
                 

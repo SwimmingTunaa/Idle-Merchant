@@ -10,6 +10,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    // Time management
+    private float previousTimeScale = 1f;
+    private bool didPauseTime = false;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -20,6 +24,23 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+    public void PauseGame()
+    {
+        previousTimeScale = Time.timeScale;
+        Time.timeScale = 0f;
+        didPauseTime = true;
+    }
+
+    public void UnpauseGame()
+    {
+        if (didPauseTime)
+        {
+            Time.timeScale = previousTimeScale;
+            didPauseTime = false;
+        }
+    }
+
 
     // Future: Game state, pause, save/load, scene management, etc.
 }

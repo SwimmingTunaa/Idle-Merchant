@@ -64,6 +64,7 @@
     <Compile Include="Assets/Scripts/Crafting/CraftingManager.cs" />
     <Compile Include="Assets/Scripts/Managers/GameCleanup.cs" />
     <Compile Include="Assets/Scripts/Entities/Customers/CustomerWantDebug.cs" />
+    <Compile Include="Assets/Scripts/Systems/Spawners/CustomerSpawner.cs" />
     <Compile Include="Assets/Scripts/Traits/CursedComboDatabase.cs" />
     <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_ImprovedClassData.cs" />
     <Compile Include="Assets/Scripts/Utility/Timers/Timer.cs" />
@@ -138,12 +139,14 @@
     <Compile Include="Assets/Scripts/Traits/TraitDef.cs" />
     <Compile Include="Assets/Scripts/Managers/UnitManager.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitCompatibilityChecker.cs" />
+    <Compile Include="Assets/Scripts/Utility/Deubugger/GameDebugger.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/BaseStats.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Pause Menu/PauseMenuController.cs" />
     <Compile Include="Assets/Scripts/Skills/Base/PassiveEffect.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitManager.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Hiring/CandidateUIMapper.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitDatabase.cs" />
+    <Compile Include="Assets/Scripts/Systems/Spawners/CustomerSpawnHandle.cs" />
     <Compile Include="Assets/SPUM/Core/Script/Data/PreviewMatchingElement.cs" />
     <Compile Include="Assets/Scripts/Identity/NamePoolDef.cs" />
     <Compile Include="Assets/Scripts/Loot/LootVisual.cs" />

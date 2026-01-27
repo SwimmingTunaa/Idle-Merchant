@@ -1,11 +1,15 @@
 using UnityEngine;
-
+public enum CustomerArcheType
+{
+    Commoner, Adventurer, Noble
+}
 
 [CreateAssetMenu(menuName = "Data/Customer")]
 public class CustomerDef : EntityDef
 {
     [Header("Customer Def")]
     public CustomerState startingState = CustomerState.Wander;
+    public CustomerArcheType customerArcheType = CustomerArcheType.Commoner;
     public ItemCategory itemPreferance;
 
   

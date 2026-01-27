@@ -20,14 +20,14 @@ public class Spawner : MonoBehaviour
     public int maxAlive = 5;
 
     [Header("Spawn Area")]
-    [SerializeField] private BoxCollider2D spawnArea;
-    [SerializeField] private BoxCollider2D wander;
+    [SerializeField] protected BoxCollider2D spawnArea;
+    [SerializeField] protected BoxCollider2D wander;
     [SerializeField] private LayerMask groundMask;
 
     private float spawnBudget;
-    private readonly List<GameObject> alive = new();
+    protected readonly List<GameObject> alive = new();
 
-    void Awake()
+    public virtual void Awake()
     {
         // Register with ProgressionManager (replaces FindObjectsByType)
         ProgressionManager.RegisterSpawner(this);
@@ -83,7 +83,7 @@ public class Spawner : MonoBehaviour
         return new Vector3(x, y, 0);
     }
 
-    private static EntityDef PickWeighted(List<EntityDef> list)
+    protected static EntityDef PickWeighted(List<EntityDef> list)
     {
         float total = 0f;
         foreach (var e in list) total += Mathf.Max(0.001f, e.spawnWeight);

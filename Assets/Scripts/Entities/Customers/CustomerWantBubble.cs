@@ -69,16 +69,16 @@ public class CustomerWantBubble : MonoBehaviour
             customer.OnStateChanged -= OnCustomerStateChanged;
     }
 
-    // void LateUpdate()
-    // {
-    //     if (!customer || !bubbleRoot) return;
+    void LateUpdate()
+    {
+        if (!customer || !bubbleRoot) return;
 
-    //     // Only refresh content when something changed
-    //     if (_lastItem != customer.desiredItem || _lastQty != customer.desiredQty)
-    //     {
-    //         RefreshAll();
-    //     }
-    // }
+        // Only refresh content when something changed
+        if (_lastItem != customer.desiredItem || _lastQty != customer.desiredQty)
+        {
+            RefreshAll();
+        }
+    }
 
     private void OnCustomerStateChanged(CustomerState prev, CustomerState next)
     {
@@ -94,7 +94,7 @@ public class CustomerWantBubble : MonoBehaviour
             CustomerState.Buying       => showInBuying,
             _                          => false
         };
-
+   
         SetVisible(show);
     }
 

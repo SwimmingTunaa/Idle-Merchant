@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Pause menu controller with bulletin board aesthetic.
@@ -26,9 +27,7 @@ public class PauseMenuController : BasePanelController
     private Button mainMenuButton;
     private Button quitButton;
 
-    // Time management
-    private float previousTimeScale = 1f;
-    private bool didPauseTime = false;
+    private GameManager gameManager;
 
     // ═════════════════════════════════════════════
     // LIFECYCLE
@@ -42,14 +41,16 @@ public class PauseMenuController : BasePanelController
         BuildUI();
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        gameManager = GameManager.Instance;
+    }
+
     protected override void OnDestroy()
     {
         // Safety: restore time if destroyed while paused
-        if (didPauseTime)
-        {
-            Time.timeScale = previousTimeScale;
-            didPauseTime = false;
-        }
+        gameManager.UnpauseGame();
         
         base.OnDestroy();
     }
@@ -64,7 +65,7 @@ public class PauseMenuController : BasePanelController
             return false;
 
         State = PanelState.Opening;
-        PauseGame();
+        gameManager.PauseGame();
         OnOpenStart();
         StartCoroutine(OpenAnimation());
         return true;
@@ -76,7 +77,7 @@ public class PauseMenuController : BasePanelController
             return false;
 
         State = PanelState.Closing;
-        UnpauseGame();
+        gameManager.UnpauseGame();
         OnCloseStart();
         StartCoroutine(CloseAnimation());
         return true;
@@ -214,32 +215,6 @@ public class PauseMenuController : BasePanelController
     }
 
     // ═════════════════════════════════════════════
-    // TIME MANAGEMENT
-    // ═════════════════════════════════════════════
-
-    private void PauseGame()
-    {
-        previousTimeScale = Time.timeScale;
-        Time.timeScale = 0f;
-        didPauseTime = true;
-
-        if (showDebugLogs)
-            Debug.Log("[PauseMenu] Game paused");
-    }
-
-    private void UnpauseGame()
-    {
-        if (didPauseTime)
-        {
-            Time.timeScale = previousTimeScale;
-            didPauseTime = false;
-
-            if (showDebugLogs)
-                Debug.Log("[PauseMenu] Game unpaused");
-        }
-    }
-
-    // ═════════════════════════════════════════════
     // BUTTON CALLBACKS
     // ═════════════════════════════════════════════
 
@@ -270,11 +245,7 @@ public class PauseMenuController : BasePanelController
     private void OnMainMenuClicked()
     {
         // Unpause before scene transition
-        if (didPauseTime)
-        {
-            Time.timeScale = previousTimeScale;
-            didPauseTime = false;
-        }
+        gameManager.UnpauseGame();
 
         // Check if scene exists before loading
         if (SceneManager.GetSceneByName(mainMenuSceneName).IsValid())
@@ -290,11 +261,7 @@ public class PauseMenuController : BasePanelController
     private void OnQuitClicked()
     {
         // Unpause before quitting
-        if (didPauseTime)
-        {
-            Time.timeScale = previousTimeScale;
-            didPauseTime = false;
-        }
+       gameManager.UnpauseGame();
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: {fileID: 22100000, guid: 7eddcac4bae0641ccb8b228e50402e89, type: 2}
+  animatorOverrideController:
+  - {fileID: 22100000, guid: 7eddcac4bae0641ccb8b228e50402e89, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Slime
