@@ -465,6 +465,8 @@ public class HireController : BasePanelController
                     return m.HireUnit(c);
         }
 
+        GameSignals.RaiseUnitHired(c.entityDef);
+
         return false;
     }
 

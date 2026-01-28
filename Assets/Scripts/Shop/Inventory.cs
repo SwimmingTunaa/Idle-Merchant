@@ -34,12 +34,6 @@ public class Inventory : PersistentSingleton<Inventory>
         base.Awake();
         gold.ResetToDefault();
         InventoryDebugUi();
-        GameSignals.OnGoldEarned += AddGold;
-    }
-
-    void OnDestroy() 
-    {
-        GameSignals.OnGoldEarned -= AddGold;
     }
 
     // ===== INVENTORY CORE =====
@@ -98,7 +92,9 @@ public class Inventory : PersistentSingleton<Inventory>
         if (whole > 0) 
         {
             goldFrac -= whole;
-            gold.Add(gold.Int);
+            gold.Add(whole);
+            //TODO: gold UI is not updatin properly
+            GameSignals.RaiseGoldEarned(whole);
             GameSignals.RaiseGoldChanged(gold.Int);
             InventoryDebugUi();
         }
@@ -111,6 +107,7 @@ public class Inventory : PersistentSingleton<Inventory>
     public void AddGold(int amount) 
     {
         gold.Add(amount);
+        GameSignals.RaiseGoldEarned(amount);
         GameSignals.RaiseGoldChanged(gold.Int);
     }
 

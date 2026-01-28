@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 /// Integrates with Unity's new Input System (uses Player.Move action).
 /// </summary>
 [RequireComponent(typeof(Camera))]
-public class CameraScrollController : MonoBehaviour
+public class CameraScrollController : PersistentSingleton<CameraScrollController>
 {
     [Header("Input System")]
     [Tooltip("Reference to InputSystem_Actions (auto-finds if null)")]
@@ -25,6 +25,9 @@ public class CameraScrollController : MonoBehaviour
     
     [Tooltip("Maximum Y coordinate (top of world, usually shop area)")]
     public float maxY = 10f;
+
+    [Tooltip("amount to add to miny when layers are unlock")]
+    public float layerAdd;
 
     [Header("Scroll Settings")]
     [Tooltip("Camera movement speed in units per second")]
@@ -64,8 +67,9 @@ public class CameraScrollController : MonoBehaviour
     private Rect leftEdgeZone;
     private Rect rightEdgeZone;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         cam = GetComponent<Camera>();
         
         if (!cam.orthographic)
@@ -91,6 +95,7 @@ public class CameraScrollController : MonoBehaviour
 
     void OnEnable()
     {
+        ProgressionManager.OnLayerUnlocked += HandleExpandVeritcalBounds;
         // Ensure Player action map is enabled
         if (inputActions != null)
         {
@@ -111,8 +116,7 @@ public class CameraScrollController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
-        
-        // Don't disable Player action map - other systems may be using it
+        ProgressionManager.OnLayerUnlocked -= HandleExpandVeritcalBounds;   
     }
 
     void Update()
@@ -200,17 +204,16 @@ public class CameraScrollController : MonoBehaviour
         return position;
     }
 
-    /// <summary>
-    /// Expand vertical bounds downward when unlocking new layers.
-    /// Call from ProgressionManager.
-    /// </summary>
-    public void ExpandVerticalBounds(float newMinY)
+    public void HandleExpandVeritcalBounds(int layer)
     {
-        if (newMinY < minY)
-        {
-            minY = newMinY;
-            Debug.Log($"[CameraScrollController] Expanded vertical bounds to {minY}");
-        }
+        float newY = layerAdd * (layer - 1);
+        minY += newY;
+    }
+
+    /// Expand vertical bounds downward when unlocking new layers.
+    public void ExpandVerticalBounds()
+    {
+        minY += layerAdd;
     }
 
     /// <summary>

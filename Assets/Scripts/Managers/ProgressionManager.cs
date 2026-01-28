@@ -464,7 +464,6 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
         maxUnlockedLayer = layer;
         RebuildAvailableItemsCache();
-        
         OnLayerUnlocked?.Invoke(layer);
 
         if (showDebugLogs)

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
   m_Name: Milestone_2Star_ActuallyMadeSomething
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
-  displayName: Milestone_2Star_ActuallyMadeSomething
-  description: Build the Forging Station. Time to turn rocks into money.
-  flavourText: Sure, the noise is terrible and the heat is unbearable, but have you
-    SEEN the markup on swords?
+  displayName: Actually Made Something!
+  description: Craft 10 items. You're a manufacturer now. Fancy.
+  flavourText: They're a bit rough, but they're YOURS. And they sell for three times
+    what the ore cost. Magic.
   icon: {fileID: 0}
   starLevel: 2
-  milestoneType: 14
-  targetValue: 4
-  requiredUpgrade: {fileID: 11400000, guid: 859fe9f4dfb174b339c34f8627ccd9cc, type: 2}
+  milestoneType: 9
+  targetValue: 10
+  requiredUpgrade: {fileID: 0}

@@ -94,7 +94,7 @@ public class ClickerManager : MonoBehaviour
                     {
                         DamageNumberManager.Instance.ShowGoldGain(applied, directHit.transform);
                     }
-                    
+                    Debug.Log(applied);
                     Inventory.Instance.AddGoldFloat(applied);
                 }
             }

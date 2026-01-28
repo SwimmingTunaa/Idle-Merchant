@@ -31,7 +31,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.MoveSpeed];
+            return cache.TryGetValue(StatType.MoveSpeed, out float value) ? value : 0f;
         }
     }
 
@@ -40,7 +40,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.AttackDamage];
+            return cache.TryGetValue(StatType.AttackDamage, out float value) ? value : 0f;
         }
     }
 
@@ -49,7 +49,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.AttackSpeed];
+            return cache.TryGetValue(StatType.AttackSpeed, out float value) ? value : 0f;
         }
     }
 
@@ -58,7 +58,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.AttackRange];
+            return cache.TryGetValue(StatType.AttackRange, out float value) ? value : 0f;
         }
     }
 
@@ -67,7 +67,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.ChaseBreakRange];
+            return cache.TryGetValue(StatType.ChaseBreakRange, out float value) ? value : 0f;
         }
     }
 
@@ -76,7 +76,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.ScanRange];
+            return cache.TryGetValue(StatType.ScanRange, out float value) ? value : 0f;
         }
     }
 
@@ -85,7 +85,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.CarryCapacity];
+            return cache.TryGetValue(StatType.CarryCapacity, out float value) ? value : 0f;
         }
     }
 
@@ -94,7 +94,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.PickupTime];
+            return cache.TryGetValue(StatType.PickupTime, out float value) ? value : 0f;
         }
     }
 
@@ -103,7 +103,7 @@ public class Stats
         get
         {
             if (dirty) RefreshCache();
-            return cache[StatType.DepositTime];
+            return cache.TryGetValue(StatType.DepositTime, out float value) ? value : 0f;
         }
     }
 
@@ -114,8 +114,22 @@ public class Stats
         this.mediator = mediator;
         this.BaseStats = baseStats;
 
+        // Initialize cache with default values to prevent NullRef
+        cache[StatType.MoveSpeed] = 0f;
+        cache[StatType.AttackDamage] = 0f;
+        cache[StatType.AttackSpeed] = 0f;
+        cache[StatType.AttackRange] = 0f;
+        cache[StatType.ChaseBreakRange] = 0f;
+        cache[StatType.ScanRange] = 0f;
+        cache[StatType.CarryCapacity] = 0f;
+        cache[StatType.PickupTime] = 0f;
+        cache[StatType.DepositTime] = 0f;
+
         // Hook cache invalidation to modifier changes
         mediator.OnModifiersChanged += MarkDirty;
+        
+        // Force initial cache refresh
+        RefreshCache();
     }
 
     // ===== CACHE MANAGEMENT =====
