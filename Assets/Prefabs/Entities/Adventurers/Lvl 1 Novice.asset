@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerDef
   prefab: {fileID: 440394158813992520, guid: dd81956239e5c433cbde7b31c8976a97, type: 3}
   useModularCharacter: 1
-  animatorOverrideController: {fileID: 0}
+  animatorOverrideController:
+  - {fileID: 0}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Novice Adventurer
   displayName: Novice Adventurer
   description: 
-  hireCost: 0
+  hireCost: 40
   assignedLayer: 1
   startingSkills:
   - {fileID: 0}

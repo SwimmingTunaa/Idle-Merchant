@@ -1,0 +1,233 @@
+/* ===== ROOT & LAYOUT ===== */
+
+.main-ui-root {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+}
+
+/* ===== TOP BAR - Single Row ===== */
+
+.top-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100px;
+    background-color: rgba(80, 60, 40, 0.85); /* Dark brown semi-transparent */
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(120, 90, 60);
+    padding: 10px 20px;
+}
+
+/* ===== LEFT SECTION - BOOKMARK TABS ===== */
+
+.bookmark-tabs-container {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.bookmark-button {
+    width: 80px;
+    height: 80px;
+    margin-right: 5px;
+    background-color: rgb(200, 180, 140); /* Tan/parchment */
+    border-width: 2px;
+    border-color: rgb(120, 100, 70);
+    border-radius: 8px 8px 0 0; /* Rounded top for tab look */
+    padding: 5px;
+    transition-duration: 0.2s;
+}
+
+.bookmark-button:hover {
+    translate: 0 -5px;
+    background-color: rgb(220, 200, 160);
+    scale: 1.05;
+}
+
+.bookmark-button:active {
+    scale: 0.95;
+}
+
+.bookmark-label {
+    font-size: 12px;
+    color: rgb(60, 40, 20);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-top: 25px;
+}
+
+/* Bookmark color variations (different tints) */
+.bookmark-hire {
+    background-color: rgb(200, 180, 140);
+}
+
+.bookmark-inventory {
+    background-color: rgb(180, 160, 120);
+}
+
+.bookmark-units {
+    background-color: rgb(190, 170, 130);
+}
+
+.bookmark-craft {
+    background-color: rgb(210, 190, 150);
+}
+
+.bookmark-research {
+    background-color: rgb(170, 150, 110);
+}
+
+/* ===== CENTER SECTION - GUILD BANNER & STARS ===== */
+
+.guild-section {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.guild-banner-button {
+    width: 250px;
+    height: 50px;
+    background-color: rgb(150, 90, 50); /* Dark brown banner */
+    border-width: 3px;
+    border-color: rgb(100, 60, 30);
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+.guild-banner-button:hover {
+    background-color: rgb(170, 110, 70);
+    scale: 1.03;
+    transition-duration: 0.2s;
+}
+
+.guild-name-label {
+    font-size: 20px;
+    color: rgb(255, 230, 200); /* Light parchment text */
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+/* Stars */
+
+.stars-container {
+    flex-direction: row;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.star {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 50%;
+}
+
+.star-filled {
+    background-color: rgb(255, 215, 0); /* Gold */
+    border-width: 1px;
+    border-color: rgb(200, 170, 0);
+}
+
+.star-empty {
+    background-color: rgb(80, 70, 60); /* Dark/empty */
+    border-width: 1px;
+    border-color: rgb(120, 110, 100);
+}
+
+.milestone-progress-label {
+    font-size: 11px;
+    color: rgb(220, 200, 160);
+    -unity-font-style: italic;
+}
+
+/* ===== RIGHT SECTION - STATS & CONTROLS ===== */
+
+.stats-section {
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.gold-amount-label {
+    font-size: 24px;
+    color: rgb(255, 215, 0); /* Gold */
+    -unity-font-style: bold;
+    margin-bottom: 3px;
+}
+
+.income-rate-label {
+    font-size: 16px;
+    color: rgb(100, 220, 100); /* Green */
+    margin-bottom: 3px;
+}
+
+.layer-status-label {
+    font-size: 14px;
+    color: rgb(220, 200, 160);
+    margin-bottom: 8px;
+}
+
+/* Utility Buttons */
+
+.utility-buttons {
+    flex-direction: row;
+    align-items: center;
+}
+
+.utility-button {
+    width: 40px;
+    height: 40px;
+    margin-left: 5px;
+    background-color: rgb(100, 70, 40);
+    border-width: 2px;
+    border-color: rgb(150, 110, 70);
+    border-radius: 6px;
+    font-size: 16px;
+    color: rgb(220, 200, 160);
+}
+
+.utility-button:hover {
+    background-color: rgb(120, 90, 50);
+    scale: 1.1;
+    transition-duration: 0.2s;
+}
+
+.speed-button {
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+.speed-selected {
+    background-color: rgb(150, 110, 60);
+    border-color: rgb(200, 150, 80);
+    border-width: 3px;
+}
+
+/* ===== GAME VIEW AREA ===== */
+
+.game-view-area {
+    flex-grow: 1;
+    background-color: transparent; /* Game renders underneath */
+}
+
+/* ===== TRANSITIONS ===== */
+
+.bookmark-button {
+    transition-property: translate, background-color, scale;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+}
+
+.guild-banner-button {
+    transition-property: background-color, scale;
+    transition-duration: 0.2s;
+}
+
+.utility-button {
+    transition-property: background-color, scale;
+    transition-duration: 0.2s;
+}

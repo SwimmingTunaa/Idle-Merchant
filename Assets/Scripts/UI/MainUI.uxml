@@ -1,0 +1,49 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI" />
+    <ui:VisualElement name="main-root" class="main-ui-root">
+        <ui:VisualElement name="top-bar" class="top-bar">
+            <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container">
+                <ui:Button name="hire-bookmark-button" class="bookmark-button bookmark-hire">
+                    <ui:Label text="Hire" class="bookmark-label" />
+                </ui:Button>
+                <ui:Button name="inventory-bookmark-button" class="bookmark-button bookmark-inventory">
+                    <ui:Label text="Inv" class="bookmark-label" />
+                </ui:Button>
+                <ui:Button name="units-bookmark-button" class="bookmark-button bookmark-units">
+                    <ui:Label text="Units" class="bookmark-label" />
+                </ui:Button>
+                <ui:Button name="craft-bookmark-button" class="bookmark-button bookmark-craft">
+                    <ui:Label text="Craft" class="bookmark-label" />
+                </ui:Button>
+                <ui:Button name="research-bookmark-button" class="bookmark-button bookmark-research">
+                    <ui:Label text="Research" class="bookmark-label" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement name="guild-section" class="guild-section">
+                <ui:Button name="guild-button" class="guild-banner-button">
+                    <ui:Label name="guild-name-label" text="The Rusty Dagger" class="guild-name-label" />
+                </ui:Button>
+                <ui:VisualElement name="stars-container" class="stars-container">
+                    <ui:VisualElement name="star-1" class="star star-filled" />
+                    <ui:VisualElement name="star-2" class="star star-filled" />
+                    <ui:VisualElement name="star-3" class="star star-filled" />
+                    <ui:VisualElement name="star-4" class="star star-empty" />
+                    <ui:VisualElement name="star-5" class="star star-empty" />
+                </ui:VisualElement>
+                <ui:Label name="milestone-progress-label" text="Progress: 2/6" class="milestone-progress-label" />
+            </ui:VisualElement>
+            <ui:VisualElement name="stats-section" class="stats-section">
+                <ui:Label name="gold-amount-label" text="5,240g" class="gold-amount-label" />
+                <ui:Label name="income-rate-label" text="+15/s" class="income-rate-label" />
+                <ui:Label name="layer-status-label" text="L1-3" class="layer-status-label" />
+                <ui:VisualElement name="utility-buttons" class="utility-buttons">
+                    <ui:Button name="settings-button" text="⚙" class="utility-button settings-button" />
+                    <ui:Button name="pause-button" text="⏸" class="utility-button pause-button" />
+                    <ui:Button name="speed-1x-button" text="1x" class="utility-button speed-button speed-selected" />
+                    <ui:Button name="speed-2x-button" text="2x" class="utility-button speed-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="game-view-area" class="game-view-area" />
+    </ui:VisualElement>
+</ui:UXML>

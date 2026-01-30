@@ -4126,3 +4126,294 @@ Memory consumption went from 159.5 MB to 155.5 MB.
 Total: 5.843208 ms (FindLiveObjects: 0.359583 ms CreateObjectMapping: 0.137959 ms MarkObjects: 4.060375 ms  DeleteObjects: 1.285125 ms)
 
 Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 33930.856773 seconds.
+  path: Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanel.uxml
+  artifactKey: Guid(2078ccd3555ce4493866577e7049d5e0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanel.uxml using Guid(2078ccd3555ce4493866577e7049d5e0) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '6569576c3c83500f802e3986587657e5') in 0.107967042 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 5
+
+========================================================================
+Received Import Request.
+  Time since last request: 1277.642524 seconds.
+  path: Assets/Sprites/UI/fantasy.png
+  artifactKey: Guid(29f0d727e719e4db093cefb85f8e398d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/UI/fantasy.png using Guid(29f0d727e719e4db093cefb85f8e398d) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '16521ceb59c26af31447564234bb7559') in 1.3024335 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1200
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.299569 seconds.
+  path: Assets/Sprites/UI/fantasy.png
+  artifactKey: Guid(29f0d727e719e4db093cefb85f8e398d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/UI/fantasy.png using Guid(29f0d727e719e4db093cefb85f8e398d) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '771de68373b83dfb3d77d7115cf4b78b') in 1.009936666 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1200
+
+========================================================================
+Received Import Request.
+  Time since last request: 31898.528559 seconds.
+  path: Assets/Sprites/UI/Inventory Book.aseprite
+  artifactKey: Guid(eabe5e0908a5243cd8f6cc985dfe7578) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/UI/Inventory Book.aseprite using Guid(eabe5e0908a5243cd8f6cc985dfe7578) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '8cc4c960dbd432cdf188c00ba0d99bcd') in 1.400079584 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 223
+
+========================================================================
+Received Import Request.
+  Time since last request: 128.662783 seconds.
+  path: Assets/Sprites/UI/Inventory Book.aseprite
+  artifactKey: Guid(eabe5e0908a5243cd8f6cc985dfe7578) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/UI/Inventory Book.aseprite using Guid(eabe5e0908a5243cd8f6cc985dfe7578) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'a8b0988c3dc19552026acc380fe0660a') in 0.893476417 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 223
+
+========================================================================
+Received Import Request.
+  Time since last request: 11.203391 seconds.
+  path: Assets/Sprites/UI/Inventory Book.aseprite
+  artifactKey: Guid(eabe5e0908a5243cd8f6cc985dfe7578) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/UI/Inventory Book.aseprite using Guid(eabe5e0908a5243cd8f6cc985dfe7578) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '06226f54d67fecedf25e4d257e092811') in 0.673745541 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 223
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16ceaf000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.821 seconds
+Refreshing native plugins compatible for Editor in 0.38 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.480 seconds
+Domain Reload Profiling: 1304ms
+	BeginReloadAssembly (435ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (45ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (2ms)
+		CreateAndSetChildDomain (153ms)
+	RebuildCommonClasses (28ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (16ms)
+	LoadAllAssembliesAndSetupDomain (337ms)
+		LoadAssemblies (303ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (171ms)
+			TypeCache.Refresh (13ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (148ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (481ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (394ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (79ms)
+			ProcessInitializeOnLoadAttributes (282ms)
+			ProcessInitializeOnLoadMethodAttributes (29ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.50 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6885 unused Assets / (5.6 MB). Loaded Objects now: 8082.
+Memory consumption went from 160.8 MB to 155.2 MB.
+Total: 6.390750 ms (FindLiveObjects: 0.356042 ms CreateObjectMapping: 0.138250 ms MarkObjects: 4.027625 ms  DeleteObjects: 1.868459 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 41666.550906 seconds.
+  path: Assets/Prefabs/Entities/Adventurers/Adventuer Agent.prefab
+  artifactKey: Guid(dd81956239e5c433cbde7b31c8976a97) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Prefabs/Entities/Adventurers/Adventuer Agent.prefab using Guid(dd81956239e5c433cbde7b31c8976a97) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '6287aac07a89a316a73c6aeb20bffa74') in 0.419834792 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 368
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16ceaf000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.557 seconds
+Refreshing native plugins compatible for Editor in 0.36 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.480 seconds
+Domain Reload Profiling: 1041ms
+	BeginReloadAssembly (208ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (41ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (78ms)
+	RebuildCommonClasses (39ms)
+	RebuildNativeTypeToScriptingClass (10ms)
+	initialDomainReloadingComplete (15ms)
+	LoadAllAssembliesAndSetupDomain (290ms)
+		LoadAssemblies (193ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (136ms)
+			TypeCache.Refresh (9ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (114ms)
+			ResolveRequiredComponents (8ms)
+	FinalizeReload (480ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (394ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (2ms)
+			BeforeProcessingInitializeOnLoad (84ms)
+			ProcessInitializeOnLoadAttributes (276ms)
+			ProcessInitializeOnLoadMethodAttributes (30ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.39 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 15 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6885 unused Assets / (5.9 MB). Loaded Objects now: 8104.
+Memory consumption went from 160.9 MB to 155.0 MB.
+Total: 7.026875 ms (FindLiveObjects: 0.363500 ms CreateObjectMapping: 0.172333 ms MarkObjects: 4.140167 ms  DeleteObjects: 2.350708 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 436.385639 seconds.
+  path: Assets/Scripts/UI/Panels/Main.uxml
+  artifactKey: Guid(993385b5732bca7418fb5bf73e851ba4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/UI/Panels/Main.uxml using Guid(993385b5732bca7418fb5bf73e851ba4) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'fc32a555b78de1efe5dc6a98b872b585') in 0.115496375 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 20
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.724023 seconds.
+  path: Assets/Scripts/Shop/Inventory.cs
+  artifactKey: Guid(18ed0cde4872b654cb6e3efe5f981ee1) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Shop/Inventory.cs using Guid(18ed0cde4872b654cb6e3efe5f981ee1) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '0090b6eb0bf47207d10c7114435e0852') in 0.172987417 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000112 seconds.
+  path: Assets/Scripts/Loot/Loot.cs
+  artifactKey: Guid(d50b643f894a148a0ac947cb249ce103) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Loot/Loot.cs using Guid(d50b643f894a148a0ac947cb249ce103) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '416f7d63003d4e6ad43121914319418b') in 0.002947292 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000031 seconds.
+  path: Assets/Resources/Milestones/2 Stars/Milestone_2Star_ActuallyMadeSomething.asset
+  artifactKey: Guid(4f3884fb1af5542d8912a37c0ce95209) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Resources/Milestones/2 Stars/Milestone_2Star_ActuallyMadeSomething.asset using Guid(4f3884fb1af5542d8912a37c0ce95209) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '78d12c51d55fdaadb76aae987d8fdee2') in 0.028185208 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000789 seconds.
+  path: Assets/Prefabs/Entities/Adventurers/Lvl 3 Adventuer Temp.asset
+  artifactKey: Guid(19aeb50240abb4c9da06cefd0ac0245f) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Adventurers/Lvl 3 Adventuer Temp.asset using Guid(19aeb50240abb4c9da06cefd0ac0245f) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'f949d53ec4a33a48c46e03574e67695b') in 0.026904625 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 348
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000079 seconds.
+  path: Assets/Scripts/Managers/UnitManager.cs
+  artifactKey: Guid(a98ce8e00879a402d9fccd8fe44f7abc) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Managers/UnitManager.cs using Guid(a98ce8e00879a402d9fccd8fe44f7abc) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'd499a616ede537131b5c1dba63dd6b6d') in 0.004771042 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000038 seconds.
+  path: Assets/Prefabs/Entities/Adventurers/Lvl 4 Adventuer Temp.asset
+  artifactKey: Guid(6382ecb9d6a2a4377ab376ac63acac61) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Adventurers/Lvl 4 Adventuer Temp.asset using Guid(6382ecb9d6a2a4377ab376ac63acac61) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '773d3182af460e78cc2fe06f424d5200') in 0.020119666 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 348
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000045 seconds.
+  path: Assets/Scripts/UI/Panels/Hiring/HireController.cs
+  artifactKey: Guid(a67850f785f3044de81007d8ed15eaf3) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/UI/Panels/Hiring/HireController.cs using Guid(a67850f785f3044de81007d8ed15eaf3) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'ea4939dd43ff75e7e0aa5017ef48afce') in 0.003481083 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000102 seconds.
+  path: Assets/Scripts/Entities/Mobs/MobAgent.cs
+  artifactKey: Guid(780b6eb5fe61742d9937cbc083778aa3) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Entities/Mobs/MobAgent.cs using Guid(780b6eb5fe61742d9937cbc083778aa3) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'aa530d373ab356df9b58479d01da091f') in 0.003294625 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000037 seconds.
+  path: Assets/Scripts/Utility/Deubugger/GameDebugger.cs
+  artifactKey: Guid(1571330aefcb4449888122c184d8993c) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Utility/Deubugger/GameDebugger.cs using Guid(1571330aefcb4449888122c184d8993c) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '27d15f435ee758b108c25fdcdabf93e6') in 0.002971292 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000037 seconds.
+  path: Assets/Prefabs/Entities/Porters/Porter lvl 1.asset
+  artifactKey: Guid(f8dbd13e0656b424b977b297348ff398) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Porters/Porter lvl 1.asset using Guid(f8dbd13e0656b424b977b297348ff398) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'e493bc81e6e668cbed69f6240338b421') in 0.013246792 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 13
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000039 seconds.
+  path: Assets/Prefabs/Entities/Adventurers/Lvl 5 Adventuer Temp.asset
+  artifactKey: Guid(29b28522699dd4ce4a4f14736c1a3f28) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Prefabs/Entities/Adventurers/Lvl 5 Adventuer Temp.asset using Guid(29b28522699dd4ce4a4f14736c1a3f28) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '2b87309915d867aed93d090a61529110') in 0.013012834 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 348
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000062 seconds.
+  path: Assets/Scenes/Main.unity
+  artifactKey: Guid(08ed22101fa2840fabe8bb95301f638d) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/Main.unity using Guid(08ed22101fa2840fabe8bb95301f638d) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '22e5d8ffeef19d4f68a2a4df2ea7f1b1') in 0.024092709 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000051 seconds.
+  path: Assets/Scripts/Managers/ProgressionManager.cs
+  artifactKey: Guid(8fa2f0a097817497cbd39ad6a78ce00f) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scripts/Managers/ProgressionManager.cs using Guid(8fa2f0a097817497cbd39ad6a78ce00f) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '69ea83b1dd0eacd568690a986cbad44e') in 0.004275292 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
+AssetImportWorker is now disconnected from the server
+Process exiting
