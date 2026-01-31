@@ -1467,7 +1467,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  showDebugLogs: 0
+  showDebugLogs: 1
 --- !u!1 &159163517
 GameObject:
   m_ObjectHideFlags: 0
@@ -28787,6 +28787,7 @@ GameObject:
   - component: {fileID: 1433364566}
   - component: {fileID: 1433364567}
   - component: {fileID: 1433364568}
+  - component: {fileID: 1433364571}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -28853,7 +28854,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimatedNumberUITK
   uiDocument: {fileID: 1433364562}
-  labelName: coin-label
+  labelName: CoinLabel
   speed: 5
   abbreviate: 0
   format: N0
@@ -28917,86 +28918,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5892c5f69fed34cb181199bad501512f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  uiDocument: {fileID: 1433364562}
   inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  cancelActionMapName: UI
+  cancelActionName: Cancel
+  pauseMenuPanelID: PauseMenu
   inputCooldown: 0.2
   uiBindings:
-  - inputActionRef: {fileID: 7727032971491509709, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    onActionPerformed:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: OnCancelPressed
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: d86de3818b09844edb6036a25b22e634, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    buttonName: menu-button
+  - {fileID: 0}
+--- !u!114 &1433364571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433364561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9c2a971a98764f52bbf3a23c3c93934, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonBinder
+  uiDocument: {fileID: 1433364562}
+  panelBindings:
+  - buttonName: 
+    panelID: 
     allowToggle: 1
-  - inputActionRef: {fileID: -6231272360773277684, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    onActionPerformed:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: TogglePanel
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: 811e3b0d9f3fc4faa9c9650a92c164fe, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    buttonName: inventory-button
-    allowToggle: 1
-  - inputActionRef: {fileID: -7260102013026993924, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    onActionPerformed:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: TogglePanel
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: 2078ccd3555ce4493866577e7049d5e0, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    buttonName: crafting-button
-    allowToggle: 1
-  - inputActionRef: {fileID: -1490099266420138534, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    onActionPerformed:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: TogglePanel
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    buttonName: hiring-board-button
-    allowToggle: 1
+  showDebugLogs: 0
 --- !u!1 &1449877901
 GameObject:
   m_ObjectHideFlags: 0

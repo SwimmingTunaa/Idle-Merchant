@@ -11,9 +11,7 @@ public class InventoryController : BasePanelController
     [Header("Grid Settings")]
     [SerializeField] private int baseSlotCount = 15;
     [SerializeField] private int slotsPerRow = 5;
-
-    public override string PanelID => "InventoryPanel";
-
+    
     private VisualElement itemGrid;
     private ScrollView itemGridScroll;
     private VisualElement detailPanel;

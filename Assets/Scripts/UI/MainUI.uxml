@@ -3,16 +3,16 @@
     <ui:VisualElement name="main-root" class="main-ui-root">
         <ui:VisualElement name="top-bar" class="top-bar">
             <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container">
-                <ui:Button name="hire-bookmark-button" class="bookmark-button bookmark-hire">
+                <ui:Button name="hiring-board-button" class="bookmark-button bookmark-hire">
                     <ui:Label text="Hire" class="bookmark-label" />
                 </ui:Button>
-                <ui:Button name="inventory-bookmark-button" class="bookmark-button bookmark-inventory">
+                <ui:Button name="inventory-button" data-source-type="UnityEditor.SerializedPropertyFilters+None, UnityEditor.CoreModule" class="bookmark-button bookmark-inventory">
                     <ui:Label text="Inv" class="bookmark-label" />
                 </ui:Button>
-                <ui:Button name="units-bookmark-button" class="bookmark-button bookmark-units">
+                <ui:Button name="units-button" class="bookmark-button bookmark-units">
                     <ui:Label text="Units" class="bookmark-label" />
                 </ui:Button>
-                <ui:Button name="craft-bookmark-button" class="bookmark-button bookmark-craft">
+                <ui:Button name="crafting-button" class="bookmark-button bookmark-craft">
                     <ui:Label text="Craft" class="bookmark-label" />
                 </ui:Button>
                 <ui:Button name="research-bookmark-button" class="bookmark-button bookmark-research">
@@ -33,7 +33,10 @@
                 <ui:Label name="milestone-progress-label" text="Progress: 2/6" class="milestone-progress-label" />
             </ui:VisualElement>
             <ui:VisualElement name="stats-section" class="stats-section">
-                <ui:Label name="gold-amount-label" text="5,240g" class="gold-amount-label" />
+                <ui:VisualElement name="coin-container" style="flex-grow: 0; flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="coin-icon" class="coin-icon pulse-target" />
+                    <ui:Label name="coin-label" text="5,240g" class="gold-amount-label" />
+                </ui:VisualElement>
                 <ui:Label name="income-rate-label" text="+15/s" class="income-rate-label" />
                 <ui:Label name="layer-status-label" text="L1-3" class="layer-status-label" />
                 <ui:VisualElement name="utility-buttons" class="utility-buttons">
@@ -44,6 +47,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="game-view-area" class="game-view-area" />
+        <ui:VisualElement name="body" class="game-view-area" />
     </ui:VisualElement>
 </ui:UXML>

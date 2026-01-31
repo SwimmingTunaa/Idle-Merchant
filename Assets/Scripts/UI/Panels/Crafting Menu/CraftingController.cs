@@ -13,8 +13,6 @@ public class CraftingController : BasePanelController
     [Header("UXML References")]
     [SerializeField] private VisualTreeAsset recipeCardAsset;
 
-    // IPanelController implementation
-    public override string PanelID => "CraftingPanel";
     //public override VisualElement RootElement => panel;
 
     // UI Elements

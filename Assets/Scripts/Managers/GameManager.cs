@@ -15,10 +15,29 @@ public class GameManager : PersistentSingleton<GameManager>
     // Time management
     private float previousTimeScale = 1f;
     private bool IsPaused {get; set;}
+    public float CurrentTimeScale => Time.timeScale;
 
     private void OnDestroy()
     {
         CharacterSpriteGenerator.Cleanup();
+    }
+
+
+    public void SetTimeScale(float scale)
+    {
+        scale = Mathf.Clamp(scale, 0.1f, 10f);
+
+        if (!IsPaused)
+        {
+            Time.timeScale = scale;
+            previousTimeScale = scale;
+        }
+        else
+        {
+            previousTimeScale = scale;
+        }
+
+        Debug.Log($"[GameManager] Time scale set to {scale}x");
     }
 
     public void PauseGame()
@@ -63,6 +82,7 @@ public class GameManager : PersistentSingleton<GameManager>
     {
         CharacterSpriteGenerator.Cleanup();
     }
+    
 
     public void QuitGame()
     {

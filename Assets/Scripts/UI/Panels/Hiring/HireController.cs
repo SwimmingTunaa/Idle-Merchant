@@ -28,8 +28,6 @@ public class HireController : BasePanelController
     [Header("Animation")]
     [SerializeField] private float hireAnimationDuration = 0.5f;
 
-    // IPanelController implementation
-    public override string PanelID => "HirePanel";
     //public override VisualElement RootElement => panel;
 
     // UI Elements

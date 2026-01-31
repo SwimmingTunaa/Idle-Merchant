@@ -1,50 +1,51 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
-/// <summary>
-/// Central UI management system.
-/// Handles panel lifecycle, navigation stack, ESC behavior, and hotkey panel opening.
-/// Supports new Input System for panel hotkeys.
-/// </summary>
+[Serializable]
+public class UIBinding 
+{   
+    [Tooltip("Action name (e.g., 'Crafting Menu')")]
+    [SerializeField]
+    public InputActionReference inputActionRef;
+    public UnityEvent onActionPerformed;
+
+    [Tooltip("Button element name in UXML")]
+    public string buttonName;
+    
+    [Tooltip("If true, pressing again closes the panel")]
+    public bool allowToggle = true;
+
+    public void OnActionTriggered(InputAction.CallbackContext context)
+    {
+        onActionPerformed.Invoke();
+    }
+
+    public void OnActionTriggered()
+    {
+        onActionPerformed.Invoke();
+    }
+}
+
 public class UIManager : PersistentSingleton<UIManager>
 {
+
+    [SerializeField] private UIDocument uiDocument;
+
     [Header("Input System")]
     [SerializeField] private InputActionAsset inputActions;
     
     [Header("ESC Navigation")]
-    [Tooltip("Action map name for cancel/ESC (e.g., 'UI')")]
-    [SerializeField] private string cancelActionMapName = "UI";
-    
-    [Tooltip("Action name for cancel/ESC (e.g., 'Cancel')")]
-    [SerializeField] private string cancelActionName = "Cancel";
-    
-    [Tooltip("Panel ID to open when ESC pressed with no panels open (e.g., 'PauseMenu')")]
-    [SerializeField] private string pauseMenuPanelID = "PauseMenu";
-    
     [Tooltip("Cooldown between ESC presses to prevent spam")]
     [SerializeField] private float inputCooldown = 0.2f;
 
     [Header("Panel Hotkey Bindings")]
     [Tooltip("Map action names to panel IDs (e.g., 'Crafting Menu' → 'CraftingPanel')")]
-    [SerializeField] private List<PanelHotkeyBinding> panelHotkeys = new List<PanelHotkeyBinding>();
+    [SerializeField] private List<UIBinding> uiBindings = new();
 
-    [Serializable]
-    public class PanelHotkeyBinding
-    {
-        [Tooltip("Action map name (e.g., 'UI')")]
-        public string actionMapName = "UI";
-        
-        [Tooltip("Action name (e.g., 'Crafting Menu')")]
-        public string actionName;
-        
-        [Tooltip("Panel ID to open/toggle (e.g., 'CraftingPanel')")]
-        public string panelID;
-        
-        [Tooltip("If true, pressing again closes the panel")]
-        public bool allowToggle = true;
-    }
 
     [Header("World Input Blocking")]
     [Tooltip("If true, world input is blocked when any modal panel is open")]
@@ -53,21 +54,26 @@ public class UIManager : PersistentSingleton<UIManager>
     // Event for WorldInputBlocker components
     public event Action<bool> OnWorldInputBlockedChanged;
 
+
     // Panel registry
     private Dictionary<string, IPanelController> panels = new Dictionary<string, IPanelController>();
+    // Store delegate references
+    private Dictionary<string, Action> buttonCallbacks = new();
     private Stack<IPanelController> modalStack = new Stack<IPanelController>();
     private Queue<PanelRequest> requestQueue = new Queue<PanelRequest>();
 
-    // Input System
-    private InputAction cancelAction;
-    private Dictionary<string, InputAction> boundActions = new Dictionary<string, InputAction>();
     private float lastCancelTime;
 
     protected override void Awake()
     {
         base.Awake();   
-        SetupInputActions();
+        if(uiDocument == null)
+            uiDocument = GetComponent<UIDocument>();
     }
+
+    void OnEnable() => SetUpUIBindings();
+
+    private void OnDisable() => CleanupInputActions();
 
     void OnDestroy()
     {
@@ -83,75 +89,51 @@ public class UIManager : PersistentSingleton<UIManager>
     // INPUT SYSTEM SETUP
     // ═════════════════════════════════════════════
 
-    private void SetupInputActions()
+    private void SetUpUIBindings()
     {
         if (inputActions == null)
         {
-            //Debug.LogError("[UIManager] InputActionAsset not assigned!");
+            Debug.LogError("[UIManager] InputActionAsset not assigned!");
             return;
         }
 
-        // Setup Cancel/ESC action
-        SetupCancelAction();
-
-        // Bind panel hotkeys
-        foreach (var binding in panelHotkeys)
+        // Bind UI 
+        foreach (var binding in uiBindings)
         {
-            if (string.IsNullOrEmpty(binding.actionMapName) || string.IsNullOrEmpty(binding.actionName))
+            // Setup input action
+            if (binding.inputActionRef != null && binding.inputActionRef.action != null)
             {
-                //Debug.LogWarning($"[UIManager] Invalid hotkey binding: empty action map or action name");
-                continue;
+                binding.inputActionRef.action.performed += binding.OnActionTriggered;
+                binding.inputActionRef.action.Enable();
+            }
+            else
+            {
+                Debug.LogWarning($"[UIManager] UIBinding has null InputActionReference");
             }
 
-            var actionMap = inputActions.FindActionMap(binding.actionMapName);
-            if (actionMap == null)
+           // Setup UI button (optional - only if buttonName is provided)
+            if (!string.IsNullOrEmpty(binding.buttonName))
             {
-                //Debug.LogWarning($"[UIManager] Action map '{binding.actionMapName}' not found!");
-                continue;
+                var button = uiDocument.rootVisualElement.Q<Button>(binding.buttonName);
+                
+                if (button != null)
+                {
+                    // Create callback and store reference for cleanup
+                    var callback = new Action(binding.OnActionTriggered);
+                    button.clicked += callback;
+                    buttonCallbacks[binding.buttonName] = callback;
+                    
+                    Debug.Log($"[UIManager] Bound button '{binding.buttonName}' to action");
+                }
+                else
+                {
+                    Debug.LogWarning($"[UIManager] Button '{binding.buttonName}' not found in UXML");
+                }
             }
-
-            var action = actionMap.FindAction(binding.actionName);
-            if (action == null)
-            {
-                Debug.LogWarning($"[UIManager] Action '{binding.actionName}' not found in map '{binding.actionMapName}'!");
-                continue;
-            }
-
-            // Subscribe to action
-            action.performed += ctx => OnPanelHotkeyPressed(binding);
-            action.Enable();
-
-            boundActions[binding.actionName] = action;
-
-            Debug.Log($"[UIManager] Bound '{binding.actionName}' → '{binding.panelID}'");
         }
     }
 
-    private void SetupCancelAction()
-    {
-        var actionMap = inputActions.FindActionMap(cancelActionMapName);
-        if (actionMap == null)
-        {
-            //Debug.LogWarning($"[UIManager] Cancel action map '{cancelActionMapName}' not found!");
-            return;
-        }
-
-        cancelAction = actionMap.FindAction(cancelActionName);
-        if (cancelAction == null)
-        {
-            //Debug.LogWarning($"[UIManager] Cancel action '{cancelActionName}' not found!");
-            return;
-        }
-
-        cancelAction.performed += OnCancelPressed;
-        
-        // CRITICAL: Enable action map with unscaled time for pause compatibility
-        actionMap.Enable();
-
-        //Debug.Log($"[UIManager] Bound ESC/Cancel action: {cancelActionMapName}/{cancelActionName}");
-    }
-
-    private void OnCancelPressed(InputAction.CallbackContext context)
+    public void OnCancelPressed(VisualTreeAsset visualTreeAsset)
     {
         // Cooldown to prevent spam (use unscaledTime for pause compatibility)
         if (Time.unscaledTime - lastCancelTime < inputCooldown)
@@ -159,70 +141,51 @@ public class UIManager : PersistentSingleton<UIManager>
 
         lastCancelTime = Time.unscaledTime;
 
-        //Debug.Log($"[UIManager] ESC pressed. Modal stack count: {modalStack.Count}");
-
         // Close top modal panel if any
         if (modalStack.Count > 0)
         {
             var topPanel = modalStack.Peek();
-            //Debug.Log($"[UIManager] Top panel: {topPanel.PanelID}, State: {topPanel.State}");
-            
+
             if (topPanel.State == PanelState.Open)
             {
-                //Debug.Log($"[UIManager] Closing panel: {topPanel.PanelID}");
                 ClosePanel(topPanel);
             }
         }
         // Open pause menu if no panels are open
-        else if (!string.IsNullOrEmpty(pauseMenuPanelID))
+        else if (!string.IsNullOrEmpty(visualTreeAsset.name))
         {
-            //Debug.Log($"[UIManager] Opening pause menu: {pauseMenuPanelID}");
-            OpenPanel(pauseMenuPanelID);
+            OpenPanel(visualTreeAsset.name);
         }
     }
 
     private void CleanupInputActions()
     {
-        // Cleanup cancel action
-        if (cancelAction != null)
+        // Cleanup input actions
+        foreach (var binding in uiBindings)
         {
-            cancelAction.performed -= OnCancelPressed;
-            cancelAction.Disable();
+            if (binding.inputActionRef != null && binding.inputActionRef.action != null)
+            {
+                binding.inputActionRef.action.performed -= binding.OnActionTriggered;
+                binding.inputActionRef.action.Disable();
+            }
         }
 
-        // Cleanup hotkey actions
-        foreach (var action in boundActions.Values)
+        // Cleanup button callbacks
+        if (uiDocument != null && uiDocument.rootVisualElement != null)
         {
-            action.Disable();
+            foreach (var kvp in buttonCallbacks)
+            {
+                var button = uiDocument.rootVisualElement.Q<Button>(kvp.Key);
+                if (button != null)
+                {
+                    button.clicked -= kvp.Value;
+                }
+            }
         }
-        boundActions.Clear();
+
+        buttonCallbacks.Clear();
     }
-
-    private void OnPanelHotkeyPressed(PanelHotkeyBinding binding)
-    {
-        if (string.IsNullOrEmpty(binding.panelID))
-        {
-            //Debug.LogWarning($"[UIManager] Hotkey action '{binding.actionName}' has no panel ID assigned");
-            return;
-        }
-
-        if (!panels.TryGetValue(binding.panelID, out var panel))
-        {
-            //Debug.LogWarning($"[UIManager] Panel '{binding.panelID}' not registered for hotkey '{binding.actionName}'");
-            return;
-        }
-
-        // Toggle behavior
-        if (binding.allowToggle && panel.State == PanelState.Open)
-        {
-            ClosePanel(panel);
-        }
-        else if (panel.State == PanelState.Closed)
-        {
-            OpenPanel(panel);
-        }
-    }
-
+    
     // ═════════════════════════════════════════════
     // PANEL REGISTRATION
     // ═════════════════════════════════════════════
@@ -246,7 +209,7 @@ public class UIManager : PersistentSingleton<UIManager>
         panel.OnOpenComplete += OnPanelOpenComplete;
         panel.OnCloseComplete += OnPanelCloseComplete;
 
-        Debug.Log($"[UIManager] Registered panel: {panel.PanelID}");
+        // Debug.Log($"[UIManager] Registered panel: {panel.PanelID}");
     }
 
     public void UnregisterPanel(IPanelController panel)
@@ -284,7 +247,7 @@ public class UIManager : PersistentSingleton<UIManager>
     {
         if (!panels.TryGetValue(panelID, out var panel))
         {
-            //Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
+            Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
             return;
         }
 
@@ -325,7 +288,7 @@ public class UIManager : PersistentSingleton<UIManager>
             }
         }
 
-        // Push to stack BEFORE opening so it's there when OnOpenComplete fires
+        // Push to stack BEFORE opening so it's there when OnOpenComplete fires, allows you to close pause menu
         if (panel.IsModal)
         {
             modalStack.Push(panel);
@@ -379,9 +342,9 @@ public class UIManager : PersistentSingleton<UIManager>
         }
     }
 
-    public void TogglePanel(string panelID)
+    public void TogglePanel(VisualTreeAsset panelID)
     {
-        if (!panels.TryGetValue(panelID, out var panel))
+        if (!panels.TryGetValue(panelID.name, out var panel))
         {
             Debug.LogError($"[UIManager] Panel '{panelID}' not registered");
             return;

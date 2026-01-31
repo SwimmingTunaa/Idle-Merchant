@@ -11,9 +11,6 @@ using UnityEngine.Rendering;
 /// </summary>
 public class PauseMenuController : BasePanelController
 {
-
-    // IPanelController implementation
-    public override string PanelID => "PauseMenu";
    // public override VisualElement RootElement => panel;
 
     // UI Elements
