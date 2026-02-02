@@ -333,6 +333,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Guild Menu",
+                    "type": "Button",
+                    "id": "2fccde8f-78e0-4adc-b075-baf1bd41367e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -828,6 +837,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Inventory",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab07f359-eacc-4379-be36-c609c3e9c93b",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Guild Menu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/GuildUpgradePanelStyle.uss?fileID=7433441132597879392&amp;guid=bd7415cec5e4746968907c784b281418&amp;type=3#GuildUpgradePanelStyle" />
+    <ui:VisualElement name="guild-upgrade-panel" class="panel-root">
+        <ui:VisualElement name="book-container" class="book-container">
+            <ui:VisualElement name="left-page" class="book-page left-page">
+                <ui:Label text="Guild Progress" class="page-header" />
+                <ui:VisualElement name="stars-display" class="stars-display">
+                    <ui:VisualElement name="star-1" class="star star-filled" />
+                    <ui:VisualElement name="star-2" class="star star-filled" />
+                    <ui:VisualElement name="star-3" class="star star-filled" />
+                    <ui:VisualElement name="star-4" class="star star-empty" />
+                    <ui:VisualElement name="star-5" class="star star-empty" />
+                </ui:VisualElement>
+                <ui:Label name="current-star-label" text="Current: 3★" class="current-star-label" />
+                <ui:Label name="next-star-label" text="Progress to 4★:" class="next-star-label" />
+                <ui:VisualElement class="separator" />
+                <ui:ScrollView name="milestones-scroll" class="milestones-scroll">
+                    <ui:VisualElement name="milestones-container" class="milestones-container" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement name="book-spine" class="book-spine" />
+            <ui:VisualElement name="right-page" class="book-page right-page">
+                <ui:Label text="Guild Upgrades" class="page-header" />
+                <ui:ScrollView name="upgrade-scroll" class="upgrade-scroll">
+                    <ui:VisualElement name="upgrade-grid" class="upgrade-grid" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="close-button" text="✕" class="close-button" />
+    </ui:VisualElement>
+</ui:UXML>

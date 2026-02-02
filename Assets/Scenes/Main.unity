@@ -28829,6 +28829,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1901297917}
   - {fileID: 266967778}
   - {fileID: 1875925580}
   - {fileID: 811366030}
@@ -36047,6 +36048,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageNumberManager
   damageNumberPrefab: {fileID: 899313587721165203, guid: f50174651f7904f2091ba97b3b25362d, type: 3}
   verticalOffset: 0.5
+--- !u!1 &1901297916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1901297917}
+  - component: {fileID: 1901297918}
+  m_Layer: 0
+  m_Name: Guild Menu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1901297917
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901297916}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1901297918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901297916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ccac340f818b4a1c93fc0e4bd88108d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradePanel
+  uiDocument: {fileID: 1433364562}
+  panelAsset: {fileID: 9197481963319205126, guid: 796d7ab8f74164f01b60af9c7c634e1e, type: 3}
+  blocksWorldInput: 1
+  isModal: 1
+  openCloseDuration: 0
+  hasOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
+  upgradeCardTemplate: {fileID: 0}
+  showDebugLogs: 0
 --- !u!1 &1908026232
 GameObject:
   m_ObjectHideFlags: 0

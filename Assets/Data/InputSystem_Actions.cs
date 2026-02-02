@@ -419,6 +419,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Guild Menu"",
+                    ""type"": ""Button"",
+                    ""id"": ""2fccde8f-78e0-4adc-b075-baf1bd41367e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -916,6 +925,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Inventory"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab07f359-eacc-4379-be36-c609c3e9c93b"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Guild Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1003,6 +1023,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_CraftingMenu = m_UI.FindAction("Crafting Menu", throwIfNotFound: true);
         m_UI_HiringBoard = m_UI.FindAction("Hiring Board", throwIfNotFound: true);
         m_UI_Inventory = m_UI.FindAction("Inventory", throwIfNotFound: true);
+        m_UI_GuildMenu = m_UI.FindAction("Guild Menu", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1215,6 +1236,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_CraftingMenu;
     private readonly InputAction m_UI_HiringBoard;
     private readonly InputAction m_UI_Inventory;
+    private readonly InputAction m_UI_GuildMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1278,6 +1300,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Inventory".
         /// </summary>
         public InputAction @Inventory => m_Wrapper.m_UI_Inventory;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/GuildMenu".
+        /// </summary>
+        public InputAction @GuildMenu => m_Wrapper.m_UI_GuildMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1343,6 +1369,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Inventory.started += instance.OnInventory;
             @Inventory.performed += instance.OnInventory;
             @Inventory.canceled += instance.OnInventory;
+            @GuildMenu.started += instance.OnGuildMenu;
+            @GuildMenu.performed += instance.OnGuildMenu;
+            @GuildMenu.canceled += instance.OnGuildMenu;
         }
 
         /// <summary>
@@ -1393,6 +1422,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Inventory.started -= instance.OnInventory;
             @Inventory.performed -= instance.OnInventory;
             @Inventory.canceled -= instance.OnInventory;
+            @GuildMenu.started -= instance.OnGuildMenu;
+            @GuildMenu.performed -= instance.OnGuildMenu;
+            @GuildMenu.canceled -= instance.OnGuildMenu;
         }
 
         /// <summary>
@@ -1618,5 +1650,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInventory(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Guild Menu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnGuildMenu(InputAction.CallbackContext context);
     }
 }

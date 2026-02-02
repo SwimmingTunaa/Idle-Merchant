@@ -1,0 +1,238 @@
+/* ═══════════════════════════════════════════════════════════════
+   UPGRADE CARD STYLES
+   States: locked (insufficient stars), unavailable (insufficient gold), 
+           available (can purchase), owned (already purchased)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Base card styling */
+.upgrade-card {
+    width: 280px;
+    min-height: 320px;
+    background-color: rgb(240, 230, 210);
+    border-width: 3px;
+    border-color: rgb(150, 130, 100);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px;
+    flex-direction: column;
+    align-items: center;
+    transition-property: scale, border-color;
+    transition-duration: 0.2s;
+}
+
+/* Icon */
+.upgrade-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+}
+
+/* Text elements */
+.upgrade-name {
+    font-size: 18px;
+    color: rgb(60, 40, 20);
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+    margin-bottom: 8px;
+    white-space: normal;
+}
+
+.upgrade-description {
+    font-size: 12px;
+    color: rgb(80, 60, 40);
+    -unity-text-align: upper-center;
+    white-space: normal;
+    margin-bottom: 12px;
+    flex-grow: 1;
+    min-height: 60px;
+}
+
+/* Cost display */
+.cost-container {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.card-coin-icon {
+    width: 20px;
+    height: 20px;
+    background-image: url('project://database/Assets/Sprites/Loot/Coin.png');
+    margin-right: 4px;
+}
+
+.cost-label {
+    font-size: 16px;
+    color: rgb(200, 140, 0);
+    -unity-font-style: bold;
+}
+
+/* Star requirement */
+.star-requirement {
+    margin-bottom: 8px;
+    display: none; /* Hidden by default, show via code if needed */
+}
+
+.star-requirement-label {
+    font-size: 12px;
+    color: rgb(200, 100, 100);
+    -unity-font-style: bold;
+}
+
+/* Purchase button */
+.purchase-button {
+    width: 100%;
+    height: 40px;
+    background-color: rgb(100, 180, 100);
+    border-width: 2px;
+    border-color: rgb(60, 120, 60);
+    border-radius: 6px;
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    margin-top: 8px;
+}
+
+.purchase-button:hover {
+    background-color: rgb(120, 200, 120);
+    scale: 1.05;
+}
+
+.purchase-button:active {
+    scale: 0.95;
+}
+
+.purchase-button:disabled {
+    background-color: rgb(150, 150, 150);
+    border-color: rgb(100, 100, 100);
+    color: rgb(200, 200, 200);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE: LOCKED (Insufficient stars)
+   Gray overlay, lock icon visible, star requirement shown in red
+   ═══════════════════════════════════════════════════════════════ */
+
+.upgrade-card--locked {
+    opacity: 0.6;
+}
+
+.upgrade-card--locked .lock-overlay {
+    display: flex;
+}
+
+.upgrade-card--locked .star-requirement {
+    display: flex;
+}
+
+.upgrade-card--locked .star-requirement-label {
+    color: rgb(220, 60, 60);
+}
+
+.upgrade-card--locked .purchase-button {
+    display: none;
+}
+
+.lock-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(50, 50, 50, 0.5);
+    border-radius: 8px;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+}
+
+.lock-icon {
+    width: 48px;
+    height: 48px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE: UNAVAILABLE (Insufficient gold)
+   Normal colors, button disabled, "Need Xg" label shown
+   ═══════════════════════════════════════════════════════════════ */
+
+.upgrade-card--unavailable .purchase-button {
+    background-color: rgb(150, 150, 150);
+    border-color: rgb(100, 100, 100);
+}
+
+.upgrade-card--unavailable .insufficient-gold-label {
+    display: flex;
+}
+
+.insufficient-gold-label {
+    font-size: 12px;
+    color: rgb(220, 120, 60);
+    -unity-font-style: bold;
+    margin-top: 4px;
+    display: none; /* Hidden by default */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE: AVAILABLE (Can purchase)
+   Highlighted border, pulse animation, button enabled
+   ═══════════════════════════════════════════════════════════════ */
+
+.upgrade-card--available {
+    border-color: rgb(200, 160, 80);
+    border-width: 4px;
+}
+
+.upgrade-card--available:hover {
+    scale: 1.05;
+}
+
+/* Pulse animation for available cards */
+@keyframes pulse {
+    0% { scale: 1; }
+    50% { scale: 1.02; }
+    100% { scale: 1; }
+}
+
+.upgrade-card--available {
+    animation-name: pulse;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE: OWNED (Already purchased)
+   Green checkmark badge, "Owned" label, button hidden
+   ═══════════════════════════════════════════════════════════════ */
+
+.upgrade-card--owned {
+    background-color: rgb(220, 240, 220);
+    border-color: rgb(100, 180, 100);
+    opacity: 0.8;
+}
+
+.upgrade-card--owned .purchase-button {
+    display: none;
+}
+
+.upgrade-card--owned .owned-badge {
+    display: flex;
+}
+
+.owned-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgb(80, 180, 80);
+    border-radius: 12px;
+    padding: 4px 12px;
+    display: none; /* Hidden by default */
+}
+
+.owned-label {
+    font-size: 14px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}

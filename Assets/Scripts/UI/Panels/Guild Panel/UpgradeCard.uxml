@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/UpgradeCard.uss?fileID=7433441132597879392&amp;guid=98e2355806c7c4ccbb3254731cc87521&amp;type=3#UpgradeCard" />
+    <ui:VisualElement name="upgrade-card" class="upgrade-card">
+        <ui:VisualElement name="upgrade-icon" class="upgrade-icon" />
+        <ui:Label name="upgrade-name" text="Forging Station" class="upgrade-name" />
+        <ui:Label name="upgrade-description" text="Unlock the crafting system to create valuable goods from raw materials." class="upgrade-description" />
+        <ui:VisualElement name="cost-container" class="cost-container">
+            <ui:VisualElement name="coin-icon" class="card-coin-icon" />
+            <ui:Label name="cost-label" text="500" class="cost-label" />
+        </ui:VisualElement>
+        <ui:VisualElement name="star-requirement" class="star-requirement">
+            <ui:Label name="star-requirement-label" text="Requires 2★" class="star-requirement-label" />
+        </ui:VisualElement>
+        <ui:Button name="purchase-button" text="Purchase" class="purchase-button" />
+        <ui:VisualElement name="lock-overlay" class="lock-overlay">
+            <ui:VisualElement name="lock-icon" class="lock-icon" />
+        </ui:VisualElement>
+        <ui:VisualElement name="owned-badge" class="owned-badge">
+            <ui:Label text="✓ Owned" class="owned-label" />
+        </ui:VisualElement>
+        <ui:Label name="insufficient-gold-label" text="Need 200g" class="insufficient-gold-label" />
+    </ui:VisualElement>
+</ui:UXML>
