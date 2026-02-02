@@ -2,24 +2,24 @@
     <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI" />
     <ui:VisualElement name="main-root" class="main-ui-root">
         <ui:VisualElement name="top-bar" class="top-bar">
-            <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container">
-                <ui:Button name="hiring-board-button" class="bookmark-button bookmark-hire">
-                    <ui:Label text="Hire" class="bookmark-label" />
+            <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/book%20bottom.png?fileID=2800000&amp;guid=fcbcf17aa828c416d9a29f93248e9b33&amp;type=3#book bottom&quot;); background-size: cover; background-position-x: left 0; background-position-y: top -90px; height: 89px; padding-top: 31px;">
+                <ui:Button name="hiring-board-button" class="bookmark-button">
+                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Book%203.png?fileID=21300000&amp;guid=6b22156af64babe4f9bff6441c5b942f&amp;type=3#Book 3&quot;); rotate: -90deg;" />
                 </ui:Button>
-                <ui:Button name="inventory-button" data-source-type="UnityEditor.SerializedPropertyFilters+None, UnityEditor.CoreModule" class="bookmark-button bookmark-inventory">
-                    <ui:Label text="Inv" class="bookmark-label" />
+                <ui:Button name="inventory-button" data-source-type="UnityEditor.SerializedPropertyFilters+None, UnityEditor.CoreModule" class="bookmark-button">
+                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Equipment/Bag.png?fileID=21300000&amp;guid=93dbc8f96dc6c00418ba8f1a8e8992e4&amp;type=3#Bag&quot;); rotate: -90deg;" />
                 </ui:Button>
-                <ui:Button name="units-button" class="bookmark-button bookmark-units">
-                    <ui:Label text="Units" class="bookmark-label" />
+                <ui:Button name="units-button" class="bookmark-button">
+                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Weapon%20&amp;%20Tool/Silver%20Sword.png?fileID=21300000&amp;guid=95052c6b62fb3de4695beaa99f842ac2&amp;type=3#Silver Sword&quot;); rotate: -90deg;" />
                 </ui:Button>
-                <ui:Button name="crafting-button" class="bookmark-button bookmark-craft">
-                    <ui:Label text="Craft" class="bookmark-label" />
+                <ui:Button name="crafting-button" class="bookmark-button">
+                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Weapon%20&amp;%20Tool/Hammer.png?fileID=21300000&amp;guid=7b8e0222a006d824e930445c7d435ac3&amp;type=3#Hammer&quot;); rotate: -90deg;" />
                 </ui:Button>
-                <ui:Button name="research-bookmark-button" class="bookmark-button bookmark-research">
-                    <ui:Label text="Research" class="bookmark-label" />
+                <ui:Button name="research-bookmark-button" class="bookmark-button">
+                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Potion/Blue%20Potion%203.png?fileID=21300000&amp;guid=ace8a02646afeda4880fc3cb14cad705&amp;type=3#Blue Potion 3&quot;); rotate: -90deg;" />
                 </ui:Button>
             </ui:VisualElement>
-            <ui:VisualElement name="guild-section" class="guild-section">
+            <ui:VisualElement name="guild-section" class="guild-section bookmark-icon">
                 <ui:Button name="guild-button" class="guild-banner-button">
                     <ui:Label name="guild-name-label" text="The Rusty Dagger" class="guild-name-label" />
                 </ui:Button>

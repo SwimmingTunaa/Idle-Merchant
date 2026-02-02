@@ -11,27 +11,48 @@
     justify-content: space-between;
     align-items: flex-start;
     height: 100px;
-    background-color: rgba(80, 60, 40, 0.85);
-    border-bottom-width: 3px;
-    border-bottom-color: rgb(120, 90, 60);
     padding: 10px 20px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
 }
 
 .bookmark-tabs-container {
     flex-direction: row;
     align-items: flex-start;
+    padding-right: 32px;
+    padding-left: 32px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/8%20Side%20tabs/2.png?fileID=2800000&guid=928e05273bb3947178767fb40e1e99b0&type=3#2");
 }
 
 .bookmark-button {
     width: 80px;
     height: 80px;
-    margin-right: 5px;
-    background-color: rgb(200, 180, 140);
+    margin-right: 8px;
+    background-color: rgba(200, 180, 140, 0);
     border-width: 2px;
     border-color: rgb(120, 100, 70);
     border-radius: 8px 8px 0 0;
     padding: 5px;
     transition-duration: 0.2s;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/8%20Side%20tabs/4.png?fileID=-4178046375966092550&guid=254b7c6d17aed49f3b34ccf9c8508d49&type=3#4_0");
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    rotate: 90deg;
+    padding-top: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    padding-left: 8px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    justify-content: center;
+    align-items: center;
 }
 
 .bookmark-button:hover {
@@ -44,12 +65,9 @@
     scale: 0.95;
 }
 
-.bookmark-label {
-    font-size: 12px;
-    color: rgb(60, 40, 20);
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    margin-top: 25px;
+.bookmark-icon {
+    width: 48px;
+    height: 48px;
 }
 
 .bookmark-hire {
