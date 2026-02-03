@@ -10,13 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
-  m_Name: Milestone_2Star_NoPunchingBag
+  m_Name: Milestone_2Star_PestControl
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
-  displayName: No Longer the Neighborhood Punching Bag
-  description: 'Defeat 100 dungeon creatures. '
-  flavourText: he goblins used to laugh when you walked by. Now they run. Progress!
+  displayName: Dungeon Pest Control Specialist
+  description: Defeat 500 creatures. You're basically a professional exterminator
+    at this point.
+  flavourText: The dungeon used to be scary. Now it's just... inventory storage with
+    attitude problems.
   icon: {fileID: 0}
-  starLevel: 2
+  starLevel: 3
   milestoneType: 3
-  targetValue: 100
+  targetValue: 500
   requiredUpgrade: {fileID: 0}

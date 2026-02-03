@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
-  m_Name: Milestone_2Star_ProductiveHoarder
+  m_Name: Milestone_1Star_HotMetalAmbition
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
-  displayName: Hoarder
-  description: Collect 100 items from the dungeon. Inventory is looking respectable!
-  flavourText: That one corner that was just dust and cobwebs? Yeah, there's actual
-    merchandise there now."
+  displayName: Hot Metal and Ambition
+  description: Build the Forging Station. Time to turn rocks into money.
+  flavourText: Sure, the noise is terrible and the heat is unbearable, but have you
+    SEEN the markup on swords?
   icon: {fileID: 0}
   starLevel: 2
-  milestoneType: 12
-  targetValue: 100
-  requiredUpgrade: {fileID: 0}
+  milestoneType: 14
+  targetValue: 4
+  requiredUpgrade: {fileID: 11400000, guid: 859fe9f4dfb174b339c34f8627ccd9cc, type: 2}

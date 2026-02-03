@@ -1460,14 +1460,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProgressionManager
   maxUnlockedLayer: 1
-  currentStars: 1
+  currentStars: 0
+  starRewards: []
   allMilestones:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  showDebugLogs: 0
+  showDebugLogs: 1
 --- !u!1 &159163517
 GameObject:
   m_ObjectHideFlags: 0
@@ -28998,6 +28999,25 @@ MonoBehaviour:
           m_CallState: 2
     buttonName: hiring-board-button
     allowToggle: 1
+  - inputActionRef: {fileID: 4483653891903410635, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    onActionPerformed:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1433364570}
+          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+          m_MethodName: TogglePanel
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 9197481963319205126, guid: 796d7ab8f74164f01b60af9c7c634e1e, type: 3}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
+              UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    buttonName: guild-button
+    allowToggle: 1
 --- !u!1 &1449877901
 GameObject:
   m_ObjectHideFlags: 0
@@ -36099,9 +36119,8 @@ MonoBehaviour:
   openCloseDuration: 0
   hasOverlay: 0
   overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
-  showDebugLogs: 0
-  upgradeCardTemplate: {fileID: 0}
-  showDebugLogs: 0
+  showDebugLogs: 1
+  upgradeCardTemplate: {fileID: 9197481963319205126, guid: c53196aa7052f446b8231034cc3a3768, type: 3}
 --- !u!1 &1908026232
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/UpgradeCard.uss?fileID=7433441132597879392&amp;guid=98e2355806c7c4ccbb3254731cc87521&amp;type=3#UpgradeCard" />
     <ui:VisualElement name="upgrade-card" class="upgrade-card">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/UpgradeCard.uss?fileID=7433441132597879392&amp;guid=98e2355806c7c4ccbb3254731cc87521&amp;type=3#UpgradeCard" />
         <ui:VisualElement name="upgrade-icon" class="upgrade-icon" />
         <ui:Label name="upgrade-name" text="Forging Station" class="upgrade-name" />
         <ui:Label name="upgrade-description" text="Unlock the crafting system to create valuable goods from raw materials." class="upgrade-description" />

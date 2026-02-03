@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9422ebf281194af389249025aad64cc, type: 3}
+  m_Name: Reward_ForgingStationGrant
+  m_EditorClassIdentifier: Assembly-CSharp::MilestoneRewardDef
+  rewardType: 2
+  upgradeToUnlock: {fileID: 11400000, guid: 859fe9f4dfb174b339c34f8627ccd9cc, type: 2}
+  featureToUnlock: 0
+  recipeToUnlock: {fileID: 0}
+  rewardMessage: Forging Station unlocked! Time to craft."
+  rewardIcon: {fileID: 0}

@@ -123,7 +123,7 @@ public class GuildUpgradePanel : BasePanelController
     private void LoadUpgrades()
     {
         // Load all GuildUpgradeDef assets from Resources/Upgrades/
-        var upgrades = Resources.LoadAll<GuildUpgradeDef>("Upgrades");
+        var upgrades = Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades");
         allUpgrades = new List<GuildUpgradeDef>(upgrades);
 
         // Sort by star requirement, then by cost

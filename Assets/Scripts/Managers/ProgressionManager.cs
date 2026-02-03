@@ -17,9 +17,14 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     [Header("Star Progression")]
     [Tooltip("Current guild star rating (1-5)")]
     [SerializeField] private int currentStars = 1;
+
+    [Header("Star Rewards")]
+    [Tooltip("Rewards granted when each star is earned")]
+    [SerializeField] private List<StarRewardDef> starRewards = new List<StarRewardDef>();
+
     
     [Tooltip("All milestone definitions (loaded from Resources)")]
-    [SerializeField] private List<StarMilestoneDef> allMilestones = new List<StarMilestoneDef>();
+    [SerializeField] private List<StarMilestoneDef> allMilestones = new();
 
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
@@ -33,6 +38,10 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
     // Owned upgrades tracking
     private HashSet<GuildUpgradeDef> ownedUpgrades = new HashSet<GuildUpgradeDef>();
+    // Track which upgrades are available for purchase (not yet owned)
+    private HashSet<GuildUpgradeDef> availableUpgrades = new HashSet<GuildUpgradeDef>();
+    private HashSet<StarMilestoneDef> completedMilestones = new HashSet<StarMilestoneDef>();
+
 
     // Milestone counters (accumulative from game start)
     private int totalGoldEarned = 0;
@@ -42,16 +51,19 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private int totalItemsCrafted = 0;
     private int totalCraftedItemsSold = 0;
     private int totalCustomersServed = 0;
+    
 
     // Events for decoupling
     public static event Action<int> OnStarEarned;
     public static event Action<GuildUpgradeDef> OnUpgradePurchased;
     public static event Action<int> OnLayerUnlocked;
+    
 
     void Start()
     {
         RebuildAvailableItemsCache();
         LoadMilestones();
+        LoadStarRewards();
     }
 
     void OnEnable()
@@ -118,6 +130,132 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         }
     }
 
+    private void LoadStarRewards()
+    {
+        var loadedRewards = Resources.LoadAll<StarRewardDef>("Rewards");
+        starRewards = new List<StarRewardDef>(loadedRewards);
+
+        if (showDebugLogs)
+        {
+            Debug.Log($"[ProgressionManager] Loaded {starRewards.Count} star rewards");
+            foreach (var reward in starRewards)
+            {
+                Debug.Log($"  {reward.starLevel}★: {reward.rewardTitle}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Check if all milestones for next star are complete.
+    /// If complete, award star. If individual milestone just completed, grant reward.
+    /// </summary>
+    private void CheckMilestones()
+    {
+        if (currentStars >= 5) return; // Already max stars
+
+        int targetStar = currentStars + 1;
+        var milestones = GetMilestonesForStar(targetStar);
+
+        if (milestones.Count == 0)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[ProgressionManager] No milestones defined for {targetStar}★");
+            return;
+        }
+
+        // Check each milestone for completion and grant rewards
+        foreach (var milestone in milestones)
+        {
+            if (IsMilestoneComplete(milestone) && !completedMilestones.Contains(milestone))
+            {
+                // Milestone just completed - grant reward
+                GrantMilestoneReward(milestone);
+                completedMilestones.Add(milestone);
+            }
+        }
+
+        // Check if all milestones complete to award star
+        bool allComplete = milestones.All(m => IsMilestoneComplete(m));
+
+        if (allComplete)
+        {
+            AwardStar(targetStar);
+        }
+    }
+
+/// <summary>
+/// Grant reward for completing a milestone (if reward is defined).
+/// Handles unlocking upgrades, features, recipes, etc.
+/// </summary>
+private void GrantMilestoneReward(StarMilestoneDef milestone)
+{
+    if (milestone.reward == null)
+        return; // No reward defined
+
+    var reward = milestone.reward;
+
+    if (showDebugLogs)
+        Debug.Log($"[ProgressionManager] Milestone '{milestone.description}' completed! Granting reward: {reward.rewardType}");
+
+    switch (reward.rewardType)
+    {
+        case RewardType.None:
+            // Just milestone completion, no special reward
+            break;
+
+        case RewardType.UnlockUpgrade:
+            // Makes upgrade available for purchase (doesn't grant it for free)
+            // You'd implement this with an "available upgrades" system
+            if (showDebugLogs)
+                Debug.Log($"[ProgressionManager] {reward.upgradeToUnlock?.name} is now available for purchase!");
+            break;
+
+        case RewardType.GrantUpgrade:
+            // Gives upgrade for free (tutorial rewards)
+            if (reward.upgradeToUnlock != null)
+            {
+                ownedUpgrades.Add(reward.upgradeToUnlock);
+                OnUpgradePurchased?.Invoke(reward.upgradeToUnlock);
+                
+                if (showDebugLogs)
+                    Debug.Log($"[ProgressionManager] Granted {reward.upgradeToUnlock.name} for free!");
+            }
+            break;
+
+        case RewardType.UnlockFeature:
+            // Enable game feature (handled by listeners to OnUpgradePurchased or custom events)
+            if (showDebugLogs)
+                Debug.Log($"[ProgressionManager] Feature unlocked: {reward.featureToUnlock}");
+            break;
+
+        case RewardType.UnlockRecipe:
+            // Enable crafting recipe
+            if (reward.recipeToUnlock != null && CraftingManager.Instance != null)
+            {
+                CraftingManager.Instance.EnableRecipe(reward.recipeToUnlock);
+                
+                if (showDebugLogs)
+                    Debug.Log($"[ProgressionManager] Recipe unlocked: {reward.recipeToUnlock.name}");
+            }
+            break;
+
+        case RewardType.UnlockLayer:
+            // Usually handled by star system, but can override
+            break;
+
+        case RewardType.SpawnNPC:
+            // Future: spawn special NPCs
+            if (showDebugLogs)
+                Debug.Log($"[ProgressionManager] NPC spawn triggered (not implemented yet)");
+            break;
+    }
+
+    // Show notification to player (you'd implement UI for this)
+    // NotificationManager.Instance?.ShowReward(reward.rewardMessage, reward.rewardIcon);
+}
+
+        
+
     // ===== SPAWNER REGISTRATION (existing system) =====
 
     public static void RegisterSpawner(Spawner spawner)
@@ -145,6 +283,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
     /// <summary>
     /// Award a star and unlock corresponding layer.
+    /// Also grants any rewards defined for this star.
     /// Fires OnStarEarned and OnLayerUnlocked events.
     /// </summary>
     private void AwardStar(int star)
@@ -165,17 +304,85 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
         currentStars = star;
 
-        // Unlock corresponding layer (2★ = Layer 2, etc.)
-        if (star <= 10 && star > maxUnlockedLayer)
+        // Unlock corresponding layer (0★ = Layer 1, 1★ = Layer 2, etc.)
+        int layerToUnlock = star + 1;
+        if (layerToUnlock <= 10 && layerToUnlock > maxUnlockedLayer)
         {
-            UnlockLayer(star);
+            UnlockLayer(layerToUnlock);
         }
+
+        // Grant star rewards
+        GrantStarReward(star);
 
         // Fire events
         OnStarEarned?.Invoke(star);
 
         if (showDebugLogs)
-            Debug.Log($"[ProgressionManager] ★ Earned {star}★! Layer {star} unlocked.");
+            Debug.Log($"[ProgressionManager] ★ Earned {star}★! Layer {layerToUnlock} unlocked.");
+    }
+
+    private void GrantStarReward(int star)
+    {
+        var reward = starRewards.Find(r => r.starLevel == star);
+
+        if (reward == null)
+        {
+            if (showDebugLogs)
+                Debug.Log($"[ProgressionManager] No reward defined for {star}★");
+            return;
+        }
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Granting {star}★ reward: {reward.rewardTitle}");
+
+        // Unlock upgrades for purchase (add to shop)
+        if (reward.upgradesAvailableForPurchase != null)
+        {
+            foreach (var upgrade in reward.upgradesAvailableForPurchase)
+            {
+                if (upgrade != null && !availableUpgrades.Contains(upgrade))
+                {
+                    availableUpgrades.Add(upgrade);
+
+                    if (showDebugLogs)
+                        Debug.Log($"[ProgressionManager] Available for purchase: {upgrade.upgradeName}");
+                }
+            }
+        }
+
+        // Grant upgrades for free
+        if (reward.upgradesGranted != null)
+        {
+            foreach (var upgrade in reward.upgradesGranted)
+            {
+                if (upgrade != null && !ownedUpgrades.Contains(upgrade))
+                {
+                    ownedUpgrades.Add(upgrade);
+                    OnUpgradePurchased?.Invoke(upgrade);
+
+                    if (showDebugLogs)
+                        Debug.Log($"[ProgressionManager] Granted for free: {upgrade.upgradeName}");
+                }
+            }
+        }
+
+        // Unlock recipes
+        if (reward.recipesUnlocked != null && CraftingManager.Instance != null)
+        {
+            foreach (var recipe in reward.recipesUnlocked)
+            {
+                if (recipe != null)
+                {
+                    CraftingManager.Instance.EnableRecipe(recipe);
+
+                    if (showDebugLogs)
+                        Debug.Log($"[ProgressionManager] Unlocked recipe: {recipe.name}");
+                }
+            }
+        }
+
+        // Show reward notification
+        // NotificationManager.Instance?.ShowStarReward(reward);
     }
 
     // ===== MILESTONE SYSTEM =====
@@ -256,32 +463,6 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         };
     }
 
-    /// <summary>
-    /// Check if all milestones for next star are complete.
-    /// Awards star if true.
-    /// </summary>
-    private void CheckMilestones()
-    {
-        if (currentStars >= 5) return; // Already max stars
-
-        int targetStar = currentStars + 1;
-        var milestones = GetMilestonesForStar(targetStar);
-
-        if (milestones.Count == 0)
-        {
-            if (showDebugLogs)
-                Debug.LogWarning($"[ProgressionManager] No milestones defined for {targetStar}★");
-            return;
-        }
-
-        bool allComplete = milestones.All(m => IsMilestoneComplete(m));
-
-        if (allComplete)
-        {
-            AwardStar(targetStar);
-        }
-    }
-
     // ===== MILESTONE INCREMENT METHODS =====
 
     public void IncrementGoldEarned(int amount)
@@ -360,6 +541,16 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         if (!Inventory.Instance.CanAfford(upgrade.goldCost)) return false; // Insufficient gold
 
         return true;
+    }
+
+    public bool IsUpgradeAvailable(GuildUpgradeDef upgrade)
+    {
+        return availableUpgrades.Contains(upgrade) && !ownedUpgrades.Contains(upgrade);
+    }
+
+    public List<GuildUpgradeDef> GetAvailableUpgrades()
+    {
+        return availableUpgrades.Where(u => !ownedUpgrades.Contains(u)).ToList();
     }
 
     /// <summary>

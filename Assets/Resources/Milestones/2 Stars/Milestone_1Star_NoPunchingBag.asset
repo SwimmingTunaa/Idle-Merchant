@@ -10,14 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
-  m_Name: Milestone_2Star_PiggyBankPromoted
+  m_Name: Milestone_1Star_NoPunchingBag
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
-  description: Earn 1,000 gold. That's rent money AND dinner!
+  displayName: No Longer the Neighborhood Punching Bag
+  description: 'Defeat 100 dungeon creatures. '
+  flavourText: he goblins used to laugh when you walked by. Now they run. Progress!
   icon: {fileID: 0}
-  displayName: Piggy Bank Promoted to Chest
-  flavourText: You're not just surviving anymore. You might actually be... running
-    a business?"
   starLevel: 2
-  milestoneType: 0
-  targetValue: 1000
+  milestoneType: 3
+  targetValue: 100
   requiredUpgrade: {fileID: 0}

@@ -9,14 +9,12 @@ using UnityEngine;
 public class StarMilestoneDef : ScriptableObject
 {
     [Header("UI Display")]
-    public string displayName;
-    [Tooltip("Description shown in milestone UI (e.g., 'Earn 1000 gold')")]
+    public string displayName = "Milestone Name";
     public string description = "Earn 1000 gold";
-    public string flavourText;
-    [Tooltip("Optional icon for milestone (uses upgrade icon if UpgradePurchased type)")]
+    [TextArea(2, 4)]
+    public string flavorText = "";
     public Sprite icon;
-  
-
+    
     [Header("Star Configuration")]
     [Tooltip("Which star tier does this milestone count toward? (2★ = 2, 3★ = 3, etc.)")]
     [Range(2, 5)]
@@ -33,6 +31,9 @@ public class StarMilestoneDef : ScriptableObject
     [Tooltip("If milestoneType is UpgradePurchased, which upgrade is required?")]
     public GuildUpgradeDef requiredUpgrade;
 
+    [Header("Reward (Optional)")]
+    [Tooltip("Reward granted when this milestone is completed")]
+    public MilestoneRewardDef reward;
 }
 
 /// <summary>
