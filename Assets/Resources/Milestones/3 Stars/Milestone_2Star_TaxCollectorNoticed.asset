@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Milestone_2Star_TaxCollectorNoticed
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
   displayName: The Tax Collector Noticed
-  description: Earn 5,000 gold. The neighbors are starting to gossip.
-  flavourText: You've upgraded from 'that weird dungeon person' to 'that SUCCESSFUL
-    weird dungeon person.'
+  description: Earn 5,000 gold
+  flavorText: Congratulations! The kingdom now knows you exist. They sent you a bill
+    to prove it.
   icon: {fileID: 0}
   starLevel: 3
   milestoneType: 0
   targetValue: 5000
   requiredUpgrade: {fileID: 0}
+  reward: {fileID: 0}

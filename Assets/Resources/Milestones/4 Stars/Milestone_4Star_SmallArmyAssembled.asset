@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
+  m_Name: Milestone_4Star_SmallArmyAssembled
+  m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
+  displayName: Small Army Assembled
+  description: Hire 20 units total
+  flavorText: Twenty employees. That's not a team anymore, that's a small army. With
+    benefits.
+  icon: {fileID: 0}
+  starLevel: 4
+  milestoneType: 3
+  targetValue: 500
+  requiredUpgrade: {fileID: 0}
+  reward: {fileID: 0}

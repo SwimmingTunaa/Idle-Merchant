@@ -26,6 +26,15 @@ public enum CombatBehaviorType
     Territorial     // Attacks if targets get too close (uses different scan range)
 }
 
+public enum AttackType
+{
+    Slash,      // Sword/melee
+    Thrust,     // Spear
+    Bash,       // Standard/unarmed
+    Shoot,      // Bow
+    Cast        // Staff/Magic
+}
+
 /// <summary>
 /// Configuration for combat behavior.
 /// Stored in EntityDef and applied to CombatBehavior component.
@@ -39,6 +48,7 @@ public struct CombatConfig
     
     // Territorial-specific
     public float territorialRadius;
+    public AttackType attackType;
     
     public static CombatConfig Passive => new CombatConfig
     {

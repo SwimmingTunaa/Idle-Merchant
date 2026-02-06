@@ -18,16 +18,23 @@ public class PorterManager : UnitManager<PorterAgent>
 
     protected override void ValidateSetup()
     {
-        base.ValidateSetup();
+        // Don't call base - porters work on any layer, skip layer validation
+        if (operationArea == null)
+        {
+            if (showDebugLogs)
+                Debug.LogError($"[PorterManager Layer {LayerIndex}] operationArea is not assigned!");
+        }
 
         if (transport == null)
         {
-            Debug.LogError($"[PorterManager Layer {LayerIndex}] transport is not assigned!");
+            if (showDebugLogs)
+                Debug.LogError($"[PorterManager Layer {LayerIndex}] transport is not assigned!");
         }
         
         if (depositPoint == null)
         {
-            Debug.LogError($"[PorterManager Layer {LayerIndex}] depositPoint is not assigned!");
+            if (showDebugLogs)
+                Debug.LogError($"[PorterManager Layer {LayerIndex}] depositPoint is not assigned!");
         }
     }
 

@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Milestone_2Star_PayrollExpensive
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
   displayName: Payroll's Getting Expensive
-  description: Hire 5 total employees. You need a bigger ledger.
-  flavourText: 10 employees! That's almost a dozen people! Wait, no, that's still
-    just five. Still impressive though.
+  description: Hire 12 units total
+  flavorText: Five employees. That's a team. Or a small gang. Depends on how you
+    look at it.
   icon: {fileID: 0}
   starLevel: 3
   milestoneType: 5
-  targetValue: 10
+  targetValue: 12
   requiredUpgrade: {fileID: 0}
+  reward: {fileID: 0}

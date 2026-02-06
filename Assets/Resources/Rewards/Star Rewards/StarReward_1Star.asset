@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StarRewardDef
   starLevel: 1
   upgradesAvailableForPurchase:
+  - {fileID: 11400000, guid: 33f10ac12106442cb80e20a0dfd9cdfc, type: 2}
   - {fileID: 11400000, guid: 859fe9f4dfb174b339c34f8627ccd9cc, type: 2}
   upgradesGranted: []
   recipesUnlocked: []
   featuresUnlocked: 00000000
   rewardTitle: New Features Unlocked!
-  rewardDescription: You can now craft items!
+  rewardDescription: You can now purchase the Forging Station from the Guild Shop
+    to start crafting!
   rewardIcon: {fileID: 0}

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
+  m_Name: Milestone_3Star_MiddleManagement
+  m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
+  displayName: Middle Management Exists
+  description: Promote 3 units
+  flavorText: They get to boss other people around while you boss them around. Delegation!
+  icon: {fileID: 0}
+  starLevel: 3
+  milestoneType: 8
+  targetValue: 3
+  requiredUpgrade: {fileID: 0}
+  reward: {fileID: 0}

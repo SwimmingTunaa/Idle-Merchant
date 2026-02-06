@@ -214,7 +214,23 @@ public class GuildUpgradePanel : BasePanelController
         var row = new VisualElement();
         row.AddToClassList("milestone-row");
 
-        // Description
+        // Display Name (bold title)
+        if (!string.IsNullOrEmpty(milestone.displayName))
+        {
+            var nameLabel = new Label(milestone.displayName);
+            nameLabel.AddToClassList("milestone-display-name");
+            row.Add(nameLabel);
+        }
+
+        // Flavour Text (italic, muted)
+        if (!string.IsNullOrEmpty(milestone.flavorText))
+        {
+            var flavourLabel = new Label($"\"{milestone.flavorText}\"");
+            flavourLabel.AddToClassList("milestone-flavour-text");
+            row.Add(flavourLabel);
+        }
+
+        // Description (technical instruction)
         var descLabel = new Label(milestone.description);
         descLabel.AddToClassList("milestone-description");
         row.Add(descLabel);

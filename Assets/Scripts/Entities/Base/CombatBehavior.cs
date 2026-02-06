@@ -235,15 +235,22 @@ public class CombatBehavior : MonoBehaviour
     /// </summary>
     private void ExecuteAttack(float damageDelay)
     {
-        // Trigger animation
         if (animator != null)
         {
-            animator.SetTrigger(AnimHash.Slash);
+            int triggerHash = config.attackType switch
+            {
+                AttackType.Slash => AnimHash.Slash,
+                AttackType.Thrust => AnimHash.Thrust,
+                AttackType.Bash => AnimHash.Bash,
+                AttackType.Shoot => AnimHash.Shoot,
+                AttackType.Cast => AnimHash.Cast,
+                _ => AnimHash.Slash
+            };
+            animator.SetTrigger(triggerHash);
         }
         
         OnAttackAnimationTrigger?.Invoke();
         
-        // Deal damage after animation delay
         if (damageCoroutine != null)
         {
             StopCoroutine(damageCoroutine);

@@ -12,6 +12,7 @@ public abstract class PersistentSingleton<T> : MonoBehaviour where T : MonoBehav
             return;
         }
         Instance = this as T;
-        DontDestroyOnLoad(gameObject);
+        if(gameObject.transform.parent == null)
+            DontDestroyOnLoad(gameObject);
     }
 }

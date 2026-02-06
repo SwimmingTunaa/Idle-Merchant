@@ -12,8 +12,15 @@ public static class AnimHash
     public static readonly int Dead = Animator.StringToHash("Dead");
     public static readonly int Damage = Animator.StringToHash("Hit");
     
-    // ===== COMBAT PARAMETERS =====
+    // ===== ADVENTURER COMBAT PARAMETERS =====
     public static readonly int Slash = Animator.StringToHash("Slash");
+    public static readonly int Thrust = Animator.StringToHash("Thrust");
+    public static readonly int Shoot = Animator.StringToHash("Shoot");
+    public static readonly int Cast = Animator.StringToHash("Cast");
+
+    // ===== MOB COMBAT PARAMETERS =====
+    public static readonly int Bash = Animator.StringToHash("Bash");
+
     
     // ===== PORTER PARAMETERS =====
     public static readonly int PickUp = Animator.StringToHash("PickUp");

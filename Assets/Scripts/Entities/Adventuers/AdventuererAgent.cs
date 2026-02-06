@@ -86,7 +86,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
                 territorialRadius = 0f
             };
             
-            combat.Init(config, Stats, this, layerIndex, spawnPoint);
+            combat.Init(adventurerDef.combatConfig, Stats, this, layerIndex, spawnPoint);
             combat.OnTargetAcquired += OnCombatTargetAcquired;
             combat.OnTargetLost += OnCombatTargetLost;
         }

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d104bfc79eea6439390eebc84fc7f607, type: 3}
+  m_Name: Crafting Station
+  m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradeDef
+  upgradeName: Forging Station
+  description: Unlock the crafting system to turn raw materials into valuable goods.
+  icon: {fileID: 0}
+  goldCost: 500
+  starRequirement: 2
+  upgradeType: 0
+  layerSpecific: 0
+  targetLayer: 1
+  requiresResearch: 0
+  requiredResearchNodeID: 

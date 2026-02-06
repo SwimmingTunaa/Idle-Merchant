@@ -164,6 +164,7 @@ public class EntityDefEditor : Editor
             adventurerWanderTimeRangeProp = serializedObject.FindProperty("wanderTimeRange");
             adventurerReturnToSpawnProp = serializedObject.FindProperty("returnToSpawn");
             leashRangeProp = serializedObject.FindProperty("leashRange");
+            combatConfigProp = serializedObject.FindProperty("combatConfig"); 
         }
         
         // Combat (MobDef)
@@ -483,6 +484,13 @@ public class EntityDefEditor : Editor
         EditorGUILayout.LabelField("Combat Configuration", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("Adventurers use EntityDef base combat stats (see Stats tab)", MessageType.Info);
         EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Combat Configuration", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(combatConfigProp, true);
+        EditorGUILayout.EndVertical();
     }
 
     private void DrawMobBehaviourTab()
@@ -507,12 +515,12 @@ public class EntityDefEditor : Editor
             SerializedProperty behaviorTypeProp = combatConfigProp.FindPropertyRelative("behaviorType");
             SerializedProperty hostileToProp = combatConfigProp.FindPropertyRelative("hostileTo");
             SerializedProperty territorialRadiusProp = combatConfigProp.FindPropertyRelative("territorialRadius");
+            SerializedProperty attackTypeProp = combatConfigProp.FindPropertyRelative("attackType");
 
             EditorGUILayout.Space(5);
             
             CombatBehaviorType behaviorType = (CombatBehaviorType)behaviorTypeProp.enumValueIndex;
             EditorGUILayout.HelpBox(GetBehaviorDescription(behaviorType), MessageType.Info);
-            
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("Quick Presets:", EditorStyles.boldLabel);
             
@@ -531,6 +539,8 @@ public class EntityDefEditor : Editor
             }
             EditorGUILayout.EndHorizontal();
         }
+
+        
         
         EditorGUILayout.EndVertical();
 
@@ -667,7 +677,7 @@ public class EntityDefEditor : Editor
 
         bool useModular = useModularCharacterProp.boolValue;
         
-        if (!useModular && spriteDropProp.objectReferenceValue == null && animatorOverrideProp.objectReferenceValue == null)
+        if (!useModular && spriteDropProp.objectReferenceValue == null && !HasAnyAssignedElement(animatorOverrideProp))
         {
             EditorGUILayout.HelpBox("No visual assigned. Assign either spriteDrop or animatorOverrideController, or enable 'Use Modular Character'.", MessageType.Warning);
             hasWarnings = true;
@@ -794,5 +804,15 @@ public class EntityDefEditor : Editor
         }
 
         return null;
+    }
+
+    private bool HasAnyAssignedElement(SerializedProperty arrayProp)
+    {
+        for (int i = 0; i < arrayProp.arraySize; i++)
+        {
+            if (arrayProp.GetArrayElementAtIndex(i).objectReferenceValue != null)
+                return true;
+        }
+        return false;
     }
 }

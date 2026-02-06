@@ -21,7 +21,7 @@ MonoBehaviour:
   id: Novice Adventurer
   displayName: Novice Adventurer
   description: 
-  hireCost: 40
+  hireCost: 0
   assignedLayer: 1
   startingSkills:
   - {fileID: 0}
@@ -59,6 +59,12 @@ MonoBehaviour:
   adventurerType: Novice
   baseHealth: 10
   startingState: 1
+  combatConfig:
+    canAttack: 1
+    behaviorType: 2
+    hostileTo: 1
+    territorialRadius: 0
+    attackType: 0
   wanderTimeRange: {x: 5, y: 8}
   returnToSpawn: 0
   leashRange: 0

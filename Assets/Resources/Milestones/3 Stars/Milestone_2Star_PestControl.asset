@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: Milestone_2Star_PestControl
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
   displayName: Dungeon Pest Control Specialist
-  description: Defeat 500 creatures. You're basically a professional exterminator
-    at this point.
-  flavourText: The dungeon used to be scary. Now it's just... inventory storage with
-    attitude problems.
+  description: Defeat 500 dungeon creatures
+  flavorText: The dungeon ecosystem is definitely feeling your presence now.
   icon: {fileID: 0}
   starLevel: 3
   milestoneType: 3
   targetValue: 500
   requiredUpgrade: {fileID: 0}
+  reward: {fileID: 0}

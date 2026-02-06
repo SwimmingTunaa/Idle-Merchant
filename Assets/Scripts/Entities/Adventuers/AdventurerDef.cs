@@ -12,6 +12,8 @@ public class AdventurerDef : EntityDef
     [Header("Adventurer Def")]
     [Tooltip("Starting state when adventurer spawns")]
     public AdventurerState startingState = AdventurerState.Wander;
+
+    public CombatConfig combatConfig;
     
     [Header("Behavior")]
     [Tooltip("Time range for wander state before going idle")]

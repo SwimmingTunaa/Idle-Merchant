@@ -17,8 +17,8 @@ public class StarMilestoneDef : ScriptableObject
     
     [Header("Star Configuration")]
     [Tooltip("Which star tier does this milestone count toward? (2★ = 2, 3★ = 3, etc.)")]
-    [Range(2, 5)]
-    public int starLevel = 2;
+    [Range(1, 5)]
+    public int starLevel = 1;
 
     [Header("Milestone Type")]
     [Tooltip("What action does this milestone track?")]
