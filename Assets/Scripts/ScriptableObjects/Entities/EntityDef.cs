@@ -14,6 +14,7 @@ public class EntityDef : ScriptableObject
     public Sprite shopSprite;
     public string id;
     public string displayName;
+    [TextArea(2, 4)]
     public string description;
     public int hireCost = 50;
     public int assignedLayer = 1;

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2cf7b404d2840cbab97bee936aa4ae, type: 3}
+  m_Name: Item_WolfPelt
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDef
+  id: Item_WolfPelt
+  displayName: Wolf Pelt
+  description: Thick fur from wild predators. Warm, durable, and smells faintly of
+    pine needles.
+  itemCategory: 1
+  spriteDrop: {fileID: 0}
+  icon: {fileID: 0}
+  prefab: {fileID: 0}
+  chance: 0.8
+  sellPrice: 12
+  baseValue: 12

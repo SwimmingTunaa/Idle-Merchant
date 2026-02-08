@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
+  m_Name: Recipe_InfernalAmulet
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
+  ingredients:
+  - item: {fileID: 11400000, guid: 3795f66c2e03a407e9a45450c84ec56c, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: dde142db08c7a451f90e81ed2b5428c7, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 31e9417e07964463a97b4510b8651658, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: e5cfbb958bd374bc38df7edddd647fb9, type: 2}
+  outputQty: 1
+  craftSeconds: 48
