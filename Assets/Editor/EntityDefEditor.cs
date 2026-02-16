@@ -727,12 +727,21 @@ public class EntityDefEditor : Editor
 
     private Sprite GetSpriteForColliderCalculation(EntityDef entityDef)
     {
+        // Priority 1: Use spriteDrop directly
         if (entityDef.spriteDrop != null)
         {
             return entityDef.spriteDrop;
         }
 
-       
+        // Priority 2: Extract first sprite from idle animation in AnimatorOverrideController
+        if (entityDef.animatorOverrideController != null)
+        {
+            foreach (var overrideController in entityDef.animatorOverrideController)
+            {
+                Sprite sprite = ExtractIdleSpriteFromAnimator(overrideController);
+                if (sprite != null) return sprite;
+            }
+        }
 
         return null;
     }

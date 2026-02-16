@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Recipe_IronSword
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  ingredients: []
-  output: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 13020a3c8650b41f4a8223fe092620fc, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 62677ba2dadd944cbb080f84503b6924, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 92fee048b433841b1a209cdc603ab314, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 8a85f7ac7f7bf4764bf57009a21c490b, type: 2}
   outputQty: 1
-  craftSeconds: 5
+  craftSeconds: 25

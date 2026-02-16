@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Recipe_BoneBlade
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  ingredients: []
-  output: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 8a85f7ac7f7bf4764bf57009a21c490b, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: e9e49d793f136462d8ecdc12ace37dbe, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 4987c0c2fd2354453978fd3c0bcfc138, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 7537df6c387a34ed391446bdb91e9e7a, type: 2}
   outputQty: 1
-  craftSeconds: 5
+  craftSeconds: 35

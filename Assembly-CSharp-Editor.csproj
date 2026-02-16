@@ -49,11 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets/Editor/ColourPaletteEditor.cs" />
+    <Compile Include="Assets/Editor/ExcelImporter.cs" />
     <Compile Include="Assets/Editor/EntityBaseEditor.cs" />
     <Compile Include="Assets/Editor/EntityDefEditor.cs" />
     <Compile Include="Assets/Editor/GameVariableEditor.cs" />
     <Compile Include="Assets/Editor/TraitDefEditor.cs" />
     <Compile Include="Assets/Editor/scriptableobject_generator.cs" />
+    <Compile Include="Assets/Editor/csv_data_exporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -568,6 +570,10 @@
       <HintPath>Library/PackageCache/com.unity.visualscripting@6279e2b7c485/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ExcelDataReader.DataSet">
+      <HintPath>Assets/Plugins/ExcelDataReader.DataSet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>Library/PackageCache/com.unity.collections@d49facba0036/Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
@@ -614,6 +620,10 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Library/PackageCache/com.unity.collections@d49facba0036/Unity.Collections.Tests/System.Runtime.CompilerServices.Unsafe/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExcelDataReader">
+      <HintPath>Assets/Plugins/ExcelDataReader.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">

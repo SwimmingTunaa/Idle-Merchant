@@ -142,9 +142,9 @@ public class CustomerWantBubble : MonoBehaviour
             // Comment out if you want strict sprite colors only.
             switch (item.itemCategory)
             {
-                case ItemCategory.Common:  iconRenderer.color = Color.white; break;
-                case ItemCategory.Crafted: iconRenderer.color = new Color(0.5f, 0.8f, 1f, 1f); break;
-                case ItemCategory.Luxury:  iconRenderer.color = new Color(1f, 0.8f, 0.3f, 1f); break;
+                case ItemCategory.Basic:  iconRenderer.color = Color.white; break;
+                case ItemCategory.Advanced: iconRenderer.color = new Color(0.5f, 0.8f, 1f, 1f); break;
+                case ItemCategory.Premium:  iconRenderer.color = new Color(1f, 0.8f, 0.3f, 1f); break;
             }
         }
         else

@@ -96,11 +96,11 @@ public class LootVisual : MonoBehaviour
         // Optional: tint based on category
         switch (category)
         {
-            case ItemCategory.Common:
+            case ItemCategory.Basic:
                 return new Color(1f, 1f, 1f, 1f); // White
-            case ItemCategory.Crafted:
+            case ItemCategory.Advanced:
                 return new Color(0.5f, 0.8f, 1f, 1f); // Light blue
-            case ItemCategory.Luxury:
+            case ItemCategory.Premium:
                 return new Color(1f, 0.8f, 0.3f, 1f); // Gold
             default:
                 return Color.white;

@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public enum CustomerState
 {
@@ -41,7 +42,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private int batchMin, batchMax;
 
     private bool hasInitialized = false;
-
+   
     [Header("Debug")]
     [SerializeField] private bool showDebugColours = false;
     [SerializeField] private bool showDebugLogs = false;
@@ -50,6 +51,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     {
         col = GetComponent<Collider2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        sortingGroup = GetComponentInChildren<SortingGroup>();
         
         if (showDebugLogs)
             Debug.Log($"[CustomerAgent] {name} Awake()");
@@ -165,7 +167,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         switch (newState)
         {
             case CustomerState.Idle:
-                if(showDebugColours) spriteRenderer.color = wanderColor;
+                spriteRenderer.color = wanderColor;
                 targetPos = null;
                 
                 // Create idle timer from EntityDef idle time range
@@ -175,7 +177,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.SeekingQueue:
-                if(showDebugColours) spriteRenderer.color = seekingColor;
+                spriteRenderer.color = seekingColor;
+                sortingGroup.sortingOrder = 5;
                 // Seek the END of the queue, not the front
                 SetTarget(QueueController.Instance.GetQueueEndPosition());
                 PickWantFromInventory();
@@ -189,8 +192,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Queueing:
-                if(showDebugColours) spriteRenderer.color = queueingColor;
-                spriteRenderer.sortingOrder = 0;
+                spriteRenderer.color = queueingColor;
+                sortingGroup.sortingOrder = 5;
                 
                 // Face toward counter (right side)
                 if (QueueController.Instance != null && QueueController.Instance.counterPoint != null)
@@ -201,26 +204,23 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Wander:
-                if(showDebugColours) spriteRenderer.color = wanderColor;
+                spriteRenderer.color = wanderColor;
                 SetTarget(GetWanderPosition(wanderArea));
-                spriteRenderer.sortingOrder = -1;
+                sortingGroup.sortingOrder = 4;
                 break;
                 
             case CustomerState.Buying:
-                if(showDebugColours) spriteRenderer.color = Color.red;
+                spriteRenderer.color = Color.white;
                 targetPos = null;
-                spriteRenderer.sortingOrder = 0;
+                sortingGroup.sortingOrder = 5;
                 break;
                 
             case CustomerState.Leaving:
-                if(showDebugColours) spriteRenderer.color = leavingColor;
-                spriteRenderer.sortingOrder = -2;
+                spriteRenderer.color = leavingColor;
+                sortingGroup.sortingOrder = 3;
                 break;
 
             case CustomerState.Exited:
-                if (showDebugLogs)
-                    Debug.Log($"[CustomerAgent] {name} entering EXITED state - about to despawn");
-
                 // Unregister BEFORE despawning (while still active)
                 if (ShopManager.Instance != null)
                 {
@@ -329,7 +329,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         budget = 0f;
         targetPos = null;
         customerDef = null; // Clear def so Start() doesn't use old data
-        spriteRenderer.sortingOrder = 0;
+        spriteRenderer.sortingOrder = 5;
         
         // Clear timers
         idleTimer = null;

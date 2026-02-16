@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Recipe_DemonWarblade
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  ingredients: []
-  output: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 7537df6c387a34ed391446bdb91e9e7a, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: ae2b7a96a0eee457daf336187b4304e5, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: c25b086a48308402b9b320e94c009ab5, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 0dd48d2bbe89447a397a5430c0e844d2, type: 2}
   outputQty: 1
-  craftSeconds: 5
+  craftSeconds: 50

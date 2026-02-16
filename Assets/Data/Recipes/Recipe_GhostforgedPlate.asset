@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
+  m_Name: Recipe_GhostforgedPlate
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
+  ingredients:
+  - item: {fileID: 11400000, guid: 1359fe709c5384d3cb31c23bbb7e14ba, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 97da4d44606c64c25bf257e9df5eae74, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 9272e3383427f456c90776208c4ea473, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 5e480447998c046378c561b50559c986, type: 2}
+  outputQty: 1
+  craftSeconds: 38

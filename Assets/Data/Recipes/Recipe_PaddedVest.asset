@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
+  m_Name: Recipe_PaddedVest
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
+  ingredients:
+  - item: {fileID: 11400000, guid: bd4f35e072de64198879417db42a1342, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 821acb548e9bb46fd9f9d39b69a2f4e1, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 2186b48dd73334f89a067c1a1214afa1, type: 2}
+  outputQty: 1
+  craftSeconds: 8

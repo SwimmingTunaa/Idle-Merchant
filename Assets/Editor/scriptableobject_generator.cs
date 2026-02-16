@@ -128,43 +128,43 @@ public class GameDataGenerator : EditorWindow
         EnsureFolderExists(itemPath);
         
         // Layer 1: Forest Materials
-        CreateItem(itemPath, "Wood", ItemCategory.Common, 2, 
+        CreateItem(itemPath, "Wood", ItemCategory.Basic, 2, 
             "Sturdy branches that sprites tend with care. The foundation of any proper workshop.", 1);
-        CreateItem(itemPath, "Slime Gel", ItemCategory.Common, 2, 
+        CreateItem(itemPath, "Slime Gel", ItemCategory.Basic, 2, 
             "Viscous goo that's surprisingly useful. Sticks things together and makes great waterproofing!", 1);
-        CreateItem(itemPath, "Sprite Dust", ItemCategory.Common, 5, 
+        CreateItem(itemPath, "Sprite Dust", ItemCategory.Basic, 5, 
             "Shimmering powder that sprites shed naturally. Enhances any craft with a touch of forest magic.", 1);
         
         // Layer 2: Stone & Minerals
-        CreateItem(itemPath, "Stone", ItemCategory.Common, 1, 
+        CreateItem(itemPath, "Stone", ItemCategory.Basic, 1, 
             "Basic quarry stone. Heavy, reliable, and found everywhere in the caverns.", 2);
-        CreateItem(itemPath, "Iron Ore", ItemCategory.Common, 5, 
+        CreateItem(itemPath, "Iron Ore", ItemCategory.Basic, 5, 
             "Raw metal veins extracted from golem bodies. The backbone of any smithy's inventory.", 2);
-        CreateItem(itemPath, "Crystal Shard", ItemCategory.Common, 10, 
+        CreateItem(itemPath, "Crystal Shard", ItemCategory.Basic, 10, 
             "Fragments of living crystal. They hum faintly with residual magic when held to light.", 2);
         
         // Layer 3: Beast Materials
-        CreateItem(itemPath, "Wolf Pelt", ItemCategory.Crafted, 12, 
+        CreateItem(itemPath, "Wolf Pelt", ItemCategory.Advanced, 12, 
             "Thick fur from wild predators. Warm, durable, and smells faintly of pine needles.", 3);
-        CreateItem(itemPath, "Bear Hide", ItemCategory.Crafted, 20, 
+        CreateItem(itemPath, "Bear Hide", ItemCategory.Advanced, 20, 
             "Legendary toughness. Hunters claim bear leather can stop a sword stroke—they're not exaggerating.", 3);
-        CreateItem(itemPath, "Spider Silk", ItemCategory.Crafted, 15, 
+        CreateItem(itemPath, "Spider Silk", ItemCategory.Advanced, 15, 
             "Impossibly strong thread found in monster dens. Lighter than cotton, stronger than steel.", 3);
         
         // Layer 4: Undead Materials
-        CreateItem(itemPath, "Bone Fragment", ItemCategory.Crafted, 8, 
+        CreateItem(itemPath, "Bone Fragment", ItemCategory.Advanced, 8, 
             "Ancient bones that refuse to crumble. Necromancers used them for... something. You'd rather not know.", 4);
-        CreateItem(itemPath, "Ectoplasm", ItemCategory.Crafted, 12, 
+        CreateItem(itemPath, "Ectoplasm", ItemCategory.Advanced, 12, 
             "Spectral essence that ghosts leave behind. Cold to touch and faintly glowing. Perfect for spirit enchantments.", 4);
-        CreateItem(itemPath, "Soul Shard", ItemCategory.Crafted, 30, 
+        CreateItem(itemPath, "Soul Shard", ItemCategory.Advanced, 30, 
             "Crystallized willpower of the departed. Handle with respect—these were once people.", 4);
         
         // Layer 5: Infernal Materials
-        CreateItem(itemPath, "Demon Horn", ItemCategory.Luxury, 25, 
+        CreateItem(itemPath, "Demon Horn", ItemCategory.Premium, 25, 
             "Twisted horns that radiate malevolent energy. Prized by dark enchanters and nobles alike.", 5);
-        CreateItem(itemPath, "Orc Hide", ItemCategory.Luxury, 30, 
+        CreateItem(itemPath, "Orc Hide", ItemCategory.Premium, 30, 
             "Battle-tested leather from warriors who never retreated. The best armor money can buy.", 5);
-        CreateItem(itemPath, "Infernal Core", ItemCategory.Luxury, 80, 
+        CreateItem(itemPath, "Infernal Core", ItemCategory.Premium, 80, 
             "Hearts of flame from demon lords. They burn eternally without fuel—priceless for master crafters.", 5);
         
         Debug.Log("Items generation complete: 15 items created");
@@ -684,9 +684,9 @@ public class GameDataGenerator : EditorWindow
     
     private ItemCategory DetermineCategory(int sellPrice)
     {
-        if (sellPrice >= 300) return ItemCategory.Luxury;
-        if (sellPrice >= 100) return ItemCategory.Crafted;
-        return ItemCategory.Common;
+        if (sellPrice >= 300) return ItemCategory.Premium;
+        if (sellPrice >= 100) return ItemCategory.Advanced;
+        return ItemCategory.Basic;
     }
     
     private void DeleteAllData()

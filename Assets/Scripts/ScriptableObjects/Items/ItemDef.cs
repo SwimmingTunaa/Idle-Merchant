@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum ItemCategory { Common, Crafted, Luxury }
+public enum ItemCategory { Basic, Advanced, Premium }
 
 /// <summary>
 /// Standalone item definition for loot, crafting materials, and shop goods.
@@ -22,7 +22,7 @@ public class ItemDef : ScriptableObject
 
     [Header("Category")]
     [Tooltip("Item category determines which inventory it goes into")]
-    public ItemCategory itemCategory = ItemCategory.Common;
+    public ItemCategory itemCategory = ItemCategory.Basic;
 
     [Header("Visuals")]
     [Tooltip("Sprite shown when loot is on the ground")]

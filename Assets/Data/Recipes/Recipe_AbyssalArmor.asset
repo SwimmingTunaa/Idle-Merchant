@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Recipe_AbyssalArmor
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  ingredients: []
-  output: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 5e480447998c046378c561b50559c986, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 73ae856984c1b4b709e6c6aa5a085774, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 6862d44a13f76463ba6395176db82162, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 3da1bb507502c4fb39872910d7644dac, type: 2}
   outputQty: 1
-  craftSeconds: 5
+  craftSeconds: 52

@@ -329,9 +329,9 @@ public class InventoryController : BasePanelController
             {
                 CategoryFilter.All => true,
                 CategoryFilter.ForSale => SalesManager.Instance.IsMarkedForSale(row.item),
-                CategoryFilter.Materials => row.category == ItemCategory.Common,
-                CategoryFilter.Crafted => row.category == ItemCategory.Crafted,
-                CategoryFilter.Luxury => row.category == ItemCategory.Luxury,
+                CategoryFilter.Materials => row.category == ItemCategory.Basic,
+                CategoryFilter.Crafted => row.category == ItemCategory.Advanced,
+                CategoryFilter.Luxury => row.category == ItemCategory.Premium,
                 _ => false
             };
 

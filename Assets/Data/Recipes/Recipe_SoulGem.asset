@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Recipe_SoulGem
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  ingredients: []
-  output: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 4643abc3c2bf441e7b00da211619192a, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 9272e3383427f456c90776208c4ea473, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 4987c0c2fd2354453978fd3c0bcfc138, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 28b647acf6aa742b592121a21a952afb, type: 2}
   outputQty: 1
-  craftSeconds: 5
+  craftSeconds: 36

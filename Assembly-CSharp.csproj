@@ -65,9 +65,7 @@
     <Compile Include="Assets/Scripts/Entities/Customers/CustomerWantDebug.cs" />
     <Compile Include="Assets/Scripts/Systems/Spawners/CustomerSpawner.cs" />
     <Compile Include="Assets/Scripts/Traits/CursedComboDatabase.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_ImprovedClassData.cs" />
     <Compile Include="Assets/Scripts/Utility/Timers/Timer.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SpritePos.cs" />
     <Compile Include="Assets/Scripts/Managers/GameManager.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitUIHelper.cs" />
     <Compile Include="Assets/Scripts/Shop/CounterService.cs" />
@@ -75,13 +73,11 @@
     <Compile Include="Assets/Scripts/UI/Panels/Hiring/HireRoster.cs" />
     <Compile Include="Assets/Scripts/Entities/Customers/CustomerWantBubble.cs" />
     <Compile Include="Assets/Scripts/Systems/Pooling/PoolDebugger.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_AnimationData.cs" />
     <Compile Include="Assets/Scripts/Skills/Base/SkillDef.cs" />
     <Compile Include="Assets/Scripts/Systems/DamageNumber/DamageNumberManager.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Colour Palette/ColourPalette.cs" />
     <Compile Include="Assets/Scripts/Utility/Animation/AnimHash.cs" />
     <Compile Include="Assets/Scripts/UI/AnimatedNumberUITK.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SpumPackage.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/MilestoneRewardDef.cs" />
     <Compile Include="Assets/Scripts/Identity/Identity.cs" />
     <Compile Include="Assets/Scripts/Config/GameVariable.cs" />
@@ -91,18 +87,15 @@
     <Compile Include="Assets/Scripts/Entities/Stats/Stats.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/BasicStatModifier.cs" />
     <Compile Include="Assets/Scripts/Systems/Camera/CameraScrollController.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_CustomStyleData.cs" />
     <Compile Include="Assets/Scripts/Entities/Porters/PorterDef.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Hiring/HireController.cs" />
     <Compile Include="Assets/Scripts/Utility/Animation/AnimParem.cs" />
     <Compile Include="Assets/Scripts/Skills/Passive/GoldGenerationEffect.cs" />
     <Compile Include="Assets/Scripts/UI/IPanelController.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_ImprovedStyleData.cs" />
     <Compile Include="Assets/Scripts/Utility/GameVariableReader.cs" />
     <Compile Include="Assets/Scripts/Loot/Loot.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/StarRewardDef.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/Query.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_MatchingList.cs" />
     <Compile Include="Assets/Scripts/Entities/Base/EntityStateMachine.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Entities/EntityDef.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/BasePanelController.cs" />
@@ -127,7 +120,6 @@
     <Compile Include="Assets/Scripts/Loot/TransportPoint.cs" />
     <Compile Include="Assets/Scripts/Skills/Passive/PassiveStatBoostEffect.cs" />
     <Compile Include="Assets/Scripts/CharacterGeneration/CharacterSpriteGenerator.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SpumAnimationClip.cs" />
     <Compile Include="Assets/Scripts/Entities/Adventuers/AdventurerManager.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/StatsMediator.cs" />
     <Compile Include="Assets/Scripts/Utility/GameVariableReaderUITK.cs" />
@@ -149,14 +141,12 @@
     <Compile Include="Assets/Scripts/Traits/TraitDatabase.cs" />
     <Compile Include="Assets/Scripts/Systems/Spawners/CustomerSpawnHandle.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/GuildUpgradeDef.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/PreviewMatchingElement.cs" />
     <Compile Include="Assets/Scripts/Identity/NamePoolDef.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Guild Panel/GuildUpgradePanel.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/StarMilestoneDef.cs" />
     <Compile Include="Assets/Scripts/Loot/LootVisual.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Skills/Passive/GoldGenerationSkillDef.cs" />
     <Compile Include="Assets/Scripts/Entities/Base/IDamageable.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SPUM_Prefabs.cs" />
     <Compile Include="Assets/Scripts/Systems/Pooling/ObjectPoolManager.cs" />
     <Compile Include="Assets/Scripts/UI/WorldInputBlocker.cs" />
     <Compile Include="Assets/Scripts/Shop/SalesManager.cs" />
@@ -176,7 +166,6 @@
     <Compile Include="Assets/Scripts/Entities/IClickableLoot.cs" />
     <Compile Include="Assets/Scripts/UI/UIManager.cs" />
     <Compile Include="Assets/Scripts/Identity/IdentityComponent.cs" />
-    <Compile Include="Assets/SPUM/Core/Script/Data/SpumTextureData.cs" />
     <Compile Include="Assets/Scripts/Traits/CursedComboDef.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/StatType.cs" />
     <Compile Include="Assets/Scripts/Config/HostilityConfig.cs" />
@@ -184,12 +173,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/Scripts/UI/Panels/style-old.uss" />
-    <None Include="Assets/Sprites/Pixel Art Icon Pack - RPG/Shader/SH UI Icon Outline Color.shader" />
+    <None Include="Assets/Sprites/Loot/Pixel Art Icon Pack - RPG/Shader/SH UI Icon Outline Color.shader" />
     <None Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanel.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/Candidate.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets/SPUM/ReadMe - 3.1.0.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets/Scripts/UI/MainUI.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uxml" />
@@ -197,7 +185,7 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" />
     <None Include="Assets/Scripts/UI/MainUI.uss" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/HirePanel.uss" />
-    <None Include="Assets/Sprites/Pixel Art Icon Pack - RPG/Shader/SH Sprite Icon Outline Color.shader" />
+    <None Include="Assets/Sprites/Loot/Pixel Art Icon Pack - RPG/Shader/SH Sprite Icon Outline Color.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader" />
     <None Include="Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss" />
@@ -719,6 +707,10 @@
       <HintPath>/Applications/Unity/Hub/Editor/6000.2.6f2/Unity.app/Contents/Managed/UnityEngine/UnityEditor.XRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ExcelDataReader.DataSet">
+      <HintPath>Assets/Plugins/ExcelDataReader.DataSet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>Library/PackageCache/com.unity.collections@d49facba0036/Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
@@ -741,6 +733,10 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Library/PackageCache/com.unity.collections@d49facba0036/Unity.Collections.Tests/System.Runtime.CompilerServices.Unsafe/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExcelDataReader">
+      <HintPath>Assets/Plugins/ExcelDataReader.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">

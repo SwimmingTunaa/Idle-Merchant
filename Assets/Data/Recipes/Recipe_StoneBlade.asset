@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
+  m_Name: Recipe_StoneBlade
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
+  ingredients:
+  - item: {fileID: 11400000, guid: 76113c00b9b6744d8999cf3eff4d5113, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: e9e83dcb06ebf4228af77e4dbbf96c14, type: 2}
+    qty: 2
+  - item: {fileID: 11400000, guid: 45edbcd9f0af6440892e3c0a394ac652, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 13020a3c8650b41f4a8223fe092620fc, type: 2}
+  outputQty: 1
+  craftSeconds: 12

@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d9f0caf5c794b9b8c031ca2a08ff77, type: 3}
   m_Name: Recipe_EnchantedRing
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDef
-  ingredients: []
-  output: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 201e54d71b360487589e125b3e60ba9d, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 329a89ca5855d4f4e9f06ac293fdbac9, type: 2}
+    qty: 1
+  - item: {fileID: 11400000, guid: 62677ba2dadd944cbb080f84503b6924, type: 2}
+    qty: 1
+  output: {fileID: 11400000, guid: 4643abc3c2bf441e7b00da211619192a, type: 2}
   outputQty: 1
-  craftSeconds: 5
+  craftSeconds: 26

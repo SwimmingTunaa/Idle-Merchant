@@ -40,9 +40,9 @@ public class Inventory : PersistentSingleton<Inventory>
     
     public Dictionary<ItemDef,int> GetInventoryType(ItemCategory itemCategory) => itemCategory switch 
     {
-        ItemCategory.Common  => commonInventory,
-        ItemCategory.Crafted => craftedInventory,
-        ItemCategory.Luxury  => luxuryInventory,
+        ItemCategory.Basic  => commonInventory,
+        ItemCategory.Advanced => craftedInventory,
+        ItemCategory.Premium  => luxuryInventory,
         _ => commonInventory
     };
 
@@ -228,9 +228,9 @@ public class Inventory : PersistentSingleton<Inventory>
     public List<InventoryRow> SnapshotAll() 
     {
         var rows = new List<InventoryRow>(64);
-        AppendSnapshot(commonInventory,  ItemCategory.Common,  rows);
-        AppendSnapshot(craftedInventory, ItemCategory.Crafted, rows);
-        AppendSnapshot(luxuryInventory,  ItemCategory.Luxury,  rows);
+        AppendSnapshot(commonInventory,  ItemCategory.Basic,  rows);
+        AppendSnapshot(craftedInventory, ItemCategory.Advanced, rows);
+        AppendSnapshot(luxuryInventory,  ItemCategory.Premium,  rows);
         rows.Sort((a,b) => 
         {
             int c = a.category.CompareTo(b.category);
