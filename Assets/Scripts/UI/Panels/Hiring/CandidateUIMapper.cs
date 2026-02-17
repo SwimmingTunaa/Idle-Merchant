@@ -8,6 +8,26 @@ using UnityEngine.UIElements;
 /// </summary>
 public static class CandidateUIMapper
 {
+
+    private static readonly string[] NewspaperNames =
+    {
+        "The Daily Dungeon",
+        "The Goblin Gazette",
+        "The Adventurer's Herald",
+        "The Ironforge Times",
+        "The Cryptkeeper's Chronicle",
+        "The Merchant's Ledger",
+        "The Tavern Tribune",
+        "The Dragon's Dispatch",
+        "The Loot Courier",
+        "The Guild Bulletin",
+        "The Dungeon Digest",
+        "The Pickaxe Press",
+        "The Torchlight Times",
+        "The Wanderer's Weekly",
+        "The Kobold Courier"
+    };
+
     /// <summary>
     /// Populate candidate card UXML with data from HiringCandidate.
     /// </summary>
@@ -79,6 +99,11 @@ public static class CandidateUIMapper
         
         // Stat Modifiers
         PopulateStatModifiers(candidateRoot, candidate);
+
+        // Newspaper name
+        var newspaperLabel = candidateRoot.Q<Label>("newspaper-name");
+        if (newspaperLabel != null)
+            newspaperLabel.text = NewspaperNames[UnityEngine.Random.Range(0, NewspaperNames.Length)];
     }
     
     /// <summary>
