@@ -172,7 +172,6 @@
     <Compile Include="Assets/Scripts/UI/UITargetMarker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets/Scripts/UI/Panels/style-old.uss" />
     <None Include="Assets/Sprites/Loot/Pixel Art Icon Pack - RPG/Shader/SH UI Icon Outline Color.shader" />
     <None Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanel.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/Candidate.uxml" />
@@ -193,6 +192,7 @@
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/UpgradeCard.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Inventory/ItemSlot.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/SDFFunctions.hlsl" />
+    <None Include="Assets/Scripts/UI/GlobalVariables.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface.shader" />
     <None Include="Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader" />
@@ -204,9 +204,9 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc" />
     <None Include="Assets/Scripts/UI/Panels/Pause Menu/pause_styles.uss" />
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/GuildUpgradePanel.uxml" />
-    <None Include="Assets/Scripts/UI/Panels/Main-old.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" />
     <None Include="Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt" />
+    <None Include="Assets/Scripts/UI/Panels/Hiring/Candidate 1.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Crafting Menu/RecipeCard.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets/BigManJD/readme.txt" />
@@ -217,6 +217,7 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" />
     <None Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanelStyle.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Hiring/CandidateUSS.uss" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
