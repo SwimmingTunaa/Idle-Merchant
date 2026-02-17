@@ -2,6 +2,7 @@
     <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel" />
     <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <ui:VisualElement name="main-root" class="main-ui-root">
         <ui:VisualElement name="top-bar" class="top-bar">
             <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/book%20bottom.png?fileID=2800000&amp;guid=fcbcf17aa828c416d9a29f93248e9b33&amp;type=3#book bottom&quot;); background-size: cover; background-position-x: left 0; background-position-y: top -90px; height: 89px; padding-top: 31px;">
@@ -50,7 +51,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="body" class="game-view-area">
-            <ui:Instance template="HirePanel" style="display: flex;" />
+            <ui:Instance template="HirePanel" style="display: none; visibility: hidden;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

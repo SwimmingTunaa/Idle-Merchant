@@ -68,7 +68,12 @@ public static class CandidateUIMapper
                 Debug.LogWarning($"[CandidateUIMapper] Failed to generate shop sprite for {candidate.DisplayName}");
             }
         }
-        
+
+        // Rank badge (layer-based)
+        var rankLabel = candidateRoot.Q<Label>("rank-level");
+        if (rankLabel != null)
+            rankLabel.text = candidate.entityDef.assignedLayer.ToString();
+                
         // Traits
         PopulateTraits(candidateRoot, candidate);
         

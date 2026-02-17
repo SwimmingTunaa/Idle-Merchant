@@ -239,9 +239,6 @@ public class HireController : BasePanelController
     {
         base.BuildUI();
         
-        // Query the open button (if it exists in root)
-        openButton = uiDocument.rootVisualElement.Q<Button>("ShopButton");
-
         // Query elements
         stackContainer = panel.Q<VisualElement>("newspaper-container");
         emptyState = panel.Q<VisualElement>("text-container");
@@ -250,6 +247,18 @@ public class HireController : BasePanelController
         countLabel = panel.Q<Label>("count");
         emptyTimerLabel = panel.Q<Label>("empty-timer");
         tabView = panel.Q<TabView>("unit-type-tabs");
+
+        // Query the open button (if it exists in root)
+        openButton = uiDocument.rootVisualElement.Q<Button>("ShopButton");
+
+        if (candidateSlotAsset == null)
+        {
+            var templateInstance = stackContainer.Q<TemplateContainer>("TemplateCandidate");
+            if (templateInstance != null)
+            {
+                candidateSlotAsset = templateInstance.templateSource;
+            }
+        }
 
         // Hook up callbacks
         if (openButton != null)
@@ -350,11 +359,15 @@ public class HireController : BasePanelController
             var card = CurrentCards[i];
             float scale = 1f - (i * stackScaleFactor);
             card.style.scale = new Scale(new Vector3(scale, scale, 1f));
+            
+            //darken card color based on index
+            float colorFactor = Mathf.Clamp( 1f - (i * 0.1f), 0.3f, 1f);
+            card.Q<VisualElement>("newspaper").style.unityBackgroundImageTintColor = new Color(colorFactor, colorFactor, colorFactor);
 
             card.pickingMode = i == 0 ? PickingMode.Position : PickingMode.Ignore;
             card.style.rotate = new Rotate(new Angle(rotationByCard[card], AngleUnit.Degree));
 
-            ApplyShadowClass(card, i);
+            // ApplyShadowClass(card, i);
 
             if (i == 0)
                 card.BringToFront();
@@ -407,6 +420,8 @@ public class HireController : BasePanelController
         CurrentRoster.Add(firstC);
         CurrentCards.Add(firstCard);
 
+        firstCard.SendToBack();    
+        
         UpdateStackVisuals();
         UpdateCount();
     }
