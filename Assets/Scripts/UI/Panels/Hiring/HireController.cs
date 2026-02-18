@@ -564,6 +564,8 @@ public class HireController : BasePanelController
         isHireAnimating = false;
         UpdateStackVisuals();
         UpdateCount();
+        if (CurrentRoster.Count == 0)
+            emptyState.style.display = DisplayStyle.Flex;
     }
 
     // ═════════════════════════════════════════════
