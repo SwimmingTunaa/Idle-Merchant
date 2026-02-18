@@ -22,7 +22,7 @@ public class CandidatePool
     private float refreshInterval = 300f;
     private float traitChance = 0.7f;
 
-    private const int BASE_POOL_SIZE = 4;
+    private const int BASE_POOL_SIZE = 5;
 
     public CandidatePool(
         HireRole role,

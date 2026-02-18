@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel" />
-    <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI" />
-    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
-    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
     <ui:VisualElement name="main-root" class="main-ui-root">
         <ui:VisualElement name="top-bar" class="top-bar">
             <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/book%20bottom.png?fileID=2800000&amp;guid=fcbcf17aa828c416d9a29f93248e9b33&amp;type=3#book bottom&quot;); background-size: cover; background-position-x: left 0; background-position-y: top -90px; height: 89px; padding-top: 31px;">
@@ -35,18 +35,20 @@
                 </ui:VisualElement>
                 <ui:Label name="milestone-progress-label" text="Progress: 2/6" class="milestone-progress-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="stats-section" class="stats-section">
-                <ui:VisualElement name="coin-container" style="flex-grow: 0; flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="coin-icon" class="coin-icon pulse-target" />
-                    <ui:Label name="coin-label" text="5,240g" class="gold-amount-label" />
-                </ui:VisualElement>
-                <ui:Label name="income-rate-label" text="+15/s" class="income-rate-label" />
-                <ui:Label name="layer-status-label" text="L1-3" class="layer-status-label" />
-                <ui:VisualElement name="utility-buttons" class="utility-buttons">
+            <ui:VisualElement name="stats-section" class="stats-section" style="background-position-y: center;">
+                <ui:VisualElement name="utility-buttons" class="utility-buttons" style="margin-right: 32px;">
                     <ui:Button name="settings-button" text="⚙" class="utility-button settings-button" />
                     <ui:Button name="pause-button" text="⏸" class="utility-button pause-button" />
                     <ui:Button name="speed-1x-button" text="1x" class="utility-button speed-button speed-selected" />
                     <ui:Button name="speed-2x-button" text="2x" class="utility-button speed-button" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1;">
+                    <ui:VisualElement name="coin-container" style="flex-grow: 0; flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="coin-icon" class="coin-icon pulse-target" style="background-image: url(&quot;project://database/Assets/Sprites/Icons/Coin.png?fileID=-992178750&amp;guid=0b3c0a61816effa42a7f2e43fdd2d5bf&amp;type=3#Coin_1&quot;);" />
+                        <ui:Label name="coin-label" text="5,240g" class="gold-amount-label text-h2" style="background-color: rgb(195, 137, 93); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 8px; padding-right: 16px; padding-bottom: 8px; padding-left: 16px; -unity-text-align: upper-right; border-left-color: rgb(51, 50, 61); border-right-color: rgb(51, 50, 61); border-top-color: rgb(51, 50, 61); border-bottom-color: rgb(51, 50, 61); border-top-width: 4px; border-right-width: 4px; border-bottom-width: 4px; border-left-width: 4px; flex-grow: 1; color: rgb(250, 175, 84); -unity-text-outline-width: 0; letter-spacing: 2px; text-shadow: 2px 3px 0 rgb(118, 75, 1);" />
+                    </ui:VisualElement>
+                    <ui:Label name="income-rate-label" text="+15/s" class="income-rate-label" style="color: rgb(50, 30, 10); -unity-text-align: upper-right; visibility: hidden; display: none;" />
+                    <ui:Label name="layer-status-label" text="L1-3" class="layer-status-label" style="color: rgb(50, 30, 10); -unity-text-align: upper-right; display: none;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

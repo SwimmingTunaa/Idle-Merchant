@@ -153,9 +153,17 @@
 }
 
 .stats-section {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-end;
     justify-content: center;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Paper/1.png?fileID=21300000&guid=67b077c3e16c24cbba49d219cfacf6bf&type=3#1");
+    -unity-background-scale-mode: scale-and-crop;
+    padding-top: 32px;
+    padding-right: 32px;
+    padding-bottom: 32px;
+    padding-left: 32px;
+    -unity-slice-scale: 5.5px;
+    -unity-slice-type: sliced;
 }
 
 .gold-amount-label {
@@ -163,6 +171,9 @@
     color: rgb(255, 215, 0);
     -unity-font-style: bold;
     margin-bottom: 3px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+    min-width: 10%;
+    background-color: rgb(195, 137, 93);
 }
 
 .income-rate-label {
@@ -233,7 +244,7 @@
 }
 
 .coin-icon {
-    background-image: url("project://database/Assets/Sprites/Loot/Coin.png?fileID=2800000&guid=0b3c0a61816effa42a7f2e43fdd2d5bf&type=3#Coin");
+    background-image: url("project://database/Assets/Sprites/Icons/Coin.png?fileID=2800000&guid=0b3c0a61816effa42a7f2e43fdd2d5bf&type=3#Coin");
     background-color: rgba(140, 140, 140, 0);
     width: 48px;
     height: 48px;

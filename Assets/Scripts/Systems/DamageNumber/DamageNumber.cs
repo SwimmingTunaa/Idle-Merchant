@@ -23,12 +23,9 @@ public class DamageNumber : MonoBehaviour
     [SerializeField] private Color critColor = Color.yellow;
     [SerializeField] private Color lootColor = Color.green;
     [SerializeField] private float lootFontSize = 5f;
-    [SerializeField] private Color goldColor = new Color(1f, 0.84f, 0f); // Gold
-    // [SerializeField] private float goldFontSize = 5.5f;
     
     [Header("Gold Sprite")]
     [SerializeField] private SpriteRenderer goldSpriteRenderer;
-    [SerializeField] private Sprite goldSprite;
     [SerializeField] private Vector3 goldSpriteOffset = new Vector3(-0.3f, 0f, 0f);
     [SerializeField] private float goldSpriteScale = 0.8f;
     
@@ -144,12 +141,9 @@ public class DamageNumber : MonoBehaviour
         // }
         
         // Show gold sprite if available
-        if (goldSpriteRenderer != null && goldSprite != null)
+        if (goldSpriteRenderer != null)
         {
-            goldSpriteRenderer.enabled = true;
-            goldSpriteRenderer.sprite = goldSprite;
-            goldSpriteRenderer.color = baseColor;
-            
+            goldSpriteRenderer.enabled = true;            
             // Position sprite relative to text
             goldSpriteRenderer.transform.localPosition = goldSpriteOffset;
             goldSpriteRenderer.transform.localScale = Vector3.one * goldSpriteScale;

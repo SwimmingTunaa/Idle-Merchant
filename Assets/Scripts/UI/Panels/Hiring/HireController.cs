@@ -4,10 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Hire panel controller - manages candidate hiring UI with stack-based navigation and animations.
-/// Inherits from BasePanelController, overrides Open() for roster rebuild and animations for card stack.
-/// </summary>
+// Hire panel controller - manages candidate hiring UI with stack-based navigation and animations.
+// Inherits from BasePanelController, overrides Open() for roster rebuild and animations for card stack.
 public class HireController : BasePanelController
 {
     [Header("UXML References")]
@@ -21,14 +19,17 @@ public class HireController : BasePanelController
     [SerializeField] private float refreshIntervalSeconds = 300f;
     [SerializeField][Range(0f, 1f)] private float traitChance = 0.7f;
 
+    [Header("Roster Settings")]
+    [SerializeField] private int maxRosterSize = 5;
+    [Tooltip("Weight per layer (index 0 = Layer 1). Higher = more likely to appear. Normalized at runtime.")]
+    [SerializeField] private float[] layerWeights = { 40f, 25f, 20f, 10f, 5f };
+
     [Header("Stack Visual Settings")]
     [SerializeField] private float stackRotationMax = 3f;
     [SerializeField] private float stackScaleFactor = 0.025f;
 
     [Header("Animation")]
     [SerializeField] private float hireAnimationDuration = 0.5f;
-
-    //public override VisualElement RootElement => panel;
 
     // UI Elements
     private VisualElement stackContainer;
@@ -97,6 +98,12 @@ public class HireController : BasePanelController
     void OnEnable()
     {
         BuildUI();
+        ProgressionManager.OnLayerUnlocked += OnLayerUnlocked;
+    }
+
+    void OnDisable()
+    {
+        ProgressionManager.OnLayerUnlocked -= OnLayerUnlocked;
     }
 
     void Awake()
@@ -251,13 +258,12 @@ public class HireController : BasePanelController
         // Query the open button (if it exists in root)
         openButton = uiDocument.rootVisualElement.Q<Button>("ShopButton");
 
+        // Fallback: use template instance from UXML if no asset assigned
         if (candidateSlotAsset == null)
         {
             var templateInstance = stackContainer.Q<TemplateContainer>("TemplateCandidate");
             if (templateInstance != null)
-            {
                 candidateSlotAsset = templateInstance.templateSource;
-            }
         }
 
         // Hook up callbacks
@@ -285,8 +291,16 @@ public class HireController : BasePanelController
     private void CreatePools<T>(List<T> managers, HireRole role, List<CandidatePool> outList)
         where T : IUnitManager
     {
+        int maxLayer = ProgressionManager.Instance != null
+            ? ProgressionManager.Instance.maxUnlockedLayer
+            : 1;
+
         foreach (var m in managers)
         {
+            // Skip layers that aren't unlocked yet
+            if (m.LayerIndex > maxLayer)
+                continue;
+
             foreach (var limit in m.UnitLimits)
             {
                 var key = (role, m.LayerIndex, limit.unitDef);
@@ -299,6 +313,42 @@ public class HireController : BasePanelController
         }
     }
 
+    // Called when a new layer is unlocked mid-session
+    private void OnLayerUnlocked(int layer)
+    {
+        // Create pools for the newly unlocked layer
+        foreach (var m in adventurerManagers)
+        {
+            if (m.LayerIndex != layer) continue;
+            foreach (var limit in ((IUnitManager)m).UnitLimits)
+            {
+                var key = (HireRole.Adventurer, m.LayerIndex, limit.unitDef);
+                if (candidatePools.ContainsKey(key)) continue;
+
+                var pool = new CandidatePool(HireRole.Adventurer, m.LayerIndex, limit.unitDef, refreshIntervalSeconds, traitChance);
+                candidatePools[key] = pool;
+                adventurerPools.Add(pool);
+            }
+        }
+
+        foreach (var m in porterManagers)
+        {
+            if (m.LayerIndex != layer) continue;
+            foreach (var limit in ((IUnitManager)m).UnitLimits)
+            {
+                var key = (HireRole.Porter, m.LayerIndex, limit.unitDef);
+                if (candidatePools.ContainsKey(key)) continue;
+
+                var pool = new CandidatePool(HireRole.Porter, m.LayerIndex, limit.unitDef, refreshIntervalSeconds, traitChance);
+                candidatePools[key] = pool;
+                porterPools.Add(pool);
+            }
+        }
+
+        if (showDebugLogs)
+            Debug.Log($"[HirePanel] Layer {layer} unlocked — new candidate pools created");
+    }
+
     // ═════════════════════════════════════════════
     // ROSTER & STACK
     // ═════════════════════════════════════════════
@@ -307,16 +357,17 @@ public class HireController : BasePanelController
     {
         candidateToPool.Clear();
 
-        adventurerRoster = HireRoster.BuildRoster(adventurerPools);
-        porterRoster = HireRoster.BuildRoster(porterPools);
+        adventurerRoster = HireRoster.BuildRoster(adventurerPools, layerWeights, maxRosterSize);
+        porterRoster = HireRoster.BuildRoster(porterPools, layerWeights, maxRosterSize);
 
+        // Map candidates back to their pools for hire tracking
         foreach (var pool in adventurerPools)
             foreach (var c in pool.GetCandidates())
-                candidateToPool[c] = pool;
+                candidateToPool.TryAdd(c, pool);
 
         foreach (var pool in porterPools)
             foreach (var c in pool.GetCandidates())
-                candidateToPool[c] = pool;
+                candidateToPool.TryAdd(c, pool);
     }
 
     private void BuildStack()
@@ -360,17 +411,14 @@ public class HireController : BasePanelController
             float scale = 1f - (i * stackScaleFactor);
             card.style.scale = new Scale(new Vector3(scale, scale, 1f));
             
-            //darken card color based on index
-            float colorFactor = Mathf.Clamp( 1f - (i * 0.1f), 0.3f, 1f);
+            // Darken card color based on index
+            float colorFactor = Mathf.Clamp(1f - (i * 0.1f), 0.3f, 1f);
             card.Q<VisualElement>("newspaper").style.unityBackgroundImageTintColor = new Color(colorFactor, colorFactor, colorFactor);
 
             card.pickingMode = i == 0 ? PickingMode.Position : PickingMode.Ignore;
             card.style.rotate = new Rotate(new Angle(rotationByCard[card], AngleUnit.Degree));
 
-            // ApplyShadowClass(card, i);
-
-            if (i == 0)
-                card.BringToFront();
+            ApplyShadowClass(card, i);
         }
 
         UpdateHireButtonState();
@@ -420,8 +468,8 @@ public class HireController : BasePanelController
         CurrentRoster.Add(firstC);
         CurrentCards.Add(firstCard);
 
-        firstCard.SendToBack();    
-        
+        firstCard.SendToBack();
+
         UpdateStackVisuals();
         UpdateCount();
     }
@@ -436,6 +484,8 @@ public class HireController : BasePanelController
 
         CurrentRoster.Insert(0, lastC);
         CurrentCards.Insert(0, lastCard);
+
+        lastCard.BringToFront();
 
         UpdateStackVisuals();
         UpdateCount();
