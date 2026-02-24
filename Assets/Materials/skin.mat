@@ -70,10 +70,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BlendAmount: 0
     - _EnableExternalAlpha: 0
     - _Value: 1
     - _ZWrite: 0
     m_Colors:
+    - _BlendColour: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 0.7372549, b: 0.56078434, a: 1}
     - _New_Colour: {r: 1, g: 0.7545538, b: 0.5613208, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}

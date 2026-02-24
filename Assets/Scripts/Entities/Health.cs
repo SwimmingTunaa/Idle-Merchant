@@ -1,11 +1,9 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// Reusable health component for entities.
-/// Handles damage, healing, death, invulnerability, and visual feedback.
-/// Designed to work with Stats system for max HP modifiers.
-/// </summary>
+// Reusable health component for entities.
+// Handles damage, healing, death, invulnerability, and visual feedback.
+// Supports multiple SpriteRenderers for modular characters.
 public class Health : MonoBehaviour, IDamageable
 {
     // ===== EVENTS =====
@@ -33,17 +31,17 @@ public class Health : MonoBehaviour, IDamageable
     
     private float currentHP;
     private bool isDead;
-    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer[] spriteRenderers;
     private CountdownTimer flashTimer;
     
-    // Cached for flash reset
-    private static readonly int BlendAmountID = Shader.PropertyToID("_Blend_Amount");
-    private static readonly int BlendColorID = Shader.PropertyToID("_Blend_Colour");
+    // Cached shader property IDs
+    private static readonly int BlendAmountID = Shader.PropertyToID("_BlendAmount");
+    private static readonly int BlendColorID = Shader.PropertyToID("_BlendColour");
 
     // ===== PROPERTIES =====
     
     public float CurrentHP => currentHP;
-    public float MaxHP => baseMaxHP; // Could be modified by Stats system
+    public float MaxHP => baseMaxHP;
     public float HealthPercent => MaxHP > 0 ? currentHP / MaxHP : 0f;
     public bool IsAlive => !isDead;
     public bool IsDead => isDead;
@@ -53,18 +51,27 @@ public class Health : MonoBehaviour, IDamageable
     
     void Awake()
     {
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        
-        if (enableDamageFlash && spriteRenderer != null && spriteRenderer.material != null)
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+
+        // Initialize timer in a finished state so Update ignores it until a hit occurs
+        flashTimer = new CountdownTimer(0f);
+
+        if (enableDamageFlash)
         {
-            spriteRenderer.material.SetColor(BlendColorID, damageFlashColor);
+            for (int i = 0; i < spriteRenderers.Length; i++)
+            {
+                if (spriteRenderers[i] != null && spriteRenderers[i].material != null)
+                {
+                    spriteRenderers[i].material.SetColor(BlendColorID, damageFlashColor);
+                }
+            }
         }
+
+        ResetFlash();
     }
 
-    /// <summary>
-    /// Initialize health with a specific max HP value.
-    /// Call this from your entity's Init() method.
-    /// </summary>
+    // Initialize health with a specific max HP value.
+    // Call this from your entity's Init() method.
     public void Init(float maxHP, bool fullHP = true)
     {
         baseMaxHP = maxHP;
@@ -76,23 +83,18 @@ public class Health : MonoBehaviour, IDamageable
     void Start()
     {
         if (startAtMaxHP)
-        {
             currentHP = MaxHP;
-        }
     }
 
     void Update()
     {
-        // Update damage flash
-        if (flashTimer != null && !flashTimer.IsFinished)
+        if (!flashTimer.IsFinished)
         {
             flashTimer.Tick(Time.deltaTime);
             UpdateFlash();
-            
+
             if (flashTimer.IsFinished)
-            {
                 ResetFlash();
-            }
         }
     }
 
@@ -104,26 +106,18 @@ public class Health : MonoBehaviour, IDamageable
         if (isDead) return 0f;
         if (isInvulnerable) return 0f;
 
-        // Calculate actual damage (can't go below 0)
         float actualDamage = Mathf.Min(amount, currentHP);
         float overkill = amount - actualDamage;
         
         currentHP -= actualDamage;
         
-        // Trigger visual feedback
         if (enableDamageFlash && actualDamage > 0f)
-        {
             TriggerFlash();
-        }
         
-        // Fire damage event
         OnDamaged?.Invoke(actualDamage, currentHP, MaxHP);
         
-        // Check for death
         if (currentHP <= 0f)
-        {
             HandleDeath(overkill);
-        }
         
         return actualDamage;
     }
@@ -133,34 +127,24 @@ public class Health : MonoBehaviour, IDamageable
         if (amount <= 0f) return 0f;
         if (isDead) return 0f;
 
-        // Calculate actual healing (can't exceed max)
         float actualHealing = Mathf.Min(amount, MaxHP - currentHP);
-        
         currentHP += actualHealing;
         
-        // Fire healing event
         OnHealed?.Invoke(actualHealing, currentHP, MaxHP);
         
         return actualHealing;
     }
 
-    /// <summary>
-    /// Set HP directly (bypasses damage/heal logic and events).
-    /// Useful for initialization or debug.
-    /// </summary>
+    // Set HP directly (bypasses damage/heal logic and events).
     public void SetHP(float hp)
     {
         currentHP = Mathf.Clamp(hp, 0f, MaxHP);
         
         if (currentHP <= 0f && !isDead)
-        {
             HandleDeath(0f);
-        }
     }
 
-    /// <summary>
-    /// Instantly kill this entity.
-    /// </summary>
+    // Instantly kill this entity.
     public void Kill()
     {
         if (isDead) return;
@@ -170,9 +154,7 @@ public class Health : MonoBehaviour, IDamageable
         HandleDeath(overkill);
     }
 
-    /// <summary>
-    /// Revive this entity with specified HP.
-    /// </summary>
+    // Revive this entity with specified HP.
     public void Revive(float hp)
     {
         isDead = false;
@@ -183,7 +165,6 @@ public class Health : MonoBehaviour, IDamageable
     
     private void HandleDeath(float overkill)
     {
-        // Check for death prevention
         if (OnDeathPrevention != null)
         {
             var result = OnDeathPrevention.Invoke(overkill);
@@ -191,15 +172,13 @@ public class Health : MonoBehaviour, IDamageable
             if (result.shouldPrevent)
             {
                 currentHP = Mathf.Clamp(result.newHP, 1f, MaxHP);
-                return; // Death prevented
+                return;
             }
         }
         
-        // Mark as dead
         isDead = true;
         currentHP = 0f;
         
-        // Fire death event
         OnDeath?.Invoke(overkill);
     }
 
@@ -207,38 +186,42 @@ public class Health : MonoBehaviour, IDamageable
     
     private void TriggerFlash()
     {
-        if (spriteRenderer == null || spriteRenderer.material == null) return;
-        
-        flashTimer = new CountdownTimer(damageFlashDuration);
+        flashTimer.Reset(damageFlashDuration);
         flashTimer.Start();
-        
-        spriteRenderer.material.SetFloat(BlendAmountID, 1f);
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] != null && spriteRenderers[i].material != null)
+                spriteRenderers[i].material.SetFloat(BlendAmountID, 1f);
+        }
     }
 
     private void UpdateFlash()
     {
-        if (spriteRenderer == null || spriteRenderer.material == null) return;
-        
-        // Lerp from 1 (full flash) to 0 (no flash)
         float flashAmount = Mathf.Lerp(1f, 0f, flashTimer.Progress);
-        spriteRenderer.material.SetFloat(BlendAmountID, flashAmount);
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] != null && spriteRenderers[i].material != null)
+                spriteRenderers[i].material.SetFloat(BlendAmountID, flashAmount);
+        }
     }
 
     private void ResetFlash()
     {
-        if (spriteRenderer == null || spriteRenderer.material == null) return;
-        spriteRenderer.material.SetFloat(BlendAmountID, 0f);
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] != null && spriteRenderers[i].material != null)
+                spriteRenderers[i].material.SetFloat(BlendAmountID, 0f);
+        }
     }
 
     // ===== DEBUG =====
     
     void OnValidate()
     {
-        // Ensure base max HP is positive
         if (baseMaxHP < 1f)
-        {
             baseMaxHP = 1f;
-        }
     }
 
 #if UNITY_EDITOR
@@ -246,12 +229,10 @@ public class Health : MonoBehaviour, IDamageable
     {
         if (!Application.isPlaying) return;
         
-        // Draw health bar above entity
         Vector3 pos = transform.position + Vector3.up * 1.5f;
         float barWidth = 1f;
         float barHeight = 0.1f;
         
-        // Background (black)
         UnityEditor.Handles.color = Color.black;
         UnityEditor.Handles.DrawSolidRectangleWithOutline(
             new Rect(pos.x - barWidth / 2f, pos.y, barWidth, barHeight),
@@ -259,7 +240,6 @@ public class Health : MonoBehaviour, IDamageable
             Color.white
         );
         
-        // Health fill (green->yellow->red gradient)
         float healthPct = HealthPercent;
         Color healthColor = Color.Lerp(Color.red, Color.green, healthPct);
         UnityEditor.Handles.color = healthColor;
@@ -269,7 +249,6 @@ public class Health : MonoBehaviour, IDamageable
             Color.clear
         );
         
-        // Label
         UnityEditor.Handles.Label(
             pos + Vector3.up * 0.2f,
             $"{currentHP:F0} / {MaxHP:F0} ({healthPct * 100f:F0}%)"

@@ -22,9 +22,8 @@ MonoBehaviour:
   displayName: Novice Adventurer
   description: 
   hireCost: 0
-  assignedLayer: 1
-  startingSkills:
-  - {fileID: 0}
+  rank: 1
+  startingSkills: []
   sortingType: 2
   spawnWeight: 1
   moveSpeed: 2
@@ -57,7 +56,10 @@ MonoBehaviour:
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 11400000, guid: 3f1982374d0784930aea64f7e170ad9c, type: 2}
   adventurerType: Novice
-  baseHealth: 100
+  baseHealth: 10
+  reviveDelay: 5
+  hitStaggerDuration: 0.4
+  hitStaggerCooldown: 3
   startingState: 1
   combatConfig:
     canAttack: 1

@@ -14,6 +14,7 @@ public struct HiringCandidate
     public CursedComboDef cursedCombo; // null if not cursed
     public int hireCost;
     public CharacterAppearanceIndices appearanceIndices;
+    public string newspaperName;
     
     // Cached generated sprite (lazy-loaded)
     private Sprite _cachedShopSprite;

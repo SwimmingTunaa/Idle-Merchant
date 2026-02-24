@@ -6,6 +6,25 @@ using UnityEngine.U2D.Animation;
 public static class HiringCandidateGenerator
 {
     private static NamePoolDef namePool; // Cached reference
+
+    private static readonly string[] NewspaperNames =
+    {
+        "The Daily Dungeon",
+        "The Goblin Gazette",
+        "The Adventurer's Herald",
+        "The Ironforge Times",
+        "The Cryptkeeper's Chronicle",
+        "The Merchant's Ledger",
+        "The Tavern Tribune",
+        "The Dragon's Dispatch",
+        "The Loot Courier",
+        "The Guild Bulletin",
+        "The Dungeon Digest",
+        "The Pickaxe Press",
+        "The Torchlight Times",
+        "The Wanderer's Weekly",
+        "The Kobold Courier"
+    };
     
     /// <summary>
     /// Initialize name pool (call once at game start or lazy-load).
@@ -87,6 +106,7 @@ public static class HiringCandidateGenerator
                 traits = traits,
                 cursedCombo = cursedCombo,
                 hireCost = CalculateHireCost(baseCost, cursedCombo),
+                newspaperName = NewspaperNames[Random.Range(0, NewspaperNames.Length)],
                 appearanceIndices = entityDef.useModularCharacter ? new CharacterAppearanceIndices
                 {
                     // Visual customization indices

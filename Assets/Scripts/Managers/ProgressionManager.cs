@@ -51,12 +51,15 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private int totalItemsCrafted = 0;
     private int totalCraftedItemsSold = 0;
     private int totalCustomersServed = 0;
+
+    // Dirty flag — set when any counter changes, checked once per frame
+    private bool milestoneCheckPending = false;
     
 
     // Events for decoupling
     public static event Action<int> OnStarEarned;
     public static event Action<GuildUpgradeDef> OnUpgradePurchased;
-    public static event Action<int> OnLayerUnlocked;
+    // Layer unlock is routed through GameSignals.OnLayerUnlocked
     
 
     void Start()
@@ -64,6 +67,15 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         RebuildAvailableItemsCache();
         LoadMilestones();
         LoadStarRewards();
+    }
+
+    void Update()
+    {
+        if (milestoneCheckPending)
+        {
+            milestoneCheckPending = false;
+            CheckMilestones();
+        }
     }
 
     void OnEnable()
@@ -468,7 +480,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementGoldEarned(int amount)
     {
         totalGoldEarned += amount;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Gold earned: +{amount} (total: {totalGoldEarned})");
@@ -477,7 +489,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementMobsKilled(int count)
     {
         totalMobsKilled += count;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Mobs killed: +{count} (total: {totalMobsKilled})");
@@ -486,7 +498,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementUnitsHired(int count)
     {
         totalUnitsHired += count;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Units hired: +{count} (total: {totalUnitsHired})");
@@ -495,7 +507,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementLootCollected(int count)
     {
         totalLootCollected += count;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Loot collected: +{count} (total: {totalLootCollected})");
@@ -504,7 +516,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementItemsCrafted(int count)
     {
         totalItemsCrafted += count;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Items crafted: +{count} (total: {totalItemsCrafted})");
@@ -513,7 +525,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementCraftedItemsSold(int count)
     {
         totalCraftedItemsSold += count;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Crafted items sold: +{count} (total: {totalCraftedItemsSold})");
@@ -522,7 +534,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public void IncrementCustomersServed(int count)
     {
         totalCustomersServed += count;
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Customers served: +{count} (total: {totalCustomersServed})");
@@ -581,7 +593,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         OnUpgradePurchased?.Invoke(upgrade);
 
         // Check if this completes any milestones
-        CheckMilestones();
+        milestoneCheckPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Purchased: {upgrade.upgradeName} ({upgrade.goldCost}g)");
@@ -655,7 +667,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
 
         maxUnlockedLayer = layer;
         RebuildAvailableItemsCache();
-        OnLayerUnlocked?.Invoke(layer);
+        GameSignals.RaiseLayerUnlocked(layer);
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Unlocked layer {layer}! Rebuilding available items cache.");

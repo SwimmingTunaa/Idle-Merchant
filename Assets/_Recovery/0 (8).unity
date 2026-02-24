@@ -1065,9 +1065,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 1
   operationArea: {fileID: 1242518143}
-  unitLimits:
-  - unitDef: {fileID: 11400000, guid: 178f8b2081c404e74be48b12e208878a, type: 2}
-    maxCount: 6
+  _maxUnits: 5
+  unitLimits: []
   showDebugLogs: 0
 --- !u!1 &117833260
 GameObject:
@@ -5075,7 +5074,7 @@ MonoBehaviour:
   refreshIntervalSeconds: 300
   traitChance: 0.3
   maxRosterSize: 5
-  layerWeights:
+  rankWeights:
   - 40
   - 25
   - 20
@@ -5665,6 +5664,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 1
   operationArea: {fileID: 1242518143}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -10897,6 +10897,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 5
   operationArea: {fileID: 1121239926}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -11361,6 +11362,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 4
   operationArea: {fileID: 1976879463}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 6382ecb9d6a2a4377ab376ac63acac61, type: 2}
     maxCount: 6
@@ -19035,6 +19037,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 4
   operationArea: {fileID: 1976879463}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -19087,6 +19090,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 5
   operationArea: {fileID: 1121239926}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 29b28522699dd4ce4a4f14736c1a3f28, type: 2}
     maxCount: 6
@@ -22600,6 +22604,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 3
   operationArea: {fileID: 569436698}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -23555,6 +23560,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 2
   operationArea: {fileID: 166850357}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -25525,6 +25531,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 3
   operationArea: {fileID: 569436698}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 19aeb50240abb4c9da06cefd0ac0245f, type: 2}
     maxCount: 6
@@ -27460,6 +27467,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 2
   operationArea: {fileID: 166850357}
+  _maxUnits: 10
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 351863467aa9345a78d73faa3378d8ff, type: 2}
     maxCount: 6

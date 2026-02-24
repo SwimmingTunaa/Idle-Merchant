@@ -17,7 +17,7 @@ public class EntityDef : ScriptableObject
     [TextArea(2, 4)]
     public string description;
     public int hireCost = 50;
-    public int assignedLayer = 1;
+    public int rank = 1;
 
     [Header("Skills")]
     [Tooltip("Skills automatically applied when entity spawns")]

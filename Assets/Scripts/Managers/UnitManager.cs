@@ -1,18 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// OPTIMIZED: Periodic cleanup + uses enhanced Inventory API.
-/// 
-/// Changes from original:
-/// 1. Cleanup runs every 2 seconds instead of every frame (99% reduction)
-/// 2. Uses Inventory.CanAfford() for clearer validation
-/// 3. Uses Inventory.TrySpendGold() for atomic gold deduction (safer)
-/// 
-/// Performance gain: 99% reduction in cleanup overhead
-/// Code quality: More readable and less error-prone
-/// </summary>
-/// <typeparam name="T">Type of unit this manager handles (must inherit from EntityBase)</typeparam>
+// Base manager for all unit types (Adventurers, Porters, etc.).
+// Handles hiring, spawning, tracking, and capacity management per layer.
+// Uses a flat maxUnits cap for total layer capacity, with optional per-type limits via unitLimits.
 public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : EntityBase
 {
     [Header("Layer Configuration")]
@@ -27,21 +18,31 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     
     [Tooltip("Area where units patrol/operate")]
     public BoxCollider2D operationArea;
+
+    [Header("Capacity")]
+    [Tooltip("Maximum total units allowed on this layer (all types combined)")]
+    [SerializeField] private int _maxUnits = 10;
+
+    public int MaxUnits
+    {
+        get => _maxUnits;
+        set => _maxUnits = value;
+    }
     
-    [Header("Unit Type Limits")]
-    [Tooltip("Define max count for each unit type on this layer")]
+    [Header("Unit Type Limits (Optional)")]
+    [Tooltip("Optional per-type caps. Types not listed are only limited by maxUnits.")]
     public List<UnitTypeLimit> unitLimits = new List<UnitTypeLimit>();
     
     List<UnitTypeLimit> IUnitManager.UnitLimits => unitLimits;
     
     [Header("Debug")]
-    [SerializeField] protected bool showDebugLogs = true;
+    [SerializeField] protected bool showDebugLogs = false;
 
     // Track spawned units by their definition
     protected Dictionary<EntityDef, List<T>> spawnedByType = new Dictionary<EntityDef, List<T>>();
     protected Vector3 spawnPoint;
 
-    // OPTIMIZATION: Periodic cleanup instead of every frame
+    // Periodic cleanup instead of every frame
     private float cleanupTimer = 0f;
     private const float CLEANUP_INTERVAL = 2f;
 
@@ -57,7 +58,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
 
     protected virtual void Update()
     {
-        // OPTIMIZED: Cleanup only every 2 seconds instead of every frame
         cleanupTimer += Time.deltaTime;
         if (cleanupTimer >= CLEANUP_INTERVAL)
         {
@@ -71,31 +71,16 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     protected virtual void ValidateSetup()
     {
         if (operationArea == null)
-        {
             Debug.LogError($"[{GetType().Name} Layer {LayerIndex}] operationArea is not assigned!");
-        }
         
-        if (unitLimits.Count == 0)
-        {
-            Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] No unit limits defined!");
-        }
-
-        foreach (var limit in unitLimits)
-        {
-            if (limit.unitDef != null && limit.unitDef.assignedLayer != LayerIndex)
-            {
-                Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] {limit.unitDef.displayName} is assigned to layer {limit.unitDef.assignedLayer}, not {LayerIndex}!");
-            }
-        }
+        if (_maxUnits <= 0)
+            Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] maxUnits is {_maxUnits} — no units can be hired!");
     }
 
     // ===== HIRING SYSTEM =====
 
-    /// <summary>
-    /// Check if a specific unit type can be hired on this layer.
-    /// Returns false if: wrong layer, no gold, or at type limit.
-    /// Implements IUnitManager.CanHire
-    /// </summary>
+    // Check if a unit can be hired on this layer.
+    // Checks: gold, total capacity, optional per-type limit.
     public virtual bool CanHire(EntityDef def)
     {
         if (def == null)
@@ -105,15 +90,6 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
 
-        // Check layer assignment
-        if (def.assignedLayer != LayerIndex)
-        {
-            if (showDebugLogs)
-                Debug.LogWarning($"[{GetType().Name}] {def.displayName} is for layer {def.assignedLayer}, this is layer {LayerIndex}");
-            return false;
-        }
-
-        // IMPROVED: Use CanAfford() helper for cleaner code
         if (!Inventory.Instance.CanAfford(def.hireCost))
         {
             if (showDebugLogs)
@@ -121,25 +97,27 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
 
-        // Check type limit
-        int currentCount = GetUnitCount(def);
-        int maxCount = GetUnitLimit(def);
-
-        if (currentCount >= maxCount)
+        // Check total layer capacity
+        if (GetTotalCount() >= _maxUnits)
         {
             if (showDebugLogs)
-                Debug.LogWarning($"[{GetType().Name}] {def.displayName} at limit ({currentCount}/{maxCount})");
+                Debug.LogWarning($"[{GetType().Name}] Layer {LayerIndex} full ({GetTotalCount()}/{_maxUnits})");
+            return false;
+        }
+
+        // Check optional per-type limit (only if def exists in unitLimits)
+        int typeLimit = GetUnitLimit(def);
+        if (typeLimit >= 0 && GetUnitCount(def) >= typeLimit)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[{GetType().Name}] {def.displayName} at type limit ({GetUnitCount(def)}/{typeLimit})");
             return false;
         }
 
         return true;
     }
 
-    /// <summary>
-    /// Hire and spawn a unit of the specified type.
-    /// Deducts gold and adds to tracked units.
-    /// Implements IUnitManager.HireUnit
-    /// </summary>
+    // Hire and spawn a unit. Deducts gold and tracks the unit.
     public virtual bool HireUnit(EntityDef def)
     {
         if (!CanHire(def))
@@ -151,108 +129,97 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             return false;
         }
 
-        // Spawn the unit
         T unit = SpawnUnit(def);
 
         if (unit == null)
         {
             Debug.LogError($"[{GetType().Name}] Failed to spawn {def.displayName}!");
-            Inventory.Instance.AddGold(def.hireCost); // Refund
+            Inventory.Instance.AddGold(def.hireCost);
             return false;
         }
 
-        // Track the spawned unit
         if (!spawnedByType.ContainsKey(def))
-        {
             spawnedByType[def] = new List<T>();
-        }
         spawnedByType[def].Add(unit);
 
-
         if (showDebugLogs)
-            Debug.Log($"[{GetType().Name}] Hired {def.displayName} on layer {LayerIndex}. Count: {GetUnitCount(def)}/{GetUnitLimit(def)}");
+            Debug.Log($"[{GetType().Name}] Hired {def.displayName} on layer {LayerIndex}. Total: {GetTotalCount()}/{_maxUnits}");
 
         return true;
     }
     
-    /// <summary>
-    /// Hire and spawn a unit from a HiringCandidate (with identity and traits).
-    /// Uses candidate's modified hire cost and applies identity/traits to spawned unit.
-    /// </summary>
-    public virtual bool HireUnit(HiringCandidate candidate)
+    // Check if a candidate can be hired (uses candidate's modified cost).
+    public virtual bool CanHire(HiringCandidate candidate)
     {
         if (candidate.entityDef == null)
         {
-            Debug.LogError($"[{GetType().Name}] Candidate has null entityDef");
-            return false;
-        }
-        
-        // Validate candidate belongs to this layer
-        if (candidate.entityDef.assignedLayer != LayerIndex)
-        {
             if (showDebugLogs)
-                Debug.LogWarning($"[{GetType().Name}] Candidate is for layer {candidate.entityDef.assignedLayer}, this is layer {LayerIndex}");
+                Debug.LogWarning($"[{GetType().Name}] CanHire called with null entityDef");
             return false;
         }
-        
-        // IMPROVED: Use CanAfford() helper
+
         if (!Inventory.Instance.CanAfford(candidate.hireCost))
         {
             if (showDebugLogs)
                 Debug.LogWarning($"[{GetType().Name}] Not enough gold. Need {candidate.hireCost}, have {Inventory.Instance.Gold}");
             return false;
         }
-        
-        // Check capacity
-        int currentCount = GetUnitCount(candidate.entityDef);
-        int maxCount = GetUnitLimit(candidate.entityDef);
-        
-        if (currentCount >= maxCount)
+
+        if (GetTotalCount() >= _maxUnits)
         {
             if (showDebugLogs)
-                Debug.LogWarning($"[{GetType().Name}] {candidate.entityDef.displayName} at limit ({currentCount}/{maxCount})");
+                Debug.LogWarning($"[{GetType().Name}] Layer {LayerIndex} full ({GetTotalCount()}/{_maxUnits})");
             return false;
         }
-        
-        // IMPROVED: Use TrySpendGold() for candidate's modified cost
+
+        int typeLimit = GetUnitLimit(candidate.entityDef);
+        if (typeLimit >= 0 && GetUnitCount(candidate.entityDef) >= typeLimit)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning($"[{GetType().Name}] {candidate.entityDef.displayName} at type limit ({GetUnitCount(candidate.entityDef)}/{typeLimit})");
+            return false;
+        }
+
+        return true;
+    }
+
+    // Hire from a HiringCandidate with identity and traits.
+    // Uses candidate's modified hire cost. Rank is decoupled from deployment layer.
+    public virtual bool HireUnit(HiringCandidate candidate)
+    {
+        if (!CanHire(candidate))
+            return false;
+
         if (!Inventory.Instance.TrySpendGold(candidate.hireCost))
         {
             Debug.LogError($"[{GetType().Name}] Failed to deduct gold for {candidate.DisplayName}!");
             return false;
         }
-        
-        // Spawn unit with candidate data
+
         T unit = SpawnUnitWithCandidate(candidate);
-        
+
         if (unit == null)
         {
             Debug.LogError($"[{GetType().Name}] Failed to spawn {candidate.DisplayName}!");
-            Inventory.Instance.AddGold(candidate.hireCost); // Refund
+            Inventory.Instance.AddGold(candidate.hireCost);
             return false;
         }
-        
-        // Track the spawned unit
+
         if (!spawnedByType.ContainsKey(candidate.entityDef))
-        {
             spawnedByType[candidate.entityDef] = new List<T>();
-        }
         spawnedByType[candidate.entityDef].Add(unit);
-        
+
         if (showDebugLogs)
-            Debug.Log($"[{GetType().Name}] Hired {candidate.DisplayName} with {candidate.traits?.Length ?? 0} traits on layer {LayerIndex}");
-        
+            Debug.Log($"[{GetType().Name}] Hired {candidate.DisplayName} (Rank {candidate.entityDef.rank}) on layer {LayerIndex}. Total: {GetTotalCount()}/{_maxUnits}");
+
         return true;
     }
 
-    /// <summary>
-    /// Remove a specific unit (for testing/debug).
-    /// In production, units are usually permanent.
-    /// </summary>
+    // Remove a specific unit.
     public virtual void RemoveUnit(T unit)
     {
         if (unit == null) return;
 
-        // Find which type list contains this unit
         foreach (var kvp in spawnedByType)
         {
             if (kvp.Value.Contains(unit))
@@ -269,44 +236,27 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         unit.Despawn();
     }
 
-    // ===== SPAWNING (Abstract - derived classes implement) =====
+    // ===== SPAWNING (Abstract) =====
 
-    /// <summary>
-    /// Spawn and initialize a unit of the specified type.
-    /// Derived classes implement type-specific initialization (AdventurerAgent.Init vs PorterAgent.Init).
-    /// </summary>
     protected abstract T SpawnUnit(EntityDef def);
-    
-    /// <summary>
-    /// Spawn and initialize a unit from a HiringCandidate.
-    /// Applies identity and traits from candidate to the spawned unit.
-    /// Derived classes implement type-specific initialization + candidate data application.
-    /// </summary>
     protected abstract T SpawnUnitWithCandidate(HiringCandidate candidate);
 
-    // ===== QUERIES (Implements IUnitManager interface) =====
+    // ===== QUERIES =====
 
-    /// <summary>
-    /// Get current count of a specific unit type.
-    /// Implements IUnitManager.GetUnitCount
-    /// </summary>
+    // Get current count of a specific unit type.
     public int GetUnitCount(EntityDef def)
     {
         if (def == null || !spawnedByType.ContainsKey(def))
             return 0;
 
-        // Clean nulls before counting
-        spawnedByType[def].RemoveAll(u => u == null);
         return spawnedByType[def].Count;
     }
 
-    /// <summary>
-    /// Get max allowed count for a specific unit type.
-    /// Implements IUnitManager.GetUnitLimit
-    /// </summary>
+    // Get per-type limit for a specific unit type.
+    // Returns -1 if not found in unitLimits (uncapped for this type, only total cap applies).
     public int GetUnitLimit(EntityDef def)
     {
-        if (def == null) return 0;
+        if (def == null) return -1;
 
         foreach (var limit in unitLimits)
         {
@@ -314,89 +264,58 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
                 return limit.maxCount;
         }
 
-        // Not found in limits - assume 0 (can't hire)
-        return 0;
+        return -1;
     }
 
-    /// <summary>
-    /// Check if a specific unit type is at its limit.
-    /// Implements IUnitManager.IsTypeFull
-    /// </summary>
+    // Check if a specific unit type is at its per-type limit.
     public bool IsTypeFull(EntityDef def)
     {
-        return GetUnitCount(def) >= GetUnitLimit(def);
+        int limit = GetUnitLimit(def);
+        if (limit < 0) return false; // No per-type limit
+        return GetUnitCount(def) >= limit;
     }
 
-    /// <summary>
-    /// Get all spawned units of a specific type
-    /// </summary>
+    // Get all spawned units of a specific type.
     public List<T> GetUnitsOfType(EntityDef def)
     {
         if (def == null || !spawnedByType.ContainsKey(def))
             return new List<T>();
 
-        // Clean nulls and return copy
-        spawnedByType[def].RemoveAll(u => u == null);
         return new List<T>(spawnedByType[def]);
     }
 
-    /// <summary>
-    /// Get all active units across all types
-    /// </summary>
+    // Get all active units across all types.
     public List<T> GetAllUnits()
     {
         var result = new List<T>();
-        
         foreach (var list in spawnedByType.Values)
-        {
-            list.RemoveAll(u => u == null);
             result.AddRange(list);
-        }
-
         return result;
     }
 
-    /// <summary>
-    /// Get total count of all units on this layer
-    /// </summary>
+    // Get total count of all units on this layer.
     public int GetTotalCount()
     {
         int total = 0;
         foreach (var list in spawnedByType.Values)
-        {
-            list.RemoveAll(u => u == null);
             total += list.Count;
-        }
         return total;
     }
 
-    /// <summary>
-    /// Get total maximum capacity across all unit types
-    /// </summary>
+    // Get total maximum capacity for this layer.
     public int GetTotalCapacity()
     {
-        int total = 0;
-        foreach (var limit in unitLimits)
-        {
-            total += limit.maxCount;
-        }
-        return total;
+        return _maxUnits;
     }
 
-    /// <summary>
-    /// Check if all unit slots are filled
-    /// </summary>
+    // Check if layer is at total capacity.
     public bool IsFull()
     {
-        return GetTotalCount() >= GetTotalCapacity();
+        return GetTotalCount() >= _maxUnits;
     }
 
     // ===== CLEANUP =====
 
-    /// <summary>
-    /// OPTIMIZED: Only runs every 2 seconds instead of every frame.
-    /// Removes null references from spawned units tracking.
-    /// </summary>
     protected virtual void CleanupNullReferences()
     {
         foreach (var list in spawnedByType.Values)
@@ -410,20 +329,18 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     [ContextMenu("Debug: Print Unit Counts")]
     protected virtual void DebugPrintUnitCounts()
     {
-        Debug.Log($"=== {GetType().Name} Layer {LayerIndex} Unit Counts ===");
+        Debug.Log($"=== {GetType().Name} Layer {LayerIndex} ===");
+        Debug.Log($"Total: {GetTotalCount()}/{_maxUnits}");
         
-        foreach (var limit in unitLimits)
+        foreach (var kvp in spawnedByType)
         {
-            if (limit.unitDef == null) continue;
+            if (kvp.Key == null) continue;
+            kvp.Value.RemoveAll(u => u == null);
             
-            int current = GetUnitCount(limit.unitDef);
-            int max = limit.maxCount;
-            string status = current >= max ? "FULL" : "AVAILABLE";
-            
-            Debug.Log($"{limit.unitDef.displayName}: {current}/{max} {status}");
+            int typeLimit = GetUnitLimit(kvp.Key);
+            string limitStr = typeLimit >= 0 ? $"/{typeLimit}" : "";
+            Debug.Log($"  {kvp.Key.displayName}: {kvp.Value.Count}{limitStr}");
         }
-
-        Debug.Log($"Total: {GetTotalCount()}/{GetTotalCapacity()}");
     }
 
     [ContextMenu("Debug: Remove All Units")]
@@ -449,26 +366,21 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     {
         if (operationArea != null)
         {
-            // Draw operation area
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.2f);
             Gizmos.DrawCube(operationArea.bounds.center, operationArea.bounds.size);
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(operationArea.bounds.center, operationArea.bounds.size);
 
-            // Draw label
             UnityEditor.Handles.Label(
                 operationArea.bounds.center + Vector3.up * (operationArea.bounds.extents.y + 0.5f),
-                $"{GetType().Name}\nLayer {LayerIndex}\n{GetTotalCount()}/{GetTotalCapacity()}"
+                $"{GetType().Name}\nLayer {LayerIndex}\n{GetTotalCount()}/{_maxUnits}"
             );
         }
     }
 #endif
 }
 
-/// <summary>
-/// Defines the maximum count allowed for a specific unit type on a layer.
-/// Used by all managers (AdventurerManager, PorterManager, etc.).
-/// </summary>
+// Optional per-type cap. Types not listed in a manager's unitLimits are only limited by maxUnits.
 [System.Serializable]
 public class UnitTypeLimit
 {

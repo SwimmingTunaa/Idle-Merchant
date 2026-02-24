@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Data/Adventurer")]
@@ -8,6 +9,9 @@ public class AdventurerDef : EntityDef
     public string adventurerType = "Miner";
     
     public float baseHealth = 10f;
+    public float reviveDelay = 5f;
+    public float hitStaggerDuration = 0.2f;
+    public float hitStaggerCooldown = 1f;
 
     [Header("Adventurer Def")]
     [Tooltip("Starting state when adventurer spawns")]

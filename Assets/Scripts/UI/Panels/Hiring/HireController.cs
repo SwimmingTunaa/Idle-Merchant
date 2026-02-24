@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 // Hire panel controller - manages candidate hiring UI with stack-based navigation and animations.
+// Candidates have a rank (intrinsic quality), players choose which layer to deploy them to.
 // Inherits from BasePanelController, overrides Open() for roster rebuild and animations for card stack.
 public class HireController : BasePanelController
 {
@@ -21,8 +22,8 @@ public class HireController : BasePanelController
 
     [Header("Roster Settings")]
     [SerializeField] private int maxRosterSize = 5;
-    [Tooltip("Weight per layer (index 0 = Layer 1). Higher = more likely to appear. Normalized at runtime.")]
-    [SerializeField] private float[] layerWeights = { 40f, 25f, 20f, 10f, 5f };
+    [Tooltip("Weight per rank (index 0 = Rank 1). Higher = more likely to appear. Normalized at runtime.")]
+    [SerializeField] private float[] rankWeights = { 40f, 25f, 20f, 10f, 5f };
 
     [Header("Stack Visual Settings")]
     [SerializeField] private float stackRotationMax = 3f;
@@ -40,6 +41,12 @@ public class HireController : BasePanelController
     private Label countLabel;
     private Label emptyTimerLabel;
     private TabView tabView;
+
+    // Layer selector UI
+    private Button layerPrevButton;
+    private Button layerNextButton;
+    private Label layerLabel;
+    private int selectedLayer = 1;
 
     // Tabs
     private enum TabType { Adventurers = 0, Porters = 1 }
@@ -59,7 +66,7 @@ public class HireController : BasePanelController
     }
 
     // Pools
-    private readonly Dictionary<(HireRole role, int layer, EntityDef def), CandidatePool> candidatePools = new();
+    private readonly Dictionary<(HireRole role, int rank, EntityDef def), CandidatePool> candidatePools = new();
     private readonly List<CandidatePool> adventurerPools = new();
     private readonly List<CandidatePool> porterPools = new();
 
@@ -98,12 +105,12 @@ public class HireController : BasePanelController
     void OnEnable()
     {
         BuildUI();
-        ProgressionManager.OnLayerUnlocked += OnLayerUnlocked;
+        GameSignals.OnLayerUnlocked += OnLayerUnlocked;
     }
 
     void OnDisable()
     {
-        ProgressionManager.OnLayerUnlocked -= OnLayerUnlocked;
+        GameSignals.OnLayerUnlocked -= OnLayerUnlocked;
     }
 
     void Awake()
@@ -145,6 +152,7 @@ public class HireController : BasePanelController
         ClampViewIndexToRoster();
         BuildStack();
         UpdateCount();
+        UpdateLayerSelector();
         
         OnOpenStart();
         StartCoroutine(OpenAnimation());
@@ -255,6 +263,11 @@ public class HireController : BasePanelController
         emptyTimerLabel = panel.Q<Label>("empty-timer");
         tabView = panel.Q<TabView>("unit-type-tabs");
 
+        // Layer selector
+        layerPrevButton = panel.Q<Button>("layer-prev-button");
+        layerNextButton = panel.Q<Button>("layer-next-button");
+        layerLabel = panel.Q<Label>("layer-label");
+
         // Query the open button (if it exists in root)
         openButton = uiDocument.rootVisualElement.Q<Button>("ShopButton");
 
@@ -273,9 +286,64 @@ public class HireController : BasePanelController
         nextButton.clicked += Next;
         tabView.activeTabChanged += OnTabChanged;
 
+        // Layer selector callbacks
+        if (layerPrevButton != null)
+            layerPrevButton.clicked += OnLayerPrev;
+        if (layerNextButton != null)
+            layerNextButton.clicked += OnLayerNext;
+
         // Initial visibility
         panel.style.display = DisplayStyle.None;
         panel.style.opacity = 0f;
+
+        UpdateLayerSelector();
+    }
+
+    // ═════════════════════════════════════════════
+    // LAYER SELECTOR
+    // ═════════════════════════════════════════════
+
+    private void OnLayerPrev()
+    {
+        if (selectedLayer > 1)
+        {
+            selectedLayer--;
+            UpdateLayerSelector();
+            UpdateHireButtonState();
+        }
+    }
+
+    private void OnLayerNext()
+    {
+        int maxLayer = ProgressionManager.Instance != null
+            ? ProgressionManager.Instance.maxUnlockedLayer
+            : 1;
+
+        if (selectedLayer < maxLayer)
+        {
+            selectedLayer++;
+            UpdateLayerSelector();
+            UpdateHireButtonState();
+        }
+    }
+
+    private void UpdateLayerSelector()
+    {
+        int maxLayer = ProgressionManager.Instance != null
+            ? ProgressionManager.Instance.maxUnlockedLayer
+            : 1;
+
+        // Clamp selected layer
+        selectedLayer = Mathf.Clamp(selectedLayer, 1, maxLayer);
+
+        if (layerLabel != null)
+            layerLabel.text = $"Dungeon Level {selectedLayer}";
+
+        // Disable arrows at bounds
+        if (layerPrevButton != null)
+            layerPrevButton.SetEnabled(selectedLayer > 1);
+        if (layerNextButton != null)
+            layerNextButton.SetEnabled(selectedLayer < maxLayer);
     }
 
     // ═════════════════════════════════════════════
@@ -288,6 +356,8 @@ public class HireController : BasePanelController
         CreatePools(porterManagers, HireRole.Porter, porterPools);
     }
 
+    // Creates candidate pools gated by maxUnlockedLayer.
+    // Pools are keyed by rank (entityDef.rank), not deployment layer.
     private void CreatePools<T>(List<T> managers, HireRole role, List<CandidatePool> outList)
         where T : IUnitManager
     {
@@ -297,56 +367,34 @@ public class HireController : BasePanelController
 
         foreach (var m in managers)
         {
-            // Skip layers that aren't unlocked yet
-            if (m.LayerIndex > maxLayer)
-                continue;
-
             foreach (var limit in m.UnitLimits)
             {
-                var key = (role, m.LayerIndex, limit.unitDef);
+                if (limit.unitDef == null) continue;
+
+                // Gate by rank — higher rank candidates only appear when that layer is unlocked
+                if (limit.unitDef.rank > maxLayer)
+                    continue;
+
+                var key = (role, limit.unitDef.rank, limit.unitDef);
                 if (candidatePools.ContainsKey(key)) continue;
 
-                var pool = new CandidatePool(role, m.LayerIndex, limit.unitDef, refreshIntervalSeconds, traitChance);
+                var pool = new CandidatePool(role, limit.unitDef.rank, limit.unitDef, refreshIntervalSeconds, traitChance);
                 candidatePools[key] = pool;
                 outList.Add(pool);
             }
         }
     }
 
-    // Called when a new layer is unlocked mid-session
+    // Called when a new layer is unlocked mid-session.
+    // Delegates to CreatePools which already skips existing keys.
     private void OnLayerUnlocked(int layer)
     {
-        // Create pools for the newly unlocked layer
-        foreach (var m in adventurerManagers)
-        {
-            if (m.LayerIndex != layer) continue;
-            foreach (var limit in ((IUnitManager)m).UnitLimits)
-            {
-                var key = (HireRole.Adventurer, m.LayerIndex, limit.unitDef);
-                if (candidatePools.ContainsKey(key)) continue;
-
-                var pool = new CandidatePool(HireRole.Adventurer, m.LayerIndex, limit.unitDef, refreshIntervalSeconds, traitChance);
-                candidatePools[key] = pool;
-                adventurerPools.Add(pool);
-            }
-        }
-
-        foreach (var m in porterManagers)
-        {
-            if (m.LayerIndex != layer) continue;
-            foreach (var limit in ((IUnitManager)m).UnitLimits)
-            {
-                var key = (HireRole.Porter, m.LayerIndex, limit.unitDef);
-                if (candidatePools.ContainsKey(key)) continue;
-
-                var pool = new CandidatePool(HireRole.Porter, m.LayerIndex, limit.unitDef, refreshIntervalSeconds, traitChance);
-                candidatePools[key] = pool;
-                porterPools.Add(pool);
-            }
-        }
+        CreatePools(adventurerManagers, HireRole.Adventurer, adventurerPools);
+        CreatePools(porterManagers, HireRole.Porter, porterPools);
+        UpdateLayerSelector();
 
         if (showDebugLogs)
-            Debug.Log($"[HirePanel] Layer {layer} unlocked — new candidate pools created");
+            Debug.Log($"[HirePanel] Layer {layer} unlocked — new rank {layer} candidate pools created");
     }
 
     // ═════════════════════════════════════════════
@@ -357,17 +405,19 @@ public class HireController : BasePanelController
     {
         candidateToPool.Clear();
 
-        adventurerRoster = HireRoster.BuildRoster(adventurerPools, layerWeights, maxRosterSize);
-        porterRoster = HireRoster.BuildRoster(porterPools, layerWeights, maxRosterSize);
+        adventurerRoster = HireRoster.BuildRoster(adventurerPools, rankWeights, maxRosterSize);
+        porterRoster = HireRoster.BuildRoster(porterPools, rankWeights, maxRosterSize);
 
         // Map candidates back to their pools for hire tracking
         foreach (var pool in adventurerPools)
-            foreach (var c in pool.GetCandidates())
-                candidateToPool.TryAdd(c, pool);
+            if (pool.CandidateCount > 0)
+                foreach (var c in pool.GetCandidates())
+                    candidateToPool.TryAdd(c, pool);
 
         foreach (var pool in porterPools)
-            foreach (var c in pool.GetCandidates())
-                candidateToPool.TryAdd(c, pool);
+            if (pool.CandidateCount > 0)
+                foreach (var c in pool.GetCandidates())
+                    candidateToPool.TryAdd(c, pool);
     }
 
     private void BuildStack()
@@ -510,6 +560,7 @@ public class HireController : BasePanelController
         StartCoroutine(AnimateHire(card, candidate));
     }
 
+    // Route hire to the manager matching selectedLayer, not the candidate's rank
     private bool HireCandidate(HiringCandidate c)
     {
         if (!candidateToPool.TryGetValue(c, out var pool) || pool == null)
@@ -518,17 +569,22 @@ public class HireController : BasePanelController
         if (pool.Role == HireRole.Adventurer)
         {
             foreach (var m in adventurerManagers)
-                if (m.LayerIndex == pool.LayerIndex)
+            {
+                if (m.LayerIndex == selectedLayer)
                     return m.HireUnit(c);
+            }
         }
         else
         {
             foreach (var m in porterManagers)
-                if (m.LayerIndex == pool.LayerIndex)
+            {
+                if (m.LayerIndex == selectedLayer)
                     return m.HireUnit(c);
+            }
         }
 
-        GameSignals.RaiseUnitHired(c.entityDef);
+        if (showDebugLogs)
+            Debug.LogWarning($"[HirePanel] No manager found for layer {selectedLayer}, role {pool.Role}");
 
         return false;
     }
@@ -538,16 +594,19 @@ public class HireController : BasePanelController
         isHireAnimating = true;
         card.BringToFront();
 
+        // Use the card's actual height so the animation scales with the layout
+        float flyDistance = card.resolvedStyle.height > 0f ? card.resolvedStyle.height : 750f;
+
         float t = 0f;
         while (t < hireAnimationDuration)
         {
             t += Time.deltaTime;
-            card.style.translate = new Translate(0, -800f * (t / hireAnimationDuration));
+            card.style.translate = new Translate(0, -flyDistance * (t / hireAnimationDuration));
             yield return null;
         }
 
         if (showDebugLogs)
-            Debug.Log($"[HirePanel] Hired {c.DisplayName}");
+            Debug.Log($"[HirePanel] Hired {c.DisplayName} → Layer {selectedLayer}");
 
         if (candidateToPool.TryGetValue(c, out var pool) && pool != null)
         {
@@ -572,6 +631,7 @@ public class HireController : BasePanelController
     // UI UPDATES
     // ═════════════════════════════════════════════
 
+    // Check hire button state against the selected deployment layer
     private void UpdateHireButtonState()
     {
         if (CurrentCards.Count == 0 || CurrentRoster.Count == 0)
@@ -587,30 +647,24 @@ public class HireController : BasePanelController
         IUnitManager manager = null;
 
         if (currentTab == TabType.Adventurers)
-            manager = adventurerManagers.Find(m => m.LayerIndex == candidate.entityDef.assignedLayer);
+            manager = adventurerManagers.Find(m => m.LayerIndex == selectedLayer);
         else
-            manager = porterManagers.Find(m => m.LayerIndex == candidate.entityDef.assignedLayer);
+            manager = porterManagers.Find(m => m.LayerIndex == selectedLayer);
 
         if (manager == null)
         {
-            hireButton.text = "Hire";
             hireButton.SetEnabled(false);
             return;
         }
 
-        int current = manager.GetUnitCount(candidate.entityDef);
-        int max = manager.GetUnitLimit(candidate.entityDef);
+        // Check total layer capacity
+        bool layerFull = manager.GetTotalCount() >= manager.MaxUnits;
 
-        if (current >= max)
-        {
-            hireButton.text = $"Lvl {manager.LayerIndex} Full ({current}/{max})";
-            hireButton.SetEnabled(false);
-        }
-        else
-        {
-            hireButton.text = "Hire";
-            hireButton.SetEnabled(true);
-        }
+        // Check optional per-type limit
+        int typeLimit = manager.GetUnitLimit(candidate.entityDef);
+        bool typeFull = typeLimit >= 0 && manager.GetUnitCount(candidate.entityDef) >= typeLimit;
+
+        hireButton.SetEnabled(!layerFull && !typeFull);
     }
 
     private void UpdateCount()
@@ -665,7 +719,7 @@ public class HireController : BasePanelController
         {
             foreach (var pool in CurrentPools)
             {
-                if (pool.GetCandidates().Count > 0)
+                if (pool.CandidateCount > 0)
                 {
                     RebuildRosters();
                     ClampViewIndexToRoster();

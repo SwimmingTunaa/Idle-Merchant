@@ -24,6 +24,8 @@ public interface IUnitManager
     bool HireUnit(EntityDef def);
     int GetUnitCount(EntityDef def);
     int GetUnitLimit(EntityDef def);
+    int GetTotalCount();
+    int MaxUnits { get; }
     bool IsTypeFull(EntityDef def);
     int LayerIndex { get; }
     System.Collections.Generic.List<UnitTypeLimit> UnitLimits { get; } // Added for HireController access

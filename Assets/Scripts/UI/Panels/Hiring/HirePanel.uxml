@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="Candidate 1" src="project://database/Assets/Scripts/UI/Panels/Hiring/Candidate.uxml?fileID=9197481963319205126&amp;guid=9b5bbf73db4954f9dbfac6d0ea03852f&amp;type=3#Candidate" />
-    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
-    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
     <ui:VisualElement name="hire-panel" style="flex-grow: 0; flex-direction: row; justify-content: center; width: 100%; align-items: center; position: absolute; top: 2px; left: -1px;">
         <ui:Button text="&lt;" name="previous-button" class="hireButton btn-secondary" style="font-size: 48px; -unity-font-style: bold;" />
         <ui:VisualElement name="newspaper-stand" style="flex-grow: 0; justify-content: center; width: auto; height: auto; background-color: rgb(149, 99, 75); min-width: 800px; min-height: 750px; align-items: center; align-content: flex-start; align-self: flex-start;">
@@ -12,6 +12,11 @@
             <ui:VisualElement name="text-container" style="flex-grow: 0; position: absolute; right: auto; top: auto; left: auto; bottom: auto; width: auto; justify-content: center; align-items: center;">
                 <ui:Label text="Check Back In" name="empty-label" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); font-size: 32%;" />
                 <ui:Label text="5:00" name="empty-timer" style="font-size: 32px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); -unity-font-style: normal;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="layer-selector" style="flex-direction: row; justify-content: center; align-items: center; padding: 8px;">
+                <ui:Button text="◀" name="layer-prev-button" class="btn-secondary" />
+                <ui:Label text="Dungeon Level 1" name="layer-label" />
+                <ui:Button text="▶" name="layer-next-button" class="btn-secondary" />
             </ui:VisualElement>
             <ui:VisualElement name="newspaper-container" style="flex-grow: 1; justify-content: flex-start; align-items: center; align-self: center; width: 100%; height: 750px;">
                 <ui:Instance template="Candidate 1" name="TemplateCandidate" style="position: absolute; width: 700px; height: 750px; -unity-slice-scale: 0;" />

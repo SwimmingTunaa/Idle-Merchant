@@ -22,7 +22,7 @@ public class EntityDefEditor : Editor
     private SerializedProperty displayNameProp;
     private SerializedProperty descriptionProp;
     private SerializedProperty hireCostProp;
-    private SerializedProperty assignedLayerProp;
+    private SerializedProperty rankLayerProp;
     private SerializedProperty startingSkillsProp;
     private SerializedProperty sortingTypeProp;
     private SerializedProperty spawnWeightProp;
@@ -66,6 +66,9 @@ public class EntityDefEditor : Editor
     private SerializedProperty adventurerWanderTimeRangeProp;
     private SerializedProperty adventurerReturnToSpawnProp;
     private SerializedProperty leashRangeProp;
+    private SerializedProperty hitStaggerDurationProp;
+    private SerializedProperty hitStaggerCooldownProp;
+    private SerializedProperty reviveDelayProp;
     
     // Combat - MobDef specific
     private SerializedProperty mobStartingStateProp;
@@ -118,7 +121,7 @@ public class EntityDefEditor : Editor
         displayNameProp = serializedObject.FindProperty("displayName");
         descriptionProp = serializedObject.FindProperty("description");
         hireCostProp = serializedObject.FindProperty("hireCost");
-        assignedLayerProp = serializedObject.FindProperty("assignedLayer");
+        rankLayerProp = serializedObject.FindProperty("rank");
         startingSkillsProp = serializedObject.FindProperty("startingSkills");
         sortingTypeProp = serializedObject.FindProperty("sortingType");
         spawnWeightProp = serializedObject.FindProperty("spawnWeight");
@@ -165,6 +168,9 @@ public class EntityDefEditor : Editor
             adventurerReturnToSpawnProp = serializedObject.FindProperty("returnToSpawn");
             leashRangeProp = serializedObject.FindProperty("leashRange");
             combatConfigProp = serializedObject.FindProperty("combatConfig"); 
+            hitStaggerDurationProp = serializedObject.FindProperty("hitStaggerDuration");
+            hitStaggerCooldownProp = serializedObject.FindProperty("hitStaggerCooldown");
+            reviveDelayProp = serializedObject.FindProperty("reviveDelay");
         }
         
         // Combat (MobDef)
@@ -274,7 +280,7 @@ public class EntityDefEditor : Editor
         EditorGUILayout.LabelField("Prefab & Spawning", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(prefabProp);
         EditorGUILayout.PropertyField(hireCostProp);
-        EditorGUILayout.PropertyField(assignedLayerProp);
+        EditorGUILayout.PropertyField(rankLayerProp);
         EditorGUILayout.PropertyField(spawnWeightProp);
         EditorGUILayout.EndVertical();
 
@@ -317,6 +323,13 @@ public class EntityDefEditor : Editor
                         EditorGUILayout.LabelField($"  Layer {layer}: {hp:F1} HP", EditorStyles.miniLabel);
                     }
                 }
+            }
+
+            if(isAdventurer)
+            {
+                EditorGUILayout.PropertyField(hitStaggerDurationProp, new GUIContent("Hit Stagger Duration"));
+                EditorGUILayout.PropertyField(hitStaggerCooldownProp, new GUIContent("Hit Stagger Cooldown"));
+                EditorGUILayout.PropertyField(reviveDelayProp, new GUIContent("Revive Delay"));
             }
             
             EditorGUILayout.EndVertical();

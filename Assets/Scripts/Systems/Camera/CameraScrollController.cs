@@ -95,7 +95,7 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
 
     void OnEnable()
     {
-        ProgressionManager.OnLayerUnlocked += HandleExpandVeritcalBounds;
+        GameSignals.OnLayerUnlocked += HandleExpandVeritcalBounds;
         // Ensure Player action map is enabled
         if (inputActions != null)
         {
@@ -116,7 +116,7 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         {
             Cursor.lockState = CursorLockMode.None;
         }
-        ProgressionManager.OnLayerUnlocked -= HandleExpandVeritcalBounds;   
+        GameSignals.OnLayerUnlocked -= HandleExpandVeritcalBounds;   
     }
 
     void Update()

@@ -56,6 +56,11 @@ public class CandidatePool
     }
 
     /// <summary>
+    /// Number of available candidates without allocating a list.
+    /// </summary>
+    public int CandidateCount => candidates.Count;
+
+    /// <summary>
     /// Get all available candidates (copy).
     /// </summary>
     public List<HiringCandidate> GetCandidates()

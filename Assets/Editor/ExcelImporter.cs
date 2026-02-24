@@ -885,7 +885,7 @@ public class ExcelDataImporter : EditorWindow
         MobDef mob = ScriptableObject.CreateInstance<MobDef>();
         mob.id = fileName;
         mob.displayName = data.name;
-        mob.assignedLayer = data.layer;
+        mob.rank = data.layer;
         mob.baseHealth = data.hp;
         mob.moveSpeed = data.moveSpeed;
         mob.attackDamage = data.attackDamage;

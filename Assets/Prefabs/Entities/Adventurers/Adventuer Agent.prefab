@@ -96,6 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a47abdb32514196ae44d906007dd56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerAgent
+  def: {fileID: 0}
   layerIndex: 1
   overriderAnimatorController: 0
   appearanceManager: {fileID: 8842850186112576047}
@@ -151,7 +152,7 @@ MonoBehaviour:
   baseMaxHP: 100
   startAtMaxHP: 1
   enableDamageFlash: 1
-  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 0.64705884}
   damageFlashDuration: 0.1
   isInvulnerable: 0
 --- !u!114 &4170936427891067786
@@ -171,6 +172,7 @@ MonoBehaviour:
     behaviorType: 2
     hostileTo: 1
     territorialRadius: 0
+    attackType: 0
   animator: {fileID: 2422309314784524776}
   showDebugLogs: 0
 --- !u!1001 &3261093898469668006
@@ -221,6 +223,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 864351943027441043, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6918b23845a8140e0be10a6bd97d2bb3, type: 2}
+    - target: {fileID: 4250516778657953563, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1645501144, guid: 075443c860096487783eb5987b84fb3c, type: 3}
     - target: {fileID: 6323932363702626183, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
       propertyPath: m_labelHash
       value: 0.011353224
@@ -232,6 +242,14 @@ PrefabInstance:
     - target: {fileID: 6734946296550151143, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
       propertyPath: m_Name
       value: BaseCharacterRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 8840193133850232631, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
+      propertyPath: m_labelHash
+      value: 0.000011785342
+      objectReference: {fileID: 0}
+    - target: {fileID: 8840193133850232631, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
+      propertyPath: m_SpriteHash
+      value: 771982917
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

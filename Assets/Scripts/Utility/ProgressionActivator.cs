@@ -48,7 +48,7 @@ public class ProgressionActivator : MonoBehaviour
         switch (trigger)
         {
             case ActivationTrigger.LayerUnlocked:
-                ProgressionManager.OnLayerUnlocked += HandleLayerUnlocked;
+                GameSignals.OnLayerUnlocked += HandleLayerUnlocked;
                 break;
             case ActivationTrigger.StarEarned:
                 ProgressionManager.OnStarEarned += HandleStarEarned;
@@ -65,7 +65,7 @@ public class ProgressionActivator : MonoBehaviour
         switch (trigger)
         {
             case ActivationTrigger.LayerUnlocked:
-                ProgressionManager.OnLayerUnlocked -= HandleLayerUnlocked;
+                GameSignals.OnLayerUnlocked -= HandleLayerUnlocked;
                 break;
             case ActivationTrigger.StarEarned:
                 ProgressionManager.OnStarEarned -= HandleStarEarned;

@@ -325,7 +325,7 @@ public class GameDataGenerator : EditorWindow
         MobDef mob = ScriptableObject.CreateInstance<MobDef>();
         mob.id = fileName;
         mob.displayName = mobName;
-        mob.assignedLayer = layer;
+        mob.rank = layer;
         mob.baseHealth = baseHP;
         mob.moveSpeed = moveSpeed;
         mob.attackDamage = attackDamage;
