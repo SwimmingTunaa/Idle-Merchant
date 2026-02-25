@@ -8,7 +8,7 @@ public enum CustomerArcheType
 public class CustomerDef : EntityDef
 {
     [Header("Customer Def")]
-    public CustomerState startingState = CustomerState.Wander;
+    public CustomerState startingState = CustomerState.Entering;
     public CustomerArcheType customerArcheType = CustomerArcheType.Commoner;
     public ItemCategory itemPreferance;
 

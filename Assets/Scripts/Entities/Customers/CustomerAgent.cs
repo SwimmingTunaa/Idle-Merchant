@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 
 public enum CustomerState
 {
+    Entering,
     Wander,
     SeekingQueue,
     Queueing,
@@ -157,7 +158,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         }
         else
         {
-            ChangeState(CustomerState.Leaving);
+            // No item found — caller handles state transition
         }
 
     }
@@ -193,8 +194,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 sortingGroup.sortingOrder = 5;
                 // Seek the END of the queue, not the front
                 SetTarget(QueueController.Instance.GetQueueEndPosition());
-                PickWantFromInventory();
-                
+
                 // Create timers for queue seeking
                 queueCheckTimer = new CountdownTimer(queueCheckInterval);
                 queueCheckTimer.Start();
@@ -215,6 +215,10 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 }
                 break;
                 
+            case CustomerState.Entering:
+                SetTarget(ShopManager.Instance.entrancePoint.position);
+                break;
+
             case CustomerState.Wander:
                 spriteRenderer.color = wanderColor;
                 SetTarget(GetWanderPosition(wanderArea));
@@ -260,7 +264,11 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 idleTimer.Tick(TickDelta);
                 if (idleTimer.IsFinished)
                 {
-                    ChangeState(CustomerState.SeekingQueue);
+                    PickWantFromInventory();
+                    if (desiredItem != null)
+                        ChangeState(CustomerState.SeekingQueue);
+                    else
+                        ChangeState(CustomerState.Leaving);
                 }
                 break;
 
@@ -307,8 +315,13 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
           
                 break;
 
+            case CustomerState.Entering:
+                if (!targetPos.HasValue)
+                    ChangeState(CustomerState.Wander);
+                break;
+
             case CustomerState.Wander:
-             
+
                 if (!targetPos.HasValue)
                 {
                     ChangeState(CustomerState.Idle);

@@ -7,6 +7,9 @@ public class ShopManager : MonoBehaviour
     private QueueController queue;
     public List<CustomerAgent> NonQueueingCustomers = new List<CustomerAgent>();
 
+    [Header("Entrance")]
+    public Transform entrancePoint;
+
     [Header("Queue Entry")]
     [Tooltip("Distance at which seeking customers join the queue")]
     public float queueJoinDistance = 1.0f;
