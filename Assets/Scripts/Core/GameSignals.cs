@@ -29,6 +29,8 @@ public static class GameSignals
     // Progression
     public static event Action<EntityBase, string, string> OnAdventurerPromoted;
     public static event Action<int> OnLayerUnlocked;
+    public static event Action<int> OnStarEarned;
+    public static event Action    OnMarkedForSaleChanged;
 
     //Hiring
     public static event Action<EntityDef> OnUnitHired;
@@ -47,6 +49,8 @@ public static class GameSignals
     public static void RaiseSkillCooldownStarted(EntityBase caster, string skillName, float cooldown) => OnSkillCooldownStarted?.Invoke(caster, skillName, cooldown);
     public static void RaiseAdventurerPromoted(EntityBase adventurer, string oldRole, string newRole) => OnAdventurerPromoted?.Invoke(adventurer, oldRole, newRole);
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
+    public static void RaiseStarEarned(int star) => OnStarEarned?.Invoke(star);
+    public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
     public static void RaiseUnitHired(EntityDef unitDef) => OnUnitHired?.Invoke(unitDef);
 
 #if UNITY_EDITOR
@@ -66,7 +70,9 @@ public static class GameSignals
         OnSkillCooldownStarted = null;
         OnAdventurerPromoted = null;
         OnLayerUnlocked = null;
-        
+        OnStarEarned = null;
+        OnMarkedForSaleChanged = null;
+
         Debug.Log("[GameSignals] All listeners cleared");
     }
 
@@ -87,6 +93,8 @@ public static class GameSignals
         Debug.Log($"OnSkillCooldownStarted: {OnSkillCooldownStarted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnAdventurerPromoted: {OnAdventurerPromoted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnLayerUnlocked: {OnLayerUnlocked?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnStarEarned: {OnStarEarned?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnMarkedForSaleChanged: {OnMarkedForSaleChanged?.GetInvocationList().Length ?? 0}");
     }
 #endif
 }

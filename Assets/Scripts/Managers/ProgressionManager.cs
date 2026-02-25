@@ -294,6 +294,14 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     }
 
     /// <summary>
+    /// Get number of unlocked dungeon layers (equals maxUnlockedLayer).
+    /// </summary>
+    public int GetUnlockedLayerCount()
+    {
+        return maxUnlockedLayer;
+    }
+
+    /// <summary>
     /// Award a star and unlock corresponding layer.
     /// Also grants any rewards defined for this star.
     /// Fires OnStarEarned and OnLayerUnlocked events.
@@ -328,6 +336,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
 
         // Fire events
         OnStarEarned?.Invoke(star);
+        GameSignals.RaiseStarEarned(star);
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] ★ Earned {star}★! Layer {layerToUnlock} unlocked.");

@@ -25,9 +25,21 @@ public class SalesManager : PersistentSingleton<SalesManager>
         if (item == null) return;
 
         forSale[item] = enabled;
+        GameSignals.RaiseMarkedForSaleChanged();
 
         if (showDebugLogs)
             Debug.Log($"[SalesManager] Auto-sell {(enabled ? "enabled" : "disabled")} for {item.displayName}");
+    }
+
+    /// <summary>
+    /// Returns the number of items currently marked for sale.
+    /// </summary>
+    public int GetMarkedForSaleCount()
+    {
+        int count = 0;
+        foreach (var kvp in forSale)
+            if (kvp.Value) count++;
+        return count;
     }
 
     public bool IsMarkedForSale(ItemDef item)
