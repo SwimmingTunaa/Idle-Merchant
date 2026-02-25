@@ -226,7 +226,7 @@ public class GameDebugger : EditorWindow
                 var manager = FindAdventurerManager(selectedLayer);
                 if (manager != null)
                 {
-                    manager.HireUnit(selectedEntity);
+                    manager.DebugHireUnit(selectedEntity);
                     Debug.Log($"[GameDebugger] Hired {selectedEntity.displayName} on layer {selectedLayer}");
                 }
             }
@@ -235,7 +235,7 @@ public class GameDebugger : EditorWindow
                 var manager = FindPorterManager(selectedLayer);
                 if (manager != null)
                 {
-                    manager.HireUnit(selectedEntity);
+                    manager.DebugHireUnit(selectedEntity);
                     Debug.Log($"[GameDebugger] Hired {selectedEntity.displayName} on layer {selectedLayer}");
                 }
             }

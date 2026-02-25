@@ -224,6 +224,38 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         return true;
     }
 
+#if UNITY_EDITOR
+    // Debug-only hire: bypasses gold cost and capacity checks.
+    // Generates a random HiringCandidate from the given def and calls SpawnUnitWithCandidate directly.
+    public bool DebugHireUnit(EntityDef def, float traitChance = 0.7f)
+    {
+        if (def == null) return false;
+
+        var candidates = HiringCandidateGenerator.GenerateCandidates(def, 1, 0, traitChance);
+        if (candidates == null || candidates.Length == 0)
+        {
+            Debug.LogError($"[{GetType().Name}] DebugHireUnit: failed to generate candidate for {def.displayName}");
+            return false;
+        }
+
+        var candidate = candidates[0];
+        T unit = SpawnUnitWithCandidate(candidate);
+
+        if (unit == null)
+        {
+            Debug.LogError($"[{GetType().Name}] DebugHireUnit: SpawnUnitWithCandidate failed for {def.displayName}");
+            return false;
+        }
+
+        if (!spawnedByType.ContainsKey(def))
+            spawnedByType[def] = new List<T>();
+        spawnedByType[def].Add(unit);
+
+        Debug.Log($"[{GetType().Name}] DebugHireUnit: Spawned {candidate.DisplayName} on layer {LayerIndex}");
+        return true;
+    }
+#endif
+
     // Remove a specific unit.
     public virtual void RemoveUnit(T unit)
     {
