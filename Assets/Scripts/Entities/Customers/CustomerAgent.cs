@@ -38,6 +38,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private CountdownTimer idleTimer;
     private CountdownTimer seekingTimeoutTimer;
     private CountdownTimer queueCheckTimer;
+    private CountdownTimer wanderTimer;
 
     private CustomerDef customerDef;
     private int batchMin, batchMax;
@@ -88,6 +89,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         idleTimer = null; // Timers created in OnEnterState
         seekingTimeoutTimer = null;
         queueCheckTimer = null;
+        wanderTimer = null;
         
         // Register with manager
         if (ShopManager.Instance != null)
@@ -221,8 +223,11 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
 
             case CustomerState.Wander:
                 spriteRenderer.color = wanderColor;
-                SetTarget(GetWanderPosition(wanderArea));
                 sortingGroup.sortingOrder = 4;
+                float wanderDuration = Random.Range(customerDef.wanderDuration.x, customerDef.wanderDuration.y);
+                wanderTimer = new CountdownTimer(wanderDuration);
+                wanderTimer.Start();
+                SetTarget(GetWanderPosition(wanderArea));
                 break;
                 
             case CustomerState.Buying:
@@ -321,10 +326,32 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
 
             case CustomerState.Wander:
+                SalesManager salesManager = SalesManager.Instance;
+                wanderTimer.Tick(TickDelta);
 
+                // Pick new wander point when current one is reached
                 if (!targetPos.HasValue)
+                    SetTarget(GetWanderPosition(wanderArea));
+
+                // Timer expired — decide to buy
+                if (wanderTimer.IsFinished)
                 {
-                    ChangeState(CustomerState.Idle);
+                    if (salesManager.TryPickDesiredForCustomer(
+                        Inventory.Instance,
+                        customerDef.itemPreferance,
+                        (int)budget,
+                        customerDef.batchRange,
+                        out var item,
+                        out var qty))
+                    {
+                        desiredItem = item;
+                        desiredQty = Mathf.Max(1, qty);
+                        ChangeState(CustomerState.SeekingQueue);
+                    }
+                    else
+                    {
+                        ChangeState(CustomerState.Leaving);
+                    }
                 }
                 break;
 
@@ -360,6 +387,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         idleTimer = null;
         seekingTimeoutTimer = null;
         queueCheckTimer = null;
+        wanderTimer = null;
         
         // Reset initialization flag so Init() will work on re-spawn
         hasInitialized = false;
