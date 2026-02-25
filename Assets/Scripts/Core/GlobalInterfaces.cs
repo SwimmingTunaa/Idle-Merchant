@@ -29,4 +29,5 @@ public interface IUnitManager
     bool IsTypeFull(EntityDef def);
     int LayerIndex { get; }
     System.Collections.Generic.List<UnitTypeLimit> UnitLimits { get; } // Added for HireController access
+    System.Collections.Generic.List<EntityDef> HireableDefs { get; }
 }

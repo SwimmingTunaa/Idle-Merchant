@@ -34,7 +34,13 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     public List<UnitTypeLimit> unitLimits = new List<UnitTypeLimit>();
     
     List<UnitTypeLimit> IUnitManager.UnitLimits => unitLimits;
-    
+
+    [Header("Hireable Unit Types")]
+    [Tooltip("Which unit defs appear as candidates in the hiring panel for this layer")]
+    [SerializeField] private List<EntityDef> hireableDefs = new List<EntityDef>();
+
+    List<EntityDef> IUnitManager.HireableDefs => hireableDefs;
+
     [Header("Debug")]
     [SerializeField] protected bool showDebugLogs = false;
 
@@ -72,9 +78,12 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
     {
         if (operationArea == null)
             Debug.LogError($"[{GetType().Name} Layer {LayerIndex}] operationArea is not assigned!");
-        
+
         if (_maxUnits <= 0)
             Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] maxUnits is {_maxUnits} — no units can be hired!");
+
+        if (hireableDefs.Count == 0)
+            Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] No hireable defs defined — no candidates will appear in hiring panel.");
     }
 
     // ===== HIRING SYSTEM =====

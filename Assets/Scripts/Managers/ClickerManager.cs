@@ -75,6 +75,10 @@ public class ClickerManager : MonoBehaviour
             if (directHit.TryGetComponent(out EntityBase entity) && entity.IsDying)
                 return;
 
+            // Only damage mobs — adventurers, porters and customers are friendly
+            if (!directHit.TryGetComponent(out MobAgent _))
+                return;
+
             if (damageRadius > 0f)
             {
                 // AOE shockwave centered on the mob you clicked
@@ -129,6 +133,10 @@ public class ClickerManager : MonoBehaviour
                         continue;
 
                     if (hit.TryGetComponent(out EntityBase entity) && entity.IsDying)
+                        continue;
+
+                    // Only damage mobs — skip friendly entities
+                    if (!hit.TryGetComponent(out MobAgent _))
                         continue;
 
                     float applied = enemy.OnDamage(clickDamage);

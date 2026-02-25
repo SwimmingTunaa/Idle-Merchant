@@ -357,7 +357,7 @@ public class HireController : BasePanelController
     }
 
     // Creates candidate pools gated by maxUnlockedLayer.
-    // Pools are keyed by rank (entityDef.rank), not deployment layer.
+    // Pools are keyed by (role, manager.LayerIndex, def) so each layer gets its own pool per def.
     private void CreatePools<T>(List<T> managers, HireRole role, List<CandidatePool> outList)
         where T : IUnitManager
     {
@@ -367,18 +367,18 @@ public class HireController : BasePanelController
 
         foreach (var m in managers)
         {
-            foreach (var limit in m.UnitLimits)
+            foreach (var def in m.HireableDefs)
             {
-                if (limit.unitDef == null) continue;
+                if (def == null) continue;
 
                 // Gate by rank — higher rank candidates only appear when that layer is unlocked
-                if (limit.unitDef.rank > maxLayer)
+                if (def.rank > maxLayer)
                     continue;
 
-                var key = (role, limit.unitDef.rank, limit.unitDef);
+                var key = (role, m.LayerIndex, def);
                 if (candidatePools.ContainsKey(key)) continue;
 
-                var pool = new CandidatePool(role, limit.unitDef.rank, limit.unitDef, refreshIntervalSeconds, traitChance);
+                var pool = new CandidatePool(role, m.LayerIndex, def, refreshIntervalSeconds, traitChance);
                 candidatePools[key] = pool;
                 outList.Add(pool);
             }
@@ -631,7 +631,9 @@ public class HireController : BasePanelController
     // UI UPDATES
     // ═════════════════════════════════════════════
 
-    // Check hire button state against the selected deployment layer
+    // Check hire button state against the candidate's pool layer.
+    // Disables the button if the player can't afford the hire cost or the target layer is full.
+    // Applies "cost--insufficient" USS class to the cost label when gold is the blocker.
     private void UpdateHireButtonState()
     {
         if (CurrentCards.Count == 0 || CurrentRoster.Count == 0)
@@ -644,18 +646,27 @@ public class HireController : BasePanelController
         if (hireButton == null)
             return;
 
-        IUnitManager manager = null;
+        var costLabel = card.Q<Label>("cost");
 
+        // Resolve manager via the candidate's pool layer, not the UI layer selector
+        candidateToPool.TryGetValue(candidate, out var pool);
+        int poolLayer = pool != null ? pool.LayerIndex : selectedLayer;
+
+        IUnitManager manager = null;
         if (currentTab == TabType.Adventurers)
-            manager = adventurerManagers.Find(m => m.LayerIndex == selectedLayer);
+            manager = adventurerManagers.Find(m => m.LayerIndex == poolLayer);
         else
-            manager = porterManagers.Find(m => m.LayerIndex == selectedLayer);
+            manager = porterManagers.Find(m => m.LayerIndex == poolLayer);
 
         if (manager == null)
         {
             hireButton.SetEnabled(false);
+            costLabel?.AddToClassList("cost--insufficient");
             return;
         }
+
+        // Check gold affordability
+        bool canAfford = Inventory.Instance != null && Inventory.Instance.CanAfford(candidate.hireCost);
 
         // Check total layer capacity
         bool layerFull = manager.GetTotalCount() >= manager.MaxUnits;
@@ -664,7 +675,16 @@ public class HireController : BasePanelController
         int typeLimit = manager.GetUnitLimit(candidate.entityDef);
         bool typeFull = typeLimit >= 0 && manager.GetUnitCount(candidate.entityDef) >= typeLimit;
 
-        hireButton.SetEnabled(!layerFull && !typeFull);
+        bool canHire = canAfford && !layerFull && !typeFull;
+        hireButton.SetEnabled(canHire);
+
+        if (costLabel != null)
+        {
+            if (canHire)
+                costLabel.RemoveFromClassList("cost--insufficient");
+            else
+                costLabel.AddToClassList("cost--insufficient");
+        }
     }
 
     private void UpdateCount()
