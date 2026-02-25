@@ -6131,6 +6131,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1860192359}
+  - {fileID: 662197243}
   - {fileID: 1426513257}
   - {fileID: 2059042694}
   - {fileID: 1157966447}
@@ -6184,6 +6185,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopManager
   NonQueueingCustomers: []
+  entrancePoint: {fileID: 662197243}
+  exitPoint: {fileID: 455401622}
   queueJoinDistance: 0.5
 --- !u!114 &354730534
 MonoBehaviour:
@@ -12009,6 +12012,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &662197242
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 662197243}
+  m_Layer: 0
+  m_Name: Shop Entrance
+  m_TagString: Untagged
+  m_Icon: {fileID: -1412012063857583412, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &662197243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 662197242}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -5.79, y: -0.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 354730529}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &666272635
 GameObject:
   m_ObjectHideFlags: 0
@@ -20028,7 +20062,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.13952065, y: 0}
+  m_Offset: {x: -0.022150956, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -20038,7 +20072,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.72095835, y: 1}
+  m_Size: {x: 0.39761508, y: 1}
   m_EdgeRadius: 0
 --- !u!4 &1157966447
 Transform:
@@ -20049,7 +20083,7 @@ Transform:
   m_GameObject: {fileID: 1157966445}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.37, y: -0.6, z: 0}
+  m_LocalPosition: {x: -0.41, y: -0.6, z: 0}
   m_LocalScale: {x: 25.68206, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25673,6 +25707,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopManager
   NonQueueingCustomers: []
+  entrancePoint: {fileID: 0}
+  exitPoint: {fileID: 0}
   queueJoinDistance: 0.5
 --- !u!4 &1565661111
 Transform:
@@ -36508,7 +36544,7 @@ Transform:
   m_GameObject: {fileID: 2059042692}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -43.48, y: -0.6, z: 0}
+  m_LocalPosition: {x: -45.7, y: -0.6, z: 0}
   m_LocalScale: {x: 7.5093746, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

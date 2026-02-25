@@ -22,7 +22,7 @@ MonoBehaviour:
   displayName: Potion Lady
   description: 
   hireCost: 50
-  assignedLayer: 1
+  rank: 1
   startingSkills: []
   sortingType: 4
   spawnWeight: 0.5
@@ -48,8 +48,11 @@ MonoBehaviour:
   ShirtColourPalette: {fileID: 0}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 0}
-  startingState: 1
+  startingState: 0
   customerArcheType: 0
   itemPreferance: 0
+  wanderDuration: {x: 5, y: 10}
+  wanderSpeedMultiplier: 0.4
+  wanderPauseDuration: {x: 0.5, y: 2}
   budget: {x: 8, y: 20}
   batchRange: {x: 1, y: 5}
