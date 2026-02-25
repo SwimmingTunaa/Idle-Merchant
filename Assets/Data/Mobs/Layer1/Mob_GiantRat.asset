@@ -23,7 +23,7 @@ MonoBehaviour:
   description: '"Oversized rodents nesting in the abandoned tunnels. They scatter
     when approached'
   hireCost: 50
-  assignedLayer: 1
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 2
@@ -87,4 +87,4 @@ MonoBehaviour:
   loot:
   - {fileID: 11400000, guid: 4e8726575cadc421985069c829e50a84, type: 2}
   - {fileID: 11400000, guid: ddf96bd2fa8954c309fc7c68ad5c7fd1, type: 2}
-  lootDropAmount: {x: 1, y: 2}
+  lootDropAmount: {x: 1, y: 1}

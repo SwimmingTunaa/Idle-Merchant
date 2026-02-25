@@ -13,6 +13,7 @@ public class GuildUpgradePanel : BasePanelController
 {
     [Header("UXML References")]
     [SerializeField] private VisualTreeAsset upgradeCardTemplate;
+    [SerializeField] private VisualTreeAsset milestoneCardTemplate;
 
     // Left page elements (star progress)
     private VisualElement leftPage;
@@ -211,65 +212,57 @@ public class GuildUpgradePanel : BasePanelController
 
     private VisualElement CreateMilestoneRow(StarMilestoneDef milestone)
     {
-        var row = new VisualElement();
-        row.AddToClassList("milestone-row");
+        var card = milestoneCardTemplate.CloneTree();
 
-        // Display Name (bold title)
-        if (!string.IsNullOrEmpty(milestone.displayName))
+        // Name
+        var nameLabel = card.Q<Label>("milestone-name");
+        if (nameLabel != null)
+            nameLabel.text = !string.IsNullOrEmpty(milestone.displayName)
+                ? milestone.displayName
+                : milestone.description;
+
+        // Flavour (hide element if empty)
+        var flavourLabel = card.Q<Label>("milestone-flavour");
+        if (flavourLabel != null)
         {
-            var nameLabel = new Label(milestone.displayName);
-            nameLabel.AddToClassList("milestone-display-name");
-            row.Add(nameLabel);
+            bool hasFlavour = !string.IsNullOrEmpty(milestone.flavorText);
+            flavourLabel.style.display = hasFlavour ? DisplayStyle.Flex : DisplayStyle.None;
+            if (hasFlavour)
+                flavourLabel.text = milestone.flavorText;
         }
 
-        // Flavour Text (italic, muted)
-        if (!string.IsNullOrEmpty(milestone.flavorText))
-        {
-            var flavourLabel = new Label($"\"{milestone.flavorText}\"");
-            flavourLabel.AddToClassList("milestone-flavour-text");
-            row.Add(flavourLabel);
-        }
+        // Description
+        var descLabel = card.Q<Label>("milestone-description");
+        if (descLabel != null)
+            descLabel.text = milestone.description;
 
-        // Description (technical instruction)
-        var descLabel = new Label(milestone.description);
-        descLabel.AddToClassList("milestone-description");
-        row.Add(descLabel);
-
-        // Progress bar container
-        var progressContainer = new VisualElement();
-        progressContainer.AddToClassList("milestone-progress-container");
-
-        var progressBar = new VisualElement();
-        progressBar.AddToClassList("milestone-progress-bar");
-
-        var progressFill = new VisualElement();
-        progressFill.AddToClassList("milestone-progress-fill");
-        
-        float progress = ProgressionManager.Instance.GetMilestoneProgress(milestone);
-        progressFill.style.width = Length.Percent(progress * 100f);
-
-        progressBar.Add(progressFill);
-        progressContainer.Add(progressBar);
-
-        // Progress text
+        // Progress
         int current = ProgressionManager.Instance.GetMilestoneCurrentValue(milestone);
         int target = milestone.targetValue;
-        
-        var progressLabel = new Label($"{current}/{target}");
-        progressLabel.AddToClassList("milestone-progress-text");
-        progressContainer.Add(progressLabel);
+        float progress = ProgressionManager.Instance.GetMilestoneProgress(milestone);
+        bool complete = ProgressionManager.Instance.IsMilestoneComplete(milestone);
 
-        // Checkmark if complete
-        if (ProgressionManager.Instance.IsMilestoneComplete(milestone))
+        var fill = card.Q<VisualElement>("milestone-progress-fill");
+        if (fill != null)
         {
-            var checkmark = new Label("✓");
-            checkmark.AddToClassList("milestone-checkmark");
-            progressContainer.Add(checkmark);
+            fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
+            if (complete)
+                fill.AddToClassList("milestone-progress-fill--complete");
         }
 
-        row.Add(progressContainer);
+        var progressText = card.Q<Label>("milestone-progress-text");
+        if (progressText != null)
+            progressText.text = $"{current}/{target}";
 
-        return row;
+        // Checkmark + card state
+        if (complete)
+        {
+            // card.AddToClassList("milestone-card--complete");
+            // var checkmark = card.Q<Label>("milestone-checkmark");
+            // checkmark?.AddToClassList("milestone-checkmark--visible");
+        }
+
+        return card;
     }
 
     // ═════════════════════════════════════════════

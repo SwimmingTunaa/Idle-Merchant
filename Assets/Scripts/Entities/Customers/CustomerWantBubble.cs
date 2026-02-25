@@ -20,7 +20,6 @@ public class CustomerWantBubble : MonoBehaviour
 #if TMP_PRESENT
     [SerializeField] private TMP_Text qtyText;             // optional "x3" etc.
 #endif
-    [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.1f, 0f);
 
     [Header("Visibility")]
     [Tooltip("Which states should show the bubble?")]

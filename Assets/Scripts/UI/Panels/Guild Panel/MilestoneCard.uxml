@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/MilestoneCard.uss?fileID=7433441132597879392&amp;guid=2f1f3d4b45c4e4f5382fd8eaedc21a90&amp;type=3#MilestoneCard" />
+    <ui:VisualElement name="milestone-card" class="milestone-card">
+        <ui:VisualElement class="milestone-header">
+            <ui:Label name="milestone-name" text="Milestone Name" class="milestone-name text-h3" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            <ui:Label name="milestone-checkmark" text="✓" class="milestone-checkmark" style="display: none;" />
+        </ui:VisualElement>
+        <ui:Label name="milestone-flavour" text="test test test lorem ipsum" class="milestone-flavour text-body" style="margin-top: 4px; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+        <ui:Label name="milestone-description" text="Earn 1000 gold" class="milestone-description text-body" style="padding-top: 0; margin-top: 16px; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+        <ui:VisualElement name="progress-bar" class="milestone-progress-row">
+            <ui:VisualElement class="milestone-progress-track">
+                <ui:VisualElement name="milestone-progress-fill" class="milestone-progress-fill milestone-progress-fill--complete" />
+            </ui:VisualElement>
+            <ui:Label name="milestone-progress-text" text="0/1000" class="milestone-progress-text text-body" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

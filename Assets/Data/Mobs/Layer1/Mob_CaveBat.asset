@@ -23,7 +23,7 @@ MonoBehaviour:
   description: Winged creatures roosting in the mine shafts. They drop from the ceiling
     in startled flurries when disturbed.
   hireCost: 50
-  assignedLayer: 1
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 1.5
@@ -87,4 +87,4 @@ MonoBehaviour:
   loot:
   - {fileID: 11400000, guid: bd4f35e072de64198879417db42a1342, type: 2}
   - {fileID: 11400000, guid: ddf96bd2fa8954c309fc7c68ad5c7fd1, type: 2}
-  lootDropAmount: {x: 1, y: 2}
+  lootDropAmount: {x: 1, y: 1}
