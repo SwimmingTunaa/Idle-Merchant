@@ -1067,6 +1067,8 @@ MonoBehaviour:
   operationArea: {fileID: 1242518143}
   _maxUnits: 5
   unitLimits: []
+  hireableDefs:
+  - {fileID: 11400000, guid: 178f8b2081c404e74be48b12e208878a, type: 2}
   showDebugLogs: 0
 --- !u!1 &117833260
 GameObject:
@@ -5668,6 +5670,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
+  hireableDefs: []
   showDebugLogs: 0
   transport: {fileID: 1642071349}
   depositPoint: {fileID: 1426513257}
@@ -10901,6 +10904,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
+  hireableDefs: []
   showDebugLogs: 0
   transport: {fileID: 1045207906}
   depositPoint: {fileID: 1426513257}
@@ -11226,6 +11230,13 @@ MonoBehaviour:
   maxCommoner: 999
   maxAdventurer: 5
   maxNoble: 3
+  baseSpawnsPerMinute: 5
+  spawnRatePerStar: 2
+  spawnRatePerSaleItem: 0.5
+  spawnRatePerLayer: 1
+  minSpawnsPerMinute: 1
+  maxSpawnsPerMinute: 60
+  showDebugLogs: 0
 --- !u!1 &620508933
 GameObject:
   m_ObjectHideFlags: 0
@@ -11366,6 +11377,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 6382ecb9d6a2a4377ab376ac63acac61, type: 2}
     maxCount: 6
+  hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &630844638
 GameObject:
@@ -19041,6 +19053,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
+  hireableDefs: []
   showDebugLogs: 0
   transport: {fileID: 1208775759}
   depositPoint: {fileID: 1426513257}
@@ -19094,6 +19107,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 29b28522699dd4ce4a4f14736c1a3f28, type: 2}
     maxCount: 6
+  hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &1097925425
 GameObject:
@@ -22608,6 +22622,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
+  hireableDefs: []
   showDebugLogs: 0
   transport: {fileID: 1871572108}
   depositPoint: {fileID: 1426513257}
@@ -23564,6 +23579,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
+  hireableDefs: []
   showDebugLogs: 0
   transport: {fileID: 188225048}
   depositPoint: {fileID: 1426513257}
@@ -25535,6 +25551,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 19aeb50240abb4c9da06cefd0ac0245f, type: 2}
     maxCount: 6
+  hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &1559429059
 GameObject:
@@ -27471,6 +27488,7 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: 351863467aa9345a78d73faa3378d8ff, type: 2}
     maxCount: 6
+  hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &1768688572
 GameObject:

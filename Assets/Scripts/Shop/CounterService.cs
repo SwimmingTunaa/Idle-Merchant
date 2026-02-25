@@ -118,7 +118,8 @@ public class CounterService : MonoBehaviour
         }
 
         Inventory.Instance.InventoryDebugUi();
-        LeaveNow(c);
+        c.SetTarget(exitPoint.position);
+        c.LeaveWithPurchase(c.desiredItem, qty);
         queue.DequeueHeadAndShift();
     }
 

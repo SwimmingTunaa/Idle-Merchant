@@ -93,6 +93,7 @@
     <Compile Include="Assets/Scripts/Skills/Passive/GoldGenerationEffect.cs" />
     <Compile Include="Assets/Scripts/UI/IPanelController.cs" />
     <Compile Include="Assets/Scripts/Utility/GameVariableReader.cs" />
+    <Compile Include="Assets/Scripts/Entities/Customers/CustomerStateEmoteTrigger.cs" />
     <Compile Include="Assets/Scripts/Loot/Loot.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/StarRewardDef.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/Query.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Assets/Scripts/Traits/TraitDef.cs" />
     <Compile Include="Assets/Scripts/Managers/UnitManager.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitCompatibilityChecker.cs" />
+    <Compile Include="Assets/Scripts/Entities/Customers/CustomerCarryDisplay.cs" />
     <Compile Include="Assets/Scripts/Utility/Deubugger/GameDebugger.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/BaseStats.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Pause Menu/PauseMenuController.cs" />
@@ -143,6 +145,7 @@
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/GuildUpgradeDef.cs" />
     <Compile Include="Assets/Scripts/Identity/NamePoolDef.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Guild Panel/GuildUpgradePanel.cs" />
+    <Compile Include="Assets/Scripts/Utility/EmoteDisplay.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/StarMilestoneDef.cs" />
     <Compile Include="Assets/Scripts/Loot/LootVisual.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Skills/Passive/GoldGenerationSkillDef.cs" />

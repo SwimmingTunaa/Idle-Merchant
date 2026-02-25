@@ -27,6 +27,9 @@ public static class AnimHash
     public static readonly int Deposit = Animator.StringToHash("Deposit");
     public static readonly int Climb = Animator.StringToHash("Climb");
     
+    // ===== CUSTOMER PARAMETERS =====
+    public static readonly int Carry = Animator.StringToHash("Carry");
+
     // ===== STATE BOOLS (Optional - if using bool parameters instead of state machine) =====
     public static readonly int IsIdle = Animator.StringToHash("IsIdle");
     public static readonly int IsMoving = Animator.StringToHash("IsMoving");

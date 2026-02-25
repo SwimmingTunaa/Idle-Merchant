@@ -157,9 +157,21 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         }
         else
         {
-            // Optional: leave immediately, or wander a bit then leave.
+            ChangeState(CustomerState.Leaving);
         }
 
+    }
+
+    /// <summary>
+    /// Called by CounterService after a successful sale.
+    /// Stamps the purchased item/qty onto the customer, then transitions to Leaving
+    /// so carry-display components can react to the state change with the correct desiredItem.
+    /// </summary>
+    public void LeaveWithPurchase(ItemDef item, int qty)
+    {
+        desiredItem = item;
+        desiredQty  = qty;
+        ChangeState(CustomerState.Leaving);
     }
 
     protected override void OnEnterState(CustomerState newState)
