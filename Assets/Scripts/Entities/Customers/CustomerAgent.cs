@@ -34,11 +34,14 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     [Tooltip("How often to check if queue is full while seeking (seconds)")]
     [SerializeField] private float queueCheckInterval = 0.5f;
     
+    private const int WanderSpeedModifierId = -100;
+
     // Timers (migrated from float to Timer classes)
     private CountdownTimer idleTimer;
     private CountdownTimer seekingTimeoutTimer;
     private CountdownTimer queueCheckTimer;
     private CountdownTimer wanderTimer;
+    private CountdownTimer wanderPauseTimer;
 
     private CustomerDef customerDef;
     private int batchMin, batchMax;
@@ -90,6 +93,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         seekingTimeoutTimer = null;
         queueCheckTimer = null;
         wanderTimer = null;
+        wanderPauseTimer = null;
         
         // Register with manager
         if (ShopManager.Instance != null)
@@ -224,9 +228,16 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
             case CustomerState.Wander:
                 spriteRenderer.color = wanderColor;
                 sortingGroup.sortingOrder = 4;
-                float wanderDuration = Random.Range(customerDef.wanderDuration.x, customerDef.wanderDuration.y);
+                float wanderDuration = Mathf.Max(1f, Random.Range(customerDef.wanderDuration.x, customerDef.wanderDuration.y));
                 wanderTimer = new CountdownTimer(wanderDuration);
                 wanderTimer.Start();
+                wanderPauseTimer = null;
+                Stats.Mediator.AddModifier(new BasicStatModifier(
+                    StatType.MoveSpeed,
+                    WanderSpeedModifierId,
+                    -1f,
+                    v => v * customerDef.wanderSpeedMultiplier
+                ));
                 SetTarget(GetWanderPosition(wanderArea));
                 break;
                 
@@ -237,6 +248,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Leaving:
+                targetPos = ShopManager.Instance.exitPoint.position;
                 spriteRenderer.color = leavingColor;
                 sortingGroup.sortingOrder = 3;
                 break;
@@ -329,11 +341,28 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 SalesManager salesManager = SalesManager.Instance;
                 wanderTimer.Tick(TickDelta);
 
-                // Pick new wander point when current one is reached
-                if (!targetPos.HasValue)
-                    SetTarget(GetWanderPosition(wanderArea));
+                // Handle pause at wander point
+                if (wanderPauseTimer != null)
+                {
+                    wanderPauseTimer.Tick(TickDelta);
+                    if (wanderPauseTimer.IsFinished)
+                    {
+                        wanderPauseTimer = null;
+                        SetTarget(GetWanderPosition(wanderArea));
+                    }
+                    break;
+                }
 
-                // Timer expired — decide to buy
+                // Reached wander point — start pause
+                if (!targetPos.HasValue)
+                {
+                    float pause = Random.Range(customerDef.wanderPauseDuration.x, customerDef.wanderPauseDuration.y);
+                    wanderPauseTimer = new CountdownTimer(pause);
+                    wanderPauseTimer.Start();
+                    break;
+                }
+
+                // Browse timer expired — decide to buy
                 if (wanderTimer.IsFinished)
                 {
                     if (salesManager.TryPickDesiredForCustomer(
@@ -369,7 +398,11 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         }
     }
 
-    protected override void OnExitState (CustomerState oldState) { }
+    protected override void OnExitState(CustomerState oldState)
+    {
+        if (oldState == CustomerState.Wander)
+            Stats.Mediator.RemoveModifier(WanderSpeedModifierId);
+    }
     public override void Despawn()
     {
         if (showDebugLogs)
@@ -388,6 +421,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         seekingTimeoutTimer = null;
         queueCheckTimer = null;
         wanderTimer = null;
+        wanderPauseTimer = null;
         
         // Reset initialization flag so Init() will work on re-spawn
         hasInitialized = false;

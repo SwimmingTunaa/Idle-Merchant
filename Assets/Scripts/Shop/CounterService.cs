@@ -91,8 +91,6 @@ public class CounterService : MonoBehaviour
 
     void LeaveNow(CustomerAgent c)
     {
-        // No purchase. Send to exit and switch state.
-        c.SetTarget(exitPoint.position);
         c.ChangeState(CustomerState.Leaving);
     }
 
@@ -118,7 +116,6 @@ public class CounterService : MonoBehaviour
         }
 
         Inventory.Instance.InventoryDebugUi();
-        c.SetTarget(exitPoint.position);
         c.LeaveWithPurchase(c.desiredItem, qty);
         queue.DequeueHeadAndShift();
     }

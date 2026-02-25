@@ -9,6 +9,9 @@ public class ShopManager : MonoBehaviour
 
     [Header("Entrance")]
     public Transform entrancePoint;
+    public Transform exitPoint;
+
+    
 
     [Header("Queue Entry")]
     [Tooltip("Distance at which seeking customers join the queue")]
