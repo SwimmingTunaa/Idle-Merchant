@@ -222,6 +222,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Entering:
+                spriteRenderer.color = Color.white;
+                sortingGroup.sortingOrder = 6;
                 SetTarget(ShopManager.Instance.entrancePoint.position);
                 break;
 

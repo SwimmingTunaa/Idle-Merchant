@@ -294,7 +294,7 @@ public class GuildUpgradePanel : BasePanelController
     private VisualElement CreateUpgradeCard(GuildUpgradeDef upgrade)
     {
         // Clone template
-        var card = upgradeCardTemplate.CloneTree().Q<VisualElement>("upgrade-card");
+        var card = upgradeCardTemplate.CloneTree();
 
         // Set icon
         var icon = card.Q<VisualElement>("upgrade-icon");

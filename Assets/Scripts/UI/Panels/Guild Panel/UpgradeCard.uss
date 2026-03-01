@@ -1,240 +1,127 @@
 /* ═══════════════════════════════════════════════════════════════
-   GUILD UPGRADE PANEL - OPEN BOOK LAYOUT
+   UPGRADE CARD WIDGET
    ═══════════════════════════════════════════════════════════════ */
 
-/* Panel root */
-.panel-root {
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Book container */
-.book-container {
-    width: 1400px;
-    height: 900px;
-    flex-direction: row;
-    background-color: rgb(139, 90, 60); /* Wood table background */
-    border-radius: 12px;
-    padding: 40px;
-    border-width: 8px;
-    border-color: rgb(101, 67, 33);
-}
-
-/* Individual pages */
-.book-page {
-    width: 640px;
-    height: 100%;
-    background-color: rgb(245, 235, 215); /* Parchment color */
-    border-radius: 8px;
-    padding: 32px;
-    border-width: 2px;
-    border-color: rgb(200, 180, 150);
+.upgrade-card {
+    width: 200px;
+    min-height: 240px;
     flex-direction: column;
-}
-
-/* Left page specific */
-.left-page {
-    margin-right: 20px;
-}
-
-/* Right page specific */
-.right-page {
-    margin-left: 20px;
-}
-
-/* Book spine (visual separator) */
-.book-spine {
-    width: 8px;
-    height: 100%;
-    background-color: rgb(80, 50, 30);
-    border-radius: 2px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   LEFT PAGE - STAR PROGRESS
-   ═══════════════════════════════════════════════════════════════ */
-
-.page-header {
-    font-size: 28px;
-    color: rgb(60, 40, 20);
-    -unity-font-style: bold;
-    -unity-text-align: upper-center;
-    margin-bottom: 20px;
-}
-
-/* Star display */
-.stars-display {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-}
-
-.star {
-    width: 32px;
-    height: 32px;
-    margin: 0 4px;
-    border-radius: 50%;
-}
-
-.star-filled {
-    background-color: rgb(255, 215, 0);
-    border-width: 2px;
-    border-color: rgb(200, 170, 0);
-}
-
-.star-empty {
-    background-color: rgb(120, 110, 100);
-    border-width: 2px;
-    border-color: rgb(160, 150, 140);
-}
-
-.current-star-label {
-    font-size: 18px;
-    color: rgb(80, 60, 40);
-    -unity-font-style: bold;
-    -unity-text-align: upper-center;
-    margin-bottom: 8px;
-}
-
-.next-star-label {
-    font-size: 16px;
-    color: rgb(100, 80, 60);
-    -unity-text-align: upper-center;
-    margin-bottom: 20px;
-}
-
-/* Separator line */
-.separator {
-    height: 2px;
-    background-color: rgb(180, 160, 130);
-    margin-bottom: 20px;
-}
-
-/* Milestones scroll view */
-.milestones-scroll {
-    flex-grow: 1;
-}
-
-.milestones-container {
-    flex-direction: column;
-}
-
-/* Milestone row */
-.milestone-row {
-    flex-direction: column;
-    margin-bottom: 20px;
-    padding: 12px;
-    background-color: rgb(235, 225, 205);
-    border-radius: 6px;
-    border-width: 1px;
-    border-color: rgb(200, 180, 150);
-}
-
-.milestone-display-name {
-    font-size: 16px;
-    color: rgb(60, 40, 20);
-    -unity-font-style: bold;
-    margin-bottom: 4px;
-}
-
-.milestone-flavour-text {
-    font-size: 11px;
-    color: rgb(120, 100, 80);
-    -unity-font-style: italic;
-    margin-bottom: 8px;
-    white-space: normal;
-}
-
-.milestone-description {
-    font-size: 14px;
-    color: rgb(70, 50, 30);
-    margin-bottom: 8px;
-}
-
-.milestone-progress-container {
-    flex-direction: row;
-    align-items: center;
-}
-
-.milestone-progress-bar {
-    flex-grow: 1;
-    height: 16px;
-    background-color: rgb(200, 180, 150);
-    border-radius: 8px;
-    margin-right: 8px;
+    align-items: stretch;
+    background-color: var(--color-bg-surface);
+    border-color: var(--color-border-medium);
+    border-width: var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin: var(--space-sm);
+    position: relative;
     overflow: hidden;
 }
 
-.milestone-progress-fill {
-    height: 100%;
-    background-color: rgb(100, 180, 100);
-    transition-property: width;
-    transition-duration: 0.3s;
+/* Icon */
+.upgrade-icon {
+    width: 64px;
+    height: 64px;
+    align-self: center;
+    margin-bottom: var(--space-sm);
+    background-color: var(--color-bg-light);
+    border-radius: var(--radius-sm);
+    border-color: var(--color-border-light);
+    border-width: var(--border-thin);
 }
 
-.milestone-progress-text {
-    font-size: 12px;
-    color: rgb(80, 60, 40);
-    width: 60px;
-    -unity-text-align: middle-center;
-}
-
-.milestone-checkmark {
-    font-size: 20px;
-    color: rgb(80, 180, 80);
+/* Name */
+.upgrade-name {
+    font-size: var(--font-size-body);
     -unity-font-style: bold;
-    margin-left: 8px;
-}
-
-.milestone-complete-label {
-    font-size: 16px;
-    color: rgb(80, 180, 80);
-    -unity-font-style: bold;
+    color: var(--color-text-primary);
     -unity-text-align: upper-center;
-    margin-top: 40px;
+    margin-bottom: var(--space-xs);
+    white-space: normal;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RIGHT PAGE - UPGRADE GRID
-   ═══════════════════════════════════════════════════════════════ */
-
-.upgrade-scroll {
+/* Description */
+.upgrade-description {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    -unity-text-align: upper-center;
+    white-space: normal;
     flex-grow: 1;
+    margin-bottom: var(--space-sm);
 }
 
-.upgrade-grid {
+/* Cost row */
+.cost-container {
     flex-direction: row;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-sm);
+}
+
+.card-coin-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: var(--space-xs);
+    background-color: var(--color-accent);
+    border-radius: var(--radius-pill);
+}
+
+.cost-label {
+    font-size: var(--font-size-body);
+    -unity-font-style: bold;
+    color: var(--color-text-primary);
+}
+
+/* Star requirement */
+.star-requirement {
+    align-items: center;
+    margin-bottom: var(--space-xs);
+}
+
+.star-requirement-label {
+    font-size: var(--font-size-caption);
+    color: var(--color-warning);
+    -unity-text-align: upper-center;
+}
+
+/* Lock overlay */
+.lock-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-bg-overlay);
+    align-items: center;
     justify-content: center;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CLOSE BUTTON
-   ═══════════════════════════════════════════════════════════════ */
+.lock-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-text-muted);
+    border-radius: var(--radius-sm);
+}
 
-.close-button {
+/* Owned badge */
+.owned-badge {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 48px;
-    height: 48px;
-    background-color: rgb(200, 100, 100);
-    border-width: 3px;
-    border-color: rgb(150, 60, 60);
-    border-radius: 24px;
-    font-size: 24px;
-    color: rgb(255, 255, 255);
+    top: var(--space-sm);
+    right: var(--space-sm);
+    background-color: var(--color-success);
+    border-radius: var(--radius-lg  );
+    padding: var(--space-xs) var(--space-sm);
+}
+
+.owned-label {
+    font-size: var(--font-size-caption);
     -unity-font-style: bold;
+    color: var(--color-text-inverse);
 }
 
-.close-button:hover {
-    background-color: rgb(220, 120, 120);
-    scale: 1.1;
-}
-
-.close-button:active {
-    scale: 0.9;
+/* Insufficient gold warning */
+.insufficient-gold-label {
+    font-size: var(--font-size-caption);
+    color: var(--color-destructive);
+    -unity-text-align: upper-center;
+    margin-top: var(--space-xs);
 }
