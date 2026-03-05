@@ -33,6 +33,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     private float stateTargetTime;
     
     private Health health;
+    [SerializeField] GameObject deathEffect;
     private CombatBehavior combat;
 
     // Hit stagger tracking
@@ -60,7 +61,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     public override void Init(EntityDef entityDef, int layer, Spawner spawner, Collider2D playArea)
     {
         base.Init(entityDef, layer, spawner, playArea);
-        
+        deathEffect?.SetActive(false);
         adventurerDef = (AdventurerDef)entityDef;
         
         leashRange = adventurerDef.leashRange;
@@ -299,6 +300,8 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             animator.SetBool(AnimHash.Dead, true);
         }
 
+        deathEffect?.SetActive(true);
+
         if (showDebugLogs)
             Debug.Log($"[{name}] Playing death animation, reviving in {adventurerDef.reviveDelay}s");
 
@@ -316,6 +319,8 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         // Reset cooldowns
         hitCooldownTimer = 0f;
         deathCoroutine = null;
+
+        deathEffect?.SetActive(false);
 
         if (showDebugLogs)
             Debug.Log($"[{name}] Revived!");

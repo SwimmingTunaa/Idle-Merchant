@@ -6,6 +6,8 @@ using UnityEngine.U2D.Animation;
 public static class HiringCandidateGenerator
 {
     private static NamePoolDef namePool; // Cached reference
+    private const float TRAIT_PRICE_SCALE = 2.5f;
+    private const float MAX_TRAIT_DELTA = 0.20f;
 
     private static readonly string[] NewspaperNames =
     {
@@ -105,7 +107,7 @@ public static class HiringCandidateGenerator
                 identity = identity,
                 traits = traits,
                 cursedCombo = cursedCombo,
-                hireCost = CalculateHireCost(baseCost, cursedCombo),
+                hireCost = CalculateHireCost(baseCost, traits, cursedCombo),
                 newspaperName = NewspaperNames[Random.Range(0, NewspaperNames.Length)],
                 appearanceIndices = entityDef.useModularCharacter ? new CharacterAppearanceIndices
                 {
@@ -176,14 +178,31 @@ public static class HiringCandidateGenerator
         };
     }
     
-    private static int CalculateHireCost(int baseCost, CursedComboDef cursedCombo)
+    private static int CalculateHireCost(int baseCost, TraitInstance[] traits, CursedComboDef cursedCombo)
     {
+        float finalMultiplier = 1f;
+
+        if (traits != null)
+        {
+            foreach (var traitInstance in traits)
+            {
+                var traitDef = TraitDatabase.GetTrait(traitInstance.traitId);
+                if (traitDef == null)
+                    continue;
+
+                float rawDelta = traitDef.hireCostMultiplier - 1f;
+                float scaledDelta = Mathf.Clamp(rawDelta * TRAIT_PRICE_SCALE, -MAX_TRAIT_DELTA, MAX_TRAIT_DELTA);
+                finalMultiplier *= 1f + scaledDelta;
+            }
+        }
+
         if (cursedCombo != null)
         {
-            return Mathf.RoundToInt(baseCost * cursedCombo.costMultiplier);
+            finalMultiplier *= cursedCombo.costMultiplier;
         }
-        
-        return baseCost;
+
+        int cost = Mathf.RoundToInt(baseCost * finalMultiplier);
+        return Mathf.Max(1, cost);
     }
 
     private static int RandomSpriteLibraryIndex(SpriteLibraryAsset[] spriteLibrary)
