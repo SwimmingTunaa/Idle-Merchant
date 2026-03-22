@@ -32,8 +32,11 @@ public static class GameSignals
     public static event Action<int> OnStarEarned;
     public static event Action    OnMarkedForSaleChanged;
 
+    // Customers
+    public static event Action OnCustomerServed;
+
     //Hiring
-    public static event Action<EntityDef> OnUnitHired;
+    public static event Action<EntityDef, HireRole> OnUnitHired;
 
     // Public invoke methods
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
@@ -51,7 +54,8 @@ public static class GameSignals
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
     public static void RaiseStarEarned(int star) => OnStarEarned?.Invoke(star);
     public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
-    public static void RaiseUnitHired(EntityDef unitDef) => OnUnitHired?.Invoke(unitDef);
+    public static void RaiseCustomerServed() => OnCustomerServed?.Invoke();
+    public static void RaiseUnitHired(EntityDef unitDef, HireRole role) => OnUnitHired?.Invoke(unitDef, role);
 
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]
@@ -72,6 +76,7 @@ public static class GameSignals
         OnLayerUnlocked = null;
         OnStarEarned = null;
         OnMarkedForSaleChanged = null;
+        OnCustomerServed = null;
 
         Debug.Log("[GameSignals] All listeners cleared");
     }
@@ -95,6 +100,8 @@ public static class GameSignals
         Debug.Log($"OnLayerUnlocked: {OnLayerUnlocked?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnStarEarned: {OnStarEarned?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnMarkedForSaleChanged: {OnMarkedForSaleChanged?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnCustomerServed: {OnCustomerServed?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnUnitHired: {OnUnitHired?.GetInvocationList().Length ?? 0}");
     }
 #endif
 }

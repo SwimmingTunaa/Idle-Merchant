@@ -110,9 +110,9 @@ public class CounterService : MonoBehaviour
         {
             Inventory.Instance.AddGold(totalCost);
 
-            //spawn coin vfx after purchase
             SpawnGoldVFX(c.transform.position, totalCost);
             GameSignals.RaiseItemSold(new ResourceStack(c.desiredItem, qty, totalCost));
+            GameSignals.RaiseCustomerServed();
         }
 
         Inventory.Instance.InventoryDebugUi();

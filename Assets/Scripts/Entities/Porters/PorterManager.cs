@@ -87,6 +87,15 @@ public class PorterManager : UnitManager<PorterAgent>
         return porter;
     }
 
+    public override bool HireUnit(HiringCandidate candidate)
+    {
+        if (!base.HireUnit(candidate))
+            return false;
+
+        GameSignals.RaiseUnitHired(candidate.entityDef, HireRole.Porter);
+        return true;
+    }
+
     // ===== TRANSPORT UPGRADE =====
 
     /// <summary>

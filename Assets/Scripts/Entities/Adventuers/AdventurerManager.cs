@@ -50,6 +50,15 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
         return agent;
     }
 
+    public override bool HireUnit(HiringCandidate candidate)
+    {
+        if (!base.HireUnit(candidate))
+            return false;
+
+        GameSignals.RaiseUnitHired(candidate.entityDef, HireRole.Adventurer);
+        return true;
+    }
+
     // ===== LEGACY WRAPPERS (for backward compatibility) =====
 
     /// <summary>

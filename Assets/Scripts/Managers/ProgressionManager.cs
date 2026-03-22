@@ -47,6 +47,8 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private int totalGoldEarned = 0;
     private int totalMobsKilled = 0;
     private int totalUnitsHired = 0;
+    private int totalAdventurersHired = 0;
+    private int totalPortersHired = 0;
     private int totalLootCollected = 0;
     private int totalItemsCrafted = 0;
     private int totalCraftedItemsSold = 0;
@@ -86,6 +88,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnLootCollected += HandleLootCollected;
         GameSignals.OnProductCrafted += HandleProductCrafted;
         GameSignals.OnUnitHired += HandleUnitHired;
+        GameSignals.OnCustomerServed += HandleCustomerServed;
     }
 
     void OnDisable()
@@ -96,6 +99,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnLootCollected -= HandleLootCollected;
         GameSignals.OnProductCrafted -= HandleProductCrafted;
         GameSignals.OnUnitHired -= HandleUnitHired;
+        GameSignals.OnCustomerServed -= HandleCustomerServed;
     }
 
     // Signal handlers
@@ -119,9 +123,16 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         IncrementItemsCrafted(stack.qty);
     }
 
-    private void HandleUnitHired(EntityDef def)
+    private void HandleUnitHired(EntityDef def, HireRole role)
     {
         IncrementUnitsHired(1);
+        if (role == HireRole.Adventurer) IncrementAdventurersHired(1);
+        else if (role == HireRole.Porter) IncrementPortersHired(1);
+    }
+
+    private void HandleCustomerServed()
+    {
+        IncrementCustomersServed(1);
     }
 
     // ===== MILESTONE LOADING =====
@@ -428,6 +439,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.GoldEarned => totalGoldEarned >= milestone.targetValue,
             MilestoneType.MobsKilled => totalMobsKilled >= milestone.targetValue,
             MilestoneType.UnitsHired => totalUnitsHired >= milestone.targetValue,
+            MilestoneType.AdventurersHired => totalAdventurersHired >= milestone.targetValue,
+            MilestoneType.PortersHired => totalPortersHired >= milestone.targetValue,
             MilestoneType.LootCollected => totalLootCollected >= milestone.targetValue,
             MilestoneType.ItemsCrafted => totalItemsCrafted >= milestone.targetValue,
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold >= milestone.targetValue,
@@ -449,6 +462,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.GoldEarned => totalGoldEarned,
             MilestoneType.MobsKilled => totalMobsKilled,
             MilestoneType.UnitsHired => totalUnitsHired,
+            MilestoneType.AdventurersHired => totalAdventurersHired,
+            MilestoneType.PortersHired => totalPortersHired,
             MilestoneType.LootCollected => totalLootCollected,
             MilestoneType.ItemsCrafted => totalItemsCrafted,
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
@@ -475,6 +490,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.GoldEarned => totalGoldEarned,
             MilestoneType.MobsKilled => totalMobsKilled,
             MilestoneType.UnitsHired => totalUnitsHired,
+            MilestoneType.AdventurersHired => totalAdventurersHired,
+            MilestoneType.PortersHired => totalPortersHired,
             MilestoneType.LootCollected => totalLootCollected,
             MilestoneType.ItemsCrafted => totalItemsCrafted,
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
@@ -511,6 +528,24 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Units hired: +{count} (total: {totalUnitsHired})");
+    }
+
+    public void IncrementAdventurersHired(int count)
+    {
+        totalAdventurersHired += count;
+        milestoneCheckPending = true;
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Adventurers hired: +{count} (total: {totalAdventurersHired})");
+    }
+
+    public void IncrementPortersHired(int count)
+    {
+        totalPortersHired += count;
+        milestoneCheckPending = true;
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Porters hired: +{count} (total: {totalPortersHired})");
     }
 
     public void IncrementLootCollected(int count)
@@ -849,6 +884,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         totalGoldEarned = 0;
         totalMobsKilled = 0;
         totalUnitsHired = 0;
+        totalAdventurersHired = 0;
+        totalPortersHired = 0;
         totalLootCollected = 0;
         totalItemsCrafted = 0;
         totalCraftedItemsSold = 0;
