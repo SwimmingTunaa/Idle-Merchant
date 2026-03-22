@@ -26,12 +26,24 @@
     --color-border-medium: rgb(139, 90, 60);
     --color-border-light: rgb(200, 185, 160);
     --color-border-accent: rgb(255, 190, 97);
-    --font-size-h1: 32px;
-    --font-size-h2: 24px;
-    --font-size-h3: 20px;
-    --font-size-body: 16px;
-    --font-size-small: 14px;
+    /* ── Numeric font scale (use these going forward) ── */
+    --text-2xs:  10px;
+    --text-xs:   12px;
+    --text-sm:   14px;
+    --text-base: 16px;
+    --text-lg:   20px;
+    --text-xl:   24px;
+    --text-2xl:  32px;
+    --text-3xl:  40px;
+    --text-4xl:  48px;
+
+    /* ── Semantic aliases (backward compat — kept as direct values) ── */
     --font-size-caption: 12px;
+    --font-size-small:   14px;
+    --font-size-body:    16px;
+    --font-size-h3:      20px;
+    --font-size-h2:      24px;
+    --font-size-h1:      32px;
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;
@@ -94,6 +106,13 @@
     font-size: var(--font-size-caption);
     color: var(--color-text-muted);
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.text-lg {
+    font-size: var(--font-size-h2);
+    color: var(--color-text-secondary);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-style: normal;
 }
 
 .text-h1-inverse {

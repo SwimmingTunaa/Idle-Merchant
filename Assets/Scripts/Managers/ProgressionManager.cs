@@ -64,11 +64,17 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     // Layer unlock is routed through GameSignals.OnLayerUnlocked
     
 
+    protected override void Awake()
+    {
+        base.Awake();
+        // Load data in Awake so it's ready before any other Start runs
+        LoadMilestones();
+        LoadStarRewards();
+    }
+
     void Start()
     {
         RebuildAvailableItemsCache();
-        LoadMilestones();
-        LoadStarRewards();
     }
 
     void Update()
@@ -141,7 +147,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     {
         // Load all milestone definitions from Resources folder
         var loadedMilestones = Resources.LoadAll<StarMilestoneDef>("Milestones");
-        allMilestones = new List<StarMilestoneDef>(loadedMilestones);
+        allMilestones = new List<StarMilestoneDef>(loadedMilestones.Where(m => m != null));
 
         if (showDebugLogs)
         {
@@ -424,7 +430,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     /// </summary>
     public List<StarMilestoneDef> GetMilestonesForStar(int star)
     {
-        return allMilestones.Where(m => m.starLevel == star).ToList();
+        return allMilestones.Where(m => m != null && m.starLevel == star).ToList();
     }
 
     /// <summary>

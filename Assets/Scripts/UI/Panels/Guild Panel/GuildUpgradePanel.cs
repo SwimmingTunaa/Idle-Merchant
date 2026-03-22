@@ -30,6 +30,7 @@ public class GuildUpgradePanel : BasePanelController
     // Data
     private List<GuildUpgradeDef> allUpgrades = new List<GuildUpgradeDef>();
     private Dictionary<GuildUpgradeDef, VisualElement> upgradeCards = new Dictionary<GuildUpgradeDef, VisualElement>();
+    private MilestoneProgressEvents progressEvents;
 
     // ═════════════════════════════════════════════
     // LIFECYCLE
@@ -47,16 +48,19 @@ public class GuildUpgradePanel : BasePanelController
     {
         base.Start();
 
-        // Subscribe to progression events
-        ProgressionManager.OnStarEarned += OnStarEarned;
-        ProgressionManager.OnUpgradePurchased += OnUpgradePurchased;
+        // Guard: only refresh progress when panel is actually open
+        progressEvents = new MilestoneProgressEvents(
+            onProgressChanged: () => { if (State == PanelState.Open) RefreshMilestoneProgress(); },
+            onFullRebuild:     () => { if (State == PanelState.Open) UpdateLeftPage(); }
+        );
+        progressEvents.Subscribe();
+
         GameSignals.GoldChanged += OnGoldChanged;
     }
 
     protected override void OnDestroy()
     {
-        ProgressionManager.OnStarEarned -= OnStarEarned;
-        ProgressionManager.OnUpgradePurchased -= OnUpgradePurchased;
+        progressEvents?.Unsubscribe();
         GameSignals.GoldChanged -= OnGoldChanged;
 
         base.OnDestroy();
@@ -214,6 +218,9 @@ public class GuildUpgradePanel : BasePanelController
     {
         var card = milestoneCardTemplate.CloneTree();
 
+        // Store def on userData so RefreshMilestoneProgress can read it without a lookup
+        card.userData = milestone;
+
         // Name
         var nameLabel = card.Q<Label>("milestone-name");
         if (nameLabel != null)
@@ -254,19 +261,49 @@ public class GuildUpgradePanel : BasePanelController
         if (progressText != null)
             progressText.text = $"{current}/{target}";
 
-        // Checkmark + card state
+        // Checkmark + card complete state
         if (complete)
         {
-            // card.AddToClassList("milestone-card--complete");
-            // var checkmark = card.Q<Label>("milestone-checkmark");
-            // checkmark?.AddToClassList("milestone-checkmark--visible");
+            card.AddToClassList("milestone-card--complete");
+            var checkmark = card.Q<Label>("milestone-checkmark");
+            checkmark?.AddToClassList("milestone-checkmark--visible");
         }
 
         return card;
     }
 
-    // ═════════════════════════════════════════════
-    // RIGHT PAGE (UPGRADE CARDS)
+    // Lightweight: updates progress bars on existing cards without rebuilding the list.
+    private void RefreshMilestoneProgress()
+    {
+        if (milestonesContainer == null) return;
+
+        foreach (var card in milestonesContainer.Children())
+        {
+            // Recover the milestone def stored on the card
+            var defHolder = card.userData as StarMilestoneDef;
+            if (defHolder == null) continue;
+
+            bool complete  = ProgressionManager.Instance.IsMilestoneComplete(defHolder);
+            int  current   = ProgressionManager.Instance.GetMilestoneCurrentValue(defHolder);
+            float progress = ProgressionManager.Instance.GetMilestoneProgress(defHolder);
+
+            var fill = card.Q<VisualElement>("milestone-progress-fill");
+            if (fill != null)
+            {
+                fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
+                fill.EnableInClassList("milestone-progress-fill--complete", complete);
+            }
+
+            var progressText = card.Q<Label>("milestone-progress-text");
+            if (progressText != null)
+                progressText.text = $"{current}/{defHolder.targetValue}";
+
+            var checkmark = card.Q<Label>("milestone-checkmark");
+            checkmark?.EnableInClassList("milestone-checkmark--visible", complete);
+
+            card.EnableInClassList("milestone-card--complete", complete);
+        }
+    }
     // ═════════════════════════════════════════════
 
     private void BuildUpgradeCards()
@@ -401,48 +438,11 @@ public class GuildUpgradePanel : BasePanelController
     // EVENT HANDLERS
     // ═════════════════════════════════════════════
 
-    private void OnStarEarned(int newStar)
-    {
-        if (State != PanelState.Open) return;
-
-        // Update left page (star display + milestones)
-        UpdateLeftPage();
-
-        // Update all card states (new upgrades may unlock)
-        foreach (var kvp in upgradeCards)
-        {
-            UpdateCardState(kvp.Value, kvp.Key);
-        }
-
-        if (showDebugLogs)
-            Debug.Log($"[GuildUpgradePanel] Star earned: {newStar}★");
-    }
-
-    private void OnUpgradePurchased(GuildUpgradeDef upgrade)
-    {
-        if (State != PanelState.Open) return;
-
-        // Update the purchased card
-        if (upgradeCards.TryGetValue(upgrade, out var card))
-        {
-            UpdateCardState(card, upgrade);
-        }
-
-        // Update milestones (purchase may complete milestone)
-        UpdateMilestoneList();
-
-        if (showDebugLogs)
-            Debug.Log($"[GuildUpgradePanel] Upgrade purchased: {upgrade.upgradeName}");
-    }
-
     private void OnGoldChanged(int newTotal)
     {
         if (State != PanelState.Open) return;
 
-        // Update all cards (affordability changed)
         foreach (var kvp in upgradeCards)
-        {
             UpdateCardState(kvp.Value, kvp.Key);
-        }
     }
 }

@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uss?fileID=7433441132597879392&amp;guid=457eaf788e8904f54b06b019b6612282&amp;type=3#MilestoneTracker" />
+    <ui:VisualElement name="milestone-tracker" class="mt-root">
+        <ui:Button name="mt-toggle-button" class="mt-header">
+            <ui:VisualElement class="mt-header-left">
+                <ui:Label name="mt-star-label" text="Progress" class="mt-star-label text-lg" />
+                <ui:Label name="mt-count-label" text="0/4" class="mt-count-label text-small" />
+            </ui:VisualElement>
+            <ui:Label name="mt-chevron" text="▲" class="mt-chevron" />
+        </ui:Button>
+        <ui:VisualElement name="mt-body" class="mt-body">
+            <ui:VisualElement name="mt-list" class="mt-list" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

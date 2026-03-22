@@ -23251,7 +23251,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8650017daf20643aa9fd763a2add210d, type: 2}
   - {fileID: 11400000, guid: e0069288b6ed340168972c4a26701eb7, type: 2}
   - {fileID: 11400000, guid: 9b7ae337f53534e3e9a0ea552f04ba54, type: 2}
-  spawnsPerMinute: 20
+  spawnsPerMinute: 40
   maxAlive: 15
   spawnArea: {fileID: 1242518143}
   wander: {fileID: 1242518143}
@@ -24021,7 +24021,7 @@ Transform:
   m_GameObject: {fileID: 1426513256}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.54, y: 0.573, z: 0}
+  m_LocalPosition: {x: 24.86, y: 0.573, z: 0}
   m_LocalScale: {x: 1.8663938, y: 1.469125, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40027,11 +40027,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 779055911996323926, guid: 2cd89fb9cf7e74c8caf040491331ca54, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -7.237
+      value: -7.83
       objectReference: {fileID: 0}
     - target: {fileID: 2693544312021704565, guid: 2cd89fb9cf7e74c8caf040491331ca54, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.895
+      value: 4.25
       objectReference: {fileID: 0}
     - target: {fileID: 2799719204591549494, guid: 2cd89fb9cf7e74c8caf040491331ca54, type: 3}
       propertyPath: m_LocalScale.y
