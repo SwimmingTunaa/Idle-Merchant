@@ -6,8 +6,12 @@ using UnityEngine.U2D.Animation;
 public static class HiringCandidateGenerator
 {
     private static NamePoolDef namePool; // Cached reference
-    private const float TRAIT_PRICE_SCALE = 2.5f;
-    private const float MAX_TRAIT_DELTA = 0.20f;
+    private const float CURSED_CANDIDATE_CHANCE = 0.02f;
+    private const float POSITIVE_MODIFIER_PRICE_DELTA = 0.30f;
+    private const float NEGATIVE_MODIFIER_PRICE_DELTA = -0.10f;
+    private const float MAX_POSITIVE_TRAIT_DELTA = 0.30f;
+    private const float MAX_NEGATIVE_TRAIT_DELTA = -0.10f;
+    private const bool ENABLE_GENERATION_LOGS = false;
 
     private static readonly string[] NewspaperNames =
     {
@@ -71,7 +75,12 @@ public static class HiringCandidateGenerator
             
             if (shouldHaveTraits)
             {
-                cursedCombo = TryRollCursedCombo(possibleCursedCombos);
+                bool cursedGatePassed = Random.value < CURSED_CANDIDATE_CHANCE;
+                if (ENABLE_GENERATION_LOGS)
+                    Debug.Log($"[HiringCandidateGenerator] Cursed gate {(cursedGatePassed ? "HIT" : "MISS")} ({CURSED_CANDIDATE_CHANCE * 100f:F1}%)");
+
+                if (cursedGatePassed)
+                    cursedCombo = TryRollCursedCombo(possibleCursedCombos);
                 
                 if (cursedCombo != null)
                 {
@@ -91,6 +100,16 @@ public static class HiringCandidateGenerator
             {
                 // No traits - empty array
                 traits = new TraitInstance[0];
+            }
+
+            if (traits.Length > 2)
+            {
+                Debug.LogWarning($"[HiringCandidateGenerator] Generated {traits.Length} traits; clamping to 2 for candidate invariants.");
+                traits = new[] { traits[0], traits[1] };
+            }
+            else if (ENABLE_GENERATION_LOGS)
+            {
+                Debug.Log($"[HiringCandidateGenerator] Candidate {i + 1}/{count}: traits={traits.Length}, cursed={(cursedCombo != null)}");
             }
             
             // Get primary trait for identity generation (if any)
@@ -147,15 +166,32 @@ public static class HiringCandidateGenerator
     {
         if (possibleCombos == null || possibleCombos.Count == 0)
             return null;
-        
+
+        float totalWeight = 0f;
         foreach (var combo in possibleCombos)
         {
-            if (Random.value < combo.spawnChance)
+            if (combo == null || combo.spawnChance <= 0f) continue;
+            totalWeight += combo.spawnChance;
+        }
+
+        if (totalWeight <= 0f)
+            return null;
+
+        float roll = Random.Range(0f, totalWeight);
+        float cumulative = 0f;
+        foreach (var combo in possibleCombos)
+        {
+            if (combo == null || combo.spawnChance <= 0f) continue;
+
+            cumulative += combo.spawnChance;
+            if (roll <= cumulative)
             {
+                if (ENABLE_GENERATION_LOGS)
+                    Debug.Log($"[HiringCandidateGenerator] Picked cursed combo: {combo.comboName}");
                 return combo;
             }
         }
-        
+
         return null;
     }
     
@@ -177,23 +213,23 @@ public static class HiringCandidateGenerator
             tier = tier
         };
     }
-    
+
     private static int CalculateHireCost(int baseCost, TraitInstance[] traits, CursedComboDef cursedCombo)
     {
+        if (traits == null || traits.Length == 0)
+            return baseCost;
+
         float finalMultiplier = 1f;
 
-        if (traits != null)
+        foreach (var traitInstance in traits)
         {
-            foreach (var traitInstance in traits)
-            {
-                var traitDef = TraitDatabase.GetTrait(traitInstance.traitId);
-                if (traitDef == null)
-                    continue;
+            var traitDef = TraitDatabase.GetTrait(traitInstance.traitId);
+            if (traitDef == null)
+                continue;
 
-                float rawDelta = traitDef.hireCostMultiplier - 1f;
-                float scaledDelta = Mathf.Clamp(rawDelta * TRAIT_PRICE_SCALE, -MAX_TRAIT_DELTA, MAX_TRAIT_DELTA);
-                finalMultiplier *= 1f + scaledDelta;
-            }
+            float traitDelta = GetTraitPriceDelta(traitDef, traitInstance.tier);
+            float clampedTraitDelta = Mathf.Clamp(traitDelta, MAX_NEGATIVE_TRAIT_DELTA, MAX_POSITIVE_TRAIT_DELTA);
+            finalMultiplier *= 1f + clampedTraitDelta;
         }
 
         if (cursedCombo != null)
@@ -203,6 +239,38 @@ public static class HiringCandidateGenerator
 
         int cost = Mathf.RoundToInt(baseCost * finalMultiplier);
         return Mathf.Max(1, cost);
+    }
+
+    private static float GetTraitPriceDelta(TraitDef traitDef, int tier)
+    {
+        if (traitDef == null || traitDef.tiers == null || traitDef.tiers.Length == 0)
+            return 0f;
+
+        int tierIndex = Mathf.Clamp(tier - 1, 0, traitDef.tiers.Length - 1);
+        var tierData = traitDef.tiers[tierIndex];
+        if (tierData.modifiers == null || tierData.modifiers.Length == 0)
+            return 0f;
+
+        float totalDelta = 0f;
+        foreach (var modifier in tierData.modifiers)
+            totalDelta += GetModifierPriceDelta(modifier);
+
+        return totalDelta;
+    }
+
+    private static float GetModifierPriceDelta(TraitStatModifier modifier)
+    {
+        float value = modifier.operation == ModifierOp.Mult
+            ? modifier.value - 1f
+            : modifier.value;
+
+        if (value > 0f)
+            return POSITIVE_MODIFIER_PRICE_DELTA;
+
+        if (value < 0f)
+            return NEGATIVE_MODIFIER_PRICE_DELTA;
+
+        return 0f;
     }
 
     private static int RandomSpriteLibraryIndex(SpriteLibraryAsset[] spriteLibrary)
