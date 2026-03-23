@@ -249,15 +249,15 @@ public class GuildUpgradePanel : BasePanelController
         float progress = ProgressionManager.Instance.GetMilestoneProgress(milestone);
         bool complete = ProgressionManager.Instance.IsMilestoneComplete(milestone);
 
-        var fill = card.Q<VisualElement>("milestone-progress-fill");
+        var fill = card.Q<VisualElement>("progress-fill");
         if (fill != null)
         {
             fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
             if (complete)
-                fill.AddToClassList("milestone-progress-fill--complete");
+                fill.AddToClassList("progress-fill--success");
         }
 
-        var progressText = card.Q<Label>("milestone-progress-text");
+        var progressText = card.Q<Label>("progress-label");
         if (progressText != null)
             progressText.text = $"{current}/{target}";
 
@@ -287,14 +287,14 @@ public class GuildUpgradePanel : BasePanelController
             int  current   = ProgressionManager.Instance.GetMilestoneCurrentValue(defHolder);
             float progress = ProgressionManager.Instance.GetMilestoneProgress(defHolder);
 
-            var fill = card.Q<VisualElement>("milestone-progress-fill");
+            var fill = card.Q<VisualElement>("progress-fill");
             if (fill != null)
             {
                 fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
-                fill.EnableInClassList("milestone-progress-fill--complete", complete);
+                fill.EnableInClassList("progress-fill--success", complete);
             }
 
-            var progressText = card.Q<Label>("milestone-progress-text");
+            var progressText = card.Q<Label>("progress-label");
             if (progressText != null)
                 progressText.text = $"{current}/{defHolder.targetValue}";
 

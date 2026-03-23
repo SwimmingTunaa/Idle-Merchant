@@ -273,7 +273,6 @@ public class Inventory : PersistentSingleton<Inventory>
         }
         sb.AppendLine($"Gold: {Gold}");
         sb.AppendLine($"Total Stock Value: {grand:0.##}");
-        UnityEngine.Debug.Log(sb.ToString());
     }
 
     [ContextMenu("Debug/Show Inventory On-Screen")]

@@ -1,11 +1,9 @@
-/* ── Milestone Tracker ─────────────────────────────────────────── */
-
 .mt-root {
-    position: absolute;
-    top: 100px;
+    position: relative;
+    top: 0;
     right: 0;
     width: 320px;
-    background-color: var(--color-bg-surface);
+    background-color: rgba(255, 255, 255, 0);
     border-top-left-radius: var(--radius-md);
     border-bottom-left-radius: var(--radius-md);
     border-width: var(--border-medium);
@@ -14,18 +12,14 @@
     overflow: hidden;
 }
 
-/* ── Header (toggle button) ───────────────────────────────────── */
-
 .mt-header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     padding: var(--space-sm) var(--space-md);
     background-color: var(--color-bg-medium);
-    border-width: 0;
     border-bottom-width: var(--border-thin);
     border-color: var(--color-border-dark);
-    border-radius: 0;
     cursor: link;
 }
 
@@ -59,27 +53,18 @@
     rotate: 180deg;
 }
 
-/* ── Body (collapsible) ───────────────────────────────────────── */
-
 .mt-body {
     overflow: hidden;
-    max-height: 600px;
-    transition-property: max-height, opacity;
-    transition-duration: var(--transition-normal);
-    opacity: 1;
 }
 
 .mt-body--collapsed {
-    max-height: 0;
-    opacity: 0;
 }
 
 .mt-list {
     flex-direction: column;
     padding: var(--space-sm);
+    background-color: rgba(250, 240, 220, 0.55);
 }
-
-/* ── Milestone row ────────────────────────────────────────────── */
 
 .mt-row {
     flex-direction: column;
@@ -88,8 +73,6 @@
     border-bottom-width: var(--border-thin);
     border-color: var(--color-border-light);
 }
-
-
 
 .mt-row-top {
     flex-direction: row;
@@ -100,7 +83,7 @@
 .mt-row-description {
     flex-grow: 1;
     color: var(--color-text-secondary);
-    font-size: var(--font-size-body);
+    font-size: var(--text-lg);
     white-space: normal;
 }
 
@@ -120,48 +103,6 @@
     display: flex;
 }
 
-/* ── Progress bar ─────────────────────────────────────────────── */
-
 .mt-progress-row {
     margin-top: var(--space-xs);
-}
-
-.mt-progress-track {
-    flex-grow: 1;
-    height: 20px;
-    background-color: var(--color-bg-light);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-.mt-progress-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 0%;
-    background-color: var(--color-accent);
-    transition-property: width;
-    transition-duration: var(--transition-normal);
-}
-
-.mt-progress-fill--complete {
-    background-color: var(--color-success);
-}
-
-.mt-progress-text {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    font-size: var(--text-xs);
-    color: var(--color-text-primary);
-    -unity-text-align: middle-right;
-    padding-right: var(--space-sm);
-    -unity-font-style: bold;
 }

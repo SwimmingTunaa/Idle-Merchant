@@ -15,7 +15,9 @@ public class Loot : MonoBehaviour, IClickableLoot
     private PorterAgent reservedBy;
     private int layerIndex;
 
-    [Header("Debug")]
+    [Header("Collider Settings")]
+    [Tooltip("Extra padding added to collider size for easier pickup")]
+    [SerializeField] private float colliderPadding = 0.3f;
     [SerializeField] private bool showDebugLogs = false;
 
     void Awake()
@@ -76,14 +78,22 @@ public class Loot : MonoBehaviour, IClickableLoot
         BoxCollider2D parentCollider = GetComponent<BoxCollider2D>();
         if (parentCollider == null) return;
 
+        float visualOffsetY = spriteRenderer != null
+            ? spriteRenderer.transform.localPosition.y
+            : 0f;
+
+        Vector2 padding = new Vector2(colliderPadding, colliderPadding);
+
         if (size != Vector2.zero)
         {
-            parentCollider.size = size;
-            parentCollider.offset = Vector2.zero;
+            parentCollider.size = size + padding;
+            parentCollider.offset = new Vector2(0f, visualOffsetY);
         }
         else if (spriteRenderer != null)
         {
-            parentCollider.size = spriteRenderer.bounds.size;
+            Vector2 boundsSize = spriteRenderer.bounds.size;
+            parentCollider.size = boundsSize + padding;
+            parentCollider.offset = new Vector2(0f, visualOffsetY);
             Debug.LogWarning($"[{name}] Sprite bounds zero, using fallback");
         }
     }

@@ -30,11 +30,28 @@ public class MilestoneTracker : MonoBehaviour
     private bool isExpanded;
     private List<(StarMilestoneDef def, VisualElement row)> rows = new();
     private Coroutine refreshCoroutine;
+    private Coroutine accordionCoroutine;
     private MilestoneProgressEvents progressEvents;
 
     // ═════════════════════════════════════════════
     // LIFECYCLE
     // ═════════════════════════════════════════════
+
+    void OnEnable()
+    {
+        if (uiDocument == null) return;
+        var btn = uiDocument.rootVisualElement?.Q<Button>("mt-toggle-button");
+        if (btn == null) return;
+        btn.clicked += Toggle;
+        Debug.Log("[MilestoneTracker] clicked registered");
+    }
+
+    void OnDisable()
+    {
+        if (uiDocument == null) return;
+        var btn = uiDocument.rootVisualElement?.Q<Button>("mt-toggle-button");
+        if (btn != null) btn.clicked -= Toggle;
+    }
 
     void Start()
     {
@@ -46,7 +63,7 @@ public class MilestoneTracker : MonoBehaviour
         Refresh();
 
         isExpanded = startExpanded;
-        ApplyExpandedState();
+        InitAccordion();
 
         refreshCoroutine = StartCoroutine(LiveRefreshLoop());
     }
@@ -57,6 +74,12 @@ public class MilestoneTracker : MonoBehaviour
 
         if (refreshCoroutine != null)
             StopCoroutine(refreshCoroutine);
+    }
+
+    private void OnTogglePressed(PointerDownEvent evt)
+    {
+        Debug.Log("[MilestoneTracker] PointerDown received");
+        Toggle();
     }
 
     // ═════════════════════════════════════════════
@@ -79,18 +102,11 @@ public class MilestoneTracker : MonoBehaviour
         body       = root.Q<VisualElement>("mt-body");
         list       = root.Q<VisualElement>("mt-list");
 
-        var toggleButton = root.Q<Button>("mt-toggle-button");
-
-        if (list == null || body == null || toggleButton == null)
+        if (body == null || list == null)
         {
-            Debug.LogError("[MilestoneTracker] Required elements not found. Check UXML is added to the UIDocument.");
+            Debug.LogError("[MilestoneTracker] Required elements not found.");
             return false;
         }
-
-        toggleButton.clicked += Toggle;
-
-        if (showDebugLogs)
-            Debug.Log("[MilestoneTracker] Elements queried successfully");
 
         return true;
     }
@@ -141,14 +157,14 @@ public class MilestoneTracker : MonoBehaviour
             int   current  = ProgressionManager.Instance.GetMilestoneCurrentValue(def);
             float progress = ProgressionManager.Instance.GetMilestoneProgress(def);
 
-            var fill = row.Q<VisualElement>("mt-progress-fill");
+            var fill = row.Q<VisualElement>("progress-fill");
             if (fill != null)
             {
                 fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
-                fill.EnableInClassList("mt-progress-fill--complete", complete);
+                fill.EnableInClassList("progress-fill--success", complete);
             }
 
-            var text = row.Q<Label>("mt-progress-text");
+            var text = row.Q<Label>("progress-label");
             if (text != null) text.text = $"{current}/{def.targetValue}";
 
             row.Q<Label>("mt-row-description")?.EnableInClassList("mt-row-description--complete", complete);
@@ -207,21 +223,21 @@ public class MilestoneTracker : MonoBehaviour
 
         row.Add(top);
 
-        // Progress bar — track is the container, fill + label both sit inside it
+        // Progress bar — uses ProgressBar component classes
         var track = new VisualElement();
-        track.AddToClassList("mt-progress-track");
+        track.AddToClassList("progress-track");
         track.AddToClassList("mt-progress-row");
 
         var fill = new VisualElement();
-        fill.name = "mt-progress-fill";
-        fill.AddToClassList("mt-progress-fill");
-        fill.EnableInClassList("mt-progress-fill--complete", complete);
+        fill.name = "progress-fill";
+        fill.AddToClassList("progress-fill");
+        fill.EnableInClassList("progress-fill--success", complete);
         fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
         track.Add(fill);
 
         var progressText = new Label($"{current}/{def.targetValue}");
-        progressText.name = "mt-progress-text";
-        progressText.AddToClassList("mt-progress-text");
+        progressText.name = "progress-label";
+        progressText.AddToClassList("progress-label");
         track.Add(progressText);
 
         row.Add(track);
@@ -233,20 +249,70 @@ public class MilestoneTracker : MonoBehaviour
     // ACCORDION
     // ═════════════════════════════════════════════
 
+    private void InitAccordion()
+    {
+        body.RegisterCallback<GeometryChangedEvent>(OnBodyGeometryReady);
+    }
+
+    private void OnBodyGeometryReady(GeometryChangedEvent evt)
+    {
+        if (evt.newRect.height <= 0f) return;
+        body.UnregisterCallback<GeometryChangedEvent>(OnBodyGeometryReady);
+
+        if (!isExpanded)
+            SnapCollapsed();
+    }
+
+    private void SnapCollapsed()
+    {
+        body.style.display = DisplayStyle.None;
+        body.style.opacity = 0f;
+        chevron.EnableInClassList("mt-chevron--collapsed", true);
+    }
+
     private void Toggle()
     {
         isExpanded = !isExpanded;
-        ApplyExpandedState();
+
+        Debug.Log($"[MilestoneTracker] Toggle → isExpanded={isExpanded}");
+
+        if (accordionCoroutine != null)
+            StopCoroutine(accordionCoroutine);
+
+        accordionCoroutine = StartCoroutine(AnimateAccordion(isExpanded));
+        chevron.EnableInClassList("mt-chevron--collapsed", !isExpanded);
     }
 
-    private void ApplyExpandedState()
+    private IEnumerator AnimateAccordion(bool expand)
     {
-        if (body == null || chevron == null) return;
+        if (expand)
+        {
+            // Show first so we can animate opacity
+            body.style.display = DisplayStyle.Flex;
+            body.style.opacity = 0f;
 
-        body.EnableInClassList("mt-body--collapsed", !isExpanded);
-        chevron.EnableInClassList("mt-chevron--collapsed", !isExpanded);
-
-        if (showDebugLogs)
-            Debug.Log($"[MilestoneTracker] {(isExpanded ? "Expanded" : "Collapsed")}");
+            float duration = 0.2f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                body.style.opacity = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+                yield return null;
+            }
+            body.style.opacity = 1f;
+        }
+        else
+        {
+            float duration = 0.15f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                body.style.opacity = Mathf.SmoothStep(1f, 0f, elapsed / duration);
+                yield return null;
+            }
+            body.style.opacity = 0f;
+            body.style.display = DisplayStyle.None;
+        }
     }
 }

@@ -27,13 +27,16 @@ public class LootVisual : MonoBehaviour
     {
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Capture the designed offset from the prefab once — this is the stable bob base
+        baseLocalPosition = transform.localPosition;
     }
 
     void OnEnable()
     {
-        // Reset animation state
         bobbingTime = 0f;
-        baseLocalPosition = transform.localPosition;
+        // Reset to the designed base position (not dirty pool state)
+        transform.localPosition = baseLocalPosition;
         
         // Play spawn VFX if available
         if (spawnVFX != null)

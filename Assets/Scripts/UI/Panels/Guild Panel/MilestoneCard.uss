@@ -58,43 +58,7 @@
     white-space: normal;
 }
 
-.milestone-progress-row {
-    flex-direction: row;
-    align-items: center;
-}
-
-.milestone-progress-track {
-    flex-grow: 1;
-    height: 70%;
-    background-color: var(--color-bg-light);
-    border-radius: var(--radius-pill);
-    overflow: hidden;
-    margin-right: var(--space-sm);
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    width: 100%;
-}
-
-.milestone-progress-fill {
-    height: 100%;
-    width: 0%;
-    background-color: rgb(255, 150, 0);
-    border-radius: var(--radius-md);
-    transition-property: width;
-    transition-duration: var(--transition-normal);
-}
-
-.milestone-progress-fill--complete {
-    background-color: var(--color-success);
-}
-
-.milestone-progress-text {
-    color: var(--color-text-muted);
-    min-width: 60px;
-    -unity-text-align: middle-right;
-}
+/* Progress bar → uses ProgressBar component (Components/ProgressBar.uss) */
 
 .milestone-card--complete {
     background-color: var(--color-bg-light);

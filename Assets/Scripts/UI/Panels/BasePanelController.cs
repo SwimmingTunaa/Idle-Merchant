@@ -80,9 +80,12 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
         var root = uiDocument.rootVisualElement.Q<VisualElement>("body");
 
         panel = panelAsset.CloneTree().Children().First();
-        
-        root.Add(panel);
 
+        // Start hidden — OpenAnimation sets display:flex when opened
+        panel.style.display = DisplayStyle.None;
+        panel.style.opacity = 0f;
+
+        root.Add(panel);
     }
     
     // ═════════════════════════════════════════════

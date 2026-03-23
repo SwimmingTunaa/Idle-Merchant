@@ -1,0 +1,35 @@
+/* ── Badge Component ───────────────────────────────────────────────
+   Usage:
+     <ui:Instance template="Badge" />
+     label.Q<Label>("badge-label").text = "2★";
+     label.Q<Label>("badge-label").AddToClassList("badge--success");
+
+   Variants:
+     badge--accent   (default gold)
+     badge--success  (green — owned, complete)
+     badge--warning  (yellow — star requirement)
+     badge--muted    (grey — disabled, locked)
+     badge--destructive (red)
+──────────────────────────────────────────────────────────────────── */
+
+.badge {
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+    font-size: var(--text-xs);
+    -unity-font-style: bold;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+    border-top-left-radius: 999px;
+    border-top-right-radius: 999px;
+    border-bottom-left-radius: 999px;
+    border-bottom-right-radius: 999px;
+    -unity-text-align: middle-center;
+}
+
+.badge--success     { background-color: var(--color-success);     color: var(--color-text-inverse); }
+.badge--warning     { background-color: var(--color-warning);     color: var(--color-text-primary); }
+.badge--muted       { background-color: var(--color-disabled-bg); color: var(--color-disabled-text); }
+.badge--destructive { background-color: var(--color-destructive); color: var(--color-text-inverse); }
+.badge--accent      { background-color: var(--color-accent);      color: var(--color-text-primary); }

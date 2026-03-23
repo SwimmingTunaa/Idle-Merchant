@@ -1,0 +1,182 @@
+/* ── Button Component ──────────────────────────────────────────────
+   Usage:
+     <ui:Button text="Buy" class="btn-primary" />
+     <ui:Button text="Cancel" class="btn-secondary btn-sm" />
+     <ui:Button text="✕" class="btn-close" />
+
+   Variants:   btn-primary | btn-secondary | btn-destructive | btn-ghost | btn-icon | btn-close
+   Sizes:      btn-sm | btn-lg  (stack on any variant)
+   States:     :hover :active :disabled handled per variant
+──────────────────────────────────────────────────────────────────── */
+
+/* ── Base shared ──────────────────────────────────────────────── */
+
+.btn-primary,
+.btn-secondary,
+.btn-destructive,
+.btn-ghost {
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-base);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+/* ── Primary ──────────────────────────────────────────────────── */
+
+.btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+    border-color: var(--color-border-dark);
+    border-width: var(--border-medium);
+    -unity-font-style: bold;
+    transition-property: background-color, scale;
+    transition-duration: var(--transition-fast);
+}
+.btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    scale: 1.02 1.02;
+}
+.btn-primary:active {
+    background-color: var(--color-accent-active);
+    scale: 0.98 0.98;
+}
+.btn-primary:disabled {
+    background-color: var(--color-disabled-bg);
+    color: var(--color-disabled-text);
+    border-color: var(--color-disabled-border);
+    scale: 1 1;
+}
+
+/* ── Secondary ────────────────────────────────────────────────── */
+
+.btn-secondary {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    border-color: var(--color-border-medium);
+    border-width: var(--border-medium);
+    transition-property: background-color, border-color, scale;
+    transition-duration: var(--transition-fast);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-bg-light);
+    border-color: var(--color-border-dark);
+    scale: 1.02 1.02;
+}
+.btn-secondary:active {
+    background-color: var(--color-bg-medium);
+    color: var(--color-text-inverse);
+    scale: 0.98 0.98;
+}
+.btn-secondary:disabled {
+    background-color: var(--color-disabled-bg);
+    color: var(--color-disabled-text);
+    border-color: var(--color-disabled-border);
+    scale: 1 1;
+}
+
+/* ── Destructive ──────────────────────────────────────────────── */
+
+.btn-destructive {
+    background-color: var(--color-destructive);
+    color: var(--color-text-inverse);
+    border-color: rgb(140, 40, 30);
+    border-width: var(--border-medium);
+    -unity-font-style: bold;
+    transition-property: background-color, scale;
+    transition-duration: var(--transition-fast);
+}
+.btn-destructive:hover {
+    background-color: var(--color-destructive-hover);
+    scale: 1.02 1.02;
+}
+.btn-destructive:active {
+    background-color: var(--color-destructive-active);
+    scale: 0.98 0.98;
+}
+.btn-destructive:disabled {
+    background-color: var(--color-disabled-bg);
+    color: var(--color-disabled-text);
+    border-color: var(--color-disabled-border);
+    scale: 1 1;
+}
+
+/* ── Ghost ────────────────────────────────────────────────────── */
+
+.btn-ghost {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--color-text-secondary);
+    border-width: 0;
+    transition-property: background-color, color;
+    transition-duration: var(--transition-fast);
+}
+.btn-ghost:hover {
+    background-color: rgba(139, 90, 60, 0.15);
+    color: var(--color-text-primary);
+}
+.btn-ghost:active {
+    background-color: rgba(139, 90, 60, 0.3);
+}
+.btn-ghost:disabled {
+    color: var(--color-disabled-text);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* ── Icon ─────────────────────────────────────────────────────── */
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(101, 67, 33, 0.5);
+    color: var(--color-text-inverse);
+    border-width: 0;
+    border-radius: var(--radius-sm);
+    padding: 0;
+    font-size: var(--text-lg);
+    -unity-text-align: middle-center;
+    transition-property: background-color;
+    transition-duration: var(--transition-fast);
+}
+.btn-icon:hover  { background-color: rgba(101, 67, 33, 0.8); }
+.btn-icon:active { background-color: rgb(101, 67, 33); }
+
+/* ── Close ────────────────────────────────────────────────────── */
+
+.btn-close {
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-destructive);
+    color: var(--color-text-inverse);
+    border-color: rgb(140, 40, 30);
+    border-width: var(--border-medium);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    padding: 0;
+    font-size: var(--text-lg);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition-property: background-color, scale;
+    transition-duration: var(--transition-fast);
+}
+.btn-close:hover {
+    background-color: var(--color-destructive-hover);
+    scale: 1.1 1.1;
+}
+.btn-close:active {
+    background-color: var(--color-destructive-active);
+    scale: 0.9 0.9;
+}
+
+/* ── Size modifiers (stack on any variant) ────────────────────── */
+
+.btn-sm {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--text-sm);
+}
+
+.btn-lg {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-xl);
+}

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss" />
+
+    <!-- Track is the root — fill and label both sit inside it as absolute children -->
+    <ui:VisualElement name="progress-track" class="progress-track">
+        <ui:VisualElement name="progress-fill" class="progress-fill" />
+        <ui:Label name="progress-label" text="" class="progress-label" />
+    </ui:VisualElement>
+</ui:UXML>

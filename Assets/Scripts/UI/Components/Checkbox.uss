@@ -1,0 +1,69 @@
+/* ── Checkbox Component ────────────────────────────────────────────
+   Usage:
+     <ui:Instance template="Checkbox" />
+
+   C# toggle:
+     var root  = el.Q<VisualElement>("checkbox-root");
+     var check = el.Q<Label>("checkbox-check");
+     bool isOn = root.ClassListContains("checkbox-root--checked");
+     root.EnableInClassList("checkbox-root--checked", !isOn);
+     check.EnableInClassList("checkbox-check--visible", !isOn);
+
+   Disabled:
+     root.AddToClassList("checkbox-root--disabled");
+──────────────────────────────────────────────────────────────────── */
+
+.checkbox-root {
+    flex-direction: row;
+    align-items: center;
+    cursor: link;
+}
+
+.checkbox-box {
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-bg-surface);
+    border-color: var(--color-border-medium);
+    border-width: var(--border-medium);
+    border-top-left-radius: var(--radius-sm);
+    border-top-right-radius: var(--radius-sm);
+    border-bottom-left-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--space-sm);
+    flex-shrink: 0;
+    transition-property: background-color, border-color;
+    transition-duration: var(--transition-fast);
+}
+
+.checkbox-root--checked .checkbox-box {
+    background-color: var(--color-accent);
+    border-color: var(--color-border-dark);
+}
+
+.checkbox-check {
+    font-size: var(--text-sm);
+    -unity-font-style: bold;
+    color: var(--color-text-primary);
+    display: none;
+}
+
+.checkbox-check--visible {
+    display: flex;
+}
+
+.checkbox-label {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    flex-grow: 1;
+}
+
+.checkbox-root--disabled .checkbox-box {
+    background-color: var(--color-disabled-bg);
+    border-color: var(--color-disabled-border);
+}
+
+.checkbox-root--disabled .checkbox-label {
+    color: var(--color-disabled-text);
+}

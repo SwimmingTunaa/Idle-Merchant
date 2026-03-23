@@ -1,0 +1,28 @@
+/* ── Divider Component ─────────────────────────────────────────────
+   Usage:
+     <ui:Instance template="Divider" />
+     <!-- with label -->
+     el.Q<Label>("divider-label").text = "Materials";
+     <!-- without label — leave text empty, lines span full width -->
+──────────────────────────────────────────────────────────────────── */
+
+.divider {
+    flex-direction: row;
+    align-items: center;
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.divider-line {
+    flex-grow: 1;
+    height: var(--border-thin);
+    background-color: var(--color-border-light);
+}
+
+.divider-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-left: var(--space-sm);
+    margin-right: var(--space-sm);
+    -unity-font-style: italic;
+}

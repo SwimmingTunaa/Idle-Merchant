@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Divider.uss" />
+
+    <!-- Plain rule — leave label empty for no text -->
+    <ui:VisualElement class="divider">
+        <ui:VisualElement class="divider-line" />
+        <ui:Label name="divider-label" text="" class="divider-label" />
+        <ui:VisualElement class="divider-line" />
+    </ui:VisualElement>
+</ui:UXML>
