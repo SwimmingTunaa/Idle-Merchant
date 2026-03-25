@@ -11234,13 +11234,13 @@ MonoBehaviour:
   maxCommoner: 999
   maxAdventurer: 5
   maxNoble: 3
-  baseSpawnsPerMinute: 5
+  baseSpawnsPerMinute: 8
   spawnRatePerStar: 2
-  spawnRatePerSaleItem: 0.5
-  spawnRatePerLayer: 1
+  spawnRatePerSaleItem: 1
+  spawnRatePerLayer: 2
   minSpawnsPerMinute: 1
   maxSpawnsPerMinute: 60
-  showDebugLogs: 0
+  showDebugLogs: 1
 --- !u!1 &620508933
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,8 +5,7 @@ public class CraftingManager : MonoBehaviour
 {
     public static CraftingManager Instance { get; private set; }
 
-    [Header("Crafting Config")]
-    [SerializeField] private List<RecipeDef> craftingRecipes = new();
+    private List<RecipeDef> craftingRecipes = new();
 
     private List<RecipeDef> enabledRecipes = new();
     private List<CraftingJob> activeCrafts = new();
@@ -34,7 +33,11 @@ public class CraftingManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
+
+        craftingRecipes = new List<RecipeDef>(Resources.LoadAll<RecipeDef>("Recipes"));
+        if (showDebugLogs) Debug.Log($"[CraftingManager] Loaded {craftingRecipes.Count} recipes from Resources/Recipes");
     }
 
     void Start()
