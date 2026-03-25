@@ -1,24 +1,6 @@
-/* ── Progress Bar Component ────────────────────────────────────────
-   Usage:
-     <ui:Instance template="ProgressBar" />
-
-   C# — query and drive:
-     var fill  = el.Q<VisualElement>("progress-fill");
-     var label = el.Q<Label>("progress-label");
-     fill.style.width = Length.Percent(75f);
-     label.text = "750/1000";
-
-   Modifiers:
-     progress-track--sm    height 10px
-     progress-track--lg    height 24px
-     progress-fill--accent (default orange)
-     progress-fill--success (green, for complete state)
-     progress-fill--warning (yellow)
-──────────────────────────────────────────────────────────────────── */
-
 .progress-track {
     height: 20px;
-    background-color: var(--color-bg-medium);
+    background-color: rgb(72, 47, 32);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -28,8 +10,13 @@
     flex-grow: 1;
 }
 
-.progress-track--sm { height: 10px; }
-.progress-track--lg { height: 28px; }
+.progress-track--sm {
+    height: 10px;
+}
+
+.progress-track--lg {
+    height: 28px;
+}
 
 .progress-fill {
     position: absolute;
@@ -37,7 +24,7 @@
     left: 0;
     bottom: 0;
     width: 0%;
-    background-color: var(--color-accent);
+    background-color: rgb(169, 231, 86);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -46,8 +33,13 @@
     transition-duration: var(--transition-normal);
 }
 
-.progress-fill--success { background-color: var(--color-success); }
-.progress-fill--warning { background-color: var(--color-warning); }
+.progress-fill--success {
+    background-color: var(--color-success);
+}
+
+.progress-fill--warning {
+    background-color: var(--color-warning);
+}
 
 .progress-label {
     position: absolute;
