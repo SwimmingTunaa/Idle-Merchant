@@ -314,7 +314,11 @@ public class CombatBehavior : MonoBehaviour
         
         // Must be IEntity to check type
         if (!target.TryGetComponent<IEntity>(out var entity)) return false;
-        
+
+        // Reject targets on a different dungeon layer
+        if (target.TryGetComponent<EntityBase>(out var targetBase) && targetBase.layerIndex != layerIndex)
+            return false;
+
         // Check hostility rules
         return IsHostileTo(entity.EntityType);
     }
