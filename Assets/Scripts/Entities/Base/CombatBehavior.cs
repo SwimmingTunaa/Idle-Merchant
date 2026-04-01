@@ -267,9 +267,12 @@ public class CombatBehavior : MonoBehaviour
         if (currentTarget.TryGetComponent<Health>(out var targetHealth))
         {
             float damageDealt = targetHealth.OnDamage(stats.AttackDamage);
-            
+
             OnDamageDealt?.Invoke(currentTarget, damageDealt);
-            
+
+            if (damageDealt > 0f && DamageNumberManager.Instance != null)
+                DamageNumberManager.Instance.ShowDamageAtEntity(damageDealt, currentTarget.transform);
+
             if (damageDealt <= 0f)
             {
                 // Target died

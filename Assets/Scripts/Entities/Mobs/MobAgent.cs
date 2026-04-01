@@ -91,11 +91,6 @@ public class MobAgent : EntityStateMachine<MobState>, IEntity
     {
         animator.SetTrigger(AnimHash.Damage);
         
-        if (DamageNumberManager.Instance != null)
-        {
-            DamageNumberManager.Instance.ShowDamageAtEntity(damageApplied, transform);
-        }
-        
         // Notify combat system (for defensive mobs)
         if (combat != null)
         {
