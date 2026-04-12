@@ -35,23 +35,6 @@
     background-position: center;
 }
 
-.close-button {
-    background-color: rgba(200, 50, 50, 0.8);
-    border-width: 2px;
-    border-color: rgb(150, 30, 30);
-    border-radius: 4px;
-    color: white;
-    font-size: 24px;
-    transition-duration: 0.2s;
-}
-
-.close-button:hover {
-    background-color: rgb(220, 70, 70);
-    scale: 1.1;
-}
-
-.item-grid {
-}
 
 .item-slot {
     cursor: link;
@@ -66,8 +49,6 @@
     scale: 1.05;
 }
 
-.item-slot-selected {
-}
 
 .item-slot-selector {
     position: absolute;
@@ -98,8 +79,6 @@
     scale: 1;
 }
 
-.detail-panel {
-}
 
 .detail-name {
     -unity-font-style: bold;
@@ -109,10 +88,6 @@
     white-space: normal;
     font-size: 24px;
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
-}
-
-.stat-label {
-    -unity-font-style: normal;
 }
 
 .action-button {
@@ -135,13 +110,6 @@
     -unity-font-style: bold;
 }
 
-.reserved-badge {
-    -unity-font-style: normal;
-}
-
-.forsale-badge {
-    -unity-font-style: normal;
-}
 
 .item-slot:hover .quantity-badge {
     background-color: rgba(0, 0, 0, 0.9);

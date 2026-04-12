@@ -108,6 +108,9 @@ public class InventoryController : MonoBehaviour, IBookPage
         GameSignals.OnProductCrafted -= OnInventoryChanged;
         GameSignals.GoldChanged -= OnGoldChanged;
 
+        if (reserveSlider != null) reserveSlider.UnregisterValueChangedCallback(OnReserveSliderChanged);
+        if (forsaleToggle != null) forsaleToggle.UnregisterValueChangedCallback(OnForSaleToggled);
+
         itemGrid = null; itemGridScroll = null; detailPanel = null;
         // Note: tabAll/tabMaterials/tabCrafted/tabLuxury/tabForSale are intentionally kept —
         // they reference the persistent inventory-filter-bar in book-root (set via SetFilterBar).
@@ -141,7 +144,7 @@ public class InventoryController : MonoBehaviour, IBookPage
 
         if (tabAll      != null) tabAll.clicked      += () => OnCategoryTabClicked(CategoryFilter.All);
         if (tabForSale  != null) tabForSale.clicked  += () => OnCategoryTabClicked(CategoryFilter.ForSale);
-        if (tabMaterials!= null) tabMaterials.clicked+= () => OnCategoryTabClicked(CategoryFilter.Materials);
+        if (tabMaterials != null) tabMaterials.clicked += () => OnCategoryTabClicked(CategoryFilter.Materials);
         if (tabCrafted  != null) tabCrafted.clicked  += () => OnCategoryTabClicked(CategoryFilter.Crafted);
         if (tabLuxury   != null) tabLuxury.clicked   += () => OnCategoryTabClicked(CategoryFilter.Luxury);
 

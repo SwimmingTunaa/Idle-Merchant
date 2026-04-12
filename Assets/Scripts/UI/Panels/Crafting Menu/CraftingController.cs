@@ -89,6 +89,9 @@ public class CraftingController : MonoBehaviour, IBookPage
     {
         GameSignals.OnProductCrafted -= OnProductCrafted;
 
+        if (filterDropdown != null) filterDropdown.UnregisterValueChangedCallback(OnFilterChanged);
+        if (sortDropdown != null) sortDropdown.UnregisterValueChangedCallback(OnSortChanged);
+
         isShown = false;
         recipeScroll = null;
         filterDropdown = null;

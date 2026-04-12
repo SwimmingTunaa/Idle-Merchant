@@ -13,8 +13,6 @@ public class PauseMenuController : BasePanelController
 {
     public override string PanelID => "Pause_Panel";
 
-   // public override VisualElement RootElement => panel;
-
     // UI Elements
     private Button resumeButton;
     private Button settingsButton;
@@ -46,8 +44,7 @@ public class PauseMenuController : BasePanelController
     protected override void OnDestroy()
     {
         // Safety: restore time if destroyed while paused
-        gameManager.UnpauseGame();
-        
+        gameManager?.UnpauseGame();
         base.OnDestroy();
     }
 

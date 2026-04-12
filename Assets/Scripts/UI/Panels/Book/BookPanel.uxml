@@ -16,7 +16,7 @@
         <ui:VisualElement name="two-page-spread" class="two-page-spread" style="right: 75px; top: 28px; left: 75px; bottom: 114px;">
             <ui:Instance template="Roster_Page" name="page-0" style="flex-grow: 1; display: none;" />
             <ui:Instance template="Guild_Page" name="page-1" style="flex-grow: 1; display: none;" />
-            <ui:Instance template="Inventory_Page" name="page-2" style="flex-grow: 1;" />
+            <ui:Instance template="Inventory_Page" name="page-2" style="flex-grow: 1; display: none;" />
             <ui:Instance template="Crafting_Page" name="page-3" style="flex-grow: 1; display: none;" />
             <ui:Instance template="Settings_Page" name="page-4" style="flex-grow: 1; display: none;" />
         </ui:VisualElement>
@@ -59,5 +59,6 @@
                 <ui:VisualElement name="tab-badge" class="tab-badge" />
             </ui:Button>
         </ui:VisualElement>
+        <ui:Button name="book-close-button" class="book-close-button" text="✕" />
     </ui:VisualElement>
 </ui:UXML>

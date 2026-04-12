@@ -92,6 +92,9 @@ public class BookPanelController : BasePanelController
             tabBadges[i] = tabButtons[i].Q<VisualElement>("tab-badge");
         }
 
+        // Close button
+        panel.Q<Button>("book-close-button")?.RegisterCallback<ClickEvent>(_ => UIManager.Instance.ClosePanel(this));
+
         // Inventory filter bar — lives in book-root, shown only when tab 2 is active
         inventoryFilterBar = panel.Q<VisualElement>("inventory-filter-bar");
         if (inventoryFilterBar != null)
@@ -140,10 +143,6 @@ public class BookPanelController : BasePanelController
         InvokeOnCloseComplete();
         return true;
     }
-
-    protected override void OnOpenStart() { }
-
-    protected override void OnCloseStart() { }
 
     // ═════════════════════════════════════════════
     // TAB MANAGEMENT

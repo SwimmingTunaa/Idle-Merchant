@@ -67,7 +67,6 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    background-color: rgba(0, 0, 0, 0);
     border-width: 0;
     padding: 0;
     margin: 0;
@@ -96,6 +95,11 @@
     -unity-slice-scale: 5px;
 }
 
+.book-tab--active:hover {
+    width: 160px;
+    -unity-slice-scale: 5px;
+}
+
 .tab-icon {
     position: absolute;
     width: 60px;
@@ -106,8 +110,26 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=2130535880278150251&guid=15c5d06bd9ee94e5a83666ad75fb289f&type=3#Home");
     scale: -1 1;
+}
+
+.book-close-button {
+    position: absolute;
+    top: 18px;
+    right: 60px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    padding: 0;
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(80, 55, 35);
+    -unity-text-align: middle-center;
+}
+
+.book-close-button:hover {
+    color: rgb(180, 60, 50);
 }
 
 .tab-badge {
