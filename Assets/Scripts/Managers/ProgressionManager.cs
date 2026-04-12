@@ -53,6 +53,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private int totalItemsCrafted = 0;
     private int totalCraftedItemsSold = 0;
     private int totalCustomersServed = 0;
+    private int totalAdventurersRankedUp = 0;
 
     // Dirty flag — set when any counter changes, checked once per frame
     private bool milestoneCheckPending = false;
@@ -95,6 +96,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnProductCrafted += HandleProductCrafted;
         GameSignals.OnUnitHired += HandleUnitHired;
         GameSignals.OnCustomerServed += HandleCustomerServed;
+        GameSignals.OnAdventurerPromoted += HandleAdventurerPromoted;
     }
 
     void OnDisable()
@@ -106,6 +108,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnProductCrafted -= HandleProductCrafted;
         GameSignals.OnUnitHired -= HandleUnitHired;
         GameSignals.OnCustomerServed -= HandleCustomerServed;
+        GameSignals.OnAdventurerPromoted -= HandleAdventurerPromoted;
     }
 
     // Signal handlers
@@ -139,6 +142,11 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private void HandleCustomerServed()
     {
         IncrementCustomersServed(1);
+    }
+
+    private void HandleAdventurerPromoted(EntityBase entity, string oldRole, string newRole)
+    {
+        IncrementAdventurersRankedUp(1);
     }
 
     // ===== MILESTONE LOADING =====
@@ -452,6 +460,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold >= milestone.targetValue,
             MilestoneType.CustomersServed => totalCustomersServed >= milestone.targetValue,
             MilestoneType.UpgradePurchased => milestone.requiredUpgrade != null && ownedUpgrades.Contains(milestone.requiredUpgrade),
+            MilestoneType.AdventurerRankedUp => totalAdventurersRankedUp >= milestone.targetValue,
             _ => false
         };
     }
@@ -475,6 +484,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
             MilestoneType.CustomersServed => totalCustomersServed,
             MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
+            MilestoneType.AdventurerRankedUp => totalAdventurersRankedUp,
             _ => 0
         };
 
@@ -503,6 +513,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
             MilestoneType.CustomersServed => totalCustomersServed,
             MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
+            MilestoneType.AdventurerRankedUp => totalAdventurersRankedUp,
             _ => 0
         };
     }
@@ -588,6 +599,15 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
 
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] Customers served: +{count} (total: {totalCustomersServed})");
+    }
+
+    private void IncrementAdventurersRankedUp(int amount)
+    {
+        totalAdventurersRankedUp += amount;
+        milestoneCheckPending = true;
+
+        if (showDebugLogs)
+            Debug.Log($"[ProgressionManager] Adventurers ranked up: +{amount} (total: {totalAdventurersRankedUp})");
     }
 
     // ===== UPGRADE SYSTEM =====

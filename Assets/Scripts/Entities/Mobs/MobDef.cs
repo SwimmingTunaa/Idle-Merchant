@@ -11,6 +11,8 @@ public class MobDef : EntityDef
     [Header("Stats")]
     public float baseHealth = 1;
     public AnimationCurve hpMultiplierByLayer = AnimationCurve.Linear(1, 1, 10, 3);
+    [Tooltip("Base XP rewarded to the adventurer that lands the killing blow.")]
+    public float baseXPReward = 10f;
     
     [Header("Damage Response")]
     [Tooltip("Time mob is paused/stunned when hit")]

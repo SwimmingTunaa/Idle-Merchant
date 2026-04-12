@@ -77,4 +77,7 @@ public enum MilestoneType
     // Customers
     CustomersServed,      // Total customers who made a purchase
     HighValueSales,       // Sell item worth X+ gold
+
+    // Adventurer progression
+    AdventurerRankedUp,   // Rank up X adventurers
 }

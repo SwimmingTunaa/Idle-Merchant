@@ -46,7 +46,6 @@ public class BookPanelController : BasePanelController
     {
         BuildUI();
         base.Start(); // registers "BookPanel" with UIManager
-        WireHUDButtons();
         WireBadgeSignals();
     }
 
@@ -100,18 +99,6 @@ public class BookPanelController : BasePanelController
             inventoryFilterBar.style.display = DisplayStyle.None;
             (_pages[2] as InventoryController)?.SetFilterBar(inventoryFilterBar);
         }
-    }
-
-    private void WireHUDButtons()
-    {
-        if (uiDocument == null) return;
-        var root = uiDocument.rootVisualElement;
-
-        root.Q<Button>("units-button")?.RegisterCallback<ClickEvent>(_ => OpenToTab(0));
-        root.Q<Button>("guild-button")?.RegisterCallback<ClickEvent>(_ => OpenToTab(1));
-        root.Q<Button>("inventory-button")?.RegisterCallback<ClickEvent>(_ => OpenToTab(2));
-        root.Q<Button>("crafting-button")?.RegisterCallback<ClickEvent>(_ => OpenToTab(3));
-        root.Q<Button>("settings-button")?.RegisterCallback<ClickEvent>(_ => OpenToTab(4));
     }
 
     private void WireBadgeSignals()

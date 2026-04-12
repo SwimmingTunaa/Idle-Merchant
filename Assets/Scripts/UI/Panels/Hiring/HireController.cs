@@ -37,7 +37,6 @@ public class HireController : BasePanelController
     // UI Elements
     private VisualElement stackContainer;
     private VisualElement emptyState;
-    private Button openButton;
     private Button prevButton;
     private Button nextButton;
     private Label countLabel;
@@ -277,9 +276,6 @@ public class HireController : BasePanelController
         layerNextButton = panel.Q<Button>("layer-next-button");
         layerLabel = panel.Q<Label>("layer-label");
 
-        // Query the open button (if it exists in root)
-        openButton = uiDocument.rootVisualElement.Q<Button>("hiring-board-button");
-
         // Fallback: use template instance from UXML if no asset assigned
         if (candidateSlotAsset == null)
         {
@@ -289,8 +285,6 @@ public class HireController : BasePanelController
         }
 
         // Hook up callbacks
-        if (openButton != null)
-            openButton.clicked += OnOpenButtonClicked;
         prevButton.clicked += Prev;
         nextButton.clicked += Next;
         tabView.activeTabChanged += OnTabChanged;

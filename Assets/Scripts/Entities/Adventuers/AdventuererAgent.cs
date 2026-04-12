@@ -41,10 +41,42 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     private float hitCooldownTimer;
     private Coroutine hitCoroutine;
     private Coroutine deathCoroutine;
-    
+
+    // XP & rank
+    private float currentXP;
+    private int currentRank = 1;
+
     // IEntity implementation
     public EntityType EntityType => EntityType.Adventurer;
     public bool IsAlive => health != null && health.IsAlive;
+
+    // XP / rank public interface
+    public float CurrentXP => currentXP;
+    public int CurrentRank => currentRank;
+
+    /// <summary>XP needed to reach the next rank, or float.MaxValue at max rank.</summary>
+    public float XPForNextRank
+    {
+        get
+        {
+            if (adventurerDef == null || currentRank >= adventurerDef.maxRank) return float.MaxValue;
+            int idx = currentRank - 1;
+            if (idx >= adventurerDef.xpThresholds.Length) return float.MaxValue;
+            return adventurerDef.xpThresholds[idx];
+        }
+    }
+
+    /// <summary>True when the adventurer has enough XP to promote and is not at max rank.</summary>
+    public bool CanPromote
+    {
+        get
+        {
+            if (adventurerDef == null || currentRank >= adventurerDef.maxRank) return false;
+            int idx = currentRank - 1;
+            if (idx >= adventurerDef.xpThresholds.Length) return false;
+            return currentXP >= adventurerDef.xpThresholds[idx];
+        }
+    }
 
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = true;
@@ -76,7 +108,9 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         stateTimer = null;
         hitCooldownTimer = 0f;
         previousState = AdventurerState.Idle;
-        
+        currentXP = 0f;
+        currentRank = 1;
+
         // Initialize health
         if (health != null && adventurerDef.baseHealth > 0f)
         {
@@ -84,13 +118,14 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             health.OnDeath += OnDeath;
             health.OnDamaged += OnHit;
         }
-        
+
         // Initialize combat
         if (combat != null)
         {
             combat.Init(adventurerDef.combatConfig, Stats, this, layerIndex, spawnPoint);
             combat.OnTargetAcquired += OnCombatTargetAcquired;
             combat.OnTargetLost += OnCombatTargetLost;
+            combat.OnDamageDealt += OnCombatDamageDealt;
         }
         
         ChangeState(adventurerDef.startingState);
@@ -424,6 +459,71 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     }
 
     // ═════════════════════════════════════════════
+    // XP & RANK
+    // ═════════════════════════════════════════════
+
+    /// <summary>Accumulates XP. Does not auto-promote — call Promote() explicitly.</summary>
+    public void GainXP(float amount)
+    {
+        if (amount <= 0f) return;
+        currentXP += amount;
+    }
+
+    /// <summary>
+    /// Applies one rank-up: boosts damage, attack speed, and max HP permanently,
+    /// increments rank, resets XP, and fires OnAdventurerPromoted.
+    /// Returns false if CanPromote is false or the adventurer is not alive.
+    /// </summary>
+    public bool Promote()
+    {
+        if (!CanPromote) return false;
+        if (health == null || !health.IsAlive) return false;
+
+        // Permanent damage bonus — ID range 1001–1004 (one per rank transition)
+        Stats.Mediator.AddModifier(new BasicStatModifier(
+            StatType.AttackDamage,
+            1000 + currentRank,
+            -1f,
+            v => v * (1f + adventurerDef.rankDamageMultiplier)
+        ));
+
+        // Permanent attack speed bonus (reduces interval = faster attacks) — ID range 2001–2004
+        Stats.Mediator.AddModifier(new BasicStatModifier(
+            StatType.AttackSpeed,
+            2000 + currentRank,
+            -1f,
+            v => v * (1f - adventurerDef.rankAttackSpeedMultiplier)
+        ));
+
+        // Max HP bonus applied directly to Health (Health is decoupled from Stats)
+        float hpRatio = health.HealthPercent;
+        float newMaxHP = health.MaxHP * (1f + adventurerDef.rankHPMultiplier);
+        health.Init(newMaxHP, fullHP: false);
+        health.SetHP(newMaxHP * hpRatio);
+
+        int prevRank = currentRank;
+        currentRank++;
+        currentXP = 0f;
+
+        GameSignals.RaiseAdventurerPromoted(this, $"Rank {prevRank}", $"Rank {currentRank}");
+        return true;
+    }
+
+    /// <summary>Subscribed to combat.OnDamageDealt — awards XP on kill.</summary>
+    private void OnCombatDamageDealt(GameObject target, float damageDealt)
+    {
+        if (damageDealt <= 0f || target == null) return;
+        if (!target.TryGetComponent<Health>(out var targetHealth)) return;
+        if (targetHealth.IsAlive) return; // not a kill
+
+        if (!target.TryGetComponent<EntityBase>(out var entity)) return;
+        if (!(entity.def is MobDef mobDef)) return;
+
+        float xp = mobDef.baseXPReward * mobDef.hpMultiplierByLayer.Evaluate(layerIndex);
+        GainXP(xp);
+    }
+
+    // ═════════════════════════════════════════════
     // CLEANUP
     // ═════════════════════════════════════════════
 
@@ -439,6 +539,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         {
             combat.OnTargetAcquired -= OnCombatTargetAcquired;
             combat.OnTargetLost -= OnCombatTargetLost;
+            combat.OnDamageDealt -= OnCombatDamageDealt;
             combat.ReleaseTarget();
         }
 

@@ -30,4 +30,20 @@ public class AdventurerDef : EntityDef
     public float leashRange = 0f;
         
     public float DPS => attackDamage / attackInterval;
+
+    [Header("Rank & XP")]
+    [Tooltip("XP required to advance each rank. Index 0 = Rank 1→2, index 1 = Rank 2→3, etc.")]
+    public float[] xpThresholds = { 100f, 300f, 900f, 2700f };
+
+    [Tooltip("Maximum rank an adventurer can reach.")]
+    public int maxRank = 5;
+
+    [Tooltip("Flat percentage bonus to AttackDamage applied on each rank-up (0.20 = +20% per rank).")]
+    public float rankDamageMultiplier = 0.20f;
+
+    [Tooltip("Flat percentage reduction to AttackInterval (faster attacks) applied on each rank-up (0.10 = 10% faster per rank).")]
+    public float rankAttackSpeedMultiplier = 0.10f;
+
+    [Tooltip("Flat percentage bonus to max HP applied on each rank-up (0.25 = +25% per rank).")]
+    public float rankHPMultiplier = 0.25f;
 }
