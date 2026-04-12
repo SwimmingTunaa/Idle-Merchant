@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Label text="Adventurers" class="page-header text-h2" style="margin-bottom: 8px;" />
+    <ui:ScrollView name="roster-list" style="flex-grow: 1;" />
+</ui:UXML>

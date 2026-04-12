@@ -1,0 +1,126 @@
+.book-root {
+    position: absolute;
+    width: 1350px;
+    height: 825px;
+    left: 50%;
+    top: 50%;
+    translate: -675px -412.5px;
+}
+
+.book-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-position: center;
+    width: 1350px;
+    height: 825px;
+}
+
+.two-page-spread {
+    position: absolute;
+    left: 40px;
+    top: 30px;
+    right: 72px;
+    bottom: 30px;
+    flex-direction: row;
+}
+
+.left-page {
+    flex-grow: 1;
+    overflow: hidden;
+    padding: 16px;
+    margin-right: 4px;
+}
+
+.right-page {
+    flex-grow: 1;
+    overflow: hidden;
+    padding: 16px;
+    margin-left: 4px;
+}
+
+.inventory-filter-bar {
+    position: absolute;
+    top: 65px;
+    left: 80px;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.tabs-container {
+    position: absolute;
+    left: -120px;
+    top: 100px;
+    width: 120px;
+    flex-direction: column;
+    align-items: flex-end;
+    overflow: visible;
+}
+
+.book-tab {
+    width: 120px;
+    height: 85px;
+    flex-basis: auto;
+    flex-shrink: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 8px;
+    -unity-overflow-clip-box: content-box;
+    scale: -1 1;
+}
+
+.book-tab:hover {
+    width: 115px;
+    background-size: 100% 100%;
+    -unity-slice-left: 0;
+    -unity-slice-top: 1;
+    -unity-slice-right: 1;
+    -unity-slice-bottom: 1;
+    -unity-slice-scale: 3;
+}
+
+.book-tab--active {
+    width: 160px;
+    background-size: 100% 100%;
+    -unity-slice-left: 0;
+    -unity-slice-top: 1;
+    -unity-slice-right: 1;
+    -unity-slice-bottom: 1;
+    -unity-slice-scale: 5px;
+}
+
+.tab-icon {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 50%;
+    top: 50%;
+    translate: -45px -30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=2130535880278150251&guid=15c5d06bd9ee94e5a83666ad75fb289f&type=3#Home");
+    scale: -1 1;
+}
+
+.tab-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: rgb(180, 60, 50);
+    display: none;
+}
+
+.tab-badge--visible {
+    display: flex;
+}

@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/CraftingPanelStyle.uss?fileID=7433441132597879392&amp;guid=1f55b20e0fbeb4ea98827c037085e89a&amp;type=3#CraftingPanelStyle" />
+    <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-right: 4px;">
+            <ui:Label text="Available Recipes" class="page-header" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 10px;" />
+            <ui:VisualElement name="controls-row" style="flex-direction: row; margin-bottom: 8px; justify-content: space-between;">
+                <ui:DropdownField name="filter-dropdown" label="Filter:" class="control-dropdown" style="flex-grow: 1; margin-right: 6px;" />
+                <ui:DropdownField name="sort-dropdown" label="Sort:" class="control-dropdown" style="flex-grow: 1;" />
+            </ui:VisualElement>
+            <ui:ScrollView name="recipe-scroll" class="recipe-list" style="flex-grow: 1; background-color: rgba(139, 90, 60, 0.1); border-radius: 4px; padding: 4px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-left: 4px;">
+            <ui:Label text="Active Crafts" class="page-header" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 12px;" />
+            <ui:Label name="active-crafts-label" text="Active Crafts: 0" style="font-size: 14px; color: rgb(50, 30, 10); margin-bottom: 6px;" />
+            <ui:Label name="status-label" text="Ready to craft" style="font-size: 14px; color: rgb(70, 45, 20);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

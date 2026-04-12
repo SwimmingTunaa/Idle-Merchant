@@ -5,32 +5,33 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Crafting panel controller - displays recipes, material reserves, and crafting progress.
-/// Inherits from BasePanelController for lifecycle and animation management.
+/// Crafting page — recipe list on the left, active crafts status on the right.
+/// Implements IBookPage; lives inside BookPanelController as tab 3.
 /// </summary>
-public class CraftingController : BasePanelController
+public class CraftingController : MonoBehaviour, IBookPage
 {
     [Header("UXML References")]
     [SerializeField] private VisualTreeAsset recipeCardAsset;
-
-    //public override VisualElement RootElement => panel;
 
     // UI Elements
     private ScrollView recipeScroll;
     private DropdownField filterDropdown;
     private DropdownField sortDropdown;
-    private Button closeButton;
     private Label activeCraftsLabel;
     private Label statusLabel;
 
     // State
     private List<RecipeCardData> recipeCards = new List<RecipeCardData>();
+    private bool isShown = false;
 
     private enum FilterMode { All, CanCraft, MissingMaterials, Enabled }
     private enum SortMode { UnlockOrder, CraftTime, OutputValue }
 
     private FilterMode currentFilter = FilterMode.All;
     private SortMode currentSort = SortMode.UnlockOrder;
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugLogs = false;
 
     private class RecipeCardData
     {
@@ -43,62 +44,33 @@ public class CraftingController : BasePanelController
         public Toggle enableToggle;
     }
 
-    // ═════════════════════════════════════════════
-    // LIFECYCLE
-    // ═════════════════════════════════════════════
+    public string PageTitle => "Crafting";
 
-    void Awake()
-    {
-        if (uiDocument == null)
-            uiDocument = GetComponent<UIDocument>();
-        
-        BuildUI();
-    }
+    void Awake() => hideFlags = HideFlags.HideInInspector;
+
+    // ═════════════════════════════════════════════
+    // UNITY LIFECYCLE
+    // ═════════════════════════════════════════════
 
     void Update()
     {
-        if (State == PanelState.Open)
-        {
-            UpdateCraftingProgress();
-            UpdateFooter();
-        }
+        if (!isShown) return;
+        UpdateCraftingProgress();
+        UpdateFooter();
     }
 
     // ═════════════════════════════════════════════
-    // LIFECYCLE HOOKS (Override from base)
+    // IBOOK PAGE
     // ═════════════════════════════════════════════
 
-    protected override void OnOpenStart()
+    public void OnPageShown(VisualElement leftPage, VisualElement rightPage)
     {
-        PopulateRecipes();
-        
-        if (showDebugLogs)
-            Debug.Log("[CraftingController] Panel opened, data populated");
-    }
+        recipeScroll = leftPage.Q<ScrollView>("recipe-scroll");
+        filterDropdown = leftPage.Q<DropdownField>("filter-dropdown");
+        sortDropdown = leftPage.Q<DropdownField>("sort-dropdown");
+        activeCraftsLabel = rightPage.Q<Label>("active-crafts-label");
+        statusLabel = rightPage.Q<Label>("status-label");
 
-    protected override void OnCloseStart()
-    {
-        if (showDebugLogs)
-            Debug.Log("[CraftingController] Panel closing");
-    }
-
-    // ═════════════════════════════════════════════
-    // UI SETUP
-    // ═════════════════════════════════════════════
-
-    protected override void BuildUI()
-    {
-        base.BuildUI();
-
-        // Query elements
-        recipeScroll = panel.Q<ScrollView>("recipe-scroll");
-        filterDropdown = panel.Q<DropdownField>("filter-dropdown");
-        sortDropdown = panel.Q<DropdownField>("sort-dropdown");
-        closeButton = panel.Q<Button>("close-button");
-        activeCraftsLabel = panel.Q<Label>("active-crafts-label");
-        statusLabel = panel.Q<Label>("status-label");
-
-        // Setup dropdowns
         filterDropdown.choices = new List<string> { "All", "Can Craft", "Missing Materials", "Enabled" };
         filterDropdown.value = "All";
         filterDropdown.RegisterValueChangedCallback(OnFilterChanged);
@@ -107,21 +79,23 @@ public class CraftingController : BasePanelController
         sortDropdown.value = "Unlock Order";
         sortDropdown.RegisterValueChangedCallback(OnSortChanged);
 
-        // Button callbacks
-        closeButton.clicked += () => Close();
-
-        // Subscribe to events
         GameSignals.OnProductCrafted += OnProductCrafted;
 
-        // Initial visibility
-        panel.style.display = DisplayStyle.None;
-        panel.style.opacity = 0f;
+        isShown = true;
+        PopulateRecipes();
     }
 
-    protected override void OnDestroy()
+    public void OnPageHidden()
     {
         GameSignals.OnProductCrafted -= OnProductCrafted;
-        base.OnDestroy();
+
+        isShown = false;
+        recipeScroll = null;
+        filterDropdown = null;
+        sortDropdown = null;
+        activeCraftsLabel = null;
+        statusLabel = null;
+        recipeCards.Clear();
     }
 
     // ═════════════════════════════════════════════
@@ -139,12 +113,8 @@ public class CraftingController : BasePanelController
             return;
         }
 
-        List<RecipeDef> recipes = CraftingManager.Instance.GetAllRecipes();
-
-        foreach (var recipe in recipes)
-        {
+        foreach (var recipe in CraftingManager.Instance.GetAllRecipes())
             CreateRecipeCard(recipe);
-        }
 
         ApplyFilterAndSort();
     }
@@ -153,37 +123,30 @@ public class CraftingController : BasePanelController
     {
         VisualElement card = recipeCardAsset.CloneTree().Q<VisualElement>("recipe-card");
 
-        // Setup output
-        VisualElement outputIcon = card.Q<VisualElement>("output-icon");
-        Label recipeName = card.Q<Label>("recipe-name");
-        Label outputQuantity = card.Q<Label>("output-quantity");
+        var outputIcon = card.Q<VisualElement>("output-icon");
+        var recipeName = card.Q<Label>("recipe-name");
+        var outputQuantity = card.Q<Label>("output-quantity");
 
         if (recipe.Output.icon != null)
             outputIcon.style.backgroundImage = new StyleBackground(recipe.Output.icon);
-
         recipeName.text = recipe.Output.displayName;
         outputQuantity.text = $"x{recipe.OutputQty}";
 
-        // Setup ingredients
-        VisualElement ingredientsContainer = card.Q<VisualElement>("ingredients-container");
+        var ingredientsContainer = card.Q<VisualElement>("ingredients-container");
         foreach (var ingredient in recipe.Ingredients)
-        {
             CreateIngredientSlot(ingredientsContainer, ingredient);
-        }
 
-        // Setup controls
-        Label craftTimeLabel = card.Q<Label>("craft-time");
+        var craftTimeLabel = card.Q<Label>("craft-time");
         craftTimeLabel.text = $"{recipe.CraftSeconds:F1}s";
 
-        VisualElement progressContainer = card.Q<VisualElement>("progress-container");
-        VisualElement progressBar = card.Q<VisualElement>("progress-bar");
+        var progressContainer = card.Q<VisualElement>("progress-container");
+        var progressBar = card.Q<VisualElement>("progress-bar");
 
-        Toggle enableToggle = card.Q<Toggle>("enable-toggle");
+        var enableToggle = card.Q<Toggle>("enable-toggle");
         enableToggle.value = CraftingManager.Instance.IsRecipeEnabled(recipe);
         enableToggle.RegisterValueChangedCallback(evt => OnRecipeToggled(recipe, evt.newValue));
 
-        // Store card data
-        RecipeCardData cardData = new RecipeCardData
+        var cardData = new RecipeCardData
         {
             recipe = recipe,
             cardElement = card,
@@ -196,21 +159,20 @@ public class CraftingController : BasePanelController
 
         recipeCards.Add(cardData);
         recipeScroll.Add(card);
-
         UpdateRecipeCardState(cardData);
     }
 
     private void CreateIngredientSlot(VisualElement container, RecipeDef.Ingredient ingredient)
     {
-        VisualElement slot = new VisualElement();
+        var slot = new VisualElement();
         slot.AddToClassList("ingredient-slot");
 
-        VisualElement icon = new VisualElement();
+        var icon = new VisualElement();
         icon.AddToClassList("ingredient-icon");
         if (ingredient.Item.icon != null)
             icon.style.backgroundImage = new StyleBackground(ingredient.Item.icon);
 
-        Label quantity = new Label($"x{ingredient.Qty}");
+        var quantity = new Label($"x{ingredient.Qty}");
         quantity.AddToClassList("ingredient-quantity");
 
         slot.Add(icon);
@@ -225,7 +187,6 @@ public class CraftingController : BasePanelController
 
         cardData.cardElement.EnableInClassList("cannot-craft", !canCraft && !isCrafting);
         cardData.cardElement.EnableInClassList("crafting", isCrafting);
-
         cardData.progressContainer.style.display = isCrafting ? DisplayStyle.Flex : DisplayStyle.None;
         cardData.craftTimeLabel.style.display = isCrafting ? DisplayStyle.None : DisplayStyle.Flex;
     }
@@ -245,9 +206,7 @@ public class CraftingController : BasePanelController
     private void RefreshRecipeList()
     {
         foreach (var cardData in recipeCards)
-        {
             UpdateRecipeCardState(cardData);
-        }
     }
 
     // ═════════════════════════════════════════════
@@ -282,9 +241,7 @@ public class CraftingController : BasePanelController
         }
 
         foreach (var cardData in recipeCards)
-        {
             cardData.cardElement.style.display = visibleCards.Contains(cardData) ? DisplayStyle.Flex : DisplayStyle.None;
-        }
     }
 
     // ═════════════════════════════════════════════
@@ -300,7 +257,6 @@ public class CraftingController : BasePanelController
             "Enabled" => FilterMode.Enabled,
             _ => FilterMode.All
         };
-
         ApplyFilterAndSort();
     }
 
@@ -312,7 +268,6 @@ public class CraftingController : BasePanelController
             "Output Value (High→Low)" => SortMode.OutputValue,
             _ => SortMode.UnlockOrder
         };
-
         ApplyFilterAndSort();
     }
 
@@ -322,32 +277,28 @@ public class CraftingController : BasePanelController
             CraftingManager.Instance.EnableRecipe(recipe);
         else
             CraftingManager.Instance.DisableRecipe(recipe);
-
-        if (showDebugLogs)
-            Debug.Log($"[CraftingController] Recipe {recipe.Output.displayName} {(enabled ? "enabled" : "disabled")}");
     }
 
     private void OnProductCrafted(ResourceStack stack)
     {
         RefreshRecipeList();
-
         var cardData = recipeCards.FirstOrDefault(c => c.recipe.Output == stack.itemDef);
         if (cardData != null)
         {
             cardData.cardElement.AddToClassList("flash-complete");
             cardData.cardElement.schedule.Execute(() =>
-            {
-                cardData.cardElement.RemoveFromClassList("flash-complete");
-            }).StartingIn(300);
+                cardData.cardElement.RemoveFromClassList("flash-complete")).StartingIn(300);
         }
     }
 
     private void UpdateFooter()
     {
-        int activeCrafts = CraftingManager.Instance.GetActiveCraftCount();
-        activeCraftsLabel.text = $"Active Crafts: {activeCrafts}";
-
-        int enabledCount = CraftingManager.Instance.GetEnabledRecipes().Count;
-        statusLabel.text = enabledCount > 0 ? $"{enabledCount} recipes enabled" : "No recipes enabled";
+        if (activeCraftsLabel != null)
+            activeCraftsLabel.text = $"Active Crafts: {CraftingManager.Instance.GetActiveCraftCount()}";
+        if (statusLabel != null)
+        {
+            int enabledCount = CraftingManager.Instance.GetEnabledRecipes().Count;
+            statusLabel.text = enabledCount > 0 ? $"{enabledCount} recipes enabled" : "No recipes enabled";
+        }
     }
 }

@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/GuildUpgradePanelStyle.uss?fileID=7433441132597879392&amp;guid=bd7415cec5e4746968907c784b281418&amp;type=3#GuildUpgradePanelStyle" />
+    <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-right: 4px;">
+            <ui:Label text="Guild Progress" class="page-header" />
+            <ui:VisualElement name="stars-display" class="stars-display">
+                <ui:VisualElement name="star-1" class="star star-filled" />
+                <ui:VisualElement name="star-2" class="star star-filled" />
+                <ui:VisualElement name="star-3" class="star star-filled" />
+                <ui:VisualElement name="star-4" class="star star-empty" />
+                <ui:VisualElement name="star-5" class="star star-empty" />
+            </ui:VisualElement>
+            <ui:Label name="current-star-label" text="Current: 3&#x2605;" class="current-star-label" />
+            <ui:Label name="next-star-label" text="Progress to 4&#x2605;:" class="next-star-label" />
+            <ui:VisualElement class="separator" />
+            <ui:ScrollView name="milestones-scroll" class="milestones-scroll" style="flex-grow: 1;">
+                <ui:VisualElement name="milestones-container" class="milestones-container" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-left: 4px;">
+            <ui:Label text="Guild Upgrades" class="page-header" />
+            <ui:ScrollView name="upgrade-scroll" class="upgrade-scroll" style="flex-grow: 1;">
+                <ui:VisualElement name="upgrade-grid" class="upgrade-grid" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

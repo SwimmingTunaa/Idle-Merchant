@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/CraftingPanelStyle.uss?fileID=7433441132597879392&amp;guid=1f55b20e0fbeb4ea98827c037085e89a&amp;type=3#CraftingPanelStyle" />
+    <ui:Label text="Active Crafts" class="page-header" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 12px;" />
+    <ui:Label name="active-crafts-label" text="Active Crafts: 0" style="font-size: 14px; color: rgb(50, 30, 10); margin-bottom: 6px;" />
+    <ui:Label name="status-label" text="Ready to craft" style="font-size: 14px; color: rgb(70, 45, 20);" />
+</ui:UXML>
