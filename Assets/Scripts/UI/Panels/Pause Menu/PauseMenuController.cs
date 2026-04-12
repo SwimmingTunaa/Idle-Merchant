@@ -11,7 +11,7 @@ using UnityEngine.Rendering;
 /// </summary>
 public class PauseMenuController : BasePanelController
 {
-   // public override VisualElement RootElement => panel;
+    public override string PanelID => "Pause_Panel";
 
     // UI Elements
     private Button resumeButton;
@@ -29,14 +29,14 @@ public class PauseMenuController : BasePanelController
 
     void Awake()
     {
+        hideFlags = HideFlags.HideInInspector;
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
-        
-        BuildUI();
     }
 
     protected override void Start()
     {
+        BuildUI();
         base.Start();
         gameManager = GameManager.Instance;
     }
@@ -44,8 +44,7 @@ public class PauseMenuController : BasePanelController
     protected override void OnDestroy()
     {
         // Safety: restore time if destroyed while paused
-        gameManager.UnpauseGame();
-        
+        gameManager?.UnpauseGame();
         base.OnDestroy();
     }
 
@@ -180,7 +179,13 @@ public class PauseMenuController : BasePanelController
 
     protected override void BuildUI()
     {
-        base.BuildUI();  
+        if (uiDocument == null) return;
+        panel = uiDocument.rootVisualElement.Q<VisualElement>("pause-panel");
+        if (panel == null)
+        {
+            Debug.LogError("[PauseMenuController] 'pause-panel' not found in UIDocument. Ensure it is present in MainUI.uxml.");
+            return;
+        }
 
         // Query buttons
         resumeButton = panel.Q<Button>("resume-button");

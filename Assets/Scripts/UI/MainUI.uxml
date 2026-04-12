@@ -1,5 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="MilestoneTracker" src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uxml?fileID=9197481963319205126&amp;guid=c986dfdbce2d64a2a9ee5099f22caa9e&amp;type=3#MilestoneTracker" />
+    <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel" />
+    <ui:Template name="PausePanel" src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/Pause_Panel.uxml?fileID=9197481963319205126&amp;guid=d86de3818b09844edb6036a25b22e634&amp;type=3#Pause_Panel" />
+    <ui:Template name="BookPanel" src="project://database/Assets/Scripts/UI/Panels/Book/BookPanel.uxml?fileID=9197481963319205126&amp;guid=c8a56a18023e84d3f9f6a7058be5abba&amp;type=3#BookPanel" />
     <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
@@ -53,8 +56,11 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="body" class="game-view-area">
-            <ui:Instance template="MilestoneTracker" style="position: absolute; right: 0; top: 20%;" />
+        <ui:VisualElement name="body" class="game-view-area" style="flex-grow: 1;">
+            <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 0; top: 20%;" />
+            <ui:Instance template="HirePanel" name="HirePanel" />
+            <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1;" />
+            <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

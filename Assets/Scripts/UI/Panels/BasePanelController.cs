@@ -30,7 +30,7 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
     [SerializeField] protected bool showDebugLogs = false;
     
     // Abstract - must implement in subclass
-    public  string PanelID => panelAsset?.name;
+    public virtual string PanelID => panelAsset?.name;
     
     public VisualElement RootElement => panel;
     protected VisualElement panel;

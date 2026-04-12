@@ -1,0 +1,64 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Template name="Roster_Page" src="project://database/Assets/Scripts/UI/Panels/Roster/Roster_Page.uxml?fileID=9197481963319205126&amp;guid=82f37ecc3776d414da1ef32426795362&amp;type=3#Roster_Page" />
+    <ui:Template name="Guild_Page" src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/Guild_Page.uxml?fileID=9197481963319205126&amp;guid=5a208e5912b714d72b7801f9a8f0c715&amp;type=3#Guild_Page" />
+    <ui:Template name="Inventory_Page" src="project://database/Assets/Scripts/UI/Panels/Inventory/Inventory_Page.uxml?fileID=9197481963319205126&amp;guid=dfbc4af8161834eacaec13672eccabca&amp;type=3#Inventory_Page" />
+    <ui:Template name="Crafting_Page" src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/Crafting_Page.uxml?fileID=9197481963319205126&amp;guid=41d18a19f835647b795246b9073862c9&amp;type=3#Crafting_Page" />
+    <ui:Template name="Settings_Page" src="project://database/Assets/Scripts/UI/Panels/Book/Settings_Page.uxml?fileID=9197481963319205126&amp;guid=96168c1664bb74b5695993ed7d380a8d&amp;type=3#Settings_Page" />
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Book/BookPanel.uss?fileID=7433441132597879392&amp;guid=33651d3e2027c41589e0d4811390dad5&amp;type=3#BookPanel" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
+    <ui:VisualElement name="book-root" class="book-root">
+        <ui:VisualElement name="decorations" style="flex-grow: 1;">
+            <ui:VisualElement name="backpage" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BackbookPages/1.png?fileID=2800000&amp;guid=8605ba37c75ee47599138ed6eb120eff&amp;type=3#1&quot;); width: 370px; height: 80px; top: -45px; left: 945px;" />
+            <ui:VisualElement name="backpage" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BackbookPages/2.png?fileID=2800000&amp;guid=ae90123e4c61b4bbbbe105863e2f0da8&amp;type=3#2&quot;); width: 423px; height: 58.5px; top: -53px; left: 67px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="book-background" class="book-background" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookSprite_Animation/Page10.png?fileID=7914989302467394114&amp;guid=d8c8615846f894fa7b44c30285e55820&amp;type=3#Page10_0&quot;); background-size: 1350px 825px; width: 1350px; height: 825px; top: 0; bottom: -525px; right: 525px; left: 0;" />
+        <ui:VisualElement name="two-page-spread" class="two-page-spread" style="right: 75px; top: 28px; left: 75px; bottom: 114px;">
+            <ui:Instance template="Roster_Page" name="page-0" style="flex-grow: 1; display: none;" />
+            <ui:Instance template="Guild_Page" name="page-1" style="flex-grow: 1; display: none;" />
+            <ui:Instance template="Inventory_Page" name="page-2" style="flex-grow: 1; display: none;" />
+            <ui:Instance template="Crafting_Page" name="page-3" style="flex-grow: 1; display: none;" />
+            <ui:Instance template="Settings_Page" name="page-4" style="flex-grow: 1; display: none;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="inventory-filter-bar" class="inventory-filter-bar" style="top: -95px; left: 76px;">
+            <ui:Button name="tab-all" class="category-tab">
+                <ui:VisualElement class="filter-icon" />
+            </ui:Button>
+            <ui:Button name="tab-materials" class="category-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BookMarks/2.png?fileID=2800000&amp;guid=8a35e9ec1fcd04d758023e03c276d6f1&amp;type=3#2&quot;);">
+                <ui:VisualElement class="filter-icon" />
+            </ui:Button>
+            <ui:Button name="tab-crafted" class="category-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BookMarks/3.png?fileID=2800000&amp;guid=9794cf6e36b7b4bd5aca8f44a05aa324&amp;type=3#3&quot;);">
+                <ui:VisualElement class="filter-icon" />
+            </ui:Button>
+            <ui:Button name="tab-luxury" class="category-tab">
+                <ui:VisualElement class="filter-icon" />
+            </ui:Button>
+            <ui:Button name="tab-forsale" class="category-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BookMarks/3.png?fileID=2800000&amp;guid=9794cf6e36b7b4bd5aca8f44a05aa324&amp;type=3#3&quot;);">
+                <ui:VisualElement class="filter-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="tabs-container" class="tabs-container" style="top: 46px; left: -81px; justify-content: space-evenly;">
+            <ui:Button name="tab-roster" class="book-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookMarksColor/Bookmark%20%20blue.PNG?fileID=2800000&amp;guid=b7ef253ce973e443face2733d04f8537&amp;type=3#Bookmark  blue&quot;);">
+                <ui:VisualElement name="tab-badge" class="tab-badge" />
+                <ui:VisualElement name="tab-icon" class="tab-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-8179040606652740800&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#adv&quot;); -unity-background-image-tint-color: rgb(117, 180, 224);" />
+            </ui:Button>
+            <ui:Button name="tab-guild" class="book-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookMarksColor/Bookmark%20%20green.PNG?fileID=2800000&amp;guid=70313a46b3cf54dccaf06f0d71356aa3&amp;type=3#Bookmark  green&quot;);">
+                <ui:VisualElement name="tab-icon" class="tab-icon" style="-unity-background-image-tint-color: rgb(153, 197, 109);" />
+                <ui:VisualElement name="tab-badge" class="tab-badge" />
+            </ui:Button>
+            <ui:Button name="tab-inventory" class="book-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookMarksColor/Bookmark%20purple.PNG?fileID=2800000&amp;guid=596a1f05cec704fb2b7b9ae307519fdf&amp;type=3#Bookmark purple&quot;);">
+                <ui:VisualElement name="tab-icon" class="tab-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-855792293&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#bag&quot;); -unity-background-image-tint-color: rgb(188, 112, 171);" />
+                <ui:VisualElement name="tab-badge" class="tab-badge" />
+            </ui:Button>
+            <ui:Button name="tab-crafting" class="book-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookMarksColor/Bookmark%20red.PNG?fileID=2800000&amp;guid=c9d63efca47a44288898370b2572a756&amp;type=3#Bookmark red&quot;);">
+                <ui:VisualElement name="tab-icon" class="tab-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-2112496779&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#hammer&quot;); -unity-background-image-tint-color: rgb(231, 139, 119);" />
+                <ui:VisualElement name="tab-badge" class="tab-badge" />
+            </ui:Button>
+            <ui:Button name="tab-settings" class="book-tab" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookMarksColor/Bookmark%20%20blue.PNG?fileID=2800000&amp;guid=b7ef253ce973e443face2733d04f8537&amp;type=3#Bookmark  blue&quot;); -unity-background-image-tint-color: rgb(253, 153, 113);">
+                <ui:VisualElement name="tab-icon" class="tab-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=1161201145128540330&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#Icons_0&quot;); -unity-background-image-tint-color: rgb(108, 115, 112);" />
+                <ui:VisualElement name="tab-badge" class="tab-badge" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:Button name="book-close-button" class="book-close-button" text="✕" />
+    </ui:VisualElement>
+</ui:UXML>

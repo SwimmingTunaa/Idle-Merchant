@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-right: 4px;">
+            <ui:Label text="Settings" class="page-header" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 16px;" />
+            <ui:VisualElement name="category-list" style="flex-direction: column;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-left: 4px;">
+            <ui:Label name="settings-content-label" text="Select a category." style="font-size: 14px; color: rgb(70, 45, 20); white-space: normal;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

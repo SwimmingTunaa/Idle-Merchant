@@ -3,53 +3,44 @@
 }
 
 .category-tab {
-    background-color: rgba(250, 240, 220, 0.1);
-    border-width: 2px;
-    border-color: rgb(70, 45, 20);
-    border-radius: 4px;
-    font-size: 32px;
-    color: rgb(250, 240, 220);
-    transition-duration: 0.2s;
+    width: 115px;
+    height: 100px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BookMarks/1.png?fileID=2800000&guid=ab0e9b587c94e4b36bbaf12e9275ef4f&type=3#1");
+    background-size: 100% 100%;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    -unity-slice-scale: 5;
+    margin-right: 8px;
 }
 
 .category-tab:hover {
-    background-color: rgba(250, 240, 220, 0.3);
-    scale: 1.05;
-}
-
-.category-tab:active {
-    background-color: rgb(250, 240, 220);
-    color: rgb(50, 30, 10);
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BookMarks/2.png?fileID=2800000&guid=8a35e9ec1fcd04d758023e03c276d6f1&type=3#2");
 }
 
 .category-tab-selected {
-    background-color: rgb(250, 240, 220);
-    color: rgb(50, 30, 10);
-    border-color: rgb(200, 150, 0);
-    border-width: 3px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BookMarks/3.png?fileID=2800000&guid=9794cf6e36b7b4bd5aca8f44a05aa324&type=3#3");
 }
 
-.close-button {
-    background-color: rgba(200, 50, 50, 0.8);
-    border-width: 2px;
-    border-color: rgb(150, 30, 30);
-    border-radius: 4px;
-    color: white;
-    font-size: 24px;
-    transition-duration: 0.2s;
+.filter-icon {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 50%;
+    top: 50%;
+    translate: -30px -30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
-.close-button:hover {
-    background-color: rgb(220, 70, 70);
-    scale: 1.1;
-}
-
-.item-grid {
-}
 
 .item-slot {
     cursor: link;
     transition-duration: 0.15s;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=21300000&guid=850d10acc4e4542a69dda03262628525&type=3#inventory slot");
+    -unity-background-image-tint-color: rgb(245, 203, 182);
 }
 
 .item-slot:hover {
@@ -58,10 +49,21 @@
     scale: 1.05;
 }
 
-.item-slot-selected {
-    border-color: rgb(200, 150, 0);
-    border-width: 4px;
-    background-color: rgba(200, 150, 0, 0.2);
+
+.item-slot-selector {
+    position: absolute;
+    width: 88px;
+    height: 88px;
+    left: 50%;
+    top: 50%;
+    translate: -44px -44px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Inscriptions/Dark/Selector-icons.png?fileID=1731615565123986282&guid=8e6332101472e45c58825f1b34a754da&type=3#selector-red");
+    background-size: 88px 88px;
+    display: none;
+}
+
+.item-slot-selected .item-slot-selector {
+    display: flex;
 }
 
 .item-slot-empty {
@@ -74,11 +76,9 @@
 .item-slot-empty:hover {
     border-color: rgb(139, 90, 60);
     border-width: 2px;
-    scale: 1.0;
+    scale: 1;
 }
 
-.detail-panel {
-}
 
 .detail-name {
     -unity-font-style: bold;
@@ -86,10 +86,8 @@
 
 .detail-description {
     white-space: normal;
-}
-
-.stat-label {
-    -unity-font-style: normal;
+    font-size: 24px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
 .action-button {
@@ -112,15 +110,18 @@
     -unity-font-style: bold;
 }
 
-.reserved-badge {
-    -unity-font-style: normal;
-}
-
-.forsale-badge {
-    -unity-font-style: normal;
-}
 
 .item-slot:hover .quantity-badge {
     background-color: rgba(0, 0, 0, 0.9);
     scale: 1.1;
+}
+
+.stat-container {
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Light/12_2.png?fileID=-7954138311804534128&guid=847c65b70758a4b6f849ec8a43ec2e9b&type=3#12_2_0");
+    background-size: 100% 100%;
+    -unity-slice-left: 3;
+    -unity-slice-top: 3;
+    -unity-slice-right: 3;
+    -unity-slice-bottom: 3;
+    -unity-slice-scale: 5;
 }

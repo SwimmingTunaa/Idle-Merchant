@@ -13616,15 +13616,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00039495394b54332a5cbd28b3bfa49f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CraftingController
-  uiDocument: {fileID: 1433364562}
-  panelAsset: {fileID: 9197481963319205126, guid: 2078ccd3555ce4493866577e7049d5e0, type: 3}
-  blocksWorldInput: 0
-  isModal: 1
-  openCloseDuration: 0
-  hasOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
-  showDebugLogs: 0
   recipeCardAsset: {fileID: 9197481963319205126, guid: 8c0eb7c24e6444fa79063a13c9241ba2, type: 3}
+  showDebugLogs: 0
 --- !u!1 &814727311
 GameObject:
   m_ObjectHideFlags: 0
@@ -24189,10 +24182,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1901297917}
+  - {fileID: 1657271962}
   - {fileID: 266967778}
   - {fileID: 1875925580}
   - {fileID: 811366030}
   - {fileID: 1698155366}
+  - {fileID: 1694265161}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -24304,15 +24299,14 @@ MonoBehaviour:
     onActionPerformed:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: TogglePanel
-          m_Mode: 2
+        - m_Target: {fileID: 1657271963}
+          m_TargetAssemblyTypeName: BookPanelController, Assembly-CSharp
+          m_MethodName: OpenToTab
+          m_Mode: 3
           m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: 811e3b0d9f3fc4faa9c9650a92c164fe, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
-            m_IntArgument: 0
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
@@ -24323,15 +24317,14 @@ MonoBehaviour:
     onActionPerformed:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: TogglePanel
-          m_Mode: 2
+        - m_Target: {fileID: 1657271963}
+          m_TargetAssemblyTypeName: BookPanelController, Assembly-CSharp
+          m_MethodName: OpenToTab
+          m_Mode: 3
           m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: 2078ccd3555ce4493866577e7049d5e0, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
-            m_IntArgument: 0
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 3
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
@@ -24361,15 +24354,32 @@ MonoBehaviour:
     onActionPerformed:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1433364570}
-          m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: TogglePanel
-          m_Mode: 2
+        - m_Target: {fileID: 1657271963}
+          m_TargetAssemblyTypeName: BookPanelController, Assembly-CSharp
+          m_MethodName: OpenToTab
+          m_Mode: 3
           m_Arguments:
-            m_ObjectArgument: {fileID: 9197481963319205126, guid: 796d7ab8f74164f01b60af9c7c634e1e, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    buttonName: units-button
+    allowToggle: 1
+  - inputActionRef: {fileID: 4483653891903410635, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    onActionPerformed:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1657271963}
+          m_TargetAssemblyTypeName: BookPanelController, Assembly-CSharp
+          m_MethodName: OpenToTab
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
@@ -25318,8 +25328,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1c0bbd417e514484a80449648ddf47e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CraftingManager
-  craftingRecipes:
-  - {fileID: 11400000, guid: efc034d4598554e85baca718b3f69911, type: 2}
   safetyPollInterval: 2
   showDebugLogs: 0
 --- !u!1 &1543229032
@@ -26166,6 +26174,63 @@ Transform:
   - {fileID: 1001585141}
   m_Father: {fileID: 1303199132}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1657271961
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1657271962}
+  - component: {fileID: 1657271963}
+  m_Layer: 0
+  m_Name: Book UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1657271962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657271961}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1657271963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657271961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbf289529179b48398ad7371a5d34548, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BookPanelController
+  uiDocument: {fileID: 1433364562}
+  panelAsset: {fileID: 9197481963319205126, guid: c8a56a18023e84d3f9f6a7058be5abba, type: 3}
+  blocksWorldInput: 1
+  isModal: 1
+  openCloseDuration: 0
+  hasOverlay: 1
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
+  rosterPage: {fileID: 1694265162}
+  guildPage: {fileID: 1901297918}
+  inventoryPage: {fileID: 1698155367}
+  craftingPage: {fileID: 811366031}
+  settingsPage: {fileID: 1875925581}
 --- !u!1 &1671205707
 GameObject:
   m_ObjectHideFlags: 0
@@ -26346,6 +26411,50 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1694265160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1694265161}
+  - component: {fileID: 1694265162}
+  m_Layer: 5
+  m_Name: Roster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1694265161
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694265160}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1694265162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694265160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3367775ff7c994297baf113f84129803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RosterPanelController
 --- !u!1 &1695241455
 GameObject:
   m_ObjectHideFlags: 0
@@ -26570,17 +26679,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ea668d93a89a4689acaab210c5006a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryController
-  uiDocument: {fileID: 1433364562}
-  panelAsset: {fileID: 9197481963319205126, guid: 811e3b0d9f3fc4faa9c9650a92c164fe, type: 3}
-  blocksWorldInput: 1
-  isModal: 1
-  openCloseDuration: 0
-  hasOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
-  showDebugLogs: 0
   itemSlotAsset: {fileID: 9197481963319205126, guid: 561d352404136405e83576f96fac8bb1, type: 3}
   baseSlotCount: 15
   slotsPerRow: 5
+  showDebugLogs: 0
 --- !u!1 &1702011754
 GameObject:
   m_ObjectHideFlags: 0
@@ -31246,16 +31348,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ccac340f818b4a1c93fc0e4bd88108d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradePanel
-  uiDocument: {fileID: 1433364562}
-  panelAsset: {fileID: 9197481963319205126, guid: 796d7ab8f74164f01b60af9c7c634e1e, type: 3}
-  blocksWorldInput: 1
-  isModal: 1
-  openCloseDuration: 0
-  hasOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
-  showDebugLogs: 1
   upgradeCardTemplate: {fileID: 9197481963319205126, guid: c53196aa7052f446b8231034cc3a3768, type: 3}
   milestoneCardTemplate: {fileID: 9197481963319205126, guid: f7dea8ac6fc5a4e54ad23aecd5869af8, type: 3}
+  showDebugLogs: 1
 --- !u!1 &1908026232
 GameObject:
   m_ObjectHideFlags: 0

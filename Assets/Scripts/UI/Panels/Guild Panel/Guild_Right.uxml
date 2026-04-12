@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/GuildUpgradePanelStyle.uss?fileID=7433441132597879392&amp;guid=bd7415cec5e4746968907c784b281418&amp;type=3#GuildUpgradePanelStyle" />
+    <ui:Label text="Guild Upgrades" class="page-header" />
+    <ui:ScrollView name="upgrade-scroll" class="upgrade-scroll" style="flex-grow: 1;">
+        <ui:VisualElement name="upgrade-grid" class="upgrade-grid" />
+    </ui:ScrollView>
+</ui:UXML>

@@ -11234,13 +11234,13 @@ MonoBehaviour:
   maxCommoner: 999
   maxAdventurer: 5
   maxNoble: 3
-  baseSpawnsPerMinute: 8
+  baseSpawnsPerMinute: 5
   spawnRatePerStar: 2
-  spawnRatePerSaleItem: 1
-  spawnRatePerLayer: 2
+  spawnRatePerSaleItem: 0.5
+  spawnRatePerLayer: 1
   minSpawnsPerMinute: 1
   maxSpawnsPerMinute: 60
-  showDebugLogs: 1
+  showDebugLogs: 0
 --- !u!1 &620508933
 GameObject:
   m_ObjectHideFlags: 0
@@ -20587,8 +20587,6 @@ GameObject:
   - component: {fileID: 1184702559}
   - component: {fileID: 1184702558}
   - component: {fileID: 1184702557}
-  - component: {fileID: 1184702561}
-  - component: {fileID: 1184702560}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -20657,30 +20655,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1184702560
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1184702556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a79c4e23d4d4b64bfa5fa9e6671a460, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UIElements.PanelRaycaster
---- !u!114 &1184702561
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1184702556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a410b213209442fb15a69799f0240a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UIElements.PanelEventHandler
 --- !u!1 &1185610543
 GameObject:
   m_ObjectHideFlags: 0
@@ -22687,6 +22661,58 @@ MonoBehaviour:
   showDebugLogs: 0
   transport: {fileID: 1871572108}
   depositPoint: {fileID: 1426513257}
+--- !u!1 &1327744482
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1327744483}
+  - component: {fileID: 1327744484}
+  m_Layer: 0
+  m_Name: Roster Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1327744483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1327744482}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1433364563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1327744484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1327744482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3367775ff7c994297baf113f84129803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RosterPanelController
+  uiDocument: {fileID: 1433364562}
+  panelAsset: {fileID: 9197481963319205126, guid: 0becbd9956ef24a6f88359ac006098ef, type: 3}
+  blocksWorldInput: 1
+  isModal: 1
+  openCloseDuration: 0
+  hasOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
 --- !u!1 &1335802218
 GameObject:
   m_ObjectHideFlags: 0
@@ -24215,6 +24241,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1327744483}
   - {fileID: 1901297917}
   - {fileID: 266967778}
   - {fileID: 1875925580}

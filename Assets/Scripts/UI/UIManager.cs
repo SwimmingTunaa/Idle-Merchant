@@ -71,7 +71,7 @@ public class UIManager : PersistentSingleton<UIManager>
             uiDocument = GetComponent<UIDocument>();
     }
 
-    void OnEnable() => SetUpUIBindings();
+    void Start() => SetUpUIBindings();
 
     private void OnDisable() => CleanupInputActions();
 
@@ -274,35 +274,18 @@ public class UIManager : PersistentSingleton<UIManager>
                 currentTop.OnLoseFocus();
         }
 
+        if (panel.IsModal)
+            modalStack.Push(panel);
+
         if (panel.Open())
         {
-            // Bring to front by moving to end of parent's children
             if (panel.RootElement != null && panel.RootElement.parent != null)
-            {
                 panel.RootElement.BringToFront();
-            }
-            
-            if (panel.IsModal)
-            {
-                modalStack.Push(panel);
-            }
         }
-
-        // Push to stack BEFORE opening so it's there when OnOpenComplete fires, allows you to close pause menu
-        if (panel.IsModal)
+        else
         {
-            modalStack.Push(panel);
-            Debug.Log($"[UIManager] Pushed {panel.PanelID} to modal stack. Stack count: {modalStack.Count}");
-        }
-
-        if (!panel.Open())
-        {
-            // Open failed, remove from stack
             if (panel.IsModal && modalStack.Count > 0 && modalStack.Peek() == panel)
-            {
                 modalStack.Pop();
-                //Debug.LogWarning($"[UIManager] Open failed for {panel.PanelID}, removed from stack");
-            }
         }
     }
 

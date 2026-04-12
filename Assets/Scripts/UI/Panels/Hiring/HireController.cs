@@ -9,6 +9,8 @@ using System.Collections.Generic;
 // Inherits from BasePanelController, overrides Open() for roster rebuild and animations for card stack.
 public class HireController : BasePanelController
 {
+    public override string PanelID => "HirePanel";
+
     [Header("UXML References")]
     [SerializeField] private VisualTreeAsset candidateSlotAsset;
 
@@ -35,7 +37,6 @@ public class HireController : BasePanelController
     // UI Elements
     private VisualElement stackContainer;
     private VisualElement emptyState;
-    private Button openButton;
     private Button prevButton;
     private Button nextButton;
     private Label countLabel;
@@ -104,7 +105,6 @@ public class HireController : BasePanelController
 
     void OnEnable()
     {
-        BuildUI();
         GameSignals.OnLayerUnlocked += OnLayerUnlocked;
     }
 
@@ -115,17 +115,19 @@ public class HireController : BasePanelController
 
     void Awake()
     {
+        hideFlags = HideFlags.HideInInspector;
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
     }
 
     protected override void Start()
     {
+        BuildUI();
         InitializeCandidatePools();
         base.Start(); // Registers with UIManager
-        
+
         // Start closed
-        panel.style.display = DisplayStyle.None;
+        if (panel != null) panel.style.display = DisplayStyle.None;
     }
 
     void Update()
@@ -252,8 +254,14 @@ public class HireController : BasePanelController
 
     protected override void BuildUI()
     {
-        base.BuildUI();
-        
+        if (uiDocument == null) return;
+        panel = uiDocument.rootVisualElement.Q<VisualElement>("hire-panel");
+        if (panel == null)
+        {
+            Debug.LogError("[HirePanel] 'hire-panel' not found in UIDocument. Ensure it is present in MainUI.uxml.");
+            return;
+        }
+
         // Query elements
         stackContainer = panel.Q<VisualElement>("newspaper-container");
         emptyState = panel.Q<VisualElement>("text-container");
@@ -268,9 +276,6 @@ public class HireController : BasePanelController
         layerNextButton = panel.Q<Button>("layer-next-button");
         layerLabel = panel.Q<Label>("layer-label");
 
-        // Query the open button (if it exists in root)
-        openButton = uiDocument.rootVisualElement.Q<Button>("ShopButton");
-
         // Fallback: use template instance from UXML if no asset assigned
         if (candidateSlotAsset == null)
         {
@@ -280,8 +285,6 @@ public class HireController : BasePanelController
         }
 
         // Hook up callbacks
-        if (openButton != null)
-            openButton.clicked += OnOpenButtonClicked;
         prevButton.clicked += Prev;
         nextButton.clicked += Next;
         tabView.activeTabChanged += OnTabChanged;
@@ -648,15 +651,14 @@ public class HireController : BasePanelController
 
         var costLabel = card.Q<Label>("cost");
 
-        // Resolve manager via the candidate's pool layer, not the UI layer selector
+        // Resolve manager via the selected layer in the UI
         candidateToPool.TryGetValue(candidate, out var pool);
-        int poolLayer = pool != null ? pool.LayerIndex : selectedLayer;
 
         IUnitManager manager = null;
         if (currentTab == TabType.Adventurers)
-            manager = adventurerManagers.Find(m => m.LayerIndex == poolLayer);
+            manager = adventurerManagers.Find(m => m.LayerIndex == selectedLayer);
         else
-            manager = porterManagers.Find(m => m.LayerIndex == poolLayer);
+            manager = porterManagers.Find(m => m.LayerIndex == selectedLayer);
 
         if (manager == null)
         {

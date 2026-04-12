@@ -66,6 +66,7 @@
     <Compile Include="Assets/Scripts/Systems/Spawners/CustomerSpawner.cs" />
     <Compile Include="Assets/Scripts/Traits/CursedComboDatabase.cs" />
     <Compile Include="Assets/Scripts/Utility/Timers/Timer.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Roster/RosterPanelController.cs" />
     <Compile Include="Assets/Scripts/Managers/GameManager.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitUIHelper.cs" />
     <Compile Include="Assets/Scripts/Shop/CounterService.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Assets/Scripts/Shop/QueueController.cs" />
     <Compile Include="Assets/Scripts/Entities/Adventuers/AdventurerDef.cs" />
     <Compile Include="Assets/Scripts/CharacterGeneration/HiringCandidate.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Book/SettingsPageController.cs" />
     <Compile Include="Assets/Scripts/Identity/IdentityGenerator.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitStructures.cs" />
     <Compile Include="Assets/Scripts/Loot/TransportPoint.cs" />
@@ -134,6 +136,7 @@
     <Compile Include="Assets/Scripts/Managers/UnitManager.cs" />
     <Compile Include="Assets/Scripts/Traits/TraitCompatibilityChecker.cs" />
     <Compile Include="Assets/Scripts/Entities/Customers/CustomerCarryDisplay.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Book/BookPanelController.cs" />
     <Compile Include="Assets/Scripts/Utility/Deubugger/GameDebugger.cs" />
     <Compile Include="Assets/Scripts/Entities/Stats/BaseStats.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Pause Menu/PauseMenuController.cs" />
@@ -146,6 +149,7 @@
     <Compile Include="Assets/Scripts/Systems/Spawners/CustomerSpawnHandle.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/GuildUpgradeDef.cs" />
     <Compile Include="Assets/Scripts/Identity/NamePoolDef.cs" />
+    <Compile Include="Assets/Scripts/UI/Panels/Book/IBookPage.cs" />
     <Compile Include="Assets/Scripts/UI/Panels/Guild Panel/GuildUpgradePanel.cs" />
     <Compile Include="Assets/Scripts/Utility/EmoteDisplay.cs" />
     <Compile Include="Assets/Scripts/ScriptableObjects/Guild/StarMilestoneDef.cs" />
@@ -183,20 +187,27 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets/Scripts/UI/MainUI.uxml" />
-    <None Include="Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Crafting Menu/Crafting_Page.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" />
     <None Include="Assets/Scripts/UI/MainUI.uss" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/HirePanel.uss" />
+    <None Include="Assets/Scripts/UI/Panels/Roster/Roster_Page.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Guild Panel/Guild_Right.uxml" />
     <None Include="Assets/Scripts/UI/Components/Checkbox.uxml" />
     <None Include="Assets/Sprites/Loot/Pixel Art Icon Pack - RPG/Shader/SH Sprite Icon Outline Color.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Book/BookPanel.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" />
+    <None Include="Assets/Scripts/UI/Panels/Guild Panel/Guild_Left.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Book/Settings_Left.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader" />
     <None Include="Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss" />
+    <None Include="Assets/Scripts/UI/Panels/Book/Settings_Right.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Milestone Tracker/MilestoneTracker.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/UpgradeCard.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Inventory/ItemSlot.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Book/Settings_Page.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/SDFFunctions.hlsl" />
     <None Include="Assets/Scripts/UI/Components/ProgressBar.uxml" />
     <None Include="Assets/Scripts/UI/Components/Checkbox.uss" />
@@ -210,6 +221,7 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF.shader" />
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/UpgradeCard.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets/Scripts/UI/Panels/Book/BookPanel.uxml" />
     <None Include="Assets/TextMesh Pro/Resources/LineBreaking Leading Characters.txt" />
     <None Include="Assets/Scripts/UI/Panels/Pause Menu/Pause_Panel.uxml" />
     <None Include="Assets/Scripts/UI/Components/Badge.uxml" />
@@ -219,22 +231,30 @@
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/GuildUpgradePanel.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Milestone Tracker/MilestoneTracker.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" />
+    <None Include="Assets/Scripts/UI/Panels/Guild Panel/Guild_Page.uxml" />
     <None Include="Assets/Scripts/UI/Components/Button.uss" />
     <None Include="Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt" />
+    <None Include="Assets/Scripts/UI/Panels/Roster/RosterPanel.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/Candidate.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Crafting Menu/RecipeCard.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets/BigManJD/readme.txt" />
+    <None Include="Assets/Scripts/UI/Panels/Roster/RosterPanel.uss" />
     <None Include="Assets/Scripts/UI/Components/Badge.uss" />
+    <None Include="Assets/Scripts/UI/Panels/Roster/Roster_Left.uxml" />
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/GuildUpgradePanelStyle.uss" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader" />
     <None Include="Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt" />
+    <None Include="Assets/Scripts/UI/Panels/Crafting Menu/Crafting_Left.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" />
     <None Include="Assets/Scripts/UI/Panels/Crafting Menu/CraftingPanelStyle.uss" />
     <None Include="Assets/Scripts/UI/Panels/Guild Panel/MilestoneCard.uss" />
+    <None Include="Assets/Scripts/UI/Panels/Roster/Roster_Right.uxml" />
+    <None Include="Assets/Scripts/UI/Panels/Crafting Menu/Crafting_Right.uxml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" />
     <None Include="Assets/Scripts/UI/Panels/Hiring/CandidateUSS.uss" />
+    <None Include="Assets/Scripts/UI/Panels/Inventory/Inventory_Page.uxml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -725,6 +745,10 @@
       <HintPath>/Applications/Unity/Hub/Editor/6000.2.6f2/Unity.app/Contents/Managed/UnityEngine/UnityEditor.XRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>Assets/Plugins/Roslyn/Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ExcelDataReader.DataSet">
       <HintPath>Assets/Plugins/ExcelDataReader.DataSet.dll</HintPath>
       <Private>False</Private>
@@ -737,8 +761,20 @@
       <HintPath>Library/PackageCache/com.unity.ext.nunit@031a54704bff/net40/unity-custom/nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>Assets/Plugins/Roslyn/System.Collections.Immutable.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>Assets/Plugins/Roslyn/Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library/PackageCache/com.unity.collections@d49facba0036/Unity.Collections.Tests/System.IO.Hashing/System.IO.Hashing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>Assets/Plugins/Roslyn/System.Reflection.Metadata.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
@@ -759,22 +795,6 @@
     </Reference>
     <Reference Include="ExcelDataReader">
       <HintPath>Assets/Plugins/ExcelDataReader.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>Assets/Plugins/Roslyn/Microsoft.CodeAnalysis.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>Assets/Plugins/Roslyn/System.Collections.Immutable.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>Assets/Plugins/Roslyn/System.Reflection.Metadata.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp">
-      <HintPath>Assets/Plugins/Roslyn/Microsoft.CodeAnalysis.CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
