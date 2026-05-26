@@ -1,7 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
-    <ui:Template name="ItemSlot" src="project://database/Assets/Scripts/UI/Panels/Inventory/ItemSlot.uxml?fileID=9197481963070184&amp;guid=561d352404136405e83576f96fac8bb1&amp;type=3#ItemSlot" />
     <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
 
         <!-- ══════════════ LEFT PAGE ══════════════ -->
@@ -17,27 +16,9 @@
             <!-- Underline deco -->
             <ui:VisualElement name="title-underline" style="height: 20px; align-self: center; width: 340px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=7417602752505748736&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline_0&quot;); margin-bottom: 12px;" />
 
-            <!-- Scrollable item grid -->
+            <!-- Item grid — populated at runtime by InventoryController -->
             <ui:ScrollView name="item-grid-scroll" style="flex-grow: 1;">
-                <ui:VisualElement name="item-grid" style="flex-wrap: wrap; flex-direction: row; padding: 4px;">
-                    <!-- Slots populated by InventoryPanelController at runtime -->
-                    <!-- Preview placeholders: -->
-                    <ui:Instance template="ItemSlot" name="slot-0" />
-                    <ui:Instance template="ItemSlot" name="slot-1" />
-                    <ui:Instance template="ItemSlot" name="slot-2" />
-                    <ui:Instance template="ItemSlot" name="slot-3" />
-                    <ui:Instance template="ItemSlot" name="slot-4" />
-                    <ui:Instance template="ItemSlot" name="slot-5" />
-                    <ui:Instance template="ItemSlot" name="slot-6" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-7" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-8" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-9" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-10" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-11" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-12" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-13" />
-                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-14" />
-                </ui:VisualElement>
+                <ui:VisualElement name="item-grid" style="flex-wrap: wrap; flex-direction: row; padding: 4px;" />
             </ui:ScrollView>
         </ui:VisualElement>
 
