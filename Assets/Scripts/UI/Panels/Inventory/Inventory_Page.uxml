@@ -1,6 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
+    <ui:Template name="ItemSlot" src="project://database/Assets/Scripts/UI/Panels/Inventory/ItemSlot.uxml?fileID=9197481963070184&amp;guid=561d352404136405e83576f96fac8bb1&amp;type=3#ItemSlot" />
     <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
 
         <!-- ══════════════ LEFT PAGE ══════════════ -->
@@ -19,63 +20,23 @@
             <!-- Scrollable item grid -->
             <ui:ScrollView name="item-grid-scroll" style="flex-grow: 1;">
                 <ui:VisualElement name="item-grid" style="flex-wrap: wrap; flex-direction: row; padding: 4px;">
-
-                    <!-- Iron Gear x12, for sale — SELECTED -->
-                    <ui:VisualElement class="item-slot item-slot-selected" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement class="item-slot-selector" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" />
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Gear.png?fileID=2800000&amp;guid=042fae2dd68bce044b8fbd1f26724a2d&amp;type=3#Gear&quot;);" />
-                        <ui:Label text="x12" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                        <ui:VisualElement style="position: absolute; top: -4px; right: -4px; width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/for-sale-stamp-small.png?fileID=6986885822868895077&amp;guid=34b68b9b1fc6a47dd8a99d807ab6c3cb&amp;type=3#for-sale-stamp-small_0&quot;); rotate: -15deg;" />
-                    </ui:VisualElement>
-
-                    <!-- Golden Coin x45, for sale -->
-                    <ui:VisualElement class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Golden%20Coin.png?fileID=2800000&amp;guid=394899dbf2938874ca7d1025f7598406&amp;type=3#Golden Coin&quot;);" />
-                        <ui:Label text="x45" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                        <ui:VisualElement style="position: absolute; top: -4px; right: -4px; width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/for-sale-stamp-small.png?fileID=6986885822868895077&amp;guid=34b68b9b1fc6a47dd8a99d807ab6c3cb&amp;type=3#for-sale-stamp-small_0&quot;); rotate: -15deg;" />
-                    </ui:VisualElement>
-
-                    <!-- Rune Stone x8 -->
-                    <ui:VisualElement class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Rune%20Stone.png?fileID=2800000&amp;guid=b9a847102a75c8c429a8f749008df6c2&amp;type=3#Rune Stone&quot;);" />
-                        <ui:Label text="x8" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                    </ui:VisualElement>
-
-                    <!-- Book x5 -->
-                    <ui:VisualElement class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Book.png?fileID=2800000&amp;guid=7972dd97521bb1c44ba8e3774391b996&amp;type=3#Book&quot;);" />
-                        <ui:Label text="x5" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                    </ui:VisualElement>
-
-                    <!-- Golden Key x3, for sale -->
-                    <ui:VisualElement class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Golden%20Key.png?fileID=2800000&amp;guid=a6c10312421cb5e438d8b9edaad2db28&amp;type=3#Golden Key&quot;);" />
-                        <ui:Label text="x3" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                        <ui:VisualElement style="position: absolute; top: -4px; right: -4px; width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/for-sale-stamp-small.png?fileID=6986885822868895077&amp;guid=34b68b9b1fc6a47dd8a99d807ab6c3cb&amp;type=3#for-sale-stamp-small_0&quot;); rotate: -15deg;" />
-                    </ui:VisualElement>
-
-                    <!-- Lantern x2 -->
-                    <ui:VisualElement class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Lantern.png?fileID=2800000&amp;guid=5780c0f7daa138f46823eb60d93b7cc6&amp;type=3#Lantern&quot;);" />
-                        <ui:Label text="x2" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                    </ui:VisualElement>
-
-                    <!-- Chest x1 -->
-                    <ui:VisualElement class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);">
-                        <ui:VisualElement style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Chest.png?fileID=2800000&amp;guid=c8303e833b0ef184e99c1bc8940fff84&amp;type=3#Chest&quot;);" />
-                        <ui:Label text="x1" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                    </ui:VisualElement>
-
-                    <!-- Empty slots -->
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-                    <ui:VisualElement class="item-slot item-slot-empty" style="width: 85px; height: 85px; margin: 6px; -unity-background-scale-mode: stretch-to-fill; opacity: 0.4; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=-6270953770400647376&amp;guid=850d10acc4e4542a69dda03262628525&amp;type=3#14_0&quot;);" />
-
+                    <!-- Slots populated by InventoryPanelController at runtime -->
+                    <!-- Preview placeholders: -->
+                    <ui:Instance template="ItemSlot" name="slot-0" />
+                    <ui:Instance template="ItemSlot" name="slot-1" />
+                    <ui:Instance template="ItemSlot" name="slot-2" />
+                    <ui:Instance template="ItemSlot" name="slot-3" />
+                    <ui:Instance template="ItemSlot" name="slot-4" />
+                    <ui:Instance template="ItemSlot" name="slot-5" />
+                    <ui:Instance template="ItemSlot" name="slot-6" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-7" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-8" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-9" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-10" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-11" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-12" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-13" />
+                    <ui:Instance template="ItemSlot" class="item-slot-empty" name="slot-14" />
                 </ui:VisualElement>
             </ui:ScrollView>
         </ui:VisualElement>
@@ -87,41 +48,41 @@
             <ui:VisualElement name="item-display" style="flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px; height: 220px;">
                 <ui:VisualElement name="deco-left" style="width: 110px; height: 48px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=8000510597704443122&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line_0&quot;); scale: -1 1;" />
                 <ui:VisualElement name="large-slot" style="width: 210px; height: 210px; align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=3669019474466461189&amp;guid=dc67f5857d1cc48f49c6bf8c91eedf54&amp;type=3#deco-diamond-big_0&quot;);">
-                    <ui:VisualElement name="detail-icon" style="width: 130px; height: 130px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Gear.png?fileID=2800000&amp;guid=042fae2dd68bce044b8fbd1f26724a2d&amp;type=3#Gear&quot;);" />
+                    <ui:VisualElement name="detail-icon" style="width: 130px; height: 130px; -unity-background-scale-mode: scale-to-fit;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="deco-right" style="width: 110px; height: 48px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=8000510597704443122&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line_0&quot;);" />
             </ui:VisualElement>
 
             <!-- Item name banner -->
             <ui:VisualElement name="item-name-banner" style="width: 360px; height: 60px; align-items: center; justify-content: center; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=-1815108092852401429&amp;guid=992d1ea8d5ec74d89b5301bb26534a78&amp;type=3#deco-title-banner_0&quot;); margin-bottom: 12px;">
-                <ui:Label name="detail-name" text="Iron Gear" style="font-size: 32px; color: rgb(253, 248, 239); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center;" />
+                <ui:Label name="detail-name" text="Select an item" style="font-size: 32px; color: rgb(253, 248, 239); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center;" />
             </ui:VisualElement>
 
             <!-- Metrics row: For Sale badge | Value | Reserved -->
             <ui:VisualElement name="metrics-row" style="flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; align-self: stretch;">
 
-                <!-- Not For Sale toggle badge -->
+                <!-- For sale toggle badge -->
                 <ui:VisualElement name="forsale-badge" style="height: 48px; align-items: center; justify-content: center; padding: 0 16px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px;">
                     <ui:Label name="forsale-label" text="Not For Sale" style="font-size: 16px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center;" />
                 </ui:VisualElement>
 
                 <!-- Value badge: number + coin icon -->
                 <ui:VisualElement name="value-badge" style="height: 48px; flex-direction: row; align-items: center; justify-content: center; padding: 0 12px; gap: 4px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px;">
-                    <ui:Label name="item-value" text="45" style="font-size: 16px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
+                    <ui:Label name="item-value" text="—" style="font-size: 16px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
                     <ui:VisualElement style="width: 24px; height: 24px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Icons/spinning%20coin.png?fileID=3719480491199129836&amp;guid=64d83157b3e0543fe912b4fad69aa702&amp;type=3#spinning coin_0&quot;);" />
                 </ui:VisualElement>
 
                 <!-- Reserved count badge -->
                 <ui:VisualElement name="reserved-badge" style="height: 48px; flex-direction: row; align-items: center; justify-content: center; padding: 0 12px; gap: 6px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px;">
                     <ui:Label text="Reserved" style="font-size: 16px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                    <ui:IntegerField name="reserve-count" value="2" style="width: 40px; font-size: 16px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
+                    <ui:IntegerField name="reserve-count" value="0" style="width: 40px; font-size: 16px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
                 </ui:VisualElement>
 
             </ui:VisualElement>
 
             <!-- Description box with 9-slice background -->
             <ui:VisualElement name="description-container" style="flex-grow: 1; align-self: stretch; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/text-box-slice.png?fileID=3997786295894542459&amp;guid=4c3028ba947224aa4a305c692c8087ed&amp;type=3#text-box-slice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px; padding: 16px;">
-                <ui:Label name="detail-description" text="A worn but sturdy iron cog salvaged from the mines. Miners use these to repair equipment — or trade them for a tidy sum at the right market stall." style="font-size: 24px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); white-space: normal; flex-grow: 1;" />
+                <ui:Label name="detail-description" text="Select an item to view details." style="font-size: 24px; color: rgb(70, 45, 20); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); white-space: normal; flex-grow: 1;" />
             </ui:VisualElement>
 
         </ui:VisualElement>

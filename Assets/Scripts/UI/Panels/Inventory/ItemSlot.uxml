@@ -1,13 +1,17 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
-    <ui:VisualElement name="item-slot" class="item-slot" style="width: 85px; height: 85px; margin: 4px; border-radius: 4px; border-width: 2px; border-color: rgb(139, 90, 60); position: relative; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0; justify-content: center; align-items: center; background-size: cover; -unity-background-image-tint-color: rgb(255, 255, 255);">
-        <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
+    <!-- Root must be named "item-slot" — InventoryController.cs queries by this name via CloneTree().Q<VisualElement>("item-slot") -->
+    <ui:VisualElement name="item-slot" class="item-slot" style="width: 85px; height: 85px; margin: 6px; position: relative; justify-content: center; align-items: center;">
+        <!-- Selected ring overlay (shown via item-slot-selected class in CSS) -->
         <ui:VisualElement name="slot-selector" class="item-slot-selector" />
-        <ui:Label name="slot-quantity" text="x87" class="quantity-badge" style="position: absolute; bottom: -1px; right: -3px; background-color: rgba(0, 0, 0, 0.7); color: white; padding: 2px 6px; border-radius: 3px; font-size: 14px;" />
-        <ui:Label name="slot-reserved" text="📦 20" class="reserved-badge" style="position: absolute; top: -3px; left: -3px; background-color: rgba(50, 90, 150, 0.9); color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px; display: flex;" />
-        <ui:VisualElement name="forsale-sticker" style="position: absolute; top: -6px; right: -8px; width: 26px; height: 27px; background-color: rgb(200, 150, 0); border-radius: 20px; border-width: 2px; border-color: rgb(250, 240, 220); align-items: center; justify-content: center; display: flex;">
-            <ui:Label text="$" style="font-size: 16px; color: white; -unity-font-style: bold; -unity-text-align: middle-center; white-space: nowrap; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); width: 3px; align-self: center;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="slot-icon" class="item-slot-selected" style="width: 64px; height: 64px; background-size: cover; background-position: center; top: auto; left: auto; right: auto; bottom: auto; align-self: center;" />
+        <!-- Item icon — background-image set by code -->
+        <ui:VisualElement name="slot-icon" style="width: 60px; height: 60px; -unity-background-scale-mode: scale-to-fit;" />
+        <!-- Quantity badge (bottom-right) -->
+        <ui:Label name="slot-quantity" text="x1" style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0,0,0,0.7); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
+        <!-- Reserved count badge (top-left, hidden by default) -->
+        <ui:Label name="slot-reserved" text="0" style="position: absolute; top: 2px; left: 2px; background-color: rgba(50,90,150,0.85); color: white; padding: 1px 4px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); display: none;" />
+        <!-- For-sale stamp (top-right, hidden by default — shown by code) -->
+        <ui:VisualElement name="forsale-sticker" style="position: absolute; top: -4px; right: -4px; width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/for-sale-stamp-small.png?fileID=6986885822868895077&amp;guid=34b68b9b1fc6a47dd8a99d807ab6c3cb&amp;type=3#for-sale-stamp-small_0&quot;); rotate: -15deg; display: none;" />
     </ui:VisualElement>
 </ui:UXML>
