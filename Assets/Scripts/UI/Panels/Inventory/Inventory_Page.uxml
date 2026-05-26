@@ -54,8 +54,8 @@
                 <ui:VisualElement name="deco-diamond-line 4" style="width: 130px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=8000510597704443122&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line_0&quot;); scale: -1 1;" />
                 <!-- slot: 210×210, contains 176×176 item -->
                 <ui:VisualElement name="slot" style="width: 210px; height: 210px; align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=3669019474466461189&amp;guid=dc67f5857d1cc48f49c6bf8c91eedf54&amp;type=3#deco-diamond-big_0&quot;);">
-                    <!-- Named "detail-icon" so InventoryController.Q("detail-icon") resolves -->
-                    <ui:VisualElement name="detail-icon" style="width: 176px; height: 176px; -unity-background-scale-mode: scale-to-fit;" />
+                    <!-- Named "detail-icon" — controller sets this to item.icon of the selected slot at runtime -->
+                    <ui:VisualElement name="detail-icon" style="width: 176px; height: 176px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Gear.png?fileID=2800000&amp;guid=042fae2dd68bce044b8fbd1f26724a2d&amp;type=3#Gear&quot;);" />
                 </ui:VisualElement>
                 <!-- Right deco diamond line — normal orientation -->
                 <ui:VisualElement name="deco-diamond-line 3" style="width: 130px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=8000510597704443122&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line_0&quot;);" />
