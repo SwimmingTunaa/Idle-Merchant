@@ -1,20 +1,35 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Roster page — shows all hired adventurers with XP progress, rank badge, and a promote button.
+/// Roster page — adventurers grouped by dungeon layer on the left, full detail panel on the right.
 /// Implements IBookPage; lives inside BookPanelController as tab 0.
+/// Live XP/HP updates via GameSignals.OnAdventurerXPChanged.
 /// </summary>
 public class RosterPanelController : MonoBehaviour, IBookPage
 {
-    // agent → card mapping for O(1) targeted refresh
-    private readonly Dictionary<AdventurerAgent, VisualElement> agentCards = new();
-    private VisualElement rosterList;
+    [SerializeField] private VisualTreeAsset slotTemplate;
+    [SerializeField] private HireController hireController;
+
+    private static readonly string[] LayerNames =
+    {
+        "",                 // index 0 unused
+        "Abandoned Mines",
+        "Deep Caverns",
+        "Crystal Hollows",
+        "Cursed Crypts",
+        "Infernal Depths",
+    };
+
+    // agent → slot wrapper for O(1) targeted refresh
+    private readonly Dictionary<AdventurerAgent, VisualElement> agentSlots = new();
+    private AdventurerAgent selectedAgent;
+    private VisualElement leftContent;
+    private VisualElement rightContent;
 
     public string PageTitle => "Roster";
-
-    void Awake() => hideFlags = HideFlags.HideInInspector;
 
     // ═════════════════════════════════════════════
     // IBOOK PAGE
@@ -22,131 +37,413 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
     public void OnPageShown(VisualElement leftPage, VisualElement rightPage)
     {
-        rosterList = leftPage.Q<VisualElement>("roster-list");
-
+        leftContent = leftPage;
+        rightContent = rightPage;
+        GameSignals.OnAdventurerXPChanged += OnAdventurerXPChanged;
         GameSignals.OnAdventurerPromoted += OnAdventurerPromoted;
-
-        RebuildRoster();
+        GameSignals.OnUnitHired += OnUnitHired;
+        RebuildRoster(leftPage);
+        ShowDetail(null);
     }
 
     public void OnPageHidden()
     {
+        GameSignals.OnAdventurerXPChanged -= OnAdventurerXPChanged;
         GameSignals.OnAdventurerPromoted -= OnAdventurerPromoted;
-        rosterList = null;
-        agentCards.Clear();
+        GameSignals.OnUnitHired -= OnUnitHired;
+        agentSlots.Clear();
+        selectedAgent = null;
+        leftContent = null;
+        rightContent = null;
     }
 
     // ═════════════════════════════════════════════
-    // ROSTER
+    // ROSTER BUILD
     // ═════════════════════════════════════════════
 
-    private void RebuildRoster()
+    private void RebuildRoster(VisualElement leftPage)
     {
-        if (rosterList == null) return;
-        rosterList.Clear();
-        agentCards.Clear();
+        var layersContainer = leftPage.Q<VisualElement>("layers-container");
+        if (layersContainer == null) return;
 
-        var managers = FindObjectsByType<AdventurerManager>(FindObjectsSortMode.None);
+        layersContainer.Clear();
+        agentSlots.Clear();
+
+        var managers = FindObjectsByType<AdventurerManager>(FindObjectsSortMode.None)
+            .OrderBy(m => m.LayerIndex)
+            .ToList();
+
         foreach (var manager in managers)
+            layersContainer.Add(BuildLayerSection(manager));
+    }
+
+    private VisualElement BuildLayerSection(AdventurerManager manager)
+    {
+        var section = new VisualElement();
+        section.AddToClassList("layer-section");
+
+        // Header: layer name + slot count
+        var header = new VisualElement();
+        header.AddToClassList("layer-header");
+
+        var nameLabel = new Label(GetLayerName(manager.LayerIndex));
+        nameLabel.AddToClassList("layer-name");
+
+        var adventurers = manager.GetAllAdventurers().Where(a => a != null).ToList();
+        var countLabel = new Label($"{adventurers.Count} / {manager.MaxUnits}");
+        countLabel.AddToClassList("layer-count");
+
+        header.Add(nameLabel);
+        header.Add(countLabel);
+        section.Add(header);
+
+        // Slot row: filled slots then empty slots
+        var slotRow = new VisualElement();
+        slotRow.AddToClassList("slot-row");
+
+        foreach (var agent in adventurers)
         {
-            foreach (var agent in manager.GetAllAdventurers())
+            var slot = BuildPortraitSlot(agent);
+            slotRow.Add(slot);
+            agentSlots[agent] = slot;
+        }
+
+        int emptyCount = manager.MaxUnits - adventurers.Count;
+        for (int i = 0; i < emptyCount; i++)
+            slotRow.Add(BuildEmptySlot(manager.LayerIndex));
+
+        section.Add(slotRow);
+        return section;
+    }
+
+    private VisualElement BuildPortraitSlot(AdventurerAgent agent)
+    {
+        if (slotTemplate == null)
+        {
+            Debug.LogError("[RosterPanelController] slotTemplate is not assigned — drag AdventurerSlot.uxml into the Slot Template field on the RosterPanelController component.");
+            return new VisualElement();
+        }
+
+        var slot = slotTemplate.Instantiate();
+
+        // Apply selected state to the inner frame
+        if (agent == selectedAgent)
+            slot.Q<VisualElement>("slot-frame")?.AddToClassList("slot-selected");
+
+        // Sprite
+        var unitIcon = slot.Q<VisualElement>("unit-icon");
+        if (unitIcon != null && agent.appearanceManager != null && agent.def != null && agent.def.useModularCharacter)
+        {
+            var sprite = CharacterSpriteGenerator.GenerateSprite(agent.def, agent.appearanceManager.GetCurrentIndices());
+            if (sprite != null)
+                unitIcon.style.backgroundImage = new StyleBackground(sprite);
+        }
+
+        RefreshSlot(slot, agent);
+
+        slot.RegisterCallback<ClickEvent>(_ => SelectAgent(agent));
+        return slot;
+    }
+
+    private VisualElement BuildEmptySlot(int layerIndex)
+    {
+        var slot = new VisualElement();
+        slot.AddToClassList("empty-slot");
+
+        var icon = new Label("+");
+        icon.AddToClassList("empty-slot-icon");
+        slot.Add(icon);
+
+        slot.RegisterCallback<ClickEvent>(_ =>
+        {
+            if (hireController != null)
+                hireController.OpenAtLayer(layerIndex);
+            else
+                UIManager.Instance.OpenPanel("HirePanel");
+        });
+
+        return slot;
+    }
+
+    private static string GetLayerName(int layerIndex) =>
+        layerIndex >= 1 && layerIndex < LayerNames.Length
+            ? LayerNames[layerIndex]
+            : $"Layer {layerIndex}";
+
+    // ═════════════════════════════════════════════
+    // SELECTION
+    // ═════════════════════════════════════════════
+
+    private void SelectAgent(AdventurerAgent agent)
+    {
+        if (selectedAgent != null && agentSlots.TryGetValue(selectedAgent, out var prevSlot))
+            prevSlot.Q<VisualElement>("slot-frame")?.RemoveFromClassList("slot-selected");
+
+        selectedAgent = agent;
+
+        if (agentSlots.TryGetValue(agent, out var newSlot))
+            newSlot.Q<VisualElement>("slot-frame")?.AddToClassList("slot-selected");
+
+        ShowDetail(agent);
+    }
+
+    // ═════════════════════════════════════════════
+    // DETAIL PANEL
+    // ═════════════════════════════════════════════
+
+    private void ShowDetail(AdventurerAgent agent)
+    {
+        if (rightContent == null) return;
+
+        var placeholder = rightContent.Q<Label>("roster-placeholder");
+        var detailContainer = rightContent.Q<VisualElement>("detail-container");
+
+        if (agent == null)
+        {
+            if (placeholder != null) placeholder.style.display = DisplayStyle.Flex;
+            if (detailContainer != null) detailContainer.style.display = DisplayStyle.None;
+            return;
+        }
+
+        if (placeholder != null) placeholder.style.display = DisplayStyle.None;
+        if (detailContainer != null) detailContainer.style.display = DisplayStyle.Flex;
+
+        // Sprite
+        var detailSprite = rightContent.Q<VisualElement>("detail-sprite");
+        if (detailSprite != null && agent.appearanceManager != null && agent.def != null && agent.def.useModularCharacter)
+        {
+            var sprite = CharacterSpriteGenerator.GenerateSprite(agent.def, agent.appearanceManager.GetCurrentIndices());
+            if (sprite != null)
+                detailSprite.style.backgroundImage = new StyleBackground(sprite);
+        }
+
+        // Rank badge
+        var rankLabel = rightContent.Q<Label>("detail-rank-number");
+        if (rankLabel != null)
+            rankLabel.text = agent.CurrentRank.ToString();
+
+        // Description
+        var descLabel = rightContent.Q<Label>("detail-description");
+        if (descLabel != null)
+        {
+            string desc = agent.Identity?.description;
+            if (string.IsNullOrEmpty(desc)) desc = "Ready for work. Probably.";
+            descLabel.text = desc;
+            descLabel.style.display = DisplayStyle.Flex;
+            Debug.Log($"[RosterPanel] description label found. Identity={(agent.Identity != null ? "set" : "NULL")} desc=\"{desc}\"");
+        }
+        else
+        {
+            Debug.LogWarning("[RosterPanel] detail-description label NOT FOUND in rightContent.");
+        }
+
+        // Name + epithet
+        var nameLabel = rightContent.Q<Label>("detail-name");
+        if (nameLabel != null)
+            nameLabel.text = agent.Identity?.DisplayName ?? agent.gameObject.name;
+
+
+        // Class + layer
+        var classLabel = rightContent.Q<Label>("detail-class");
+        if (classLabel != null)
+            classLabel.text = "Novice";
+
+        var layerLabel = rightContent.Q<Label>("detail-layer");
+        if (layerLabel != null)
+            layerLabel.text = GetLayerName(agent.layerIndex);
+
+        // Stats
+        if (agent.Stats != null)
+        {
+            var atkLabel = rightContent.Q<Label>("stat-atk");
+            if (atkLabel != null)
+                atkLabel.text = agent.Stats.AttackDamage.ToString("F1");
+
+            float interval = agent.Stats.AttackInterval;
+            float aps = interval > 0f ? 1f / interval : 0f;
+
+            var spdLabel = rightContent.Q<Label>("stat-spd");
+            if (spdLabel != null)
+                spdLabel.text = aps > 0f ? $"{aps:F1}/s" : "0/s";
+
+            var dpsLabel = rightContent.Q<Label>("stat-dps");
+            if (dpsLabel != null)
+                dpsLabel.text = (agent.Stats.AttackDamage * aps).ToString("F1");
+        }
+
+        // XP bar
+        RefreshDetailXP(agent);
+
+        // HP bar
+        var health = agent.GetComponent<Health>();
+        var hpFill = rightContent.Q<VisualElement>("detail-hp-fill");
+        var hpValueLabel = rightContent.Q<Label>("hp-label-value");
+        if (health != null)
+        {
+            if (hpFill != null) hpFill.style.width = Length.Percent(health.HealthPercent * 100f);
+            if (hpValueLabel != null) hpValueLabel.text = $"{health.CurrentHP:F0}/{health.MaxHP:F0}";
+        }
+        else
+        {
+            if (hpFill != null) hpFill.style.width = Length.Percent(0f);
+            if (hpValueLabel != null) hpValueLabel.text = "?/?";
+        }
+
+        // Traits
+        var traitsContainer = rightContent.Q<VisualElement>("detail-traits");
+        if (traitsContainer != null)
+        {
+            traitsContainer.Clear();
+            var traitComponent = agent.GetComponent<TraitComponent>();
+            if (traitComponent != null)
             {
-                if (agent == null) continue;
-                var card = BuildCard(agent);
-                rosterList.Add(card);
-                agentCards[agent] = card;
+                foreach (var ti in traitComponent.GetTraits())
+                {
+                    var traitDef = TraitDatabase.GetTrait(ti.traitId);
+                    if (traitDef == null) continue;
+                    var chip = new Label(traitDef.displayName);
+                    chip.AddToClassList("trait");
+                    traitsContainer.Add(chip);
+                }
             }
         }
-    }
 
-    private VisualElement BuildCard(AdventurerAgent agent)
-    {
-        var card = new VisualElement();
-        card.AddToClassList("adventurer-card");
-
-        var nameLabel = new Label();
-        nameLabel.name = "adventurer-name";
-        nameLabel.AddToClassList("adventurer-name");
-        card.Add(nameLabel);
-
-        var rankLabel = new Label();
-        rankLabel.name = "adventurer-rank";
-        rankLabel.AddToClassList("adventurer-rank");
-        card.Add(rankLabel);
-
-        var xpRow = new VisualElement();
-        xpRow.AddToClassList("xp-row");
-
-        var xpBarBg = new VisualElement();
-        xpBarBg.AddToClassList("xp-bar-bg");
-        var xpFill = new VisualElement();
-        xpFill.name = "xp-bar-fill";
-        xpFill.AddToClassList("xp-bar-fill");
-        xpBarBg.Add(xpFill);
-        xpRow.Add(xpBarBg);
-
-        var xpLabel = new Label();
-        xpLabel.name = "xp-label";
-        xpLabel.AddToClassList("xp-label");
-        xpRow.Add(xpLabel);
-        card.Add(xpRow);
-
-        var promoteBtn = new Button();
-        promoteBtn.name = "promote-button";
-        promoteBtn.text = "Promote";
-        promoteBtn.AddToClassList("promote-button");
-        promoteBtn.clicked += () => TryPromote(agent, card);
-        card.Add(promoteBtn);
-
-        RefreshCard(card, agent);
-        return card;
-    }
-
-    private void RefreshCard(VisualElement card, AdventurerAgent agent)
-    {
-        var nameLabel = card.Q<Label>("adventurer-name");
-        if (nameLabel != null)
+        // Mods
+        var modsContainer = rightContent.Q<VisualElement>("detail-mods");
+        if (modsContainer != null)
         {
-            var id = agent.GetComponent<IdentityComponent>();
-            nameLabel.text = (id != null && id.Identity != null)
-                ? id.Identity.DisplayName
-                : agent.gameObject.name;
+            modsContainer.Clear();
+            var traitComponent = agent.GetComponent<TraitComponent>();
+            var traits = traitComponent?.GetTraits();
+            if (traits != null)
+            {
+                foreach (var ti in traits)
+                {
+                    var traitDef = TraitDatabase.GetTrait(ti.traitId);
+                    if (traitDef == null || ti.tier < 1 || ti.tier > traitDef.tiers.Length) continue;
+                    var tierData = traitDef.tiers[ti.tier - 1];
+                    if (tierData.modifiers == null) continue;
+                    foreach (var mod in tierData.modifiers)
+                    {
+                        var modLabel = new Label(FormatStatModifier(mod));
+                        modLabel.AddToClassList("mod");
+                        modsContainer.Add(modLabel);
+                    }
+                }
+            }
         }
 
-        var rankLabel = card.Q<Label>("adventurer-rank");
+        // Promote button
+        var promoteBtn = rightContent.Q<Button>("detail-promote-btn");
+        if (promoteBtn != null)
+        {
+            promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
+            promoteBtn.clicked -= OnPromoteClicked;
+            promoteBtn.clicked += OnPromoteClicked;
+        }
+    }
+
+    private void OnPromoteClicked()
+    {
+        if (selectedAgent == null || !selectedAgent.CanPromote) return;
+        selectedAgent.Promote();
+        ShowDetail(selectedAgent);
+        if (agentSlots.TryGetValue(selectedAgent, out var slot))
+            RefreshSlot(slot, selectedAgent);
+    }
+
+    // ═════════════════════════════════════════════
+    // REFRESH HELPERS
+    // ═════════════════════════════════════════════
+
+    private static void RefreshSlot(VisualElement slot, AdventurerAgent agent)
+    {
+        bool atMax = agent.XPForNextRank == float.MaxValue;
+        float xpRatio = atMax ? 1f : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextRank);
+
+        var xpFill = slot.Q<VisualElement>("slot-xp-fill");
+        if (xpFill != null)
+            xpFill.style.width = Length.Percent(xpRatio * 100f);
+
+        var rankLabel = slot.Q<Label>("rank-level");
         if (rankLabel != null)
-            rankLabel.text = $"Rank {agent.CurrentRank}";
+            rankLabel.text = agent.CurrentRank.ToString();
+
+        var health = agent.GetComponent<Health>();
+        var hpFill = slot.Q<VisualElement>("slot-hp-fill");
+        if (hpFill != null)
+            hpFill.style.width = Length.Percent(health != null ? health.HealthPercent * 100f : 0f);
+    }
+
+    private void RefreshDetailXP(AdventurerAgent agent)
+    {
+        if (rightContent == null) return;
 
         bool atMax = agent.XPForNextRank == float.MaxValue;
         float xpRatio = atMax ? 1f : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextRank);
 
-        var xpFill = card.Q<VisualElement>("xp-bar-fill");
+        var xpFill = rightContent.Q<VisualElement>("detail-xp-fill");
         if (xpFill != null)
             xpFill.style.width = Length.Percent(xpRatio * 100f);
 
-        var xpLabel = card.Q<Label>("xp-label");
+        var xpLabel = rightContent.Q<Label>("xp-label-value");
         if (xpLabel != null)
-            xpLabel.text = atMax ? "Max Rank" : $"{agent.CurrentXP:F0} / {agent.XPForNextRank:F0} XP";
-
-        var promoteBtn = card.Q<Button>("promote-button");
-        if (promoteBtn != null)
-            promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
+            xpLabel.text = atMax ? "Max Rank" : $"{agent.CurrentXP:F0} / {agent.XPForNextRank:F0}";
     }
 
-    private void TryPromote(AdventurerAgent agent, VisualElement card)
+    // ═════════════════════════════════════════════
+    // MOD FORMATTING
+    // ═════════════════════════════════════════════
+
+    private static string FormatStatModifier(TraitStatModifier mod)
     {
-        if (!agent.CanPromote) return;
-        agent.Promote();
-        RefreshCard(card, agent);
+        string sign = mod.value >= 0 ? "+" : "";
+        string valueStr;
+        if (mod.operation == ModifierOp.Mult)
+        {
+            float pct = (mod.value - 1f) * 100f;
+            sign = pct >= 0 ? "+" : "";
+            valueStr = $"{sign}{pct:F0}%";
+        }
+        else
+        {
+            valueStr = $"{sign}{mod.value:F0}";
+        }
+        return $"{valueStr} {mod.stat}";
     }
 
     // ═════════════════════════════════════════════
     // SIGNALS
     // ═════════════════════════════════════════════
 
+    private void OnAdventurerXPChanged(AdventurerAgent agent, float newXP)
+    {
+        if (agentSlots.TryGetValue(agent, out var slot))
+            RefreshSlot(slot, agent);
+
+        if (agent == selectedAgent)
+        {
+            RefreshDetailXP(agent);
+            var promoteBtn = rightContent?.Q<Button>("detail-promote-btn");
+            if (promoteBtn != null)
+                promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    private void OnUnitHired(EntityDef unitDef, HireRole role)
+    {
+        if (leftContent == null) return;
+        RebuildRoster(leftContent);
+    }
+
     private void OnAdventurerPromoted(EntityBase entity, string oldRole, string newRole)
     {
-        if (entity is AdventurerAgent agent && agentCards.TryGetValue(agent, out var card))
-            RefreshCard(card, agent);
+        if (!(entity is AdventurerAgent agent)) return;
+
+        if (agentSlots.TryGetValue(agent, out var slot))
+            RefreshSlot(slot, agent);
+
+        if (agent == selectedAgent)
+            ShowDetail(agent);
     }
 }

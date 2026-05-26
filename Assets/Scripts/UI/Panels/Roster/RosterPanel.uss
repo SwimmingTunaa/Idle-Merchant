@@ -1,6 +1,3 @@
-/* ── Roster Panel ─────────────────────────────────── */
-
-/* Full-screen transparent backdrop — centres the container */
 .roster-panel {
     position: absolute;
     left: 0;
@@ -11,7 +8,6 @@
     justify-content: center;
 }
 
-/* Visible card */
 .roster-container {
     width: 720px;
     min-height: 300px;
@@ -22,8 +18,6 @@
     border-radius: 8px;
     flex-direction: column;
 }
-
-/* ── Header ──────────────────────────────────────── */
 
 .roster-header {
     flex-direction: row;
@@ -63,8 +57,6 @@
     background-color: rgb(155, 75, 35);
 }
 
-/* ── Scroll / list ───────────────────────────────── */
-
 .roster-scroll {
     flex-grow: 1;
     padding: 12px 16px;
@@ -74,8 +66,6 @@
     flex-direction: column;
     flex-grow: 1;
 }
-
-/* ── Adventurer card ─────────────────────────────── */
 
 .adventurer-card {
     flex-direction: row;
@@ -111,8 +101,6 @@
     flex-shrink: 0;
     -unity-text-align: middle-center;
 }
-
-/* ── XP row ──────────────────────────────────────── */
 
 .xp-row {
     flex-direction: row;
@@ -150,8 +138,6 @@
     -unity-text-align: middle-left;
 }
 
-/* ── Promote button ──────────────────────────────── */
-
 .promote-button {
     background-color: rgb(70, 150, 70);
     color: rgb(250, 240, 220);
@@ -172,8 +158,6 @@
     background-color: rgb(50, 120, 50);
 }
 
-/* ── HUD notification dot on units-button ─────────── */
-
 .notification-badge {
     position: absolute;
     top: 3px;
@@ -184,4 +168,353 @@
     border-radius: 5px;
     border-width: 1px;
     border-color: rgb(180, 0, 0);
+}
+
+.roster-card {
+    width: 160px;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: var(--color-bg-surface);
+    border-width: 3px;
+    border-color: var(--color-border-dark);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    margin: 6px;
+}
+
+.roster-card:hover {
+    background-color: var(--color-bg-light);
+}
+
+.roster-card--selected {
+    border-color: var(--color-accent);
+    border-width: 3px;
+    background-color: var(--color-bg-light);
+}
+
+.card-sprite-container {
+    width: 80px;
+    height: 100px;
+    border-width: 2px;
+    border-color: var(--color-border-medium);
+    overflow: hidden;
+    align-self: center;
+    margin-bottom: 4px;
+}
+
+.card-unit-icon {
+    width: 100%;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.card-name {
+    font-size: var(--text-xs);
+    -unity-text-align: middle-center;
+    color: var(--color-text-primary);
+    overflow: hidden;
+    -unity-text-overflow-position: end;
+    width: 100%;
+    white-space: nowrap;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+.card-class {
+    font-size: var(--text-sm);
+    -unity-text-align: middle-center;
+    color: var(--color-text-secondary);
+    margin: 0;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.card-divider {
+    height: 1px;
+    background-color: var(--color-border-medium);
+    margin-top: 4px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+}
+
+.card-bar-row {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: 4px;
+    margin-bottom: 2px;
+}
+
+.card-bar-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    min-width: 22px;
+    -unity-text-align: middle-right;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.card-xp-bar-bg {
+    height: 12px;
+    flex-grow: 1;
+    background-color: rgb(100, 70, 40);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.card-xp-fill {
+    height: 100%;
+    background-color: rgb(60, 130, 210);
+    width: 0%;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.card-info-row {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1px;
+}
+
+.card-rank {
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.card-hp-bar-bg {
+    height: 12px;
+    flex-grow: 1;
+    background-color: rgb(100, 70, 40);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.card-hp-fill {
+    height: 100%;
+    background-color: rgb(180, 50, 50);
+    width: 0%;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.detail-sprite-frame {
+    width: 150px;
+    height: 190px;
+    flex-shrink: 0;
+    border-width: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.detail-sprite {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.detail-ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+}
+
+.rank-badge-overlay {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    width: 48px;
+    height: 48px;
+}
+
+.stat-chip {
+    background-color: var(--color-bg-light);
+    border-width: 1px;
+    border-color: var(--color-border-medium);
+    border-radius: 4px;
+    padding: 4px 8px;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.stat-chip-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.stat-chip-value {
+    font-size: var(--text-xs);
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+}
+
+.detail-bar-bg {
+    height: 14px;
+    width: 100%;
+    background-color: var(--color-bg-light);
+    border-width: 1px;
+    border-color: var(--color-border-medium);
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.detail-xp-fill {
+    height: 100%;
+    background-color: rgb(60, 130, 210);
+    width: 0%;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.detail-hp-fill {
+    height: 100%;
+    background-color: rgb(180, 50, 50);
+    width: 0%;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.trait-chip {
+    background-color: var(--color-bg-surface);
+    border-width: 1px;
+    border-color: var(--color-border-medium);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.card-class-badge {
+    background-color: var(--color-bg-surface);
+    border-width: 1px;
+    border-color: var(--color-border-medium);
+    border-radius: var(--radius-pill);
+    padding: 2px 8px;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.layer-section {
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.layer-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom-width: 1px;
+    border-color: var(--color-border-medium);
+}
+
+.layer-name {
+    flex-grow: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+.layer-count {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.slot-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.slot-frame {
+    width: 110px;
+    height: 110px;
+    overflow: hidden;
+    border-width: 3px;
+    border-color: var(--color-border-medium);
+    border-radius: 4px;
+    background-color: var(--color-bg-light);
+}
+
+.slot-frame:hover {
+    border-color: var(--color-accent);
+}
+
+.slot-selected {
+    border-color: var(--color-accent);
+    border-width: 3px;
+}
+
+.slot-bar-bg {
+    height: 5px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.slot-xp-fill {
+    height: 100%;
+    background-color: rgb(60, 130, 210);
+    width: 0%;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.slot-hp-fill {
+    height: 100%;
+    background-color: rgb(200, 60, 60);
+    width: 0%;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.empty-slot {
+    width: 110px;
+    height: 110px;
+    margin: 6px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=21300000&guid=850d10acc4e4542a69dda03262628525&type=3#inventory slot");
+    -unity-background-image-tint-color: rgb(80, 52, 28);
+    opacity: 0.4;
+    border-style: dashed;
+    border-width: 2px;
+    border-color: var(--color-border-medium);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.empty-slot:hover {
+    opacity: 0.75;
+    border-color: var(--color-accent);
+    scale: 1.03;
+}
+
+.empty-slot-icon {
+    font-size: 28px;
+    color: rgb(101, 67, 33);
+    -unity-font-style: bold;
+}
+
+.mod {
+    margin: 0;
+    padding: 0;
+    -unity-font-style: normal;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    font-size: 16px;
+    color: var(--color-text-primary);
+    -unity-text-align: middle-center;
 }

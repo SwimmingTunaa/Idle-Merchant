@@ -26,24 +26,29 @@
     --color-border-medium: rgb(139, 90, 60);
     --color-border-light: rgb(200, 185, 160);
     --color-border-accent: rgb(255, 190, 97);
-    /* ── Numeric font scale (use these going forward) ── */
-    --text-2xs:  10px;
-    --text-xs:   12px;
-    --text-sm:   14px;
-    --text-base: 16px;
-    --text-lg:   20px;
-    --text-xl:   24px;
-    --text-2xl:  32px;
-    --text-3xl:  40px;
-    --text-4xl:  48px;
+    /* ── Numeric font scale ──────────────────────────────────────────
+       NotJamBlkltr13 (headings)  pixel-perfect at: 13px, 26px
+       BrightLinger   (body/UI)   pixel-perfect at: 16px, 32px
+       Rule: use BrightLinger 16px for all readable labels/captions.
+             use NotJam 26px for headings only. 13px is too small to read.
+    ── */
+    --text-2xs:  16px;   /* BrightLinger 1× — smallest readable size      */
+    --text-xs:   16px;   /* BrightLinger 1×                                */
+    --text-sm:   16px;   /* BrightLinger 1×                                */
+    --text-base: 16px;   /* BrightLinger 1×                                */
+    --text-lg:   26px;   /* NotJam 2×                                      */
+    --text-xl:   26px;   /* NotJam 2×                                      */
+    --text-2xl:  32px;   /* BrightLinger 2×                                */
+    --text-3xl:  32px;
+    --text-4xl:  32px;
 
-    /* ── Semantic aliases (backward compat — kept as direct values) ── */
-    --font-size-caption: 12px;
-    --font-size-small:   14px;
-    --font-size-body:    16px;
-    --font-size-h3:      20px;
-    --font-size-h2:      24px;
-    --font-size-h1:      32px;
+    /* ── Semantic aliases ── */
+    --font-size-caption: 16px;   /* BrightLinger 1× */
+    --font-size-small:   16px;   /* BrightLinger 1× */
+    --font-size-body:    16px;   /* BrightLinger 1× */
+    --font-size-h3:      26px;   /* NotJam 2×       */
+    --font-size-h2:      26px;   /* NotJam 2×       */
+    --font-size-h1:      26px;   /* NotJam 2×       */
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;

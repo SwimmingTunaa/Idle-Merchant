@@ -106,11 +106,18 @@ public class HireController : BasePanelController
     void OnEnable()
     {
         GameSignals.OnLayerUnlocked += OnLayerUnlocked;
+        GameSignals.GoldChanged += OnGoldChanged;
     }
 
     void OnDisable()
     {
         GameSignals.OnLayerUnlocked -= OnLayerUnlocked;
+        GameSignals.GoldChanged -= OnGoldChanged;
+    }
+
+    private void OnGoldChanged(int total)
+    {
+        UpdateHireButtonState();
     }
 
     void Awake()
@@ -125,9 +132,6 @@ public class HireController : BasePanelController
         BuildUI();
         InitializeCandidatePools();
         base.Start(); // Registers with UIManager
-
-        // Start closed
-        if (panel != null) panel.style.display = DisplayStyle.None;
     }
 
     void Update()
@@ -138,6 +142,17 @@ public class HireController : BasePanelController
 
         if (State == PanelState.Open)
             UpdateEmptyTimer();
+    }
+
+    // ═════════════════════════════════════════════
+    // OPEN AT SPECIFIC LAYER (called from Roster empty slots)
+    // ═════════════════════════════════════════════
+
+    public void OpenAtLayer(int layerIndex)
+    {
+        int maxLayer = ProgressionManager.Instance != null ? ProgressionManager.Instance.maxUnlockedLayer : 1;
+        selectedLayer = Mathf.Clamp(layerIndex, 1, maxLayer);
+        UIManager.Instance.OpenPanel(PanelID);
     }
 
     // ═════════════════════════════════════════════
@@ -183,6 +198,7 @@ public class HireController : BasePanelController
             yield break;
         }
 
+        if (panel.parent != null) panel.parent.style.display = DisplayStyle.Flex;
         panel.style.display = DisplayStyle.Flex;
         if (hasOverlay && overlayElement != null)
             overlayElement.style.display = DisplayStyle.Flex;
@@ -192,11 +208,11 @@ public class HireController : BasePanelController
         {
             elapsed += GetDeltaTime();
             float t = Mathf.Clamp01(elapsed / openCloseDuration);
-            
+
             panel.style.opacity = t;
             if (hasOverlay && overlayElement != null)
                 overlayElement.style.opacity = t * overlayColor.a;
-            
+
             yield return null;
         }
 
@@ -235,6 +251,7 @@ public class HireController : BasePanelController
 
         panel.style.opacity = 0f;
         panel.style.display = DisplayStyle.None;
+        if (panel.parent != null) panel.parent.style.display = DisplayStyle.None;
         if (hasOverlay && overlayElement != null)
         {
             overlayElement.style.opacity = 0f;
@@ -295,9 +312,10 @@ public class HireController : BasePanelController
         if (layerNextButton != null)
             layerNextButton.clicked += OnLayerNext;
 
-        // Initial visibility
+        // Initial visibility — hide TC so it doesn't intercept events when closed
         panel.style.display = DisplayStyle.None;
         panel.style.opacity = 0f;
+        if (panel.parent != null) panel.parent.style.display = DisplayStyle.None;
 
         UpdateLayerSelector();
     }

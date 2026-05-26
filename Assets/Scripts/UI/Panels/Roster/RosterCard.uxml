@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Roster/RosterPanel.uss?fileID=7433441132597879392&amp;guid=fcda90a85139941bea862f290df11926&amp;type=3#RosterPanel" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
+    <ui:VisualElement name="sprite-wrapper" style="align-self: stretch; flex-shrink: 0; margin-top: 8px; margin-right: 8px; margin-bottom: 6px; margin-left: 8px; position: relative; flex-grow: 1;">
+        <ui:VisualElement name="sprite-container" style="align-self: stretch; flex-direction: column; justify-content: flex-start; border-top-width: 8px; border-right-width: 8px; border-bottom-width: 8px; border-left-width: 8px; border-left-color: rgb(195, 137, 93); border-right-color: rgb(195, 137, 93); border-top-color: rgb(195, 137, 93); border-bottom-color: rgb(195, 137, 93); overflow: hidden; flex-grow: 1;">
+            <ui:VisualElement name="unit-container" style="flex-grow: 1; min-height: 110px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                <ui:VisualElement name="unit-icon" style="flex-grow: 1; -unity-background-scale-mode: scale-to-fit; width: auto; height: auto; flex-shrink: 1;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="rank-container" style="position: absolute; top: -15px; left: -9px; width: 50px; height: 50px; background-image: url(&quot;project://database/Assets/Sprites/UI/Hire%20Menu/adventurer%20badge%20Background.png?fileID=2800000&amp;guid=2e3cf9576aa94484baa390a68e8a8034&amp;type=3#adventurer badge Background&quot;); -unity-background-image-tint-color: rgb(130, 130, 130); align-items: center; justify-content: center;">
+            <ui:VisualElement name="rank-border" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url(&quot;project://database/Assets/Sprites/UI/Hire%20Menu/adventurer%20badge%20Border.png?fileID=2800000&amp;guid=b8ba2a3fed1324a4db468921b4ae72b5&amp;type=3#adventurer badge Border&quot;); justify-content: center; align-items: center;">
+                <ui:Label name="rank-level" text="4" style="color: rgb(248, 248, 248); font-size: 18px; -unity-font-style: bold; padding-top: 10px; padding-left: 2px; margin: 0; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="card-details" style="flex-grow: 0; flex-direction: column; padding-left: 8px; padding-right: 8px; padding-bottom: 8px;">
+        <ui:VisualElement name="identity-block" style="align-items: center; margin-bottom: 4px;">
+            <ui:Label name="card-name-label" text="Aldric the Bold" class="card-name" style="-unity-text-align: middle-center; width: auto; font-size: 16px;" />
+            <ui:Label name="card-class-label" text="Warrior" class="card-class" style="margin-top: 1px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="trait-container" style="flex-direction: row; flex-wrap: wrap; justify-content: center; padding-bottom: 4px;">
+            <ui:Label text="Brave" class="trait" />
+            <ui:Label text="Swift" class="trait" />
+        </ui:VisualElement>
+        <ui:VisualElement class="card-divider" style="margin-top: auto;" />
+        <ui:VisualElement class="card-bar-row">
+            <ui:Label name="card-rank-label" text="Lv.4" class="card-bar-label" />
+            <ui:VisualElement class="card-xp-bar-bg">
+                <ui:VisualElement name="card-xp-fill" class="card-xp-fill" style="width: 60%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="card-bar-row">
+            <ui:Label text="HP" class="card-bar-label" />
+            <ui:VisualElement class="card-hp-bar-bg">
+                <ui:VisualElement name="card-hp-fill" class="card-hp-fill" style="width: 75%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

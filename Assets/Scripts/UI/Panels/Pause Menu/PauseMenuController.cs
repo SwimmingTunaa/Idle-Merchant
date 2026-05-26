@@ -96,6 +96,7 @@ public class PauseMenuController : BasePanelController
         }
 
         // Show elements
+        if (panel.parent != null) panel.parent.style.display = DisplayStyle.Flex;
         panel.style.display = DisplayStyle.Flex;
         if (hasOverlay && overlayElement != null)
             overlayElement.style.display = DisplayStyle.Flex;
@@ -158,6 +159,7 @@ public class PauseMenuController : BasePanelController
         // Hide elements
         panel.style.opacity = 0f;
         panel.style.display = DisplayStyle.None;
+        if (panel.parent != null) panel.parent.style.display = DisplayStyle.None;
         panel.style.scale = new Scale(new Vector3(0.9f, 0.9f, 1f));
 
         if (hasOverlay && overlayElement != null)
@@ -208,9 +210,10 @@ public class PauseMenuController : BasePanelController
         saveButton.SetEnabled(false);
         loadButton.SetEnabled(false);
 
-        // Initial visibility
+        // Initial visibility — hide TC so it doesn't intercept events when closed
         panel.style.display = DisplayStyle.None;
         panel.style.opacity = 0f;
+        if (panel.parent != null) panel.parent.style.display = DisplayStyle.None;
     }
 
     // ═════════════════════════════════════════════

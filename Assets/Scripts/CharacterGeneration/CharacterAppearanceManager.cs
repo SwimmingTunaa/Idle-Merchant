@@ -147,6 +147,8 @@ public class CharacterAppearanceManager : MonoBehaviour
         appearanceIndices = indices;
     }
 
+    public CharacterAppearanceIndices GetCurrentIndices() => appearanceIndices;
+
     public void ApplyAppearance()
     {
         if (entityDef.shirtSpriteLibraries?.Length > 0)

@@ -117,16 +117,14 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
             agent.appearanceManager.ApplyAppearance();
         }
         
-        // Apply identity
-        var identityComponent = agent.GetComponent<IdentityComponent>();
-        if (identityComponent != null && candidate.identity != null)
+        // Apply identity — set on both EntityBase and IdentityComponent so all systems agree
+        if (candidate.identity != null)
         {
-            identityComponent.ApplyIdentity(candidate.identity);
-        }
-        else if (candidate.identity != null)
-        {
-            // Fallback: rename GameObject if no IdentityComponent
-            agent.gameObject.name = candidate.identity.DisplayName;
+            agent.ApplyIdentity(candidate.identity);
+
+            var identityComponent = agent.GetComponent<IdentityComponent>();
+            if (identityComponent != null)
+                identityComponent.ApplyIdentity(candidate.identity);
         }
         
         // Apply candidate's traits

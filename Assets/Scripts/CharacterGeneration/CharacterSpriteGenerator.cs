@@ -24,19 +24,21 @@ public static class CharacterSpriteGenerator
     public static Sprite GenerateSprite(HiringCandidate candidate)
     {
         int configHash = GetVisualConfigHash(candidate);
-        
         if (_spriteCache.TryGetValue(configHash, out Sprite cachedSprite))
-        {
             return cachedSprite;
-        }
-        
-        EnsureRenderSetup();
-        ConfigurePreviewCharacter(candidate);
-        
-        Sprite generatedSprite = CaptureSprite();
-        _spriteCache[configHash] = generatedSprite;
-        
-        return generatedSprite;
+        return GenerateSpriteInternal(candidate.entityDef, candidate.appearanceIndices, configHash);
+    }
+
+    /// <summary>
+    /// Generate sprite for a live entity using its EntityDef and current appearance indices.
+    /// Returns cached sprite if visual config already generated.
+    /// </summary>
+    public static Sprite GenerateSprite(EntityDef def, CharacterAppearanceIndices indices)
+    {
+        int configHash = GetVisualConfigHash(def, indices);
+        if (_spriteCache.TryGetValue(configHash, out Sprite cachedSprite))
+            return cachedSprite;
+        return GenerateSpriteInternal(def, indices, configHash);
     }
     
     /// <summary>
@@ -106,21 +108,21 @@ public static class CharacterSpriteGenerator
         Object.DontDestroyOnLoad(cameraObj);
     }
     
-    private static void ConfigurePreviewCharacter(HiringCandidate candidate)
+    private static void ConfigurePreviewCharacter(EntityDef def, CharacterAppearanceIndices indices)
     {
         if (_previewInstance == null)
         {
-            _previewInstance = Object.Instantiate(candidate.entityDef.prefab, PREVIEW_POSITION, Quaternion.identity);
+            _previewInstance = Object.Instantiate(def.prefab, PREVIEW_POSITION, Quaternion.identity);
             _previewInstance.name = "CharacterPreview";
             Object.DontDestroyOnLoad(_previewInstance);
-            
+
             // Disable any gameplay components
             DisableGameplayComponents(_previewInstance);
         }
-        
+
         _previewInstance.transform.position = PREVIEW_POSITION;
-        
-        ApplyVisualConfiguration(_previewInstance, candidate);
+
+        ApplyVisualConfiguration(_previewInstance, def, indices);
     }
     
     private static void DisableGameplayComponents(GameObject obj)
@@ -139,13 +141,13 @@ public static class CharacterSpriteGenerator
             rigidbody.simulated = false;
     }
     
-    private static void ApplyVisualConfiguration(GameObject instance, HiringCandidate candidate)
+    private static void ApplyVisualConfiguration(GameObject instance, EntityDef def, CharacterAppearanceIndices indices)
     {
         var spriteLibraries = instance.GetComponentsInChildren<SpriteLibrary>(true);
         var spriteResolvers = instance.GetComponentsInChildren<SpriteResolver>(true);
         CharacterAppearanceManager appearanceManager = instance.GetComponentInChildren<CharacterAppearanceManager>();
-        appearanceManager.SetEntityDef(candidate.entityDef);
-        appearanceManager.SetAppearanceIndices(candidate.appearanceIndices);
+        appearanceManager.SetEntityDef(def);
+        appearanceManager.SetAppearanceIndices(indices);
         appearanceManager.ApplyAppearance();
         
         // Refresh sprite resolvers
@@ -163,8 +165,15 @@ public static class CharacterSpriteGenerator
         }
     }
     
-   
-    
+    private static Sprite GenerateSpriteInternal(EntityDef def, CharacterAppearanceIndices indices, int configHash)
+    {
+        EnsureRenderSetup();
+        ConfigurePreviewCharacter(def, indices);
+        Sprite generatedSprite = CaptureSprite();
+        _spriteCache[configHash] = generatedSprite;
+        return generatedSprite;
+    }
+
     private static Sprite CaptureSprite()
     {
         // Render character to texture
@@ -195,20 +204,25 @@ public static class CharacterSpriteGenerator
     /// </summary>
     private static int GetVisualConfigHash(HiringCandidate candidate)
     {
+        return GetVisualConfigHash(candidate.entityDef, candidate.appearanceIndices);
+    }
+
+    private static int GetVisualConfigHash(EntityDef def, CharacterAppearanceIndices indices)
+    {
         unchecked
         {
             int hash = 17;
-            hash = hash * 31 + candidate.entityDef.GetHashCode();
-            hash = hash * 31 + candidate.appearanceIndices.pants;
-            hash = hash * 31 + candidate.appearanceIndices.shirt;
-            hash = hash * 31 + candidate.appearanceIndices.hairTop;
-            hash = hash * 31 + candidate.appearanceIndices.hairBack;
-            hash = hash * 31 + candidate.appearanceIndices.frontWeapon;
-            hash = hash * 31 + candidate.appearanceIndices.backWeapon;
-            hash = hash * 31 + candidate.appearanceIndices.skinColour.GetHashCode();
-            hash = hash * 31 + candidate.appearanceIndices.shirtColour;
-            hash = hash * 31 + candidate.appearanceIndices.pantsColour;
-            hash = hash * 31 + candidate.appearanceIndices.hairColour;
+            hash = hash * 31 + def.GetHashCode();
+            hash = hash * 31 + indices.pants;
+            hash = hash * 31 + indices.shirt;
+            hash = hash * 31 + indices.hairTop;
+            hash = hash * 31 + indices.hairBack;
+            hash = hash * 31 + indices.frontWeapon;
+            hash = hash * 31 + indices.backWeapon;
+            hash = hash * 31 + indices.skinColour.GetHashCode();
+            hash = hash * 31 + indices.shirtColour;
+            hash = hash * 31 + indices.pantsColour;
+            hash = hash * 31 + indices.hairColour;
             return hash;
         }
     }

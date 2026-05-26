@@ -279,8 +279,10 @@ public class UIManager : PersistentSingleton<UIManager>
 
         if (panel.Open())
         {
-            if (panel.RootElement != null && panel.RootElement.parent != null)
-                panel.RootElement.BringToFront();
+            // Bring the TemplateContainer (not the inner element) to front so
+            // the active panel always renders above inactive TCs in body.
+            if (panel.RootElement?.parent != null)
+                panel.RootElement.parent.BringToFront();
         }
         else
         {

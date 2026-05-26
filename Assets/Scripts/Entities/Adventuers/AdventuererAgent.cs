@@ -467,6 +467,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     {
         if (amount <= 0f) return;
         currentXP += amount;
+        GameSignals.RaiseAdventurerXPChanged(this, currentXP);
     }
 
     /// <summary>

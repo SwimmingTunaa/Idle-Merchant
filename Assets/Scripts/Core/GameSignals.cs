@@ -28,6 +28,7 @@ public static class GameSignals
 
     // Progression
     public static event Action<EntityBase, string, string> OnAdventurerPromoted;
+    public static event Action<AdventurerAgent, float> OnAdventurerXPChanged;
     public static event Action<int> OnLayerUnlocked;
     public static event Action<int> OnStarEarned;
     public static event Action    OnMarkedForSaleChanged;
@@ -51,6 +52,7 @@ public static class GameSignals
     public static void RaiseSkillActivated(EntityBase caster, string skillName) => OnSkillActivated?.Invoke(caster, skillName);
     public static void RaiseSkillCooldownStarted(EntityBase caster, string skillName, float cooldown) => OnSkillCooldownStarted?.Invoke(caster, skillName, cooldown);
     public static void RaiseAdventurerPromoted(EntityBase adventurer, string oldRole, string newRole) => OnAdventurerPromoted?.Invoke(adventurer, oldRole, newRole);
+    public static void RaiseAdventurerXPChanged(AdventurerAgent agent, float newXP) => OnAdventurerXPChanged?.Invoke(agent, newXP);
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
     public static void RaiseStarEarned(int star) => OnStarEarned?.Invoke(star);
     public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
@@ -73,6 +75,7 @@ public static class GameSignals
         OnSkillActivated = null;
         OnSkillCooldownStarted = null;
         OnAdventurerPromoted = null;
+        OnAdventurerXPChanged = null;
         OnLayerUnlocked = null;
         OnStarEarned = null;
         OnMarkedForSaleChanged = null;
@@ -97,6 +100,7 @@ public static class GameSignals
         Debug.Log($"OnSkillActivated: {OnSkillActivated?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnSkillCooldownStarted: {OnSkillCooldownStarted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnAdventurerPromoted: {OnAdventurerPromoted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnAdventurerXPChanged: {OnAdventurerXPChanged?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnLayerUnlocked: {OnLayerUnlocked?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnStarEarned: {OnStarEarned?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnMarkedForSaleChanged: {OnMarkedForSaleChanged?.GetInvocationList().Length ?? 0}");
