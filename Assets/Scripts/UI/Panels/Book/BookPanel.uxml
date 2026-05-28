@@ -9,11 +9,11 @@
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
     <ui:VisualElement name="book-root" class="book-root">
         <ui:VisualElement name="decorations" style="flex-grow: 1;">
-            <ui:VisualElement name="backpage" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BackbookPages/1.png?fileID=2800000&amp;guid=8605ba37c75ee47599138ed6eb120eff&amp;type=3#1&quot;); width: 370px; height: 80px; top: -45px; left: 945px;" />
-            <ui:VisualElement name="backpage" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BackbookPages/2.png?fileID=2800000&amp;guid=ae90123e4c61b4bbbbe105863e2f0da8&amp;type=3#2&quot;); width: 423px; height: 58.5px; top: -53px; left: 67px;" />
+            <ui:VisualElement name="backpage" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BackbookPages/backpage-decoration%201.png?fileID=2800000&amp;guid=c68f840b770c94259a1d5294de977150&amp;type=3#backpage-decoration 1&quot;); width: 370px; height: 80px; top: -45px; left: 945px;" />
+            <ui:VisualElement name="backpage" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/BackbookPagesAndBookMarks/BackbookPages/backpage-decoration%202.png?fileID=2800000&amp;guid=bdf239620de6148079acfb7c938816fc&amp;type=3#backpage-decoration 2&quot;); width: 423px; height: 58.5px; top: -53px; left: 67px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="book-background" class="book-background" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookSprite_Animation/Page10.png?fileID=7914989302467394114&amp;guid=d8c8615846f894fa7b44c30285e55820&amp;type=3#Page10_0&quot;); background-size: 1350px 825px; width: 1350px; height: 825px; top: 0; bottom: -525px; right: 525px; left: 0;" />
-        <ui:VisualElement name="two-page-spread" class="two-page-spread" style="right: 75px; top: 28px; left: 75px; bottom: 114px;">
+        <ui:VisualElement name="book-background" class="book-background" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookSprite_Animation/Page10.png?fileID=7914989302467394114&amp;guid=d8c8615846f894fa7b44c30285e55820&amp;type=3#Page10_0&quot;); background-size: 1350px 825px; width: 1350px; height: 825px; top: 1px; bottom: -1px; right: 0; left: 0;" />
+        <ui:VisualElement name="two-page-spread" class="two-page-spread" style="right: 100px; top: 45px; left: 100px; bottom: 130px;">
             <ui:Instance template="Roster_Page" name="page-0" style="flex-grow: 1; display: none;" />
             <ui:Instance template="Guild_Page" name="page-1" style="flex-grow: 1; display: none;" />
             <ui:Instance template="Inventory_Page" name="page-2" style="flex-grow: 1; display: none;" />
@@ -59,6 +59,6 @@
                 <ui:VisualElement name="tab-badge" class="tab-badge" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Button name="book-close-button" class="book-close-button" text="✕" />
+        <ui:Button name="book-close-button" text="✕" class="book-close-button" />
     </ui:VisualElement>
 </ui:UXML>

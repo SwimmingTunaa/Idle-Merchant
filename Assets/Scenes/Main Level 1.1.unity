@@ -26455,6 +26455,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3367775ff7c994297baf113f84129803, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RosterPanelController
+  slotTemplate: {fileID: 9197481963319205126, guid: 6eba097cdc81c406083b05c2e13f2368, type: 3}
+  hireController: {fileID: 266967779}
 --- !u!1 &1695241455
 GameObject:
   m_ObjectHideFlags: 0
@@ -26682,6 +26684,53 @@ MonoBehaviour:
   itemSlotAsset: {fileID: 9197481963319205126, guid: 561d352404136405e83576f96fac8bb1, type: 3}
   baseSlotCount: 15
   slotsPerRow: 5
+  forsaleDitherAnim:
+    frames:
+    - {fileID: 1729883773912937322, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: 2197075722861297169, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -8898411946214266577, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: 2903399660716352218, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -7445724130090873401, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: 8731731008920725586, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: 3134751073398002206, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: 7701595776606312009, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -1455342415156001246, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -6492668678207415751, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -8611141686705014387, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: 706947200797703746, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -8991772925246851749, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    - {fileID: -4304244132933059056, guid: 019c67496337345b5b1654dbcc071b00, type: 3}
+    frameMs: 40
+    reverse: 0
+    loop: 0
+    end: 3
+    fadeMs: 0
+  stampSlamAnim:
+    frames:
+    - {fileID: 5866281921551675546, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 9129975886385831117, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 6334206538514807543, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -2864496073268497266, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 6935106224701664221, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 5564853175316236378, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -4213501716333155547, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 6640706924349662298, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -5885712519965676434, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -8351265668080454234, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -6536262768416613218, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 583312348319829652, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -3270006147757044512, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 3367353534868551812, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 5325059221620905716, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -3116831977216169240, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -8897551904983628329, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: 8048730388599052521, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    - {fileID: -7468666210341371610, guid: 6fdb63f54eb1349438d92a27ec084b83, type: 3}
+    frameMs: 40
+    reverse: 0
+    loop: 0
+    end: 3
+    fadeMs: 150
   showDebugLogs: 0
 --- !u!1 &1702011754
 GameObject:

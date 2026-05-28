@@ -58,8 +58,8 @@
         </ui:VisualElement>
         <ui:VisualElement name="body" class="game-view-area" style="flex-grow: 1;">
             <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 0; top: 20%;" />
-            <ui:Instance template="HirePanel" name="HirePanel" />
-            <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1;" />
+            <ui:Instance template="HirePanel" name="HirePanel" style="display: none;" />
+            <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1; display: none;" />
             <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;" />
         </ui:VisualElement>
     </ui:VisualElement>
