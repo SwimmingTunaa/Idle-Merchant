@@ -16,6 +16,12 @@ public class InventoryController : MonoBehaviour, IBookPage
     [SerializeField] private int baseSlotCount = 15;
     [SerializeField] private int slotsPerRow = 5;
 
+    [Header("For-Sale Stamp Animation")]
+    [Tooltip("Dither-erase played on the badge stamp when un-marking an item (frame 0 = full stamp, last = erased).")]
+    [SerializeField] private FrameAnim forsaleDitherAnim = new() { frameMs = 40, end = UIFrameAnimator.EndBehaviour.HideAndReset };
+    [Tooltip("Big stamp-slam overlay played across the page when marking an item for sale.")]
+    [SerializeField] private FrameAnim stampSlamAnim = new() { frameMs = 40, fadeMs = 150, end = UIFrameAnimator.EndBehaviour.HideAndReset };
+
     private VisualElement itemGrid;
     private ScrollView itemGridScroll;
     private VisualElement detailPanel;
@@ -33,14 +39,12 @@ public class InventoryController : MonoBehaviour, IBookPage
     private VisualElement detailIcon;
     private Label detailName;
     private Label detailDescription;
-    private Label statTotal;
-    private Label statReserved;
-    private Label statForSale;
-    private Label statValue;
-    private SliderInt reserveSlider;
-    private Toggle forsaleToggle;
-
-    private VisualElement emptyDetailMessage;
+    private VisualElement forsaleBadge;
+    private Label forsaleLabel;
+    private VisualElement forsaleStamp;
+    private VisualElement stampAnim;
+    private Label itemValueLabel;
+    private Label reserveCountLabel;
 
     private bool filterBarInitialized = false;
 
@@ -69,27 +73,33 @@ public class InventoryController : MonoBehaviour, IBookPage
         capacityLabel = leftPage.Q<Label>("capacity-label");
         goldLabel = leftPage.Q<Label>("gold-label");
 
-        // Right page queries
-        detailPanel = rightPage.Q<VisualElement>("detail-panel");
-        emptyDetailMessage = rightPage.Q<VisualElement>("empty-detail-message");
+        // Right page queries — rightPage IS the detail panel root
+        detailPanel = rightPage;
         detailIcon = rightPage.Q<VisualElement>("detail-icon");
         detailName = rightPage.Q<Label>("detail-name");
         detailDescription = rightPage.Q<Label>("detail-description");
-        statTotal = rightPage.Q<Label>("stat-total");
-        statReserved = rightPage.Q<Label>("stat-reserved");
-        statForSale = rightPage.Q<Label>("stat-forsale");
-        statValue = rightPage.Q<Label>("stat-value");
-        reserveSlider = rightPage.Q<SliderInt>("reserve-slider");
-        forsaleToggle = rightPage.Q<Toggle>("forsale-toggle");
+        forsaleBadge = rightPage.Q<VisualElement>("forsale-badge");
+        forsaleLabel = rightPage.Q<Label>("forsale-label");
+        forsaleStamp = rightPage.Q<VisualElement>("forsale-stamp");
+        // Stampanim lives at page-root level (sibling of right-content) so it overlays the whole page.
+        stampAnim = (rightPage.parent ?? rightPage).Q<VisualElement>("Stampanim");
+        itemValueLabel = rightPage.Q<Label>("item-value");
+        reserveCountLabel = rightPage.Q<Label>("reserve-count");
+
+        if (stampAnim != null) stampAnim.style.display = DisplayStyle.None;
+
+        // Both the "Not For Sale" badge and the "FOR SALE" stamp toggle the state.
+        // The handler routes by current state: not-for-sale → slam-in, for-sale → dither-out.
+        if (forsaleBadge != null)
+            forsaleBadge.RegisterCallback<ClickEvent>(OnForSaleBadgeClicked);
+        if (forsaleStamp != null)
+            forsaleStamp.RegisterCallback<ClickEvent>(OnForSaleBadgeClicked);
 
         // Unregister first to prevent double-registration if OnPageShown is called twice
         GameSignals.OnItemAdded -= OnInventoryChanged;
         GameSignals.OnItemSold -= OnInventoryChanged;
         GameSignals.OnProductCrafted -= OnInventoryChanged;
         GameSignals.GoldChanged -= OnGoldChanged;
-
-        if (reserveSlider != null) reserveSlider.RegisterValueChangedCallback(OnReserveSliderChanged);
-        if (forsaleToggle != null) forsaleToggle.RegisterValueChangedCallback(OnForSaleToggled);
 
         GameSignals.OnItemAdded += OnInventoryChanged;
         GameSignals.OnItemSold += OnInventoryChanged;
@@ -108,17 +118,16 @@ public class InventoryController : MonoBehaviour, IBookPage
         GameSignals.OnProductCrafted -= OnInventoryChanged;
         GameSignals.GoldChanged -= OnGoldChanged;
 
-        if (reserveSlider != null) reserveSlider.UnregisterValueChangedCallback(OnReserveSliderChanged);
-        if (forsaleToggle != null) forsaleToggle.UnregisterValueChangedCallback(OnForSaleToggled);
-
         itemGrid = null; itemGridScroll = null; detailPanel = null;
         // Note: tabAll/tabMaterials/tabCrafted/tabLuxury/tabForSale are intentionally kept —
         // they reference the persistent inventory-filter-bar in book-root (set via SetFilterBar).
         categoryTitle = null; capacityLabel = null; goldLabel = null;
         detailIcon = null; detailName = null; detailDescription = null;
-        statTotal = null; statReserved = null; statForSale = null; statValue = null;
-        reserveSlider = null; forsaleToggle = null;
-        emptyDetailMessage = null;
+        if (forsaleBadge != null) forsaleBadge.UnregisterCallback<ClickEvent>(OnForSaleBadgeClicked);
+        if (forsaleStamp != null) forsaleStamp.UnregisterCallback<ClickEvent>(OnForSaleBadgeClicked);
+        forsaleStamp?.Stop();
+        stampAnim?.Stop();
+        forsaleBadge = null; forsaleLabel = null; forsaleStamp = null; stampAnim = null; itemValueLabel = null; reserveCountLabel = null;
         itemSlots.Clear();
         selectedItem = null;
     }
@@ -246,8 +255,13 @@ public class InventoryController : MonoBehaviour, IBookPage
     private void ShowEmptyDetailPanel()
     {
         selectedItem = null;
-        if (detailDescription != null) detailDescription.style.display = DisplayStyle.None;
-        if (emptyDetailMessage != null) emptyDetailMessage.style.display = DisplayStyle.Flex;
+        if (detailIcon != null) detailIcon.style.backgroundImage = null;
+        if (detailName != null) detailName.text = "Select an item";
+        if (detailDescription != null) detailDescription.text = "Select an item to view details.";
+        if (forsaleLabel != null) { forsaleLabel.text = "Not For Sale"; forsaleLabel.style.display = DisplayStyle.Flex; }
+        if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.None;
+        if (itemValueLabel != null) itemValueLabel.text = "—";
+        if (reserveCountLabel != null) reserveCountLabel.text = "0";
         foreach (var kvp in itemSlots) kvp.Value.RemoveFromClassList("item-slot-selected");
     }
 
@@ -359,8 +373,6 @@ public class InventoryController : MonoBehaviour, IBookPage
     private void ShowDetailPanel(ItemDef item)
     {
         if (detailPanel == null) return;
-        if (detailDescription != null) detailDescription.style.display = DisplayStyle.Flex;
-        if (emptyDetailMessage != null) emptyDetailMessage.style.display = DisplayStyle.None;
         UpdateDetailPanel(item);
     }
 
@@ -368,57 +380,113 @@ public class InventoryController : MonoBehaviour, IBookPage
     {
         if (item == null || detailPanel == null) return;
 
-        if (detailIcon != null && item.icon != null)
-            detailIcon.style.backgroundImage = new StyleBackground(item.icon);
+        if (detailIcon != null)
+            detailIcon.style.backgroundImage = item.icon != null ? new StyleBackground(item.icon) : null;
         if (detailName != null) detailName.text = item.displayName;
         if (detailDescription != null) detailDescription.text = item.description;
 
-        int totalStock = SalesManager.Instance.GetTotalStock(item);
         int reserved = SalesManager.Instance.GetReservedAmount(item);
-        int forSale = SalesManager.Instance.GetAvailableForSale(item);
+        bool isForSale = SalesManager.Instance.IsMarkedForSale(item);
 
-        if (statTotal != null) statTotal.text = $"Total Stock: {totalStock}";
-        if (statReserved != null) statReserved.text = $"Reserved: {reserved}";
-        if (statForSale != null) statForSale.text = $"For Sale: {forSale}";
-        if (statValue != null) statValue.text = $"Unit Value: {item.sellPrice}g";
-
-        if (reserveSlider != null)
-        {
-            reserveSlider.highValue = totalStock;
-            reserveSlider.SetValueWithoutNotify(reserved);
-        }
-        if (forsaleToggle != null)
-            forsaleToggle.SetValueWithoutNotify(SalesManager.Instance.IsMarkedForSale(item));
+        if (forsaleLabel != null) forsaleLabel.style.display = isForSale ? DisplayStyle.None : DisplayStyle.Flex;
+        if (forsaleStamp != null) forsaleStamp.style.display = isForSale ? DisplayStyle.Flex : DisplayStyle.None;
+        if (itemValueLabel != null) itemValueLabel.text = $"{item.sellPrice}";
+        if (reserveCountLabel != null) reserveCountLabel.text = $"{reserved}";
     }
 
     // ═════════════════════════════════════════════
     // CALLBACKS
     // ═════════════════════════════════════════════
 
-    private void OnReserveSliderChanged(ChangeEvent<int> evt)
+    private void OnForSaleBadgeClicked(ClickEvent evt)
     {
         if (selectedItem == null) return;
-        Inventory.Instance.SetReserve(selectedItem, evt.newValue);
-        IncrementalUpdateItem(selectedItem);
+
+        bool newState = !SalesManager.Instance.IsMarkedForSale(selectedItem);
+        SalesManager.Instance.SetMarkedForSale(selectedItem, newState);
+
+        var item = selectedItem;
+
+        // Update the slot's sticker badge immediately
+        if (itemSlots.TryGetValue(item, out var slot))
+        {
+            UpdateSlotBadges(slot, item);
+            slot.Q<VisualElement>("forsale-sticker")?.SetDisplay(newState ? DisplayStyle.Flex : DisplayStyle.None);
+        }
+
+        if (newState)
+        {
+            // Marking ON: play the big stamp-slam overlay, then settle into the for-sale state
+            PlayStampSlamIn(() =>
+            {
+                if (selectedItem == item) UpdateDetailPanel(item);
+            });
+        }
+        else
+        {
+            // Marking OFF: play dither-out animation on the stamp, then update panel
+            PlayStampDitherOut(() =>
+            {
+                if (currentCategory == CategoryFilter.ForSale)
+                    RefreshGrid();
+                else if (selectedItem == item)
+                    UpdateDetailPanel(item);
+            });
+        }
     }
 
-    private void OnForSaleToggled(ChangeEvent<bool> evt)
+    // Big stamp-slam overlay (Stampanim) — plays the Stamp sheet across the right page when
+    // an item is marked for sale. The persistent badge stamp is revealed at the impact frame
+    // (midway through the slam) rather than at the end, so it lands in sync with the slam.
+    private void PlayStampSlamIn(System.Action onComplete)
     {
-        if (selectedItem == null) return;
-        SalesManager.Instance.SetMarkedForSale(selectedItem, evt.newValue);
+        // Hide the small badge label/stamp during the slam so only the dramatic overlay shows
+        if (forsaleLabel != null) forsaleLabel.style.display = DisplayStyle.None;
+        if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.None;
 
-        if (currentCategory == CategoryFilter.ForSale && !evt.newValue)
+        if (stampAnim == null || stampSlamAnim?.frames == null || stampSlamAnim.frames.Length == 0)
         {
-            RefreshGrid();
+            // No overlay — just reveal the badge stamp now
+            if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.Flex;
+            onComplete?.Invoke();
             return;
         }
 
-        if (itemSlots.TryGetValue(selectedItem, out var slot))
-        {
-            UpdateSlotBadges(slot, selectedItem);
-            slot.Q<VisualElement>("forsale-sticker")?.SetDisplay(evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-        }
-        UpdateDetailPanel(selectedItem);
+        int impactFrame = stampSlamAnim.frames.Length / 2; // midway = the "slam lands" moment
+
+        stampAnim.style.display = DisplayStyle.Flex;
+        stampSlamAnim.Play(
+            stampAnim,
+            onComplete: onComplete,
+            onFrame: idx =>
+            {
+                // Reveal the persistent badge stamp the instant the slam reaches impact
+                if (idx == impactFrame && forsaleStamp != null)
+                    forsaleStamp.style.display = DisplayStyle.Flex;
+            });
+    }
+
+    // Pixel-art dither-erase: swap backgroundImage through the for-sale-stamp-sheet frames.
+    // Frame 0 is the full stamp, the last frame is fully erased. The overlay "FOR SALE"
+    // text is hidden during the animation since the dither frames have the text baked in,
+    // and "Not For Sale" is shown underneath so it reveals as the stamp erases.
+    private void PlayStampDitherOut(System.Action onComplete)
+    {
+        if (forsaleStamp == null) { onComplete?.Invoke(); return; }
+
+        var stampText = forsaleStamp.Q<Label>("forsale-stamp-text");
+        if (stampText != null) stampText.style.display = DisplayStyle.None;
+        if (forsaleLabel != null) forsaleLabel.style.display = DisplayStyle.Flex;
+
+        forsaleDitherAnim.Play(
+            forsaleStamp,
+            onComplete: () =>
+            {
+                // Restore the text so the next time the stamp is shown (re-marked for sale),
+                // the label appears overlaid on frame 0 correctly.
+                if (stampText != null) stampText.style.display = DisplayStyle.Flex;
+                onComplete?.Invoke();
+            });
     }
 
     private void UpdateHeaderLabels()

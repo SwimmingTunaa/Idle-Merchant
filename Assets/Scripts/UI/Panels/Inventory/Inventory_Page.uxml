@@ -2,29 +2,18 @@
     <ui:Template name="ItemSlot" src="project://database/Assets/Scripts/UI/Panels/Inventory/ItemSlot.uxml?fileID=9197481963319205126&amp;guid=561d352404136405e83576f96fac8bb1&amp;type=3#ItemSlot" />
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
-
-    <!-- book-content: 1194×690, flex-row -->
     <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1; overflow: hidden;">
-
-        <!-- ══ LEFT PAGE ══ flex-1, gap:32, pr:55 -->
-        <ui:VisualElement name="left-page" style="flex-grow: 1; flex-basis: 0; flex-direction: column; gap: 32px; overflow: hidden; padding-right: 55px; align-items: center;">
-
-            <!-- book-header: flex-col, gap:10, items-center -->
-            <ui:VisualElement name="book-header" style="flex-direction: column; gap: 10px; align-items: center; justify-content: center; flex-shrink: 0;">
-                <!-- Title row: gap:16, items-center, justify-center -->
-                <ui:VisualElement style="flex-direction: row; gap: 16px; align-items: center; justify-content: center;">
-                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=-5161804649517974985&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl_0&quot;);" />
-                    <ui:Label name="page-title" text="Inventory" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); color: rgb(128, 75, 24); -unity-text-align: middle-center;" />
-                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=140487574076577522&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right_0&quot;);" />
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; flex-direction: column; overflow: hidden; padding-right: 55px; align-items: center;">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Inventory" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); color: rgb(128, 75, 24); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
                 </ui:VisualElement>
-                <!-- deco-underline 1: 415×40 -->
-                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=7417602752505748736&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline_0&quot;);" />
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 10px;" />
             </ui:VisualElement>
-
-            <!-- slots: flex-wrap, gap:16, justify-center — populated at runtime by InventoryController -->
-            <!-- Named "item-grid" so InventoryController.Q("item-grid") resolves correctly -->
-            <ui:ScrollView name="item-grid-scroll" style="flex-grow: 1; width: 100%;">
-                <ui:VisualElement name="item-grid" style="flex-wrap: wrap; flex-direction: row; gap: 16px; justify-content: center; align-items: flex-start; padding: 4px;">
+            <ui:ScrollView name="item-grid-scroll" style="flex-grow: 1; width: 100%; margin-top: 32px;">
+                <ui:VisualElement name="item-grid" style="flex-wrap: wrap; flex-direction: row; justify-content: center; align-items: flex-start; padding: 4px;">
                     <ui:Instance template="ItemSlot" />
                     <ui:Instance template="ItemSlot" />
                     <ui:Instance template="ItemSlot" />
@@ -42,61 +31,40 @@
                     <ui:Instance template="ItemSlot" class="item-slot-empty" />
                 </ui:VisualElement>
             </ui:ScrollView>
-
         </ui:VisualElement>
-
-        <!-- ══ RIGHT PAGE ══ flex-1, gap:16, pl:55 -->
-        <ui:VisualElement name="right-page" style="flex-grow: 1; flex-basis: 0; flex-direction: column; gap: 16px; overflow: hidden; padding-left: 55px; align-items: center;">
-
-            <!-- sprite-container: flex-row, gap:16, items-center, justify-center -->
-            <ui:VisualElement name="sprite-container" style="flex-direction: row; gap: 16px; align-items: center; justify-content: center; flex-shrink: 0;">
-                <!-- Left deco diamond line — flipped horizontally (scaleX: -1) -->
-                <ui:VisualElement name="deco-diamond-line 4" style="width: 130px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=8000510597704443122&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line_0&quot;); scale: -1 1;" />
-                <!-- slot: 210×210, contains 176×176 item -->
-                <ui:VisualElement name="slot" style="width: 210px; height: 210px; align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=3669019474466461189&amp;guid=dc67f5857d1cc48f49c6bf8c91eedf54&amp;type=3#deco-diamond-big_0&quot;);">
-                    <!-- Named "detail-icon" — controller sets this to item.icon of the selected slot at runtime -->
-                    <ui:VisualElement name="detail-icon" style="width: 176px; height: 176px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Gear.png?fileID=2800000&amp;guid=042fae2dd68bce044b8fbd1f26724a2d&amp;type=3#Gear&quot;);" />
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; flex-direction: column; overflow: hidden; padding-left: 55px; align-items: center;">
+            <ui:VisualElement name="sprite-container" style="flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0;">
+                <ui:VisualElement name="deco-diamond-line 4" style="width: 130px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=2800000&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line&quot;); scale: -1 1; margin-right: 16px;" />
+                <ui:VisualElement name="slot" style="width: 210px; height: 210px; align-items: center; justify-content: center; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=2800000&amp;guid=dc67f5857d1cc48f49c6bf8c91eedf54&amp;type=3#deco-diamond-big&quot;); background-size: 103% 100%; -unity-background-scale-mode: scale-to-fit;">
+                    <ui:VisualElement name="detail-icon" style="width: 176px; height: 176px; -unity-background-scale-mode: scale-to-fit;" />
                 </ui:VisualElement>
-                <!-- Right deco diamond line — normal orientation -->
-                <ui:VisualElement name="deco-diamond-line 3" style="width: 130px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=8000510597704443122&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line_0&quot;);" />
+                <ui:VisualElement name="deco-diamond-line 3" style="width: 130px; height: 60px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=2800000&amp;guid=2113edcd15d6a4096a25fbbc91c2bad5&amp;type=3#deco-diamond-line&quot;); margin-left: 16px;" />
             </ui:VisualElement>
-
-            <!-- item-name-container: 400×80, flex-col, items-center, pb:16 -->
-            <ui:VisualElement name="item-name-container" style="width: 400px; height: 80px; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 16px; flex-shrink: 0; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=-1815108092852401429&amp;guid=992d1ea8d5ec74d89b5301bb26534a78&amp;type=3#deco-title-banner_0&quot;);">
-                <!-- Named "detail-name" so InventoryController.Q("detail-name") resolves -->
-                <ui:Label name="detail-name" text="Select an item" style="font-size: 32px; color: rgb(128, 75, 24); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center;" />
+            <ui:VisualElement name="item-name-container" style="width: 400px; height: 80px; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 16px; flex-shrink: 0; margin-top: 16px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=2800000&amp;guid=992d1ea8d5ec74d89b5301bb26534a78&amp;type=3#deco-title-banner&quot;);">
+                <ui:Label name="detail-name" text="Select an item" style="font-size: 32px; color: rgb(128, 75, 24); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center; height: 30px;" />
             </ui:VisualElement>
-
-            <!-- Metrics: flex-row, gap:8, items-start, w-full -->
-            <ui:VisualElement name="Metrics" style="flex-direction: row; gap: 8px; align-items: flex-start; flex-shrink: 0; align-self: stretch;">
-
-                <!-- forsale-badge: 175px fixed, 52px tall -->
-                <ui:VisualElement name="forsale-badge" style="width: 175px; height: 52px; align-items: center; justify-content: center; flex-shrink: 0; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px;">
+            <ui:VisualElement name="Metrics" style="flex-direction: row; align-items: flex-start; flex-shrink: 0; align-self: stretch; margin-top: 16px;">
+                <ui:VisualElement name="forsale-badge" style="width: 175px; height: 52px; align-items: center; justify-content: center; flex-shrink: 0; cursor: link; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 8; -unity-slice-top: 3; -unity-slice-right: 8; -unity-slice-bottom: 3; -unity-slice-scale: 2px;">
                     <ui:Label name="forsale-label" text="Not For Sale" style="font-size: 24px; color: rgb(170, 160, 140); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center;" />
                 </ui:VisualElement>
-
-                <!-- value-badge: flex-1, 52px tall, items-center, justify-center -->
-                <ui:VisualElement name="value-badge" style="flex-grow: 1; flex-basis: 0; height: 52px; flex-direction: row; align-items: center; justify-content: center; gap: 4px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px;">
+                <ui:VisualElement name="value-badge" style="flex-grow: 1; flex-basis: 0; height: 52px; flex-direction: row; align-items: center; justify-content: center; margin-left: 8px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 8; -unity-slice-top: 3; -unity-slice-right: 8; -unity-slice-bottom: 3; -unity-slice-scale: 3px;">
                     <ui:Label name="item-value" text="—" style="font-size: 40px; color: rgb(155, 112, 72); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
-                    <ui:VisualElement name="spinning coin 1" style="width: 30px; height: 27px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Icons/spinning%20coin.png?fileID=3719480491199129836&amp;guid=64d83157b3e0543fe912b4fad69aa702&amp;type=3#spinning coin_0&quot;);" />
+                    <ui:VisualElement name="spinning coin 1" style="width: 30px; height: 27px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/Icons/spinning%20coin.png?fileID=3719480491199129836&amp;guid=64d83157b3e0543fe912b4fad69aa702&amp;type=3#spinning coin_0&quot;); margin-left: 4px;" />
                 </ui:VisualElement>
-
-                <!-- reserved-input: flex-1, 52px tall, icon + count + stepper -->
-                <ui:VisualElement name="reserved-input" style="flex-grow: 1; flex-basis: 0; height: 52px; flex-direction: row; align-items: center; justify-content: center; gap: 8px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px; padding-left: 16px; padding-right: 8px;">
-                    <ui:VisualElement name="icon &amp; text" style="flex-grow: 1; flex-basis: 0; flex-direction: row; gap: 8px; align-items: center;">
-                        <ui:VisualElement name="Lock" style="width: 20px; height: 24px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/16x16.png?fileID=d47fbbccd6f4a48da9e057d26ca35484&amp;guid=d47fbbccd6f4a48da9e057d26ca35484&amp;type=3&quot;);" />
-                        <ui:Label name="reserve-count" text="0" style="font-size: 40px; color: rgb(155, 112, 72); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;);" />
+                <ui:VisualElement name="reserved-input" style="flex-grow: 1; flex-basis: 0; height: 52px; flex-direction: row; align-items: center; justify-content: center; margin-left: 8px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 8; -unity-slice-top: 3; -unity-slice-right: 8; -unity-slice-bottom: 3; -unity-slice-scale: 3px; padding-left: 16px; padding-right: 8px;">
+                    <ui:VisualElement name="icon &amp; text" style="flex-grow: 1; flex-basis: 0; flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="Lock" style="width: 20px; height: 24px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/lock.svg?fileID=7388822144124034973&amp;guid=b85ff3f7aa304a0d8c6996191dbc0ddb&amp;type=3#lock&quot;);" />
+                        <ui:Label name="reserve-count" text="0" style="font-size: 40px; color: rgb(155, 112, 72); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); margin-left: 8px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-
             </ui:VisualElement>
-
-            <!-- description-container: shrink-0, w-full, h:150, p:16 -->
-            <ui:VisualElement name="description-container" style="flex-shrink: 0; align-self: stretch; height: 150px; padding: 16px; gap: 10px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/text-box-slice.png?fileID=3997786295894542459&amp;guid=4c3028ba947224aa4a305c692c8087ed&amp;type=3#text-box-slice_0&quot;); -unity-slice-left: 2; -unity-slice-top: 2; -unity-slice-right: 2; -unity-slice-bottom: 2; -unity-slice-scale: 5px;">
-                <!-- Named "detail-description" so InventoryController.Q("detail-description") resolves -->
+            <ui:VisualElement name="description-container" style="flex-shrink: 0; align-self: stretch; height: 150px; padding: 16px; margin-top: 16px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/text-box-slice.png?fileID=3997786295894542459&amp;guid=4c3028ba947224aa4a305c692c8087ed&amp;type=3#text-box-slice_0&quot;); -unity-slice-left: 1; -unity-slice-top: 1; -unity-slice-right: 1; -unity-slice-bottom: 1; -unity-slice-scale: 5;">
                 <ui:Label name="detail-description" text="Select an item to view details." style="flex-grow: 1; font-size: 24px; color: rgb(128, 75, 24); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); white-space: normal;" />
             </ui:VisualElement>
-
+            <ui:VisualElement name="forsale-stamp" style="position: absolute; left: 52px; right: 370px; top: 330px; bottom: 308px; cursor: link; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/for-sale-stamp-sheet.png?fileID=1729883773912937322&amp;guid=019c67496337345b5b1654dbcc071b00&amp;type=3#for-sale-stamp-sheet_0&quot;); display: flex; align-items: center; justify-content: center; rotate: -17deg; width: 175px; height: 52px;">
+                <ui:Label name="forsale-stamp-text" text="FOR SALE" style="font-size: 24px; color: rgb(215, 181, 148); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&amp;guid=b42dfca3fffbe4c5e9a29a3cd1074f71&amp;type=3#BrightLinger&quot;); -unity-text-align: middle-center; -unity-text-outline-width: 0; -unity-text-outline-color: rgb(80, 20, 20);" />
+            </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="Stampanim" picking-mode="Ignore" style="flex-grow: 0; position: absolute; width: 593px; height: 594px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/Stamp.png?fileID=5564853175316236378&amp;guid=6fdb63f54eb1349438d92a27ec084b83&amp;type=3#Stamp_5&quot;); top: 1px; left: 388px; display: flex;" />
     </ui:VisualElement>
 </ui:UXML>
