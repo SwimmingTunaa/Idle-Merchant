@@ -45,6 +45,11 @@ public class InventoryController : MonoBehaviour, IBookPage
     private VisualElement stampAnim;
     private Label itemValueLabel;
     private Label reserveCountLabel;
+    private VisualElement reserveUpButton;
+    private VisualElement reserveDownButton;
+    private IVisualElementScheduledItem reserveHoldRepeat;
+    private const int ReserveHoldInitialDelayMs = 350;
+    private const int ReserveHoldIntervalMs = 70;
 
     private bool filterBarInitialized = false;
 
@@ -85,6 +90,21 @@ public class InventoryController : MonoBehaviour, IBookPage
         stampAnim = (rightPage.parent ?? rightPage).Q<VisualElement>("Stampanim");
         itemValueLabel = rightPage.Q<Label>("item-value");
         reserveCountLabel = rightPage.Q<Label>("reserve-count");
+        reserveUpButton = rightPage.Q<VisualElement>("reserve-up");
+        reserveDownButton = rightPage.Q<VisualElement>("reserve-down");
+
+        if (reserveUpButton != null)
+        {
+            reserveUpButton.RegisterCallback<PointerDownEvent>(OnReserveUpPointerDown);
+            reserveUpButton.RegisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            reserveUpButton.RegisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
+        if (reserveDownButton != null)
+        {
+            reserveDownButton.RegisterCallback<PointerDownEvent>(OnReserveDownPointerDown);
+            reserveDownButton.RegisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            reserveDownButton.RegisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
 
         if (stampAnim != null) stampAnim.style.display = DisplayStyle.None;
 
@@ -125,9 +145,23 @@ public class InventoryController : MonoBehaviour, IBookPage
         detailIcon = null; detailName = null; detailDescription = null;
         if (forsaleBadge != null) forsaleBadge.UnregisterCallback<ClickEvent>(OnForSaleBadgeClicked);
         if (forsaleStamp != null) forsaleStamp.UnregisterCallback<ClickEvent>(OnForSaleBadgeClicked);
+        if (reserveUpButton != null)
+        {
+            reserveUpButton.UnregisterCallback<PointerDownEvent>(OnReserveUpPointerDown);
+            reserveUpButton.UnregisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            reserveUpButton.UnregisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
+        if (reserveDownButton != null)
+        {
+            reserveDownButton.UnregisterCallback<PointerDownEvent>(OnReserveDownPointerDown);
+            reserveDownButton.UnregisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            reserveDownButton.UnregisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
+        StopReserveHold();
         forsaleStamp?.Stop();
         stampAnim?.Stop();
         forsaleBadge = null; forsaleLabel = null; forsaleStamp = null; stampAnim = null; itemValueLabel = null; reserveCountLabel = null;
+        reserveUpButton = null; reserveDownButton = null;
         itemSlots.Clear();
         selectedItem = null;
     }
@@ -433,6 +467,43 @@ public class InventoryController : MonoBehaviour, IBookPage
                     UpdateDetailPanel(item);
             });
         }
+    }
+
+    // Reserve stepper — supports hold-to-repeat. PointerDown fires StepReserve once,
+    // then after a short delay starts auto-repeating until pointer is released or leaves.
+    private void OnReserveUpPointerDown(PointerDownEvent evt) => StartReserveHold(+1);
+    private void OnReserveDownPointerDown(PointerDownEvent evt) => StartReserveHold(-1);
+    private void OnReservePointerRelease(EventBase evt) => StopReserveHold();
+
+    private void StartReserveHold(int delta)
+    {
+        StopReserveHold();
+        StepReserve(delta); // immediate first step on press
+        // Then after the initial delay, auto-repeat. Use detailPanel as a stable schedule host.
+        var host = detailPanel ?? reserveUpButton;
+        if (host == null) return;
+        reserveHoldRepeat = host.schedule
+            .Execute(() => StepReserve(delta))
+            .StartingIn(ReserveHoldInitialDelayMs)
+            .Every(ReserveHoldIntervalMs);
+    }
+
+    private void StopReserveHold()
+    {
+        reserveHoldRepeat?.Pause();
+        reserveHoldRepeat = null;
+    }
+
+    private void StepReserve(int delta)
+    {
+        if (selectedItem == null) return;
+        int totalStock = SalesManager.Instance.GetTotalStock(selectedItem);
+        int current = Inventory.Instance.GetReserve(selectedItem);
+        int next = Mathf.Clamp(current + delta, 0, totalStock);
+        if (next == current) return; // already at bound — no work
+        Inventory.Instance.SetReserve(selectedItem, next);
+        // Refresh the slot badge + detail labels for the changed item
+        IncrementalUpdateItem(selectedItem);
     }
 
     // Big stamp-slam overlay (Stampanim) — plays the Stamp sheet across the right page when

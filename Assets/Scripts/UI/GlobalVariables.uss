@@ -1,14 +1,33 @@
 :root {
+    /* ═════════ Primitives — mirrors Figma Primary/* and Blue/* ═════════
+       These are the canonical colour swatches. Semantic tokens below
+       should alias to these where possible. Update both Figma and this
+       block together when the design system changes.
+    ── */
+    --primary-200: rgb(238, 225, 200);   /* #EEE1C8 — Figma Primary/200 */
+    --primary-300: rgb(221, 211, 193);   /* #DDD3C1 — Figma Primary/300 */
+    --primary-800: rgb(128, 75, 24);     /* #804B18 — Figma Primary/800 */
+
+    --blue-200: rgb(169, 212, 239);      /* #A9D4EF — Figma Blue/200 */
+    --blue-300: rgb(117, 180, 224);      /* #75B4E0 — Figma Blue/300 */
+    --blue-400: rgb(88, 155, 210);       /* #589BD2 — Figma Blue/400 */
+    --blue-500: rgb(59, 130, 196);       /* #3B82C4 — Figma Blue/500 */
+    --blue-600: rgb(50, 111, 169);       /* #326FA9 — Figma Blue/600 */
+    --blue-700: rgb(42, 93, 143);        /* #2A5D8F — Figma Blue/700 */
+    --blue-800: rgb(28, 63, 99);         /* #1C3F63 — Figma Blue/800 */
+
+    /* ═════════ Semantic colour tokens ═════════ */
     --color-bg-dark: rgb(101, 67, 33);
     --color-bg-medium: rgb(139, 90, 60);
     --color-bg-light: rgb(221, 211, 193);
     --color-bg-surface: rgb(250, 240, 220);
     --color-bg-overlay: rgba(20, 12, 5, 0.6);
-    --color-text-primary: rgb(128, 75, 24);
-    --color-text-secondary: rgb(132, 90, 50);
-    --color-text-muted: rgb(170, 160, 140);
-    --color-text-inverse: rgb(250, 240, 220);
-    --color-text-link: rgb(180, 130, 50);
+    --color-text-primary: rgb(128, 75, 24);     /* #804B18 — Figma Text/Primary */
+    --color-text-secondary: rgb(155, 112, 72);  /* #9B7048 — Figma Text/Secondary */
+    --color-text-muted: rgb(170, 160, 140);     /* #AAA08C — Figma Text/Muted */
+    --color-text-inverse: rgb(250, 240, 220);   /* #FAF0DC — Figma Text/Inverse */
+    --color-text-link: rgb(180, 130, 50);       /* Unity-only */
+    --color-exp: var(--blue-500);               /* mirrors Figma color-exp → Blue/500 */
     --color-accent: rgb(255, 190, 97);
     --color-accent-hover: rgb(255, 210, 140);
     --color-accent-active: rgb(220, 160, 60);
@@ -49,6 +68,17 @@
     --font-size-h3:      26px;   /* NotJam 2×       */
     --font-size-h2:      26px;   /* NotJam 2×       */
     --font-size-h1:      26px;   /* NotJam 2×       */
+
+    /* ── Figma-aligned font sizes (mirrors FontSize/* in Figma) ──
+       ⚠ Some Figma sizes aren't pixel-perfect multiples of the
+       native font sizes — they may render slightly fuzzy in-engine.
+       Prefer the Unity-native scale above for crisp pixel rendering.
+    ── */
+    --font-size-body-sm:     16px;   /* Figma Body/SM — pixel-perfect (BrightLinger 1×) */
+    --font-size-body-md:     24px;   /* Figma Body/MD — NOT pixel-perfect */
+    --font-size-body-lg:     32px;   /* Figma Body/LG — pixel-perfect (BrightLinger 2×) */
+    --font-size-body-xl:     40px;   /* Figma Body/XL — NOT pixel-perfect */
+    --font-size-heading-lg:  52px;   /* Figma Heading/LG — pixel-perfect (NotJam 4×) */
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;

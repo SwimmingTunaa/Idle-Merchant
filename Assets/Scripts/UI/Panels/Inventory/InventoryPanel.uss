@@ -116,6 +116,23 @@
     scale: 1.1;
 }
 
+/* Reserved-amount stepper buttons (▲ / ▼) */
+.reserve-step-btn {
+    background-color: rgba(0, 0, 0, 0);
+    cursor: link;
+    border-radius: 0;
+    transition-property: background-color;
+    transition-duration: 0.08s;
+}
+
+.reserve-step-btn:hover {
+    background-color: rgba(128, 75, 24, 0.12);
+}
+
+.reserve-step-btn:active {
+    background-color: rgba(128, 75, 24, 0.22);
+}
+
 .stat-container {
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Light/12_2.png?fileID=-7954138311804534128&guid=847c65b70758a4b6f849ec8a43ec2e9b&type=3#12_2_0");
     background-size: 100% 100%;
