@@ -1,10 +1,12 @@
 # Idle Merchant Guild — Game Design Document
 
-**Version:** 2.2
-**Date:** 2026-02-23
+**Version:** 2.3
+**Date:** 2026-05-31
 **Engine:** Unity 2D (URP, UI Toolkit, Spine/SpriteLibrary)
 **Genre:** Idle / Management
 **Platform:** PC (primary)
+
+> **This document describes design intent.** For current implementation status (what is built vs. planned), see `GAME_SPEC.md` in the project root — do not treat this GDD as a status source.
 
 ---
 
@@ -300,9 +302,9 @@ Idle → Wander → SeekingQueue → Queueing → Buying → Leaving → Exited
 - Seeks the queue when they decide to buy; gives up and leaves after 5s if they can't reach the queue end
 - Joins queue when within 1m of the queue tail
 - Queue position calculated dynamically (spacing tightens as queue grows: 0.08–0.35m gap)
-- On reaching counter: picks the highest-priced affordable item within their budget
-- Budget is randomised per customer within a range (`CustomerDef.budgetRange`)
-- Buys a random quantity (`CustomerDef.batchQuantity` min/max)
+- Each customer has an **archetype** — Commoner / Adventurer / Noble (`CustomerDef.customerArcheType`) — with a preferred item category (`CustomerDef.itemPreferance`), a budget range (`CustomerDef.budget`), and a per-visit batch quantity (`CustomerDef.batchRange`)
+- On reaching the counter: resolves a **want** against current stock within budget (`SalesManager.TryPickDesiredForCustomer`), favouring higher-value affordable items biased by archetype preference; the desired item is shown via a want-bubble above the customer
+- Buys a quantity within the batch range that budget and stock allow
 - Leaves after purchase, despawns on exit
 
 **Design Intent:**
@@ -536,7 +538,7 @@ This ensures the game never hard-locks, while still making gold mismanagement fe
 
 1. Customer decides to buy → enters `SeekingQueue` state
 2. Joins queue when within 1m of queue tail
-3. At counter: `SalesManager.TryPickDesiredForCustomer()` finds the best affordable item (highest priced, within budget)
+3. At counter: `SalesManager.TryPickDesiredForCustomer()` resolves the customer's **want** — the best affordable in-stock item within budget, biased by the customer's archetype category preference
 4. Transaction: item removed from inventory, gold added, `GameSignals.RaiseItemSold()` fired
 5. Customer exits
 
@@ -1103,10 +1105,9 @@ Letting players name their guild and potentially customise the shop's visual sty
 A subtle dotted-line or indicator showing a porter's planned route could help players understand bottlenecks. Low priority but high readability value.
 
 **Contract / Quest System**
-A `ContractManager` exists in code. Contracts could give players short-term goals ("sell 10 Steel Swords by end of day") with gold/XP rewards. This could supplement the milestone system for mid-session engagement. Worth prototyping.
+A `ContractManager` class exists in code but is currently an **empty stub** — no contract logic is implemented. Contracts could give players short-term goals ("sell 10 Steel Swords by end of day") with gold/XP rewards, supplementing the milestone system for mid-session engagement. Still undecided; worth prototyping.
 
-**Rank-Up Timing**
-Should adventurers auto-rank-up when XP threshold is met, or require an explicit player action? Explicit creates satisfying engagement moments (and a clear notification hook) but risks friction if players don't notice. Auto-rank reduces friction but removes a feeling of agency. Currently leaning toward explicit with a prominent UI notification and no downside to delaying.
+**Rank-Up Timing** — ✅ *Resolved (implemented).* Adventurers do **not** auto-rank-up; promotion is an explicit player action (`AdventuererAgent.Promote()`), and the Roster panel surfaces a promote button once the XP threshold is met. There is no downside to delaying. Retained here for design-history context.
 
 **Party Customer Cooldown Tuning**
 How frequent should parties be? Too rare and they feel like a lottery. Too common and they lose their "event" quality. A starting point: one party per 5–10 minutes of active play, scaling down (more frequent) at higher stars. Needs playtesting.
@@ -1171,4 +1172,4 @@ At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be e
 
 ---
 
-*End of Game Design Document — Idle Merchant Guild v2.0*
+*End of Game Design Document — Idle Merchant Guild v2.3*
