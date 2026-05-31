@@ -13,6 +13,9 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     [SerializeField] private VisualTreeAsset slotTemplate;
     [SerializeField] private HireController hireController;
 
+    [Tooltip("Optional per-rank gem sprites (index 0 = Wood … 4 = Gold). Falls back to the slot's placeholder when empty.")]
+    [SerializeField] private Sprite[] rankBadgeSprites;
+
     private static readonly string[] LayerNames =
     {
         "",                 // index 0 unused
@@ -229,10 +232,8 @@ public class RosterPanelController : MonoBehaviour, IBookPage
                 detailSprite.style.backgroundImage = new StyleBackground(sprite);
         }
 
-        // Rank badge
-        var rankLabel = rightContent.Q<Label>("detail-rank-number");
-        if (rankLabel != null)
-            rankLabel.text = agent.CurrentRank.ToString();
+        // Rank badge (roman level), tier name, and Promote button
+        RefreshDetailRank(agent);
 
         // Description
         var descLabel = rightContent.Q<Label>("detail-description");
@@ -345,14 +346,6 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             }
         }
 
-        // Promote button
-        var promoteBtn = rightContent.Q<Button>("detail-promote-btn");
-        if (promoteBtn != null)
-        {
-            promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
-            promoteBtn.clicked -= OnPromoteClicked;
-            promoteBtn.clicked += OnPromoteClicked;
-        }
     }
 
     private void OnPromoteClicked()
@@ -368,18 +361,25 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     // REFRESH HELPERS
     // ═════════════════════════════════════════════
 
-    private static void RefreshSlot(VisualElement slot, AdventurerAgent agent)
+    private void RefreshSlot(VisualElement slot, AdventurerAgent agent)
     {
-        bool atMax = agent.XPForNextRank == float.MaxValue;
-        float xpRatio = atMax ? 1f : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextRank);
+        float xpRatio = agent.XPForNextLevel >= float.MaxValue
+            ? 1f
+            : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextLevel);
 
         var xpFill = slot.Q<VisualElement>("slot-xp-fill");
         if (xpFill != null)
             xpFill.style.width = Length.Percent(xpRatio * 100f);
 
+        // Badge shows the level as a roman numeral (I..V); gem sprite by rank when provided.
         var rankLabel = slot.Q<Label>("rank-level");
         if (rankLabel != null)
-            rankLabel.text = agent.CurrentRank.ToString();
+            rankLabel.text = AdventurerRank.Roman(agent.CurrentLevel);
+
+        var rankBadge = slot.Q<VisualElement>("rank-container");
+        var badgeSprite = RankSprite(agent.CurrentRank);
+        if (rankBadge != null && badgeSprite != null)
+            rankBadge.style.backgroundImage = new StyleBackground(badgeSprite);
 
         var health = agent.GetComponent<Health>();
         var hpFill = slot.Q<VisualElement>("slot-hp-fill");
@@ -387,12 +387,22 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             hpFill.style.width = Length.Percent(health != null ? health.HealthPercent * 100f : 0f);
     }
 
+    /// <summary>Optional per-rank gem sprite (1-based rank); null falls back to the slot placeholder.</summary>
+    private Sprite RankSprite(int rank)
+    {
+        int i = rank - 1;
+        if (rankBadgeSprites != null && i >= 0 && i < rankBadgeSprites.Length)
+            return rankBadgeSprites[i];
+        return null;
+    }
+
     private void RefreshDetailXP(AdventurerAgent agent)
     {
         if (rightContent == null) return;
 
-        bool atMax = agent.XPForNextRank == float.MaxValue;
-        float xpRatio = atMax ? 1f : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextRank);
+        float xpRatio = agent.XPForNextLevel >= float.MaxValue
+            ? 1f
+            : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextLevel);
 
         var xpFill = rightContent.Q<VisualElement>("detail-xp-fill");
         if (xpFill != null)
@@ -400,7 +410,33 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
         var xpLabel = rightContent.Q<Label>("xp-label-value");
         if (xpLabel != null)
-            xpLabel.text = atMax ? "Max Rank" : $"{agent.CurrentXP:F0} / {agent.XPForNextRank:F0}";
+        {
+            if (agent.IsMaxLevel) xpLabel.text = "Max";
+            else if (agent.CanPromote) xpLabel.text = "Ready to Promote";
+            else xpLabel.text = $"{agent.CurrentXP:F0} / {agent.XPForNextLevel:F0}";
+        }
+    }
+
+    /// <summary>Updates the detail rank badge (roman level), tier name, and the Promote button.</summary>
+    private void RefreshDetailRank(AdventurerAgent agent)
+    {
+        if (rightContent == null) return;
+
+        var rankNum = rightContent.Q<Label>("detail-rank-number");
+        if (rankNum != null) rankNum.text = AdventurerRank.Roman(agent.CurrentLevel);
+
+        var rankName = rightContent.Q<Label>("detail-rank-name");
+        if (rankName != null) rankName.text = agent.RankName;
+
+        var promoteBtn = rightContent.Q<Button>("detail-promote-btn");
+        if (promoteBtn != null)
+        {
+            promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
+            promoteBtn.text = agent.CanPromote ? $"Promote ({agent.PromoteCost}g)" : "Promote";
+            promoteBtn.SetEnabled(Inventory.Instance != null && Inventory.Instance.CanAfford(agent.PromoteCost));
+            promoteBtn.clicked -= OnPromoteClicked;
+            promoteBtn.clicked += OnPromoteClicked;
+        }
     }
 
     // ═════════════════════════════════════════════
@@ -436,9 +472,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (agent == selectedAgent)
         {
             RefreshDetailXP(agent);
-            var promoteBtn = rightContent?.Q<Button>("detail-promote-btn");
-            if (promoteBtn != null)
-                promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
+            RefreshDetailRank(agent);
         }
     }
 

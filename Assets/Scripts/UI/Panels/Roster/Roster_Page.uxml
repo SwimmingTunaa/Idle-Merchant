@@ -123,6 +123,8 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; align-self: center; align-items: center; margin-bottom: 8px;">
+                    <ui:Label name="detail-rank-name" text="Wood" class="card-class-badge" />
+                    <ui:Label text="·" style="color: rgb(150, 110, 65); font-size: 14px; margin-left: 6px; margin-right: 6px;" />
                     <ui:Label name="detail-class" text="Warrior" class="card-class-badge" />
                     <ui:Label text="·" style="color: rgb(150, 110, 65); font-size: 14px; margin-left: 6px; margin-right: 6px;" />
                     <ui:Label name="detail-layer" text="Abandoned Mines" class="text-caption" style="color: rgb(110, 72, 30);" />

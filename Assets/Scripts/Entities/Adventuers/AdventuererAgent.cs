@@ -42,41 +42,55 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     private Coroutine hitCoroutine;
     private Coroutine deathCoroutine;
 
-    // XP & rank
+    // XP, rank & level
     private float currentXP;
     private int currentRank = 1;
+    private int currentLevel = 1;
 
     // IEntity implementation
     public EntityType EntityType => EntityType.Adventurer;
     public bool IsAlive => health != null && health.IsAlive;
 
-    // XP / rank public interface
+    // XP / rank / level public interface
     public float CurrentXP => currentXP;
     public int CurrentRank => currentRank;
+    public int CurrentLevel => currentLevel;
 
-    /// <summary>XP needed to reach the next rank, or float.MaxValue at max rank.</summary>
-    public float XPForNextRank
+    /// <summary>Global level across all ranks (1..maxRank*levelsPerRank); drives the XP curve.</summary>
+    public int TotalLevel =>
+        adventurerDef == null ? currentLevel : (currentRank - 1) * adventurerDef.levelsPerRank + currentLevel;
+
+    /// <summary>Rank tier name, e.g. "Wood".</summary>
+    public string RankName => AdventurerRank.Name(currentRank);
+
+    /// <summary>Rank tier plus roman level, e.g. "Wood V".</summary>
+    public string RankDisplay => AdventurerRank.Display(currentRank, currentLevel);
+
+    /// <summary>Gold cost to promote out of the current rank.</summary>
+    public int PromoteCost => adventurerDef != null ? adventurerDef.PromoteCost(currentRank) : 0;
+
+    /// <summary>True at the final rank and level — no further progression.</summary>
+    public bool IsMaxLevel =>
+        adventurerDef != null && currentRank >= adventurerDef.maxRank && currentLevel >= adventurerDef.levelsPerRank;
+
+    /// <summary>
+    /// XP needed for the next auto level-up, or float.MaxValue at a rank's top level
+    /// (where Promote — not XP — is the gate) and at max level.
+    /// </summary>
+    public float XPForNextLevel
     {
         get
         {
-            if (adventurerDef == null || currentRank >= adventurerDef.maxRank) return float.MaxValue;
-            int idx = currentRank - 1;
-            if (idx >= adventurerDef.xpThresholds.Length) return float.MaxValue;
-            return adventurerDef.xpThresholds[idx];
+            if (adventurerDef == null || currentLevel >= adventurerDef.levelsPerRank) return float.MaxValue;
+            return adventurerDef.XPForLevel(TotalLevel);
         }
     }
 
-    /// <summary>True when the adventurer has enough XP to promote and is not at max rank.</summary>
-    public bool CanPromote
-    {
-        get
-        {
-            if (adventurerDef == null || currentRank >= adventurerDef.maxRank) return false;
-            int idx = currentRank - 1;
-            if (idx >= adventurerDef.xpThresholds.Length) return false;
-            return currentXP >= adventurerDef.xpThresholds[idx];
-        }
-    }
+    /// <summary>True once at the top level of a non-max rank — eligible to spend gold and promote.</summary>
+    public bool CanPromote =>
+        adventurerDef != null
+        && currentRank < adventurerDef.maxRank
+        && currentLevel >= adventurerDef.levelsPerRank;
 
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = true;
@@ -110,6 +124,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         previousState = AdventurerState.Idle;
         currentXP = 0f;
         currentRank = 1;
+        currentLevel = 1;
 
         // Initialize health
         if (health != null && adventurerDef.baseHealth > 0f)
@@ -462,23 +477,63 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     // XP & RANK
     // ═════════════════════════════════════════════
 
-    /// <summary>Accumulates XP. Does not auto-promote — call Promote() explicitly.</summary>
+    /// <summary>
+    /// Accumulates XP and auto-levels within the current rank. Crossing into the next
+    /// rank is gated by Promote() (gold), so auto-leveling stops at the rank's top level.
+    /// </summary>
     public void GainXP(float amount)
     {
         if (amount <= 0f) return;
         currentXP += amount;
+
+        if (adventurerDef != null)
+        {
+            // Auto level-up while below the rank's top level and enough XP is banked.
+            while (currentLevel < adventurerDef.levelsPerRank)
+            {
+                float need = adventurerDef.XPForLevel(TotalLevel);
+                if (currentXP < need) break;
+                currentXP -= need;
+                currentLevel++;
+                ApplyLevelBonus();
+                GameSignals.RaiseAdventurerLeveledUp(this, currentLevel);
+            }
+
+            // At the rank's top level there is no further auto-level — keep the bar full
+            // (Promote is the gate) and don't bank surplus XP.
+            if (currentLevel >= adventurerDef.levelsPerRank) currentXP = 0f;
+        }
+
         GameSignals.RaiseAdventurerXPChanged(this, currentXP);
     }
 
+    /// <summary>Small permanent stat bump applied automatically on each level-up.</summary>
+    private void ApplyLevelBonus()
+    {
+        if (adventurerDef == null) return;
+        int id = TotalLevel; // unique per total level — never collides with rank IDs
+
+        Stats.Mediator.AddModifier(new BasicStatModifier(
+            StatType.AttackDamage, 3000 + id, -1f,
+            v => v * (1f + adventurerDef.levelDamageMultiplier)));
+
+        Stats.Mediator.AddModifier(new BasicStatModifier(
+            StatType.AttackSpeed, 4000 + id, -1f,
+            v => v * (1f - adventurerDef.levelAttackSpeedMultiplier)));
+    }
+
     /// <summary>
-    /// Applies one rank-up: boosts damage, attack speed, and max HP permanently,
-    /// increments rank, resets XP, and fires OnAdventurerPromoted.
-    /// Returns false if CanPromote is false or the adventurer is not alive.
+    /// Spends gold to advance to the next rank: applies the rank milestone bonuses,
+    /// resets to level 1, and fires OnAdventurerPromoted. Returns false if not eligible,
+    /// not alive, or the guild can't afford the cost.
     /// </summary>
     public bool Promote()
     {
         if (!CanPromote) return false;
         if (health == null || !health.IsAlive) return false;
+
+        int cost = adventurerDef.PromoteCost(currentRank);
+        if (Inventory.Instance == null || !Inventory.Instance.TrySpendGold(cost)) return false;
 
         // Permanent damage bonus — ID range 1001–1004 (one per rank transition)
         Stats.Mediator.AddModifier(new BasicStatModifier(
@@ -504,9 +559,10 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
         int prevRank = currentRank;
         currentRank++;
+        currentLevel = 1;
         currentXP = 0f;
 
-        GameSignals.RaiseAdventurerPromoted(this, $"Rank {prevRank}", $"Rank {currentRank}");
+        GameSignals.RaiseAdventurerPromoted(this, AdventurerRank.Name(prevRank), AdventurerRank.Name(currentRank));
         return true;
     }
 
