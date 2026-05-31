@@ -82,20 +82,26 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         var section = new VisualElement();
         section.AddToClassList("layer-section");
 
-        // Header: layer name + slot count
+        // Header: flourish line · centered layer name · mirrored flourish line
         var header = new VisualElement();
         header.AddToClassList("layer-header");
+
+        var lineLeft = new VisualElement();
+        lineLeft.AddToClassList("layer-deco-line");
 
         var nameLabel = new Label(GetLayerName(manager.LayerIndex));
         nameLabel.AddToClassList("layer-name");
 
-        var adventurers = manager.GetAllAdventurers().Where(a => a != null).ToList();
-        var countLabel = new Label($"{adventurers.Count} / {manager.MaxUnits}");
-        countLabel.AddToClassList("layer-count");
+        var lineRight = new VisualElement();
+        lineRight.AddToClassList("layer-deco-line");
+        lineRight.AddToClassList("layer-deco-line--right");
 
+        header.Add(lineLeft);
         header.Add(nameLabel);
-        header.Add(countLabel);
+        header.Add(lineRight);
         section.Add(header);
+
+        var adventurers = manager.GetAllAdventurers().Where(a => a != null).ToList();
 
         // Slot row: filled slots then empty slots
         var slotRow = new VisualElement();
@@ -112,6 +118,11 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         for (int i = 0; i < emptyCount; i++)
             slotRow.Add(BuildEmptySlot(manager.LayerIndex));
 
+        // No `gap` in UI Toolkit — slots carry margin-right; clear it on the last
+        // slot so the trailing gap doesn't eat width (keeps slots at full size).
+        if (slotRow.childCount > 0)
+            slotRow[slotRow.childCount - 1].style.marginRight = 0;
+
         section.Add(slotRow);
         return section;
     }
@@ -125,6 +136,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         }
 
         var slot = slotTemplate.Instantiate();
+        slot.AddToClassList("adv-slot-container");
 
         // Apply selected state to the inner frame
         if (agent == selectedAgent)

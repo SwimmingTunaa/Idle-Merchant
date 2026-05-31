@@ -240,7 +240,6 @@
     flex-direction: row;
     align-items: center;
     width: 100%;
-    gap: 4px;
     margin-bottom: 2px;
 }
 
@@ -340,7 +339,6 @@
     border-radius: 4px;
     padding: 4px 8px;
     flex-direction: row;
-    gap: 4px;
     align-items: center;
 }
 
@@ -405,66 +403,115 @@
 
 .layer-section {
     flex-direction: column;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-md);
 }
 
 .layer-header {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 4px;
-    padding-bottom: 4px;
-    border-bottom-width: 1px;
-    border-color: var(--color-border-medium);
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.layer-deco-line {
+    width: 100px;
+    height: 10px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/17_16x16.png?fileID=2800000&guid=83b416998b1d04cac9d9a7d906b610ae&type=3#17_16x16");
+}
+
+.layer-deco-line--right {
+    scale: -1 1;
 }
 
 .layer-name {
     flex-grow: 1;
-    font-size: var(--text-sm);
+    flex-basis: 0;
+    margin-left: var(--space-sm);
+    margin-right: var(--space-sm);
+    font-size: var(--font-size-body-lg);
     color: var(--color-text-primary);
-    -unity-font-style: bold;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+    -unity-font-style: normal;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
-.layer-count {
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+#roster-scroll .unity-scroll-view__vertical-scroller {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
 
 .slot-row {
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+.adv-slot-container {
+    width: 95px;
+    height: 95px;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-right: var(--space-md);
+}
+
+.slot-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
 }
 
 .slot-frame {
-    width: 110px;
-    height: 110px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: visible;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=21300000&guid=850d10acc4e4542a69dda03262628525&type=3#inventory slot");
+}
+
+.slot-wrapper:hover .slot-frame {
+    scale: 1.03;
+}
+
+.slot-portrait-clip {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
     overflow: hidden;
-    border-width: 3px;
-    border-color: var(--color-border-medium);
-    border-radius: 4px;
-    background-color: var(--color-bg-light);
 }
 
-.slot-frame:hover {
-    border-color: var(--color-accent);
+.slot-portrait {
+    width: 100%;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
-.slot-selected {
-    border-color: var(--color-accent);
-    border-width: 3px;
+.slot-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    padding: 4px 4px 2px 4px;
+    background-color: var(--primary-500);
 }
 
 .slot-bar-bg {
-    height: 5px;
-    background-color: rgba(0, 0, 0, 0.35);
-    border-radius: 2px;
+    height: 4px;
+    background-color: var(--primary-900);
     overflow: hidden;
+    margin-bottom: 2px;
 }
 
 .slot-xp-fill {
     height: 100%;
-    background-color: rgb(60, 130, 210);
+    background-color: var(--color-exp);
     width: 0%;
     transition-property: width;
     transition-duration: 0.3s;
@@ -472,41 +519,72 @@
 
 .slot-hp-fill {
     height: 100%;
-    background-color: rgb(200, 60, 60);
+    background-color: var(--color-destructive);
     width: 0%;
     transition-property: width;
     transition-duration: 0.3s;
 }
 
+.slot-selector {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100px;
+    height: 100px;
+    translate: -50px -50px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Inscriptions/Dark/Selector-icons.png?fileID=1731615565123986282&guid=8e6332101472e45c58825f1b34a754da&type=3#selector-red");
+    display: none;
+}
+
+.slot-selected .slot-selector {
+    display: flex;
+}
+
+.slot-rank {
+    position: absolute;
+    top: -19px;
+    right: -15px;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=2800000&guid=d825792e71a5342959a9c727f20b2749&type=3#Rank 1");
+}
+
+.slot-rank-label {
+    font-size: var(--font-size-body-md);
+    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    padding-bottom: 4px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    padding-left: 2px;
+}
+
 .empty-slot {
-    width: 110px;
-    height: 110px;
-    margin: 6px;
+    width: 95px;
+    height: 95px;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-right: var(--space-md);
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/inventory%20slot.png?fileID=21300000&guid=850d10acc4e4542a69dda03262628525&type=3#inventory slot");
-    -unity-background-image-tint-color: rgb(80, 52, 28);
-    opacity: 0.4;
-    border-style: dashed;
-    border-width: 2px;
-    border-color: var(--color-border-medium);
-    border-top-width: 0;
-    border-right-width: 0;
-    border-bottom-width: 0;
-    border-left-width: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/adv-slot.png?fileID=2800000&guid=7dce2c3279a3a4ce592395994f6a87ab&type=3#adv-slot");
 }
 
 .empty-slot:hover {
-    opacity: 0.75;
-    border-color: var(--color-accent);
     scale: 1.03;
 }
 
 .empty-slot-icon {
-    font-size: 28px;
-    color: rgb(101, 67, 33);
+    font-size: 32px;
+    color: var(--primary-500);
     -unity-font-style: bold;
+    margin: 0;
+    padding: 0;
 }
 
 .mod {

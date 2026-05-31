@@ -4,32 +4,42 @@
     <Style src="project://database/Assets/Scripts/UI/Panels/Roster/RosterPanel.uss?fileID=7433441132597879392&amp;guid=fcda90a85139941bea862f290df11926&amp;type=3#RosterPanel" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
     <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
-        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; flex-direction: column; padding: 12px;">
-            <ui:Label text="Roster" class="text-h2" style="margin-bottom: 8px;" />
-            <ui:ScrollView name="roster-scroll" style="flex-grow: 1;">
-                <ui:VisualElement name="layers-container" style="flex-direction: column; padding: 4px;">
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; flex-direction: column; padding: 12px; padding-top: 0; padding-right: 55px; padding-bottom: 0; padding-left: 0;">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 12px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Roster" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); color: rgb(128, 75, 24); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=2800000&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right&quot;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
+            </ui:VisualElement>
+            <ui:ScrollView name="roster-scroll" mode="Vertical" style="flex-grow: 1;">
+                <ui:VisualElement name="layers-container" style="flex-direction: column; padding: 0; padding-top: 20px;">
                     <ui:VisualElement class="layer-section">
                         <ui:VisualElement class="layer-header">
+                            <ui:VisualElement class="layer-deco-line" />
                             <ui:Label text="Abandoned Mines" class="layer-name" />
-                            <ui:Label text="3 / 4" class="layer-count" />
+                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
-                            <ui:Instance template="AdventurerSlot" />
-                            <ui:Instance template="AdventurerSlot" />
-                            <ui:Instance template="AdventurerSlot" />
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
                             <ui:VisualElement class="empty-slot">
-                                <ui:Label text="+" class="empty-slot-icon" />
+                                <ui:Label text="+" name="Label" class="empty-slot-icon" />
                             </ui:VisualElement>
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
                         <ui:VisualElement class="layer-header">
+                            <ui:VisualElement class="layer-deco-line" />
                             <ui:Label text="Deep Caverns" class="layer-name" />
-                            <ui:Label text="2 / 4" class="layer-count" />
+                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
-                            <ui:Instance template="AdventurerSlot" />
-                            <ui:Instance template="AdventurerSlot" />
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
                             <ui:VisualElement class="empty-slot">
                                 <ui:Label text="+" class="empty-slot-icon" />
                             </ui:VisualElement>
@@ -40,11 +50,12 @@
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
                         <ui:VisualElement class="layer-header">
+                            <ui:VisualElement class="layer-deco-line" />
                             <ui:Label text="Crystal Hollows" class="layer-name" />
-                            <ui:Label text="1 / 3" class="layer-count" />
+                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
-                            <ui:Instance template="AdventurerSlot" />
+                            <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
                             <ui:VisualElement class="empty-slot">
                                 <ui:Label text="+" class="empty-slot-icon" />
                             </ui:VisualElement>
@@ -55,8 +66,9 @@
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
                         <ui:VisualElement class="layer-header">
+                            <ui:VisualElement class="layer-deco-line" />
                             <ui:Label text="Cursed Crypts" class="layer-name" />
-                            <ui:Label text="0 / 3" class="layer-count" />
+                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:VisualElement class="empty-slot">
@@ -72,8 +84,9 @@
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
                         <ui:VisualElement class="layer-header">
+                            <ui:VisualElement class="layer-deco-line" />
                             <ui:Label text="Infernal Depths" class="layer-name" />
-                            <ui:Label text="0 / 2" class="layer-count" />
+                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:VisualElement class="empty-slot">
@@ -93,7 +106,7 @@
                 <ui:VisualElement style="align-items: center; margin-bottom: 6px; height: 210px; justify-content: center; flex-direction: row;">
                     <ui:VisualElement style="flex-grow: 1; flex-direction: row; position: absolute; align-items: center;">
                         <ui:VisualElement style="width: 100px; height: 40px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/3_Right_16x16.png?fileID=4217371202849751748&amp;guid=f6ce0fa1c6896481b972c924e2abb5da&amp;type=3#single&quot;); rotate: 180deg; margin-right: 8px;" />
-                        <ui:VisualElement style="width: 210px; height: 210px; position: relative; align-self: center; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/Diamond%20Big.png?fileID=2800000&amp;guid=914b27bc6ad9648eb814957fc8e2c047&amp;type=3#Diamond Big&quot;); margin-left: 32px; margin-right: 32px;" />
+                        <ui:VisualElement style="width: 210px; height: 210px; position: relative; align-self: center; background-image: url(&apos;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/Diamond%20Big.png?fileID=2800000&amp;guid=914b27bc6ad9648eb814957fc8e2c047&amp;type=3#Diamond Big&apos;); margin-left: 32px; margin-right: 32px;" />
                         <ui:VisualElement style="width: 100px; height: 40px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/3_Right_16x16.png?fileID=4217371202849751748&amp;guid=f6ce0fa1c6896481b972c924e2abb5da&amp;type=3#single&quot;); margin-left: 8px;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="detail-sprite-frame" class="detail-sprite-frame">
@@ -114,7 +127,7 @@
                     <ui:Label text="·" style="color: rgb(150, 110, 65); font-size: 14px; margin-left: 6px; margin-right: 6px;" />
                     <ui:Label name="detail-layer" text="Abandoned Mines" class="text-caption" style="color: rgb(110, 72, 30);" />
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Light/12_2.png?fileID=-7954138311804534128&amp;guid=847c65b70758a4b6f849ec8a43ec2e9b&amp;type=3#12_2_0&quot;); -unity-slice-left: 1; -unity-slice-top: 1; -unity-slice-right: 1; -unity-slice-bottom: 1; -unity-slice-scale: 5px; padding: 12px; margin-bottom: 8px;">
+                <ui:VisualElement style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/12_2.png?fileID=-7954138311804534128&amp;guid=847c65b70758a4b6f849ec8a43ec2e9b&amp;type=3#12_2_0&quot;); -unity-slice-left: 1; -unity-slice-top: 1; -unity-slice-right: 1; -unity-slice-bottom: 1; -unity-slice-scale: 5px; padding: 12px; margin-bottom: 8px;">
                     <ui:VisualElement name="detail-traits" style="flex-direction: row; flex-wrap: wrap; margin-bottom: 6px;">
                         <ui:Label text="Berserker" class="trait" />
                         <ui:Label text="Iron Skin" class="trait" />
