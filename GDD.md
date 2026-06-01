@@ -1,7 +1,7 @@
 # Idle Merchant Guild — Game Design Document
 
-**Version:** 2.3
-**Date:** 2026-05-31
+**Version:** 2.4
+**Date:** 2026-06-01
 **Engine:** Unity 2D (URP, UI Toolkit, Spine/SpriteLibrary)
 **Genre:** Idle / Management
 **Platform:** PC (primary)
@@ -193,10 +193,10 @@ Adventurers are the engine of loot production. More adventurers = faster mob cle
 
 ### 4.2 Adventurer Promotion (Rank-Up)
 
-Adventurers gain XP by killing mobs. When enough XP is accumulated, the player can **promote them to the next rank** (Rank 1 → Rank 2 → … → Rank 5). Promotion is a player-initiated action — the adventurer keeps fighting at their current rank until the player promotes them.
+Adventurers progress on two nested tracks: **5 ranks** — Wood → Bronze → Iron → Silver → Gold — each holding **5 levels** (shown as roman numerals I–V), for 25 levels total. Killing mobs earns XP, which **auto-levels** the adventurer within their rank (Wood I → Wood II → …). At a rank's top level (V), the player can **promote** to the next rank, which **costs gold** and resets the adventurer to Level I of the higher tier (e.g. Wood V → Bronze I). Auto-leveling is automatic; promotion is a deliberate, player-initiated, gold-gated choice.
 
-**Rank Effects:**
-Each rank-up applies a permanent stat improvement — better attack damage, more HP, faster attack speed. The exact modifier values are tuned per rank. There are no branching paths; rank is a linear upgrade.
+**Level & Rank Effects:**
+Each **level-up** applies a small permanent stat bump (attack damage, attack speed). Each **promote** (rank-up) applies a larger milestone bump (attack damage, attack speed, max HP). Values are tuned in `AdventurerDef`. There are no branching paths — both tracks are linear upgrades.
 
 | Rank | Relative Power |
 |---|---|
@@ -207,7 +207,7 @@ Each rank-up applies a permanent stat improvement — better attack damage, more
 | 5 | Max — top-end adventurer |
 
 **Design Notes:**
-- Rank 1–5 exists at both hire time (higher-rank candidates cost more gold) and as an in-field upgrade (free via XP)
+- Ranks exist at both hire time (higher-rank candidates cost more gold) and as an in-field upgrade. Levelling within a rank is free via XP; **promoting between ranks costs gold** — a deliberate gold sink and decision point (invest in this adventurer now, or save). ✅ *Reconciled: promotion was originally "free via XP"; the build settled on a gold cost.*
 - The tension: a Rank 1 adventurer you've levelled to Rank 3 through play may be more valuable than a freshly hired Rank 3 because of their traits
 - Higher-rank adventurers should be visually distinct (e.g. better equipment sprites) so rank is readable on screen without opening a panel
 - XP progress should be visible on the adventurer's card in the roster UI
@@ -215,18 +215,11 @@ Each rank-up applies a permanent stat improvement — better attack damage, more
 **XP & Leveling:**
 - XP earned per mob kill, tracked on the entity
 - XP per kill scales with layer depth — deeper mobs are worth more XP, incentivising pushing adventurers into harder layers
-- **Recommended curve: exponential (3× per rank)**
+- **Curve: exponential per level** — `XPForLevel(n) = baseXP × xpGrowth^(n-1)` over the global level (1–25). Defaults `baseXP 40`, `xpGrowth 1.22` (tunable in `AdventurerDef`): Lv I→II ≈ 40 XP, ramping to ≈ 3,900 XP for the final level-up. ✅ *Reconciled: replaces the old per-rank gate table (100/300/900/2700, 3×/rank) — XP is now a single per-level curve, and ranks advance via a gold-gated promote rather than XP.*
 
-| Rank Gate | XP Required | Notes |
-|---|---|---|
-| 1 → 2 | 100 XP | Fast — achievable in early Phase 1 |
-| 2 → 3 | 300 XP | Takes noticeable time, feels earned |
-| 3 → 4 | 900 XP | Mid-game investment |
-| 4 → 5 | 2,700 XP | Late-game grind — Rank 5 should feel prestigious |
+Early levels arrive fast (frequent small wins); the rank gate at Level V is the prestige milestone. Deeper layers give more XP per kill, so adventurers assigned to them level faster — a further incentive to push layers.
 
-At ~1 XP per Layer 1 kill and ~10 kills/min, first rank-up takes roughly 10 minutes of idle time. Deeper layers give more XP per kill so adventurers assigned to them rank up faster — a further incentive to push layers.
-
-- Promotion is capped at Rank 5 — no further gates after that
+- Levels cap at V within a rank; ranks cap at Gold (`maxRank` 5) — Gold V is the ceiling, no further gates after that
 
 ---
 
@@ -1172,4 +1165,4 @@ At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be e
 
 ---
 
-*End of Game Design Document — Idle Merchant Guild v2.3*
+*End of Game Design Document — Idle Merchant Guild v2.4*
