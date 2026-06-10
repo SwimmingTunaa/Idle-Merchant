@@ -31,19 +31,47 @@ public class AdventurerDef : EntityDef
         
     public float DPS => attackDamage / attackInterval;
 
-    [Header("Rank & XP")]
-    [Tooltip("XP required to advance each rank. Index 0 = Rank 1→2, index 1 = Rank 2→3, etc.")]
-    public float[] xpThresholds = { 100f, 300f, 900f, 2700f };
+    // NOTE: the old `xpThresholds` array was removed — XP per level is now an
+    // exponential curve (XPForLevel) and ranks advance via Promote(), not XP.
 
+    [Header("Leveling")]
+    [Tooltip("Levels within each rank (badge shows I..N). Promote unlocks at the top level.")]
+    public int levelsPerRank = 5;
+
+    [Tooltip("XP for the first level-up; each subsequent level multiplies by XP Growth.")]
+    public float baseXP = 40f;
+
+    [Tooltip("Exponential growth of the per-level XP cost (1.22 = +22% each level).")]
+    public float xpGrowth = 1.22f;
+
+    [Tooltip("Per-level AttackDamage bonus applied automatically on each level-up (0.04 = +4%).")]
+    public float levelDamageMultiplier = 0.04f;
+
+    [Tooltip("Per-level attack-speed bonus (interval reduction) on each level-up (0.02 = 2% faster).")]
+    public float levelAttackSpeedMultiplier = 0.02f;
+
+    [Header("Rank & Promote")]
     [Tooltip("Maximum rank an adventurer can reach.")]
     public int maxRank = 5;
 
-    [Tooltip("Flat percentage bonus to AttackDamage applied on each rank-up (0.20 = +20% per rank).")]
+    [Tooltip("Gold cost to promote from rank 1; multiplied by Promote Cost Growth each rank.")]
+    public int basePromoteCost = 150;
+
+    [Tooltip("Exponential growth of the promote gold cost per rank (2.5 = ×2.5 each rank).")]
+    public float promoteCostGrowth = 2.5f;
+
+    [Tooltip("AttackDamage bonus applied on each promote / rank-up (0.20 = +20%).")]
     public float rankDamageMultiplier = 0.20f;
 
-    [Tooltip("Flat percentage reduction to AttackInterval (faster attacks) applied on each rank-up (0.10 = 10% faster per rank).")]
+    [Tooltip("Attack-interval reduction (faster attacks) applied on each promote / rank-up (0.10 = 10% faster).")]
     public float rankAttackSpeedMultiplier = 0.10f;
 
-    [Tooltip("Flat percentage bonus to max HP applied on each rank-up (0.25 = +25% per rank).")]
+    [Tooltip("Max HP bonus applied on each promote / rank-up (0.25 = +25%).")]
     public float rankHPMultiplier = 0.25f;
+
+    /// <summary>XP required to go from the given global level (1-based) to the next — exponential.</summary>
+    public float XPForLevel(int totalLevel) => baseXP * Mathf.Pow(xpGrowth, Mathf.Max(0, totalLevel - 1));
+
+    /// <summary>Gold cost to promote out of the given 1-based rank — exponential.</summary>
+    public int PromoteCost(int rank) => Mathf.RoundToInt(basePromoteCost * Mathf.Pow(promoteCostGrowth, Mathf.Max(0, rank - 1)));
 }

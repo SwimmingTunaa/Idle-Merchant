@@ -69,7 +69,20 @@ public class EntityDefEditor : Editor
     private SerializedProperty hitStaggerDurationProp;
     private SerializedProperty hitStaggerCooldownProp;
     private SerializedProperty reviveDelayProp;
-    
+
+    // Rank & Leveling - AdventurerDef specific
+    private SerializedProperty levelsPerRankProp;
+    private SerializedProperty baseXPProp;
+    private SerializedProperty xpGrowthProp;
+    private SerializedProperty levelDamageMultiplierProp;
+    private SerializedProperty levelAttackSpeedMultiplierProp;
+    private SerializedProperty maxRankProp;
+    private SerializedProperty basePromoteCostProp;
+    private SerializedProperty promoteCostGrowthProp;
+    private SerializedProperty rankDamageMultiplierProp;
+    private SerializedProperty rankAttackSpeedMultiplierProp;
+    private SerializedProperty rankHPMultiplierProp;
+
     // Combat - MobDef specific
     private SerializedProperty mobStartingStateProp;
     private SerializedProperty isBossProp;
@@ -171,6 +184,18 @@ public class EntityDefEditor : Editor
             hitStaggerDurationProp = serializedObject.FindProperty("hitStaggerDuration");
             hitStaggerCooldownProp = serializedObject.FindProperty("hitStaggerCooldown");
             reviveDelayProp = serializedObject.FindProperty("reviveDelay");
+
+            levelsPerRankProp = serializedObject.FindProperty("levelsPerRank");
+            baseXPProp = serializedObject.FindProperty("baseXP");
+            xpGrowthProp = serializedObject.FindProperty("xpGrowth");
+            levelDamageMultiplierProp = serializedObject.FindProperty("levelDamageMultiplier");
+            levelAttackSpeedMultiplierProp = serializedObject.FindProperty("levelAttackSpeedMultiplier");
+            maxRankProp = serializedObject.FindProperty("maxRank");
+            basePromoteCostProp = serializedObject.FindProperty("basePromoteCost");
+            promoteCostGrowthProp = serializedObject.FindProperty("promoteCostGrowth");
+            rankDamageMultiplierProp = serializedObject.FindProperty("rankDamageMultiplier");
+            rankAttackSpeedMultiplierProp = serializedObject.FindProperty("rankAttackSpeedMultiplier");
+            rankHPMultiplierProp = serializedObject.FindProperty("rankHPMultiplier");
         }
         
         // Combat (MobDef)
@@ -503,6 +528,39 @@ public class EntityDefEditor : Editor
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("Combat Configuration", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(combatConfigProp, true);
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Leveling", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(levelsPerRankProp, new GUIContent("Levels Per Rank"));
+        EditorGUILayout.PropertyField(baseXPProp, new GUIContent("Base XP"));
+        EditorGUILayout.PropertyField(xpGrowthProp, new GUIContent("XP Growth (per level)"));
+        EditorGUILayout.PropertyField(levelDamageMultiplierProp, new GUIContent("Per-Level Damage +"));
+        EditorGUILayout.PropertyField(levelAttackSpeedMultiplierProp, new GUIContent("Per-Level Atk Speed +"));
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Rank & Promote", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(maxRankProp, new GUIContent("Max Rank"));
+        EditorGUILayout.PropertyField(basePromoteCostProp, new GUIContent("Base Promote Cost (gold)"));
+        EditorGUILayout.PropertyField(promoteCostGrowthProp, new GUIContent("Promote Cost Growth (per rank)"));
+        EditorGUILayout.PropertyField(rankDamageMultiplierProp, new GUIContent("Per-Rank Damage +"));
+        EditorGUILayout.PropertyField(rankAttackSpeedMultiplierProp, new GUIContent("Per-Rank Atk Speed +"));
+        EditorGUILayout.PropertyField(rankHPMultiplierProp, new GUIContent("Per-Rank Max HP +"));
+
+        if (target is AdventurerDef advDef && advDef.levelsPerRank > 0 && advDef.maxRank > 0)
+        {
+            int total = advDef.levelsPerRank * advDef.maxRank;
+            EditorGUILayout.HelpBox(
+                $"{advDef.maxRank} ranks × {advDef.levelsPerRank} levels = {total} total levels.\n" +
+                $"XP: Lv1→2 = {advDef.XPForLevel(1):F0}, final = {advDef.XPForLevel(Mathf.Max(1, total - 1)):F0}.\n" +
+                $"Promote cost: rank 1 = {advDef.PromoteCost(1)}g, rank {Mathf.Max(1, advDef.maxRank - 1)} = {advDef.PromoteCost(Mathf.Max(1, advDef.maxRank - 1))}g.",
+                MessageType.Info);
+        }
         EditorGUILayout.EndVertical();
     }
 
