@@ -102,3 +102,5 @@ For the exact section layouts — spec feature blocks, Kanban table columns, the
 ## A note on triggers
 
 This skill is the *reconciliation method*; it does not run itself. Run a drift-sync pass on demand — after a feature lands, before sharing project state, or on a cadence. A cheap optional nudge: a git hook or CI check that simply *flags* drift (e.g. warns if `KANBAN_BOARD.md` hasn't changed in N commits, or if HEAD is well past a doc's last-updated). The hook only reminds; this skill does the judgement-based work.
+
+> **Git LFS trap:** if the repo uses LFS (check `.gitattributes` for `filter=lfs`), any custom `pre-push` hook must keep `git lfs pre-push "$@"` as its last line — overwriting the hook without it clobbers LFS's own uploader and every push is rejected for missing LFS objects.
