@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss" />
+
+    <!-- Reusable button (mirrors the Figma "Button" component).
+         · Type:     swap the root class — btn-primary | btn-secondary | btn-success | btn-danger | btn-disabled
+         · Size:     add btn-sm or btn-lg on the root
+         · Leading:  set #button-leading background-image + style.display = Flex
+         · Trailing: set #button-trailing style.display = Flex, fill #button-trailing-text and/or #button-trailing-icon
+         Plain text buttons can ignore the slots and just set #button-label text. -->
+    <ui:Button name="button" text="" class="btn-primary">
+        <ui:VisualElement name="button-leading" class="btn-leading" style="display: none;" />
+        <ui:Label name="button-label" text="Button" class="btn-label" />
+        <ui:VisualElement name="button-trailing" class="btn-trailing" style="display: none;">
+            <ui:Label name="button-trailing-text" text="" class="btn-trailing-text" />
+            <ui:VisualElement name="button-trailing-icon" class="btn-coin" />
+        </ui:VisualElement>
+    </ui:Button>
+</ui:UXML>

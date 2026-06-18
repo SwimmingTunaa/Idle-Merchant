@@ -90,6 +90,15 @@
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
+/* ── Token-bound colours (moved off inline styles — var() can't resolve inline) ── */
+#page-title,
+#detail-name,
+#detail-description { color: var(--color-text-primary); }
+#item-value,
+#reserve-count { color: var(--color-text-secondary); }
+#reserve-stepper { background-color: var(--primary-200); }
+#reserve-up { border-bottom-color: var(--primary-300); }
+
 .action-button {
     cursor: link;
     transition-duration: 0.2s;
