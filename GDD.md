@@ -1,7 +1,7 @@
 # Idle Merchant Guild — Game Design Document
 
-**Version:** 2.4
-**Date:** 2026-06-01
+**Version:** 2.5
+**Date:** 2026-06-10
 **Engine:** Unity 2D (URP, UI Toolkit, Spine/SpriteLibrary)
 **Genre:** Idle / Management
 **Platform:** PC (primary)
@@ -1100,7 +1100,7 @@ A subtle dotted-line or indicator showing a porter's planned route could help pl
 **Contract / Quest System**
 A `ContractManager` class exists in code but is currently an **empty stub** — no contract logic is implemented. Contracts could give players short-term goals ("sell 10 Steel Swords by end of day") with gold/XP rewards, supplementing the milestone system for mid-session engagement. Still undecided; worth prototyping.
 
-**Rank-Up Timing** — ✅ *Resolved (implemented).* Adventurers do **not** auto-rank-up; promotion is an explicit player action (`AdventuererAgent.Promote()`), and the Roster panel surfaces a promote button once the XP threshold is met. There is no downside to delaying. Retained here for design-history context.
+**Rank-Up Timing** — ✅ *Resolved (implemented).* Adventurers do **not** auto-rank-up; promotion is an explicit player action (`AdventurerAgent.Promote()`). The Roster panel surfaces a promote button (with its gold cost) once the adventurer reaches the rank's top level. Note the redesign changed the delay calculus: promotion now **costs gold**, and XP earned while parked at a rank's top level is **discarded** (not banked) — so delaying a promote wastes that adventurer's XP output. This is a deliberate anti-hoarding pressure toward prompt promotion. Retained here for design-history context.
 
 **Party Customer Cooldown Tuning**
 How frequent should parties be? Too rare and they feel like a lottery. Too common and they lose their "event" quality. A starting point: one party per 5–10 minutes of active play, scaling down (more frequent) at higher stars. Needs playtesting.
@@ -1165,4 +1165,4 @@ At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be e
 
 ---
 
-*End of Game Design Document — Idle Merchant Guild v2.4*
+*End of Game Design Document — Idle Merchant Guild v2.5*

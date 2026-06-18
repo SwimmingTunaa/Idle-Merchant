@@ -34,8 +34,16 @@
     --color-accent: rgb(255, 190, 97);
     --color-accent-hover: rgb(255, 210, 140);
     --color-accent-active: rgb(220, 160, 60);
+    /* Button semantics — mirror Figma Primary/* and Secondary/* (Default/Hover/Active) */
+    --color-primary: rgb(139, 90, 60);            /* #8B5A3C — Primary/Default → Primary/700 */
+    --color-primary-hover: rgb(155, 112, 72);     /* #9B7048 — Primary/600 */
+    --color-primary-active: rgb(128, 75, 24);     /* #804B18 — Primary/800 */
+    --color-secondary: rgb(238, 225, 200);        /* #EEE1C8 — Secondary/Default → Primary/200 */
+    --color-secondary-hover: rgb(221, 211, 193);  /* #DDD3C1 — Primary/300 */
+    --color-secondary-active: rgb(200, 172, 138); /* #C8AC8A — Primary/400 */
     --color-success: rgb(100, 160, 80);
     --color-success-hover: rgb(120, 180, 100);
+    --color-success-active: rgb(75, 135, 60);     /* #4B873C — Success/600 (press) */
     --color-warning: rgb(220, 170, 50);
     --color-warning-hover: rgb(240, 190, 70);
     --color-destructive: rgb(180, 60, 50);

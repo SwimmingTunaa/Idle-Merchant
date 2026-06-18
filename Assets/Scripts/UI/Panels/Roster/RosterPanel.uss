@@ -437,6 +437,9 @@
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
+/* Page title colour via token — var() can't resolve in inline styles, so it lives here. */
+#page-title { color: var(--color-text-primary); }
+
 #roster-scroll .unity-scroll-view__vertical-scroller {
     position: absolute;
     right: 0;
