@@ -437,8 +437,9 @@
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
-/* Page title colour via token — var() can't resolve in inline styles, so it lives here. */
-#page-title { color: var(--color-text-primary); }
+#page-title {
+    color: var(--color-text-primary);
+}
 
 #roster-scroll .unity-scroll-view__vertical-scroller {
     position: absolute;
@@ -598,4 +599,261 @@
     font-size: 16px;
     color: var(--color-text-primary);
     -unity-text-align: middle-center;
+}
+
+.detail-class-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    flex-direction: row;
+    align-items: center;
+}
+
+.detail-class-circle {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/circle-outline%2016x16.png?fileID=-5501662205497309343&guid=f2fa623a4e5dc47679de73bd62d02cea&type=3#circle-outline 16x16_0");
+}
+
+.detail-class-icon {
+    width: 38px;
+    height: 38px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/job_icons_singleoutline.png?fileID=-7428873440664082796&guid=98b2f1c9237cb4662958fb3b4cdf2261&type=3#novice");
+}
+
+.detail-class-banner {
+    margin-left: -12px;
+    min-height: 38px;
+    padding: 6px 16px 6px 22px;
+    align-items: center;
+    justify-content: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&guid=7431fc87a504d4dc29fd217299608c7f&type=3#box-splice_0");
+    -unity-slice-left: 16;
+    -unity-slice-right: 16;
+    -unity-slice-top: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 2px;
+}
+
+#detail-class {
+    font-size: 20px;
+    color: var(--color-text-secondary);
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.detail-diamond {
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    align-self: center;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url('project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/Diamond%20Big.png?fileID=2800000&guid=914b27bc6ad9648eb814957fc8e2c047&type=3#Diamond Big');
+}
+
+.detail-name-banner {
+    align-self: center;
+    min-width: 380px;
+    padding: 4px 48px;
+    align-items: center;
+    justify-content: center;
+    background-image: url('project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=-1815108092852401429&guid=992d1ea8d5ec74d89b5301bb26534a78&type=3#deco-title-banner_0');
+    -unity-slice-left: 24;
+    -unity-slice-right: 24;
+    -unity-slice-top: 5;
+    -unity-slice-bottom: 5;
+    -unity-slice-scale: 2px;
+}
+
+#detail-name {
+    font-size: 52px;
+    color: var(--color-text-primary);
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+.detail-epithet-banner {
+    align-self: center;
+    margin-top: -4px;
+    min-width: 200px;
+    padding: 4px 28px;
+    align-items: center;
+    justify-content: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/epithet.png?fileID=-7657284972936839921&guid=b52c24f2512b34c459b9c716530f0692&type=3#epithet_0");
+    -unity-slice-left: 12;
+    -unity-slice-right: 12;
+    -unity-slice-top: 2;
+    -unity-slice-bottom: 2;
+    -unity-slice-scale: 2px;
+}
+
+#detail-epithet {
+    font-size: 24px;
+    color: var(--color-text-secondary);
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+#detail-layer {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-text-align: middle-center;
+    margin-top: 2px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.detail-exp-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 4px;
+    margin-bottom: 10px;
+}
+
+.detail-rank-shield {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=2800000&guid=d825792e71a5342959a9c727f20b2749&type=3#Rank 1");
+}
+
+#detail-rank-number {
+    font-size: 24px;
+    color: var(--color-text-inverse);
+    -unity-text-align: middle-center;
+    padding-bottom: 6px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+.detail-exp-col {
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.detail-exp-head {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4px;
+}
+
+.detail-exp-label {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+#detail-rank-name {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+#xp-label-value {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.detail-section {
+    margin-bottom: 8px;
+}
+
+.detail-section-head {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.detail-section-deco {
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 14px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/14_16x16.png?fileID=-3802367633072120375&guid=10da1518798c0455f8498d53948aa2a1&type=3#14_16x16_0");
+}
+
+.detail-section-deco--right {
+    scale: -1 1;
+}
+
+.detail-section-title {
+    margin-left: 10px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    font-size: 26px;
+    color: var(--color-text-strong);
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+.detail-badge-row {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.detail-badge {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+    min-height: 62px;
+    padding: 6px 4px;
+    align-items: center;
+    justify-content: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&guid=7431fc87a504d4dc29fd217299608c7f&type=3#box-splice_0");
+    -unity-slice-left: 16;
+    -unity-slice-right: 16;
+    -unity-slice-top: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 2px;
+}
+
+.detail-badge-label {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    -unity-text-align: middle-center;
+    margin-bottom: 2px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.detail-badge-value {
+    font-size: 24px;
+    color: var(--color-text-strong);
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.detail-badge-value--trait {
+    color: var(--color-text-success);
+}
+
+.detail-badge-value--skill {
+    color: var(--color-text-info);
+}
+
+.detail-desc-box {
+    flex-grow: 1;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding: 12px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/12_2.png?fileID=-7954138311804534128&guid=847c65b70758a4b6f849ec8a43ec2e9b&type=3#12_2_0");
+    -unity-slice-left: 1;
+    -unity-slice-right: 1;
+    -unity-slice-top: 1;
+    -unity-slice-bottom: 1;
+    -unity-slice-scale: 5px;
+}
+
+.detail-dismiss-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 4px;
 }
