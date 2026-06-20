@@ -3,6 +3,7 @@
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Roster/RosterPanel.uss?fileID=7433441132597879392&amp;guid=fcda90a85139941bea862f290df11926&amp;type=3#RosterPanel" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
     <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
         <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; flex-direction: column; padding: 12px; padding-top: 0; padding-right: 55px; padding-bottom: 0; padding-left: 0;">
             <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 12px;">
@@ -100,75 +101,98 @@
                 </ui:VisualElement>
             </ui:ScrollView>
         </ui:VisualElement>
-        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; flex-direction: column; padding-top: 16px; padding-bottom: 16px; padding-left: 64px; padding-right: 32px;">
-            <ui:Label name="roster-placeholder" text="Select an adventurer" class="text-body" style="color: rgb(128, 75, 23); -unity-text-align: middle-center; flex-grow: 1; font-size: 32px; display: none;" />
-            <ui:VisualElement name="detail-container" style="display: flex; flex-direction: column; flex-grow: 1;">
-                <ui:VisualElement style="align-items: center; margin-bottom: 6px; height: 210px; justify-content: center; flex-direction: row;">
-                    <ui:VisualElement style="flex-grow: 1; flex-direction: row; position: absolute; align-items: center;">
-                        <ui:VisualElement style="width: 100px; height: 40px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/3_Right_16x16.png?fileID=4217371202849751748&amp;guid=f6ce0fa1c6896481b972c924e2abb5da&amp;type=3#single&quot;); rotate: 180deg; margin-right: 8px;" />
-                        <ui:VisualElement style="width: 210px; height: 210px; position: relative; align-self: center; background-image: url(&apos;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/Diamond%20Big.png?fileID=2800000&amp;guid=914b27bc6ad9648eb814957fc8e2c047&amp;type=3#Diamond Big&apos;); margin-left: 32px; margin-right: 32px;" />
-                        <ui:VisualElement style="width: 100px; height: 40px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/3_Right_16x16.png?fileID=4217371202849751748&amp;guid=f6ce0fa1c6896481b972c924e2abb5da&amp;type=3#single&quot;); margin-left: 8px;" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="detail-sprite-frame" class="detail-sprite-frame">
-                        <ui:VisualElement name="detail-sprite" class="detail-sprite" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-bottom: 2px;">
-                    <ui:Label name="detail-name" text="Astrid the Bold" class="text-h2" style="-unity-text-align: middle-center;" />
-                    <ui:VisualElement style="width: 36px; height: 36px; margin-left: 6px; flex-shrink: 0;">
-                        <ui:VisualElement style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url(&quot;project://database/Assets/Sprites/UI/Hire%20Menu/adventurer%20badge%20Background.png?fileID=2800000&amp;guid=2e3cf9576aa94484baa390a68e8a8034&amp;type=3#adventurer badge Background&quot;); -unity-background-image-tint-color: rgb(130, 130, 130);" />
-                        <ui:VisualElement style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url(&quot;project://database/Assets/Sprites/UI/Hire%20Menu/adventurer%20badge%20Border.png?fileID=2800000&amp;guid=b8ba2a3fed1324a4db468921b4ae72b5&amp;type=3#adventurer badge Border&quot;); justify-content: center; align-items: center;">
-                            <ui:Label name="detail-rank-number" text="3" style="color: rgb(248, 248, 248); font-size: 14px; -unity-font-style: bold; padding-top: 8px; padding-left: 2px; margin: 0; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;);" />
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; flex-direction: column;">
+            <ui:Label name="roster-placeholder" text="Select an adventurer" class="text-body" style="-unity-text-align: middle-center; flex-grow: 1; font-size: 32px; display: none;" />
+            <ui:VisualElement name="detail-container">
+                <ui:VisualElement name="detail-top" class="detail-top">
+                    <ui:VisualElement name="sprite-container" class="sprite-container">
+                        <ui:VisualElement name="deco-diamond-big 1" class="deco-diamond-big" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=2800000&amp;guid=dc67f5857d1cc48f49c6bf8c91eedf54&amp;type=3#deco-diamond-big&quot;);" />
+                        <ui:VisualElement name="slot" class="slot">
+                            <ui:VisualElement name="detail-sprite" class="adv-sprite-big" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="item-name-container" class="item-name-container">
+                            <ui:VisualElement class="name-shadow" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=2800000&amp;guid=992d1ea8d5ec74d89b5301bb26534a78&amp;type=3#deco-title-banner&quot;); -unity-slice-left: 0; -unity-slice-top: 0; -unity-slice-right: 0; -unity-slice-bottom: 0; -unity-slice-scale: 0;" />
+                            <ui:VisualElement class="name-fill" />
+                            <ui:VisualElement name="Container" class="name-text-container">
+                                <ui:Label name="detail-name" text="Astrid" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="epithet-wrapper" class="epithet-wrapper">
+                            <ui:VisualElement class="epithet-rotate">
+                                <ui:VisualElement name="epithet" class="epithet">
+                                    <ui:VisualElement class="epithet-shadow" />
+                                    <ui:VisualElement class="epithet-fill" />
+                                    <ui:Label name="detail-epithet" text="the Long Example" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; align-self: center; align-items: center; margin-bottom: 8px;">
-                    <ui:Label name="detail-rank-name" text="Wood" class="card-class-badge" />
-                    <ui:Label text="·" style="color: rgb(150, 110, 65); font-size: 14px; margin-left: 6px; margin-right: 6px;" />
-                    <ui:Label name="detail-class" text="Warrior" class="card-class-badge" />
-                    <ui:Label text="·" style="color: rgb(150, 110, 65); font-size: 14px; margin-left: 6px; margin-right: 6px;" />
-                    <ui:Label name="detail-layer" text="Abandoned Mines" class="text-caption" style="color: rgb(110, 72, 30);" />
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/12_2.png?fileID=-7954138311804534128&amp;guid=847c65b70758a4b6f849ec8a43ec2e9b&amp;type=3#12_2_0&quot;); -unity-slice-left: 1; -unity-slice-top: 1; -unity-slice-right: 1; -unity-slice-bottom: 1; -unity-slice-scale: 5px; padding: 12px; margin-bottom: 8px;">
-                    <ui:VisualElement name="detail-traits" style="flex-direction: row; flex-wrap: wrap; margin-bottom: 6px;">
-                        <ui:Label text="Berserker" class="trait" />
-                        <ui:Label text="Iron Skin" class="trait" />
+                    <ui:VisualElement name="Class" class="class-group" style="top: 1px;">
+                        <ui:VisualElement name="class-name container" class="class-frame" style="top: 25px; left: 62px; padding-top: 4px; padding-bottom: 4px; padding-left: 16px; padding-right: 16px;">
+                            <ui:Label name="detail-class" text="Novice" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Class Icon" class="class-circle">
+                            <ui:VisualElement name="circle-outline 16x16 1" class="circle-outline" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/circle-outline%2016x16.png?fileID=2800000&amp;guid=f2fa623a4e5dc47679de73bd62d02cea&amp;type=3#circle-outline 16x16&quot;);" />
+                            <ui:VisualElement name="job_icons_doubleoutline - novice" class="job-icon" style="top: 2px; left: 0; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/job_icons_singleoutline.png?fileID=-7428873440664082796&amp;guid=98b2f1c9237cb4662958fb3b4cdf2261&amp;type=3#novice&quot;);" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="detail-mods" style="flex-direction: column; margin-bottom: 6px;">
-                        <ui:Label text="+25% Attack Damage" class="mod" />
-                        <ui:Label text="+15 Max HP" class="mod" />
+                    <ui:Label name="detail-layer" text="Abandoned Mines" class="detail-layer" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Progress Bars" class="progress-bars">
+                    <ui:VisualElement name="Level &amp; Rank" class="level-rank">
+                        <ui:VisualElement name="Rank" class="rank">
+                            <ui:Label name="detail-rank-number" text="I" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Progress Bar &amp; Label" class="progress-bar-label">
+                            <ui:VisualElement name="exp-head" class="exp-head">
+                                <ui:Label text="EXP" class="exp-label" style="flex-grow: 0;" />
+                                <ui:Label name="detail-rank-name" text="Wood" style="flex-grow: 1;" />
+                                <ui:Label name="xp-label-value" text="99 / 100" style="flex-grow: 1; -unity-text-align: upper-right;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="exp-bar-bg" class="exp-bar-bg">
+                                <ui:VisualElement name="detail-xp-fill" style="width: 68%;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="detail-description" text="A fearless fighter who charges headlong into danger. Astrid has never met a foe she didn&apos;t immediately charge at." class="detail-description" style="white-space: normal;" />
+                    <ui:Button name="detail-promote-btn" text="Promote" class="btn-success" style="display: none; margin-top: 8px;" />
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; margin-bottom: 6px; align-items: stretch;">
-                    <ui:VisualElement class="stat-container" style="flex-grow: 1; align-items: center; justify-content: center; height: 60px; margin: 4px; padding: 5px 8px;">
-                        <ui:Label text="ATK" class="text-caption" style="color: rgb(120, 85, 45);" />
-                        <ui:Label name="stat-atk" text="12.5" class="text-small" style="font-size: 24px; color: rgb(50, 30, 10);" />
+                <ui:VisualElement name="description-container" class="description-container" style="height: auto;">
+                    <ui:Label name="detail-description" text="A fearless fighter who charges headlong into danger." />
+                </ui:VisualElement>
+                <ui:VisualElement name="Section" class="section" style="flex-grow: 1;">
+                    <ui:VisualElement name="Stats Container" class="section-group">
+                        <ui:VisualElement name="heading" class="heading">
+                            <ui:VisualElement class="heading-deco" />
+                            <ui:Label text="Stats" class="heading-title" />
+                            <ui:VisualElement class="heading-deco heading-deco--right" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Stats" class="badge-row">
+                            <ui:VisualElement name="Badge" class="badge">
+                                <ui:Label text="DPS" class="badge-label" />
+                                <ui:Label name="stat-dps" text="3" class="badge-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="Badge" class="badge">
+                                <ui:Label text="SPD" class="badge-label" />
+                                <ui:Label name="stat-spd" text="3" class="badge-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="Badge" class="badge">
+                                <ui:Label text="HP" class="badge-label" />
+                                <ui:Label name="hp-label-value" text="100/100" class="badge-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement class="stat-container" style="flex-grow: 1; align-items: center; justify-content: center; height: 60px; margin: 4px; padding: 5px 8px;">
-                        <ui:Label text="SPD" class="text-caption" style="color: rgb(120, 85, 45);" />
-                        <ui:Label name="stat-spd" text="1.4/s" class="text-small" style="font-size: 24px; color: rgb(50, 30, 10);" />
+                    <ui:VisualElement name="traits-skills-section" class="section-group section-group--traits">
+                        <ui:VisualElement name="heading" class="heading">
+                            <ui:VisualElement class="heading-deco" />
+                            <ui:Label text="Traits &amp; Skills" class="heading-title" />
+                            <ui:VisualElement class="heading-deco heading-deco--right" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="detail-traits" class="badge-row" />
                     </ui:VisualElement>
-                    <ui:VisualElement class="stat-container" style="flex-grow: 1; align-items: center; justify-content: center; height: 60px; margin: 4px; padding: 5px 8px;">
-                        <ui:Label text="DPS" class="text-caption" style="color: rgb(120, 85, 45);" />
-                        <ui:Label name="stat-dps" text="0" class="text-small" style="font-size: 24px; color: rgb(50, 30, 10);" />
-                    </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; margin-bottom: 3px;">
-                    <ui:Label text="XP" class="text-small" style="color: rgb(80, 52, 20);" />
-                    <ui:Label name="xp-label-value" text="340 / 500" class="text-small" style="margin-left: auto; color: rgb(80, 52, 20);" />
+                <ui:VisualElement name="actions" class="frame-6">
+                    <ui:Button name="detail-dismiss-btn" text="Dismiss" class="btn-danger" style="width: 126px;" />
                 </ui:VisualElement>
-                <ui:VisualElement class="detail-bar-bg" style="margin-bottom: 6px;">
-                    <ui:VisualElement name="detail-xp-fill" class="detail-xp-fill" style="width: 68%;" />
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; margin-bottom: 3px;">
-                    <ui:Label text="HP" class="text-small" style="color: rgb(80, 52, 20);" />
-                    <ui:Label name="hp-label-value" text="65/80" class="text-small" style="margin-left: auto; color: rgb(80, 52, 20);" />
-                </ui:VisualElement>
-                <ui:VisualElement class="detail-bar-bg" style="margin-bottom: 8px;">
-                    <ui:VisualElement name="detail-hp-fill" class="detail-hp-fill" style="width: 81%;" />
-                </ui:VisualElement>
-                <ui:Button name="detail-promote-btn" text="Promote" class="promote-button" style="display: flex;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

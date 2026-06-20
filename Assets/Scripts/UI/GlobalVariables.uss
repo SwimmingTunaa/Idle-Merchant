@@ -25,9 +25,14 @@
     --color-bg-light: rgb(221, 211, 193);
     --color-bg-surface: rgb(250, 240, 220);
     --color-bg-overlay: rgba(20, 12, 5, 0.6);
+    --color-box-bg: rgb(215, 181, 148);         /* #D7B594 — box/plate inner background (sampled from box sprites) */
+    --color-box-border: rgb(179, 145, 111);     /* #B3916F — box/plate sprite border */
     --color-text-primary: rgb(128, 75, 24);     /* #804B18 — Figma Text/Primary */
     --color-text-secondary: rgb(155, 112, 72);  /* #9B7048 — Figma Text/Secondary */
     --color-text-muted: rgb(170, 160, 140);     /* #AAA08C — Figma Text/Muted */
+    --color-text-strong: rgb(101, 67, 33);      /* #654321 — Figma Text/Strong (headings) */
+    --color-text-success: rgb(55, 108, 45);     /* #376C2D — Figma Text/Success (trait values) */
+    --color-text-info: rgb(42, 93, 143);        /* #2A5D8F — Figma Text/Info (skill values) */
     --color-text-inverse: rgb(250, 240, 220);   /* #FAF0DC — Figma Text/Inverse */
     --color-text-link: rgb(180, 130, 50);       /* Unity-only */
     --color-exp: var(--blue-500);               /* mirrors Figma color-exp → Blue/500 */

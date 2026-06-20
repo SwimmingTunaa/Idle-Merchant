@@ -46,6 +46,14 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         GameSignals.OnAdventurerPromoted += OnAdventurerPromoted;
         GameSignals.OnUnitHired += OnUnitHired;
         RebuildRoster(leftPage);
+
+        var dismissBtn = rightPage.Q<Button>("detail-dismiss-btn");
+        if (dismissBtn != null)
+        {
+            dismissBtn.clicked -= OnDismissClicked;
+            dismissBtn.clicked += OnDismissClicked;
+        }
+
         ShowDetail(null);
     }
 
@@ -250,10 +258,20 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             Debug.LogWarning("[RosterPanel] detail-description label NOT FOUND in rightContent.");
         }
 
-        // Name + epithet
+        // Name + epithet (separate banners)
         var nameLabel = rightContent.Q<Label>("detail-name");
         if (nameLabel != null)
-            nameLabel.text = agent.Identity?.DisplayName ?? agent.gameObject.name;
+            nameLabel.text = !string.IsNullOrEmpty(agent.Identity?.firstName)
+                ? agent.Identity.firstName
+                : agent.gameObject.name;
+
+        var epithetLabel = rightContent.Q<Label>("detail-epithet");
+        if (epithetLabel != null)
+        {
+            string ep = agent.Identity?.epithet;
+            epithetLabel.text = ep ?? "";
+            epithetLabel.style.display = string.IsNullOrEmpty(ep) ? DisplayStyle.None : DisplayStyle.Flex;
+        }
 
 
         // Class + layer
@@ -302,7 +320,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             if (hpValueLabel != null) hpValueLabel.text = "?/?";
         }
 
-        // Traits
+        // Traits & Skills — box-splice badges (trait name + its first stat-mod, green)
         var traitsContainer = rightContent.Q<VisualElement>("detail-traits");
         if (traitsContainer != null)
         {
@@ -314,37 +332,30 @@ public class RosterPanelController : MonoBehaviour, IBookPage
                 {
                     var traitDef = TraitDatabase.GetTrait(ti.traitId);
                     if (traitDef == null) continue;
-                    var chip = new Label(traitDef.displayName);
-                    chip.AddToClassList("trait");
-                    traitsContainer.Add(chip);
+
+                    string value = "";
+                    if (ti.tier >= 1 && ti.tier <= traitDef.tiers.Length)
+                    {
+                        var tierData = traitDef.tiers[ti.tier - 1];
+                        if (tierData.modifiers != null)
+                        {
+                            foreach (var mod in tierData.modifiers)
+                            {
+                                value = FormatStatModifier(mod);
+                                break;
+                            }
+                        }
+                    }
+                    traitsContainer.Add(BuildDetailBadge(traitDef.displayName, value, "badge-value--trait"));
                 }
             }
         }
 
-        // Mods
-        var modsContainer = rightContent.Q<VisualElement>("detail-mods");
-        if (modsContainer != null)
-        {
-            modsContainer.Clear();
-            var traitComponent = agent.GetComponent<TraitComponent>();
-            var traits = traitComponent?.GetTraits();
-            if (traits != null)
-            {
-                foreach (var ti in traits)
-                {
-                    var traitDef = TraitDatabase.GetTrait(ti.traitId);
-                    if (traitDef == null || ti.tier < 1 || ti.tier > traitDef.tiers.Length) continue;
-                    var tierData = traitDef.tiers[ti.tier - 1];
-                    if (tierData.modifiers == null) continue;
-                    foreach (var mod in tierData.modifiers)
-                    {
-                        var modLabel = new Label(FormatStatModifier(mod));
-                        modLabel.AddToClassList("mod");
-                        modsContainer.Add(modLabel);
-                    }
-                }
-            }
-        }
+        // Hide the whole Traits & Skills section (heading included) when there are none.
+        var traitsSection = rightContent.Q<VisualElement>("traits-skills-section");
+        if (traitsSection != null)
+            traitsSection.style.display =
+                (traitsContainer != null && traitsContainer.childCount > 0) ? DisplayStyle.Flex : DisplayStyle.None;
 
     }
 
@@ -355,6 +366,34 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         ShowDetail(selectedAgent);
         if (agentSlots.TryGetValue(selectedAgent, out var slot))
             RefreshSlot(slot, selectedAgent);
+    }
+
+    // Dismiss = clear the selection and return to the placeholder.
+    // NOTE: this only deselects; it does NOT fire/remove the adventurer.
+    private void OnDismissClicked()
+    {
+        if (selectedAgent != null && agentSlots.TryGetValue(selectedAgent, out var slot))
+            slot.Q<VisualElement>("slot-frame")?.RemoveFromClassList("slot-selected");
+        selectedAgent = null;
+        ShowDetail(null);
+    }
+
+    /// <summary>Box-splice badge (label on top, coloured value below) for the Stats / Traits rows.</summary>
+    private static VisualElement BuildDetailBadge(string label, string value, string valueModifier = null)
+    {
+        var badge = new VisualElement();
+        badge.AddToClassList("badge");
+
+        var l = new Label(label);
+        l.AddToClassList("badge-label");
+        badge.Add(l);
+
+        var v = new Label(value);
+        v.AddToClassList("badge-value");
+        if (!string.IsNullOrEmpty(valueModifier)) v.AddToClassList(valueModifier);
+        badge.Add(v);
+
+        return badge;
     }
 
     // ═════════════════════════════════════════════
@@ -457,7 +496,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         {
             valueStr = $"{sign}{mod.value:F0}";
         }
-        return $"{valueStr} {mod.stat}";
+        return $"{valueStr} {TraitUIHelper.GetStatShortName(mod.stat)}";
     }
 
     // ═════════════════════════════════════════════
