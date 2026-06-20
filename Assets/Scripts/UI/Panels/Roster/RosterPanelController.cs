@@ -346,10 +346,16 @@ public class RosterPanelController : MonoBehaviour, IBookPage
                             }
                         }
                     }
-                    traitsContainer.Add(BuildDetailBadge(traitDef.displayName, value, "detail-badge-value--trait"));
+                    traitsContainer.Add(BuildDetailBadge(traitDef.displayName, value, "badge-value--trait"));
                 }
             }
         }
+
+        // Hide the whole Traits & Skills section (heading included) when there are none.
+        var traitsSection = rightContent.Q<VisualElement>("traits-skills-section");
+        if (traitsSection != null)
+            traitsSection.style.display =
+                (traitsContainer != null && traitsContainer.childCount > 0) ? DisplayStyle.Flex : DisplayStyle.None;
 
     }
 
@@ -376,14 +382,14 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     private static VisualElement BuildDetailBadge(string label, string value, string valueModifier = null)
     {
         var badge = new VisualElement();
-        badge.AddToClassList("detail-badge");
+        badge.AddToClassList("badge");
 
         var l = new Label(label);
-        l.AddToClassList("detail-badge-label");
+        l.AddToClassList("badge-label");
         badge.Add(l);
 
         var v = new Label(value);
-        v.AddToClassList("detail-badge-value");
+        v.AddToClassList("badge-value");
         if (!string.IsNullOrEmpty(valueModifier)) v.AddToClassList(valueModifier);
         badge.Add(v);
 
@@ -490,7 +496,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         {
             valueStr = $"{sign}{mod.value:F0}";
         }
-        return $"{valueStr} {mod.stat}";
+        return $"{valueStr} {TraitUIHelper.GetStatShortName(mod.stat)}";
     }
 
     // ═════════════════════════════════════════════

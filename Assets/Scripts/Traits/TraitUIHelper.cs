@@ -53,6 +53,24 @@ public static class TraitUIHelper
             _ => stat.ToString()
         };
     }
+
+    /// <summary>
+    /// Short stat label for compact UI (e.g. trait badges): "Atk", "Spd", "HP".
+    /// </summary>
+    public static string GetStatShortName(StatType stat)
+    {
+        return stat switch
+        {
+            StatType.MoveSpeed => "Move",
+            StatType.AttackDamage => "Atk",
+            StatType.AttackSpeed => "AtkSpd",
+            StatType.AttackRange => "Range",
+            StatType.CarryCapacity => "Carry",
+            StatType.PickupTime => "Pickup",
+            StatType.DepositTime => "Deposit",
+            _ => stat.ToString()
+        };
+    }
     
     /// <summary>
     /// Format all stat modifiers from a tier as multi-line string.

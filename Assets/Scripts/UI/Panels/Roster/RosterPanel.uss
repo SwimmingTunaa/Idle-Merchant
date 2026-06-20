@@ -601,89 +601,154 @@
     -unity-text-align: middle-center;
 }
 
-.detail-class-badge {
-    position: absolute;
-    top: 0;
-    left: 0;
-    flex-direction: row;
-    align-items: center;
+/* ════════════════════════════════════════════════════════════════════════════
+   Roster detail — RIGHT PAGE. Mirrors Figma node 112:1017 exactly.
+   Font   = Font/Body (BrightLinger).      Sizes  = Body/* tokens (px verbatim).
+   Colour = Text/* tokens.                 Spacing = Spacing/* tokens.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Reset Unity's built-in (theme) margins. Bare * = specificity 0, so every
+   explicit class/inline margin below (the gap-as-margin spacing) overrides it.
+   NOTE: do NOT raise this to `#right-content *` — an id selector (1,0,0) would
+   outrank the .class margins (0,1,0) and wipe out all the gaps. */
+* {
+    margin: 0;
 }
 
-.detail-class-circle {
-    width: 60px;
-    height: 60px;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    -unity-background-scale-mode: scale-to-fit;
-    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/circle-outline%2016x16.png?fileID=-5501662205497309343&guid=f2fa623a4e5dc47679de73bd62d02cea&type=3#circle-outline 16x16_0");
-}
-
-.detail-class-icon {
-    width: 38px;
-    height: 38px;
-    -unity-background-scale-mode: scale-to-fit;
-    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/job_icons_singleoutline.png?fileID=-7428873440664082796&guid=98b2f1c9237cb4662958fb3b4cdf2261&type=3#novice");
-}
-
-.detail-class-banner {
-    margin-left: -12px;
-    min-height: 38px;
-    padding: 6px 16px 6px 22px;
-    align-items: center;
-    justify-content: center;
-    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&guid=7431fc87a504d4dc29fd217299608c7f&type=3#box-splice_0");
-    -unity-slice-left: 16;
-    -unity-slice-right: 16;
-    -unity-slice-top: 8;
-    -unity-slice-bottom: 8;
-    -unity-slice-scale: 2px;
-}
-
-#detail-class {
-    font-size: 20px;
-    color: var(--color-text-secondary);
-    -unity-text-align: middle-center;
+/* All detail text uses Font/Body = BrightLinger. */
+#detail-container Label {
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
-.detail-diamond {
+#detail-container {
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* ── Top overlap region (sprite-container @x210 + class group @x48) — full page width ── */
+.detail-top {                /* sprite-container region (242); page gap-8 added on next child */
+    height: 242px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* sprite-container 210×242 @ x210 */
+.sprite-container {
     position: absolute;
+    left: 210px;
+    top: 0;
+    width: 210px;
+    height: 250px;
+}
+.deco-diamond-big {
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 210px;
     height: 210px;
-    align-self: center;
     -unity-background-scale-mode: scale-to-fit;
-    background-image: url('project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/Diamond%20Big.png?fileID=2800000&guid=914b27bc6ad9648eb814957fc8e2c047&type=3#Diamond Big');
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/Diamond%20Big.png?fileID=2800000&guid=914b27bc6ad9648eb814957fc8e2c047&type=3#Diamond Big");
 }
-
-.detail-name-banner {
-    align-self: center;
-    min-width: 380px;
-    padding: 4px 48px;
+.slot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210px;
+    height: 210px;
+}
+/* adv-sprite-big 146×124 @ (32,43) within the slot */
+.adv-sprite-big {
+    position: absolute;
+    left: 32px;
+    top: 43px;
+    width: 146px;
+    height: 124px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+/* item-name-container 400×80 @ (-95,170) */
+.item-name-container {       /* centered over the slot; banner + faked shadow are layers */
+    position: absolute;
+    left: -95px;
+    top: 170px;
+    width: 400px;
+    height: 80px;
     align-items: center;
     justify-content: center;
-    background-image: url('project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=-1815108092852401429&guid=992d1ea8d5ec74d89b5301bb26534a78&type=3#deco-title-banner_0');
-    -unity-slice-left: 24;
-    -unity-slice-right: 24;
-    -unity-slice-top: 5;
-    -unity-slice-bottom: 5;
-    -unity-slice-scale: 2px;
+    padding-bottom: 16px;
 }
-
+/* Faked drop-shadow (Figma shadow 0 4px 0 #b3916f): tinted banner copy, 4px lower, behind. */
+.name-shadow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 4px;
+    bottom: -4px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=2800000&guid=992d1ea8d5ec74d89b5301bb26534a78&type=3#deco-title-banner");
+    -unity-background-scale-mode: scale-and-crop;
+    -unity-background-image-tint-color: var(--color-box-border);
+}
+.name-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=2800000&guid=992d1ea8d5ec74d89b5301bb26534a78&type=3#deco-title-banner");
+    -unity-background-scale-mode: scale-and-crop;
+}
+.name-text-container {       /* Figma "Container" 241×64 */
+    width: 241px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+}
 #detail-name {
-    font-size: 52px;
-    color: var(--color-text-primary);
+    font-size: 48px;                     /* Body/2XL */
+    color: var(--color-text-primary);    /* Text/Primary */
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
 }
-
-.detail-epithet-banner {
-    align-self: center;
-    margin-top: -4px;
-    min-width: 200px;
-    padding: 4px 28px;
+/* epithet 202×49 @ (215,220) — i.e. (5,220) inside sprite-container */
+/* epithet — absolute wrapper holds a 2.6° rotated banner (Figma rotate-[2.6deg]) */
+.epithet-wrapper {
+    position: absolute;
+    left: 3px;
+    top: 220px;
+    width: 202px;
+    height: 49px;
     align-items: center;
     justify-content: center;
+}
+.epithet-rotate {
+    rotate: 2.6deg;
+    align-items: center;
+    justify-content: center;
+}
+.epithet {                   /* inner banner box 200×40; banner + faked shadow are layers */
+    width: 200px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+.epithet-shadow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 4px;
+    bottom: -4px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/epithet.png?fileID=-7657284972936839921&guid=b52c24f2512b34c459b9c716530f0692&type=3#epithet_0");
+    -unity-slice-left: 12;
+    -unity-slice-right: 12;
+    -unity-slice-top: 2;
+    -unity-slice-bottom: 2;
+    -unity-slice-scale: 2px;
+    -unity-background-image-tint-color: var(--color-box-border);
+}
+.epithet-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/epithet.png?fileID=-7657284972936839921&guid=b52c24f2512b34c459b9c716530f0692&type=3#epithet_0");
     -unity-slice-left: 12;
     -unity-slice-right: 12;
@@ -691,121 +756,184 @@
     -unity-slice-bottom: 2;
     -unity-slice-scale: 2px;
 }
-
 #detail-epithet {
-    font-size: 24px;
-    color: var(--color-text-secondary);
+    font-size: 24px;                     /* Body/MD */
+    color: var(--color-text-strong);     /* Text/Strong */
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
 }
 
-#detail-layer {
-    font-size: 16px;
-    color: var(--color-text-secondary);
-    -unity-text-align: middle-center;
-    margin-top: 2px;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+/* ── Class group (Group 1) 191×80 @ (48,1) ── */
+.class-group {
+    position: absolute;
+    left: 48px;
+    top: 1px;
+    width: 191px;
+    height: 80px;
 }
-
-.detail-exp-row {
-    flex-direction: row;
-    align-items: center;
-    margin-top: 4px;
-    margin-bottom: 10px;
+.class-circle {              /* Group 2 — circle + job icon, 80×80 @ x0 */
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80px;
+    height: 80px;
 }
-
-.detail-rank-shield {
+.circle-outline {            /* 64×64 @ (8,11) within Group 2 */
+    position: absolute;
+    left: 8px;
+    top: 11px;
     width: 64px;
     height: 64px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/circle-outline%2016x16.png?fileID=-5501662205497309343&guid=f2fa623a4e5dc47679de73bd62d02cea&type=3#circle-outline 16x16_0");
+}
+.job-icon {                  /* 80×80 @ x0 */
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80px;
+    height: 80px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/job_icons_singleoutline.png?fileID=1811167131&guid=98b2f1c9237cb4662958fb3b4cdf2261&type=3#warrior");
+}
+.class-frame {               /* class-name container — hugs content, @ (61,20) */
+    position: absolute;
+    left: 61px;
+    top: 20px;
+    align-items: center;
+    justify-content: center;
+    padding-left: 32px;      /* Spacing/XL */
+    padding-right: 32px;     /* Spacing/XL */
+    padding-top: 16px;       /* Spacing/MD */
+    padding-bottom: 16px;    /* Spacing/MD */
+    background-color: var(--color-box-bg);      /* inner background #D7B594 */
+    border-width: 5px;
+    border-color: var(--color-box-border);      /* sprite border #B3916F */
+    border-radius: 0;
+}
+#detail-class {
+    font-size: 24px;                     /* Body/MD */
+    color: var(--color-text-primary);    /* Text/Primary */
+    -unity-text-align: middle-center;
+}
+
+/* ── Progress Bars 520×80 — rank shield + EXP bar (+ hidden promote) ── */
+.progress-bars {
+    margin-left: 55px;
+    margin-top: 8px;                     /* Spacing/SM — page gap (mimics gap-8) */
+    flex-direction: column;
+    flex-shrink: 0;
+}
+.level-rank {
+    flex-direction: row;
+    align-items: center;
+    height: 80px;
+}
+.rank {                      /* 80×80 shield */
+    width: 80px;
+    height: 80px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
     -unity-background-scale-mode: scale-to-fit;
     background-image: url("project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=2800000&guid=d825792e71a5342959a9c727f20b2749&type=3#Rank 1");
 }
-
 #detail-rank-number {
-    font-size: 24px;
+    font-size: 24px;                     /* Body/MD */
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    padding-bottom: 6px;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+    padding-bottom: 4px;
 }
-
-.detail-exp-col {
+.progress-bar-label {        /* exp column, starts 8px (Spacing/SM) after the rank */
     flex-grow: 1;
-    margin-left: 10px;
+    margin-left: 8px;
+    flex-direction: column;
+    justify-content: center;
 }
-
-.detail-exp-head {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 4px;
-}
-
-.detail-exp-label {
-    font-size: 16px;
-    color: var(--color-text-secondary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
-}
-
-#detail-rank-name {
-    font-size: 16px;
-    color: var(--color-text-secondary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
-}
-
-#xp-label-value {
-    font-size: 16px;
-    color: var(--color-text-secondary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
-}
-
-.detail-section {
-    margin-bottom: 8px;
-}
-
-.detail-section-head {
+.exp-head {                              /* Figma "Label": left-grouped, gap 8 */
     flex-direction: row;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 4px;                  /* Spacing/XS */
+}
+.exp-label {
+    font-size: 16px;                     /* Body/SM */
+    color: var(--color-text-primary);    /* Text/Primary */
+}
+#detail-rank-name {                      /* rank tier (e.g. "Wood") in the EXP row */
+    font-size: 16px;                     /* Body/SM */
+    color: var(--color-text-primary);  /* Text/Primary */
+}
+#xp-label-value {
+    font-size: 16px;                     /* Body/SM */
+    color: var(--color-text-secondary);  /* Text/Secondary */
+    margin-left: 8px;                    /* Spacing/SM — gap before the value */
+}
+/* dungeon layer name, pinned to the top-right of the page */
+.detail-layer {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 16px;                     /* Body/SM */
+    color: var(--color-text-secondary);  /* Text/Secondary */
+    -unity-text-align: middle-right;
+}
+.exp-bar-bg {
+    height: 12px;
+    background-color: var(--blue-200);   /* Blue/200 track */
+    overflow: hidden;
+}
+#detail-xp-fill {
+    height: 100%;
+    width: 0;
+    background-color: var(--color-exp);  /* color-exp / Blue/500 */
+    transition-property: width;
+    transition-duration: 0.3s;
 }
 
-.detail-section-deco {
+/* ── Section (Stats + Traits & Skills) ── */
+.section {                               /* one Section wraps both groups; page gap-8 above */
+    margin-left: 55px;
+    margin-top: 8px;                     /* Spacing/SM — page gap (mimics gap-8) */
+    flex-shrink: 0;
+}
+.section-group {                         /* Stats group / Traits & Skills group */
+    flex-shrink: 0;
+}
+.section-group--traits {
+    margin-top: 16px;                    /* Spacing/MD — gap between the two groups */
+}
+.heading {
+    flex-direction: row;
+    align-items: center;
+    height: 18px;
+    margin-bottom: 8px;                  /* heading 18 → badges @26 */
+}
+.heading-deco {
     flex-grow: 1;
     flex-basis: 0;
-    height: 14px;
+    height: 10px;
     -unity-background-scale-mode: scale-to-fit;
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/14_16x16.png?fileID=-3802367633072120375&guid=10da1518798c0455f8498d53948aa2a1&type=3#14_16x16_0");
 }
-
-.detail-section-deco--right {
+.heading-deco--right {
     scale: -1 1;
 }
-
-.detail-section-title {
-    margin-left: 10px;
-    margin-right: 10px;
+.heading-title {
     flex-shrink: 0;
-    font-size: 26px;
-    color: var(--color-text-strong);
+    margin-left: 8px;
+    margin-right: 8px;
+    font-size: 24px;                     /* Body/MD */
+    color: var(--color-text-primary);    /* Text/Primary */
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
 }
-
-.detail-badge-row {
+.badge-row {
     flex-direction: row;
-    align-items: stretch;
+    height: 64px;
 }
-
-.detail-badge {
+.badge {                     /* 168×64, gap 8 (Spacing/SM) */
     flex-grow: 1;
     flex-basis: 0;
     margin-left: 4px;
     margin-right: 4px;
-    min-height: 62px;
-    padding: 6px 4px;
     align-items: center;
     justify-content: center;
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&guid=7431fc87a504d4dc29fd217299608c7f&type=3#box-splice_0");
@@ -815,35 +943,36 @@
     -unity-slice-bottom: 8;
     -unity-slice-scale: 2px;
 }
-
-.detail-badge-label {
-    font-size: 16px;
-    color: var(--color-text-secondary);
+.badge-label {
+    font-size: 16px;                     /* Body/SM */
+    color: var(--color-text-secondary);  /* Text/Secondary */
     -unity-text-align: middle-center;
-    margin-bottom: 2px;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    margin-bottom: 4px;
 }
-
-.detail-badge-value {
-    font-size: 24px;
-    color: var(--color-text-strong);
+.badge-value {
+    font-size: 40px;                     /* Body/XL (stat values) */
+    color: var(--color-text-secondary);  /* Text/Secondary */
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+.badge-value--trait {
+    font-size: 32px;                     /* Body/LG */
+    color: var(--color-text-success);    /* Text/Success */
+}
+.badge-value--skill {
+    font-size: 32px;                     /* Body/LG */
+    color: var(--color-text-info);       /* Text/Info */
 }
 
-.detail-badge-value--trait {
-    color: var(--color-text-success);
-}
-
-.detail-badge-value--skill {
-    color: var(--color-text-info);
-}
-
-.detail-desc-box {
-    flex-grow: 1;
-    margin-top: 6px;
-    margin-bottom: 6px;
-    padding: 12px;
+/* ── description-container 520×84 ── */
+.description-container {
+    margin-left: 55px;
+    margin-top: 8px;                     /* Section ends 534 → desc @542 */
+    height: 84px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/12_2.png?fileID=-7954138311804534128&guid=847c65b70758a4b6f849ec8a43ec2e9b&type=3#12_2_0");
     -unity-slice-left: 1;
     -unity-slice-right: 1;
@@ -851,9 +980,19 @@
     -unity-slice-bottom: 1;
     -unity-slice-scale: 5px;
 }
+#detail-description {
+    font-size: 16px;                     /* Body/SM */
+    color: var(--color-text-primary);    /* Text/Primary */
+    white-space: normal;
+}
 
-.detail-dismiss-row {
+/* ── Frame 6 520×56 — Dismiss button, right-aligned ── */
+.frame-6 {
+    margin-left: 55px;
+    margin-top: 8px;                     /* desc ends 626 → button @634 */
+    height: 56px;
+    flex-shrink: 0;
     flex-direction: row;
     justify-content: flex-end;
-    margin-top: 4px;
+    align-items: center;
 }
