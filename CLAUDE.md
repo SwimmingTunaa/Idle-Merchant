@@ -55,7 +55,9 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 - Panels live in `Scripts/UI/Panels/`; each has a controller inheriting `BasePanelController`
 - `UIManager` — top-level panel orchestration
 - `GameSignals` drives reactive UI updates (gold display, unit counts, etc.)
-- Global USS variables: `Scripts/UI/GlobalVariables.uss`
+- Design tokens: `Scripts/UI/GlobalVariables.uss` — colour / text / spacing / font-size `--vars` mirrored from Figma; consume via `var()` in `.class`/`#id` rules
+- Reusable Button: `Scripts/UI/Components/Button.uss` + `Button.uxml` — tint-driven 9-slice variants (`btn-primary` / `-secondary` / `-success` / `-danger` / `-disabled`)
+- **UI Toolkit gotchas:** no `gap` (use margins) · no `box-shadow` / `text-shadow` · `var()` resolves only in USS rules, never inline `style=""` (inline `var()` throws an NRE that aborts the whole `CloneTree` → blank panel) · a margin reset must be a bare `*`, not `#scope *` (id specificity wipes class margins)
 
 ### Shop Pipeline
 `Shop/Inventory.cs` → gold source of truth (use `Inventory.Instance` for gold ops)
