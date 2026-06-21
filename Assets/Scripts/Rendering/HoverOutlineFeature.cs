@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering.RenderGraphModule;
@@ -79,10 +80,15 @@ public class HoverOutlineFeature : ScriptableRendererFeature
             var renderingData = frameData.Get<UniversalRenderingData>();
             var lightData = frameData.Get<UniversalLightData>();
 
-            // Temp silhouette mask, camera-sized, colour only.
+            // Temp silhouette mask, camera-sized, colour only. Force an RGBA format with a
+            // real alpha channel — inheriting cameraTargetDescriptor can give a format with
+            // no alpha (e.g. post-HDR), and sampling its .a then returns 1.0 everywhere, so
+            // the whole screen reads as "inside the silhouette" and no outline ever draws.
             var desc = cameraData.cameraTargetDescriptor;
             desc.depthBufferBits = 0;
+            desc.depthStencilFormat = GraphicsFormat.None;
             desc.msaaSamples = 1;
+            desc.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm;
             TextureHandle mask = UniversalRenderer.CreateRenderGraphTexture(
                 renderGraph, desc, "_HoverOutlineMask", false);
 
