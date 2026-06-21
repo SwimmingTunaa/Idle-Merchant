@@ -105,6 +105,12 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     }
 
     // ── Hover highlight (world right-click affordance) ───────────────────────
+    [Header("Hover Highlight")]
+    [Tooltip("Colour the sprites tint toward while the cursor is over this hero.")]
+    [SerializeField] private Color hoverColor = Color.white;
+    [Tooltip("How strongly to tint toward Hover Colour (0 = none, 1 = full).")]
+    [SerializeField, Range(0f, 1f)] private float hoverStrength = 0.35f;
+
     private SpriteRenderer[] hoverRenderers;
     private Color[] hoverBaseColors;
     private bool isHovered;
@@ -128,7 +134,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             {
                 if (hoverRenderers[i] == null) continue;
                 hoverBaseColors[i] = hoverRenderers[i].color;
-                hoverRenderers[i].color = Color.Lerp(hoverBaseColors[i], Color.white, 0.35f);
+                hoverRenderers[i].color = Color.Lerp(hoverBaseColors[i], hoverColor, hoverStrength);
             }
         }
         else
