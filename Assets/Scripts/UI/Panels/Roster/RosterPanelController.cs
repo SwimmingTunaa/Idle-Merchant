@@ -29,6 +29,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     // agent → slot wrapper for O(1) targeted refresh
     private readonly Dictionary<AdventurerAgent, VisualElement> agentSlots = new();
     private AdventurerAgent selectedAgent;
+    private AdventurerAgent pendingFocus;   // set by FocusAgent (world right-click) until the page is built
     private VisualElement leftContent;
     private VisualElement rightContent;
 
@@ -55,6 +56,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         }
 
         ShowDetail(null);
+        ApplyPendingFocus();
     }
 
     public void OnPageHidden()
@@ -208,6 +210,22 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             newSlot.Q<VisualElement>("slot-frame")?.AddToClassList("slot-selected");
 
         ShowDetail(agent);
+    }
+
+    /// <summary>Open the page focused on a specific adventurer (from a world right-click).
+    /// Selects immediately if the page is already built, otherwise after the next rebuild.</summary>
+    public void FocusAgent(AdventurerAgent agent)
+    {
+        pendingFocus = agent;
+        if (leftContent != null) ApplyPendingFocus();
+    }
+
+    private void ApplyPendingFocus()
+    {
+        if (pendingFocus == null) return;
+        var agent = pendingFocus;
+        pendingFocus = null;
+        SelectAgent(agent);
     }
 
     // ═════════════════════════════════════════════

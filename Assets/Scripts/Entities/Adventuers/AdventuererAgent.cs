@@ -104,6 +104,53 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         combat = GetComponent<CombatBehavior>();
     }
 
+    // ── Hover highlight (world right-click affordance) ───────────────────────
+    [Header("Hover Highlight")]
+    [Tooltip("Colour the sprites tint toward while the cursor is over this hero.")]
+    [SerializeField] private Color hoverColor = Color.white;
+    [Tooltip("How strongly to tint toward Hover Colour (0 = none, 1 = full). Set 0 to use only the outline.")]
+    [SerializeField, Range(0f, 1f)] private float hoverStrength = 0.35f;
+    [Tooltip("Rendering-layer bit toggled on hover for HoverOutlineFeature (must match its selectedRenderingLayer).")]
+    [SerializeField] private uint outlineRenderingLayer = 2;
+
+    private SpriteRenderer[] hoverRenderers;
+    private Color[] hoverBaseColors;
+    private bool isHovered;
+
+    /// <summary>Brighten the character while the cursor is over it, so the player can
+    /// tell it's interactable (right-click opens the Roster to this hero). Tint-only —
+    /// deliberately avoids localScale (used for facing) and the damage-flash material
+    /// channel, so it can't fight either.</summary>
+    public void SetHovered(bool on)
+    {
+        if (on == isHovered) return;
+        isHovered = on;
+
+        hoverRenderers ??= GetComponentsInChildren<SpriteRenderer>(true);
+
+        if (on)
+        {
+            if (hoverBaseColors == null || hoverBaseColors.Length != hoverRenderers.Length)
+                hoverBaseColors = new Color[hoverRenderers.Length];
+            for (int i = 0; i < hoverRenderers.Length; i++)
+            {
+                if (hoverRenderers[i] == null) continue;
+                hoverBaseColors[i] = hoverRenderers[i].color;
+                hoverRenderers[i].color = Color.Lerp(hoverBaseColors[i], hoverColor, hoverStrength);
+                hoverRenderers[i].renderingLayerMask |= outlineRenderingLayer;   // mark for the outline pass
+            }
+        }
+        else
+        {
+            for (int i = 0; i < hoverRenderers.Length; i++)
+            {
+                if (hoverRenderers[i] == null) continue;
+                hoverRenderers[i].color = hoverBaseColors[i];
+                hoverRenderers[i].renderingLayerMask &= ~outlineRenderingLayer;
+            }
+        }
+    }
+
     public override void Init(EntityDef entityDef, int layer, Spawner spawner, Collider2D playArea)
     {
         base.Init(entityDef, layer, spawner, playArea);

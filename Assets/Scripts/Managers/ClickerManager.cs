@@ -33,6 +33,9 @@ public class ClickerManager : MonoBehaviour
     private float currentShockwaveRadius = 0f;
     private bool isShockwaveActive = false;
 
+    private AdventurerAgent hoveredAdv;
+    private const string InspectHintKey = "heroInspectHintShown";
+
     void Update()
     {
         secondTimer += Time.deltaTime;
@@ -41,6 +44,12 @@ public class ClickerManager : MonoBehaviour
             secondTimer = 0f;
             clicksThisSecond = 0;
         }
+
+        // Right-click is a separate channel from the left-click clicker.
+        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+            OnPlayerInspect();
+
+        UpdateHover();
     }
 
     /// <summary>World-space position under the mouse cursor (raw camera z). Shared by
@@ -48,6 +57,59 @@ public class ClickerManager : MonoBehaviour
     private static Vector3 GetCursorWorldPos()
     {
         return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+    }
+
+    /// <summary>Right-click a friendly adventurer to open the Roster focused on them.
+    /// A separate input channel from the left-click clicker so the two never collide.</summary>
+    public void OnPlayerInspect()
+    {
+        // Already viewing the book? Don't inspect through it.
+        if (UIManager.Instance != null && UIManager.Instance.IsPanelOpen("BookPanel")) return;
+
+        var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent(out AdventurerAgent adv))
+            {
+                GameSignals.RaiseAdventurerFocusRequested(adv);
+                return;
+            }
+        }
+    }
+
+    // ── Hover affordance: brighten the adventurer under the cursor, and the first
+    //    time, float a one-time nudge teaching the right-click gesture. ─────────
+    private void UpdateHover()
+    {
+        AdventurerAgent under = null;
+
+        // No world hover while the book is open (you're already inside it).
+        if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
+        {
+            var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
+            }
+        }
+
+        if (under == hoveredAdv) return;
+
+        if (hoveredAdv != null) hoveredAdv.SetHovered(false);
+        hoveredAdv = under;
+        if (hoveredAdv != null)
+        {
+            hoveredAdv.SetHovered(true);
+            ShowInspectHintOnce(hoveredAdv);
+        }
+    }
+
+    private void ShowInspectHintOnce(AdventurerAgent adv)
+    {
+        if (PlayerPrefs.GetInt(InspectHintKey, 0) != 0) return;
+        PlayerPrefs.SetInt(InspectHintKey, 1);
+        if (DamageNumberManager.Instance != null)
+            DamageNumberManager.Instance.ShowText("Right-click to view", adv.transform);
     }
 
     public void OnPlayerClick()
@@ -58,41 +120,36 @@ public class ClickerManager : MonoBehaviour
         Vector3 world = GetCursorWorldPos();
         lastClickPosition = world;
 
-        var directHit = Physics2D.OverlapPoint(world);
-        
-        // Priority 1: Direct loot click
-        if (directHit && directHit.TryGetComponent(out IClickableLoot directLoot))
+        // Resolve everything under the cursor so friendly units never block a click.
+        var hits = Physics2D.OverlapPointAll(world);
+
+        // Priority 1: loot under the cursor
+        foreach (var hit in hits)
         {
-            if (lootPickupRadius > 0f)
+            if (hit.TryGetComponent(out IClickableLoot _))
             {
-                VacuumLootToMouse(world, lootPickupRadius);
+                if (lootPickupRadius > 0f)
+                    VacuumLootToMouse(world, lootPickupRadius);
+                else
+                    StartCoroutine(MoveLootToMouse(hit.gameObject));
+                return;
             }
-            else
-            {
-                StartCoroutine(MoveLootToMouse(directHit.gameObject));
-            }
-            return;
         }
 
-        // Priority 2: Direct mob click
-        if (directHit && directHit.TryGetComponent(out IDamageable enemy))
+        // Priority 2: a mob under the cursor. Adventurers / porters / customers are
+        // friendly — transparent to the clicker, so a hero standing over a mob never
+        // eats the click (the click passes through to the mob behind it).
+        foreach (var hit in hits)
         {
-            // Don't damage dying entities
-            if (directHit.TryGetComponent(out EntityBase entity) && entity.IsDying)
-                return;
-
-            // Only damage mobs — adventurers, porters and customers are friendly
-            if (!directHit.TryGetComponent(out MobAgent _))
-                return;
+            if (!hit.TryGetComponent(out MobAgent _)) continue;
+            if (!hit.TryGetComponent(out IDamageable enemy)) continue;
+            if (hit.TryGetComponent(out EntityBase entity) && entity.IsDying) continue;
 
             if (damageRadius > 0f)
             {
                 // AOE shockwave centered on the mob you clicked
-                if (activeShockwave != null)
-                {
-                    StopCoroutine(activeShockwave);
-                }
-                activeShockwave = StartCoroutine(DamageShockwave(directHit.transform.position, damageRadius, shockwaveDuration));
+                if (activeShockwave != null) StopCoroutine(activeShockwave);
+                activeShockwave = StartCoroutine(DamageShockwave(hit.transform.position, damageRadius, shockwaveDuration));
             }
             else
             {
@@ -101,17 +158,14 @@ public class ClickerManager : MonoBehaviour
                 if (applied > 0f)
                 {
                     if (DamageNumberManager.Instance != null)
-                    {
-                        DamageNumberManager.Instance.ShowGoldGain(applied, directHit.transform);
-                    }
-                    Debug.Log(applied);
+                        DamageNumberManager.Instance.ShowGoldGain(applied, hit.transform);
                     Inventory.Instance.AddGoldFloat(applied);
                 }
             }
             return;
         }
 
-        // Click on empty space = no action
+        // Click on empty space (or only friendly units) = no action
     }
 
     // ===== AOE DAMAGE SHOCKWAVE =====

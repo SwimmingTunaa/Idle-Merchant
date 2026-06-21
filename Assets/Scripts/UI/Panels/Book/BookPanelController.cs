@@ -40,6 +40,8 @@ public class BookPanelController : BasePanelController
             uiDocument = GetComponent<UIDocument>();
 
         _pages = new MonoBehaviour[] { rosterPage, guildPage, inventoryPage, craftingPage, settingsPage };
+
+        GameSignals.OnAdventurerFocusRequested += OnAdventurerFocusRequested;
     }
 
     protected override void Start()
@@ -52,7 +54,17 @@ public class BookPanelController : BasePanelController
     protected override void OnDestroy()
     {
         GameSignals.OnAdventurerPromoted -= OnAdventurerPromotedForBadge;
+        GameSignals.OnAdventurerFocusRequested -= OnAdventurerFocusRequested;
         base.OnDestroy();
+    }
+
+    // World right-click on an adventurer → open the book to the Roster, focused on them.
+    // Only fires when the book is closed (the clicker guards on IsPanelOpen), so OpenToTab
+    // always opens fresh rather than toggling.
+    private void OnAdventurerFocusRequested(AdventurerAgent agent)
+    {
+        OpenToTab(0);
+        (rosterPage as RosterPanelController)?.FocusAgent(agent);
     }
 
     // ═════════════════════════════════════════════
