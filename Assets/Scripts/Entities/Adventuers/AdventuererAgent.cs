@@ -108,8 +108,10 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     [Header("Hover Highlight")]
     [Tooltip("Colour the sprites tint toward while the cursor is over this hero.")]
     [SerializeField] private Color hoverColor = Color.white;
-    [Tooltip("How strongly to tint toward Hover Colour (0 = none, 1 = full).")]
+    [Tooltip("How strongly to tint toward Hover Colour (0 = none, 1 = full). Set 0 to use only the outline.")]
     [SerializeField, Range(0f, 1f)] private float hoverStrength = 0.35f;
+    [Tooltip("Rendering-layer bit toggled on hover for HoverOutlineFeature (must match its selectedRenderingLayer).")]
+    [SerializeField] private uint outlineRenderingLayer = 2;
 
     private SpriteRenderer[] hoverRenderers;
     private Color[] hoverBaseColors;
@@ -135,12 +137,17 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
                 if (hoverRenderers[i] == null) continue;
                 hoverBaseColors[i] = hoverRenderers[i].color;
                 hoverRenderers[i].color = Color.Lerp(hoverBaseColors[i], hoverColor, hoverStrength);
+                hoverRenderers[i].renderingLayerMask |= outlineRenderingLayer;   // mark for the outline pass
             }
         }
         else
         {
             for (int i = 0; i < hoverRenderers.Length; i++)
-                if (hoverRenderers[i] != null) hoverRenderers[i].color = hoverBaseColors[i];
+            {
+                if (hoverRenderers[i] == null) continue;
+                hoverRenderers[i].color = hoverBaseColors[i];
+                hoverRenderers[i].renderingLayerMask &= ~outlineRenderingLayer;
+            }
         }
     }
 
