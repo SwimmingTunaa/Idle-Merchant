@@ -21,9 +21,9 @@ public class ObjectPoolManager : MonoBehaviour
     private readonly Dictionary<ItemDef, GameObject> itemDefHolders = new();
 
     // Generic GameObject pools (existing)
-    private readonly Dictionary<int, ObjectPool<GameObject>> genericPools = new();
-    private readonly Dictionary<GameObject, int> instanceToPrefabID = new();
-    private readonly Dictionary<int, GameObject> genericHolders = new();
+    private readonly Dictionary<GameObject, ObjectPool<GameObject>> genericPools = new();
+    private readonly Dictionary<GameObject, GameObject> instanceToPrefab = new();
+    private readonly Dictionary<GameObject, GameObject> genericHolders = new();
 
     public enum PoolType { GameObject, ParticleSystem }
 
@@ -230,12 +230,11 @@ public class ObjectPoolManager : MonoBehaviour
             return null;
         }
 
-        int prefabID = prefab.GetInstanceID();
-
-        if (!genericPools.TryGetValue(prefabID, out var pool))
+        // Key pools by the prefab reference — GetInstanceID() / EntityId→int are error-level obsolete in Unity 6000.5+.
+        if (!genericPools.TryGetValue(prefab, out var pool))
         {
-            CreateGenericPool(prefab, prefabID, poolType);
-            pool = genericPools[prefabID];
+            CreateGenericPool(prefab, poolType);
+            pool = genericPools[prefab];
         }
 
         var go = pool.Get();
@@ -251,11 +250,11 @@ public class ObjectPoolManager : MonoBehaviour
         return go ? go.GetComponent<T>() : null;
     }
 
-    private void CreateGenericPool(GameObject prefab, int prefabID, PoolType poolType)
+    private void CreateGenericPool(GameObject prefab, PoolType poolType)
     {
         var pool = new ObjectPool<GameObject>(
-            createFunc: () => CreateGenericInstance(prefab, prefabID, poolType),
-            actionOnGet: go => OnGetGeneric(go, prefabID, poolType),
+            createFunc: () => CreateGenericInstance(prefab, poolType),
+            actionOnGet: go => OnGetGeneric(go, prefab, poolType),
             actionOnRelease: OnRelease,
             actionOnDestroy: OnDestroyGenericInstance,
             collectionCheck: false,
@@ -263,23 +262,23 @@ public class ObjectPoolManager : MonoBehaviour
             maxSize: 256
         );
 
-        genericPools[prefabID] = pool;
+        genericPools[prefab] = pool;
     }
 
-    private GameObject CreateGenericInstance(GameObject prefab, int prefabID, PoolType poolType)
+    private GameObject CreateGenericInstance(GameObject prefab, PoolType poolType)
     {
-        GameObject parent = GetGenericHolder(prefab, prefabID, poolType);
+        GameObject parent = GetGenericHolder(prefab, poolType);
         var go = Instantiate(prefab, parent.transform);
         go.SetActive(false);
-        instanceToPrefabID[go] = prefabID;
+        instanceToPrefab[go] = prefab;
         return go;
     }
 
-    private void OnGetGeneric(GameObject go, int prefabID, PoolType poolType)
+    private void OnGetGeneric(GameObject go, GameObject prefab, PoolType poolType)
     {
         if (go == null) return;
 
-        GameObject parent = GetGenericHolder(null, prefabID, poolType);
+        GameObject parent = GetGenericHolder(prefab, poolType);
         if (go.transform.parent != parent.transform)
             go.transform.SetParent(parent.transform, false);
 
@@ -289,22 +288,22 @@ public class ObjectPoolManager : MonoBehaviour
     private void OnDestroyGenericInstance(GameObject go)
     {
         if (go == null) return;
-        instanceToPrefabID.Remove(go);
+        instanceToPrefab.Remove(go);
         Destroy(go);
     }
 
-    private GameObject GetGenericHolder(GameObject prefab, int prefabID, PoolType poolType)
+    private GameObject GetGenericHolder(GameObject prefab, PoolType poolType)
     {
-        if (genericHolders.TryGetValue(prefabID, out GameObject holder))
+        if (genericHolders.TryGetValue(prefab, out GameObject holder))
             return holder;
 
-        string holderName = prefab != null ? prefab.name : $"Generic_{prefabID}";
+        string holderName = prefab != null ? prefab.name : "Generic";
         GameObject parent = poolType == PoolType.ParticleSystem ? particleSystemHolder : gameObjectHolder;
 
         holder = new GameObject($"Pool_{holderName}");
         holder.transform.SetParent(parent.transform, false);
 
-        genericHolders[prefabID] = holder;
+        genericHolders[prefab] = holder;
         return holder;
     }
 
@@ -357,9 +356,9 @@ public class ObjectPoolManager : MonoBehaviour
         }
 
         // Try generic GameObject pool (existing)
-        if (instanceToPrefabID.TryGetValue(instance, out var prefabID))
+        if (instanceToPrefab.TryGetValue(instance, out var prefab))
         {
-            if (genericPools.TryGetValue(prefabID, out var pool))
+            if (genericPools.TryGetValue(prefab, out var pool))
             {
                 instance.SetActive(false);
                 pool.Release(instance);
@@ -367,7 +366,7 @@ public class ObjectPoolManager : MonoBehaviour
             }
             else
             {
-                instanceToPrefabID.Remove(instance);
+                instanceToPrefab.Remove(instance);
                 Destroy(instance);
                 return;
             }
