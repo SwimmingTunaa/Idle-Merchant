@@ -58,41 +58,36 @@ public class ClickerManager : MonoBehaviour
         Vector3 world = GetCursorWorldPos();
         lastClickPosition = world;
 
-        var directHit = Physics2D.OverlapPoint(world);
-        
-        // Priority 1: Direct loot click
-        if (directHit && directHit.TryGetComponent(out IClickableLoot directLoot))
+        // Resolve everything under the cursor so friendly units never block a click.
+        var hits = Physics2D.OverlapPointAll(world);
+
+        // Priority 1: loot under the cursor
+        foreach (var hit in hits)
         {
-            if (lootPickupRadius > 0f)
+            if (hit.TryGetComponent(out IClickableLoot _))
             {
-                VacuumLootToMouse(world, lootPickupRadius);
+                if (lootPickupRadius > 0f)
+                    VacuumLootToMouse(world, lootPickupRadius);
+                else
+                    StartCoroutine(MoveLootToMouse(hit.gameObject));
+                return;
             }
-            else
-            {
-                StartCoroutine(MoveLootToMouse(directHit.gameObject));
-            }
-            return;
         }
 
-        // Priority 2: Direct mob click
-        if (directHit && directHit.TryGetComponent(out IDamageable enemy))
+        // Priority 2: a mob under the cursor. Adventurers / porters / customers are
+        // friendly — transparent to the clicker, so a hero standing over a mob never
+        // eats the click (the click passes through to the mob behind it).
+        foreach (var hit in hits)
         {
-            // Don't damage dying entities
-            if (directHit.TryGetComponent(out EntityBase entity) && entity.IsDying)
-                return;
-
-            // Only damage mobs — adventurers, porters and customers are friendly
-            if (!directHit.TryGetComponent(out MobAgent _))
-                return;
+            if (!hit.TryGetComponent(out MobAgent _)) continue;
+            if (!hit.TryGetComponent(out IDamageable enemy)) continue;
+            if (hit.TryGetComponent(out EntityBase entity) && entity.IsDying) continue;
 
             if (damageRadius > 0f)
             {
                 // AOE shockwave centered on the mob you clicked
-                if (activeShockwave != null)
-                {
-                    StopCoroutine(activeShockwave);
-                }
-                activeShockwave = StartCoroutine(DamageShockwave(directHit.transform.position, damageRadius, shockwaveDuration));
+                if (activeShockwave != null) StopCoroutine(activeShockwave);
+                activeShockwave = StartCoroutine(DamageShockwave(hit.transform.position, damageRadius, shockwaveDuration));
             }
             else
             {
@@ -101,17 +96,14 @@ public class ClickerManager : MonoBehaviour
                 if (applied > 0f)
                 {
                     if (DamageNumberManager.Instance != null)
-                    {
-                        DamageNumberManager.Instance.ShowGoldGain(applied, directHit.transform);
-                    }
-                    Debug.Log(applied);
+                        DamageNumberManager.Instance.ShowGoldGain(applied, hit.transform);
                     Inventory.Instance.AddGoldFloat(applied);
                 }
             }
             return;
         }
 
-        // Click on empty space = no action
+        // Click on empty space (or only friendly units) = no action
     }
 
     // ===== AOE DAMAGE SHOCKWAVE =====
