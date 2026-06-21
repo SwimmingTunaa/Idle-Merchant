@@ -104,50 +104,49 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         combat = GetComponent<CombatBehavior>();
     }
 
-    // ── Hover highlight (world right-click affordance) ───────────────────────
-    [Header("Hover Highlight")]
-    [Tooltip("Colour the sprites tint toward while the cursor is over this hero.")]
-    [SerializeField] private Color hoverColor = Color.white;
-    [Tooltip("How strongly to tint toward Hover Colour (0 = none, 1 = full). Set 0 to use only the outline.")]
-    [SerializeField, Range(0f, 1f)] private float hoverStrength = 0.35f;
-    [Tooltip("Rendering-layer bit toggled on hover for HoverOutlineFeature (must match its selectedRenderingLayer).")]
+    // ── Selection outline (Roster focus) ─────────────────────────────────────
+    [Header("Selection Outline")]
+    [Tooltip("Rendering-layer bit toggled while this hero is the one selected in the Roster " +
+             "(must match HoverOutlineFeature.selectedRenderingLayer).")]
     [SerializeField] private uint outlineRenderingLayer = 2;
 
-    private SpriteRenderer[] hoverRenderers;
-    private Color[] hoverBaseColors;
-    private bool isHovered;
+    // Two independent reasons to outline this hero — the outline shows while EITHER holds,
+    // so hovering doesn't clear a Roster selection's outline and vice-versa.
+    private bool hoverOutline;
+    private bool selectOutline;
+    private bool outlineApplied;
 
-    /// <summary>Brighten the character while the cursor is over it, so the player can
-    /// tell it's interactable (right-click opens the Roster to this hero). Tint-only —
-    /// deliberately avoids localScale (used for facing) and the damage-flash material
-    /// channel, so it can't fight either.</summary>
-    public void SetHovered(bool on)
+    /// <summary>Outline this hero while the cursor is over them in the world (set by ClickerManager).</summary>
+    public void SetHoverOutline(bool on)
     {
-        if (on == isHovered) return;
-        isHovered = on;
+        if (hoverOutline == on) return;
+        hoverOutline = on;
+        ApplyOutline();
+    }
 
-        hoverRenderers ??= GetComponentsInChildren<SpriteRenderer>(true);
+    /// <summary>Outline this hero while they're the one selected in the Roster (set by RosterPanelController).</summary>
+    public void SetOutlined(bool on)
+    {
+        if (selectOutline == on) return;
+        selectOutline = on;
+        ApplyOutline();
+    }
 
-        if (on)
+    /// <summary>Flip the rendering-layer bit HoverOutlineFeature draws from, on iff either
+    /// outline reason holds. Outline only — no tint, so it never fights the facing flip or the
+    /// damage-flash material. Re-queries the child renderers each change so it stays correct
+    /// after the modular character is reassembled on pool reuse.</summary>
+    private void ApplyOutline()
+    {
+        bool on = hoverOutline || selectOutline;
+        if (on == outlineApplied) return;
+        outlineApplied = on;
+
+        foreach (var sr in GetComponentsInChildren<SpriteRenderer>(true))
         {
-            if (hoverBaseColors == null || hoverBaseColors.Length != hoverRenderers.Length)
-                hoverBaseColors = new Color[hoverRenderers.Length];
-            for (int i = 0; i < hoverRenderers.Length; i++)
-            {
-                if (hoverRenderers[i] == null) continue;
-                hoverBaseColors[i] = hoverRenderers[i].color;
-                hoverRenderers[i].color = Color.Lerp(hoverBaseColors[i], hoverColor, hoverStrength);
-                hoverRenderers[i].renderingLayerMask |= outlineRenderingLayer;   // mark for the outline pass
-            }
-        }
-        else
-        {
-            for (int i = 0; i < hoverRenderers.Length; i++)
-            {
-                if (hoverRenderers[i] == null) continue;
-                hoverRenderers[i].color = hoverBaseColors[i];
-                hoverRenderers[i].renderingLayerMask &= ~outlineRenderingLayer;
-            }
+            if (sr == null) continue;
+            if (on) sr.renderingLayerMask |= outlineRenderingLayer;
+            else    sr.renderingLayerMask &= ~outlineRenderingLayer;
         }
     }
 
@@ -633,6 +632,11 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
     public override void Despawn()
     {
+        // Clear any outline so the rendering-layer bit doesn't leak onto the next hero
+        // this pooled instance is reused for.
+        SetHoverOutline(false);
+        SetOutlined(false);
+
         if (health != null)
         {
             health.OnDeath -= OnDeath;

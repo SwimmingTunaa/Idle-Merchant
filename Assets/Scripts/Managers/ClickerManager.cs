@@ -34,7 +34,6 @@ public class ClickerManager : MonoBehaviour
     private bool isShockwaveActive = false;
 
     private AdventurerAgent hoveredAdv;
-    private const string InspectHintKey = "heroInspectHintShown";
 
     void Update()
     {
@@ -50,6 +49,29 @@ public class ClickerManager : MonoBehaviour
             OnPlayerInspect();
 
         UpdateHover();
+    }
+
+    // Outline the adventurer under the cursor so the player can tell they're interactable
+    // (right-click opens the Roster to them). Outline only — no tint, no tooltip.
+    private void UpdateHover()
+    {
+        AdventurerAgent under = null;
+
+        // No world hover while the book is open (you're already inside it).
+        if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
+        {
+            var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
+            }
+        }
+
+        if (under == hoveredAdv) return;
+
+        if (hoveredAdv != null) hoveredAdv.SetHoverOutline(false);
+        hoveredAdv = under;
+        if (hoveredAdv != null) hoveredAdv.SetHoverOutline(true);
     }
 
     /// <summary>World-space position under the mouse cursor (raw camera z). Shared by
@@ -75,41 +97,6 @@ public class ClickerManager : MonoBehaviour
                 return;
             }
         }
-    }
-
-    // ── Hover affordance: brighten the adventurer under the cursor, and the first
-    //    time, float a one-time nudge teaching the right-click gesture. ─────────
-    private void UpdateHover()
-    {
-        AdventurerAgent under = null;
-
-        // No world hover while the book is open (you're already inside it).
-        if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
-        {
-            var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
-            foreach (var hit in hits)
-            {
-                if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
-            }
-        }
-
-        if (under == hoveredAdv) return;
-
-        if (hoveredAdv != null) hoveredAdv.SetHovered(false);
-        hoveredAdv = under;
-        if (hoveredAdv != null)
-        {
-            hoveredAdv.SetHovered(true);
-            ShowInspectHintOnce(hoveredAdv);
-        }
-    }
-
-    private void ShowInspectHintOnce(AdventurerAgent adv)
-    {
-        if (PlayerPrefs.GetInt(InspectHintKey, 0) != 0) return;
-        PlayerPrefs.SetInt(InspectHintKey, 1);
-        if (DamageNumberManager.Instance != null)
-            DamageNumberManager.Instance.ShowText("Right-click to view", adv.transform);
     }
 
     public void OnPlayerClick()

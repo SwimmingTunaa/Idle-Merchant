@@ -56,6 +56,10 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
     // Cached references
     private Camera cam;
     private Vector3 targetPosition;
+
+    // Lock-on follow (Roster selection). While set, the camera tracks this transform each
+    // frame; any manual scroll clears it so the player always regains control.
+    private Transform followTarget;
     
     // Camera frustum dimensions (updated when orthographic size changes)
     private float cameraHalfHeight;
@@ -147,10 +151,22 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         // Apply movement
         if (inputVector.sqrMagnitude > 0.01f)
         {
+            // Manual scroll always wins — it breaks any Roster lock-on so the player keeps control.
+            followTarget = null;
             Vector3 movement = inputVector * scrollSpeed * Time.deltaTime;
             targetPosition += movement;
         }
-        
+        else if (followTarget != null)
+        {
+            // Drop the lock if the target was despawned (pooled → deactivated and parked
+            // off-map), so the camera never chases a dead hero off into the void.
+            if (!followTarget.gameObject.activeInHierarchy)
+                followTarget = null;
+            else
+                // Locked onto a selected hero — keep them centred as they wander.
+                targetPosition = new Vector3(followTarget.position.x, followTarget.position.y, targetPosition.z);
+        }
+
         // Clamp target to bounds
         targetPosition = ClampToBounds(targetPosition);
         
@@ -202,6 +218,21 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         position.y = Mathf.Clamp(position.y, effectiveMinY, effectiveMaxY);
         
         return position;
+    }
+
+    /// <summary>Lock the camera onto a transform so it follows them (clamped to world
+    /// bounds) as they move — used when a hero is selected in the Roster. The lock holds
+    /// until another target is set, <see cref="ClearLock"/> is called, or the player scrolls
+    /// manually. The existing Update lerp eases the motion.</summary>
+    public void LockOnto(Transform target)
+    {
+        followTarget = target;
+    }
+
+    /// <summary>Release the lock-on follow; the camera stays where it is and manual scroll resumes.</summary>
+    public void ClearLock()
+    {
+        followTarget = null;
     }
 
     public void HandleExpandVeritcalBounds(int layer)

@@ -29,7 +29,8 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     // agent → slot wrapper for O(1) targeted refresh
     private readonly Dictionary<AdventurerAgent, VisualElement> agentSlots = new();
     private AdventurerAgent selectedAgent;
-    private AdventurerAgent pendingFocus;   // set by FocusAgent (world right-click) until the page is built
+    private AdventurerAgent outlinedAgent;  // hero outlined + camera-locked in the world while the Roster is open
+    private AdventurerAgent pendingFocus;    // set by FocusAgent (world right-click) until the page is built
     private VisualElement leftContent;
     private VisualElement rightContent;
 
@@ -64,6 +65,9 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         GameSignals.OnAdventurerXPChanged -= OnAdventurerXPChanged;
         GameSignals.OnAdventurerPromoted -= OnAdventurerPromoted;
         GameSignals.OnUnitHired -= OnUnitHired;
+        // Roster page is gone (book closed or tab switched away) → drop the world outline
+        // and release the camera lock; they only live while you're viewing the Roster.
+        SetWorldFocus(null);
         agentSlots.Clear();
         selectedAgent = null;
         leftContent = null;
@@ -209,7 +213,27 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (agentSlots.TryGetValue(agent, out var newSlot))
             newSlot.Q<VisualElement>("slot-frame")?.AddToClassList("slot-selected");
 
+        SetWorldFocus(agent);
         ShowDetail(agent);
+    }
+
+    /// <summary>Outline the hero in the world and lock the camera onto them, moving both off
+    /// any previously-focused hero. Pass null to clear. Lives only while the Roster is open —
+    /// selecting another hero moves it; Dismiss or closing the Roster clears it.</summary>
+    private void SetWorldFocus(AdventurerAgent agent)
+    {
+        if (outlinedAgent != agent)
+        {
+            if (outlinedAgent != null) outlinedAgent.SetOutlined(false);
+            outlinedAgent = agent;
+            if (outlinedAgent != null) outlinedAgent.SetOutlined(true);
+        }
+
+        if (CameraScrollController.Instance != null)
+        {
+            if (agent != null) CameraScrollController.Instance.LockOnto(agent.transform);
+            else CameraScrollController.Instance.ClearLock();
+        }
     }
 
     /// <summary>Open the page focused on a specific adventurer (from a world right-click).
@@ -393,6 +417,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (selectedAgent != null && agentSlots.TryGetValue(selectedAgent, out var slot))
             slot.Q<VisualElement>("slot-frame")?.RemoveFromClassList("slot-selected");
         selectedAgent = null;
+        SetWorldFocus(null);   // dismiss un-pins the world outline + camera lock
         ShowDetail(null);
     }
 
