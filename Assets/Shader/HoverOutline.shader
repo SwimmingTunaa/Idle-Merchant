@@ -28,6 +28,10 @@ Shader "Hidden/HoverOutline"
             float4 _OutlineColor;
             float  _OutlineWidthPixels;
 
+            // Largest outline width (in texels) the box dilation supports. The sample grid is
+            // (2*MAX+1)^2 and is unrolled at compile time; raise only if you need thicker outlines.
+            #define OUTLINE_MAX_RADIUS 4
+
             float SampleMask(float2 uv)
             {
                 return SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv).a;
@@ -41,19 +45,25 @@ Shader "Hidden/HoverOutline"
                 if (SampleMask(uv) > 0.1)
                     return half4(0.0, 0.0, 0.0, 0.0);
 
-                float2 t = _BlitTexture_TexelSize.xy * _OutlineWidthPixels;
-
+                // Square (Chebyshev) dilation: this texel is outline if ANY filled texel sits
+                // within the [-r, r] box around it. A box rather than a ring/circle is what gives
+                // crisp right-angle corners instead of rounded ones. The loop bounds are a
+                // compile-time constant (so it unrolls on Metal); the runtime width just gates
+                // which samples count.
+                int r = clamp((int)round(_OutlineWidthPixels), 0, OUTLINE_MAX_RADIUS);
                 float n = 0.0;
-                n = max(n, SampleMask(uv + float2( t.x, 0.0)));
-                n = max(n, SampleMask(uv + float2(-t.x, 0.0)));
-                n = max(n, SampleMask(uv + float2(0.0,  t.y)));
-                n = max(n, SampleMask(uv + float2(0.0, -t.y)));
-                n = max(n, SampleMask(uv + float2( t.x,  t.y)));
-                n = max(n, SampleMask(uv + float2(-t.x, -t.y)));
-                n = max(n, SampleMask(uv + float2( t.x, -t.y)));
-                n = max(n, SampleMask(uv + float2(-t.x,  t.y)));
+                [unroll]
+                for (int yy = -OUTLINE_MAX_RADIUS; yy <= OUTLINE_MAX_RADIUS; yy++)
+                {
+                    [unroll]
+                    for (int xx = -OUTLINE_MAX_RADIUS; xx <= OUTLINE_MAX_RADIUS; xx++)
+                    {
+                        if (abs(xx) <= r && abs(yy) <= r)
+                            n = max(n, SampleMask(uv + _BlitTexture_TexelSize.xy * float2(xx, yy)));
+                    }
+                }
 
-                float edge = step(0.1, n);             // a neighbour is filled → we're on the ring
+                float edge = step(0.1, n);             // a neighbour is filled → we're on the outline
                 return half4(_OutlineColor.rgb, _OutlineColor.a * edge);
             }
             ENDHLSL

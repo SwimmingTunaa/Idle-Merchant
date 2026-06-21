@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3289680107639417060}
   - component: {fileID: -259556887160843058}
   - component: {fileID: -1464411269404421513}
+  - component: {fileID: 3389874610754164736}
   m_Layer: 9
   m_Name: Porter Agent
   m_TagString: Untagged
@@ -93,7 +94,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28a9c23f43cb9452caf5217ef4a331e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PorterAgent
+  def: {fileID: 0}
   layerIndex: 1
+  overriderAnimatorController: 1
+  appearanceManager: {fileID: 0}
   traitComponent: {fileID: 0}
   animator: {fileID: 2325290538031787467}
   showDebugGizmos: 0
@@ -116,6 +120,19 @@ MonoBehaviour:
   - traitId: 
     tier: 0
   showDebugLogs: 0
+--- !u!114 &3389874610754164736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440394158813992520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 705e81f59b8824e03b489de7fda77077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PermanentOutline
+  outlineRenderingLayer: 4
 --- !u!1 &840724104000160350
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,6 +168,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1895843359107275096
 SpriteRenderer:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -196,6 +214,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: -8029374031438669788, guid: 1d33467dd7dfb4ad69876ada74cbb30d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -205,8 +224,8 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []
 --- !u!95 &2325290538031787467
 Animator:
   serializedVersion: 7

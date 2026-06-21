@@ -51,6 +51,19 @@ public class EntityBaseEditor : Editor
                 return;
             }
 
+            // A Stats deserialized by Unity (not constructed at runtime) has a non-null BaseStats
+            // but a null Mediator/cache, which slips past the BaseStats guard below and NREs on
+            // any modified-stat read. Bail before touching it.
+            if (stats.Mediator == null)
+            {
+                EditorGUILayout.HelpBox(
+                    "Stats found but not runtime-initialized (no Mediator) — this is a serialized/" +
+                    "uninitialized instance, not a live entity. Select a spawned entity in Play Mode.",
+                    MessageType.Warning
+                );
+                return;
+            }
+
             // Buttons
             using (new EditorGUILayout.HorizontalScope())
             {

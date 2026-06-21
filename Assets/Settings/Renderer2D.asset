@@ -25,8 +25,9 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 2800000, guid: 24ec0e140fb444a44ab96ee80844e18e, type: 3}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
+  - {fileID: 4421436736012832778}
   - {fileID: 648359389140682691}
-  m_RendererFeatureMap: c30785e46d6fff08
+  m_RendererFeatureMap: 0a50e81e49195c3dc30785e46d6fff08
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -75,3 +76,22 @@ MonoBehaviour:
     outlineColor: {r: 1, g: 0.92, b: 0.35, a: 1}
     outlineWidthPixels: 2.5
     outlineMaterial: {fileID: 2100000, guid: 85cf850c4086c43d3a5d0fca7991ec4b, type: 2}
+--- !u!114 &4421436736012832778
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f08ba4e0dd742129ea155bcbc94c97, type: 3}
+  m_Name: PermanentBlackOutline
+  m_EditorClassIdentifier: Assembly-CSharp::HoverOutlineFeature
+  m_Active: 1
+  settings:
+    renderPassEvent: 500
+    selectedRenderingLayer: 4
+    outlineColor: {r: 0, g: 0, b: 0, a: 1}
+    outlineWidthPixels: 3.1
+    outlineMaterial: {fileID: 2100000, guid: 0c416d3ab25004b978e77300c44158ac, type: 2}

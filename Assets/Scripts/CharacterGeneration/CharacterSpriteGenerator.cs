@@ -15,6 +15,12 @@ public static class CharacterSpriteGenerator
     
     private const int RENDER_SIZE = 256;
     private const int SPRITE_PIXELS_PER_UNIT = 100;
+
+    // Baked black outline width in render-texture texels. Tuned to read like the world outline
+    // at the small slot-icon size; the detail portrait shows the same sprite larger so its line
+    // appears proportionally bolder (see RosterPanelController — same cached sprite, scaled).
+    private const int ICON_OUTLINE_TEXELS = 6;
+    private static readonly Color32 IconOutlineColor = new Color32(0, 0, 0, 255);
     private static readonly Vector3 PREVIEW_POSITION = new Vector3(9999f, 9999f, 0f); // Off-screen
 
     /// <summary>
@@ -131,14 +137,23 @@ public static class CharacterSpriteGenerator
         var entityBase = obj.GetComponent<EntityBase>();
         if (entityBase != null)
             entityBase.enabled = false;
-        
+
         var collider = obj.GetComponent<Collider2D>();
         if (collider != null)
             collider.enabled = false;
-        
+
         var rigidbody = obj.GetComponent<Rigidbody2D>();
         if (rigidbody != null)
             rigidbody.simulated = false;
+
+        // Stop the world black-outline feature from stroking the baked icon — we bake our own
+        // outline at the right resolution below. Disable before Start so it never flags the bit.
+        var permanentOutline = obj.GetComponent<PermanentOutline>();
+        if (permanentOutline != null)
+        {
+            permanentOutline.enabled = false;
+            permanentOutline.Clear();
+        }
     }
     
     private static void ApplyVisualConfiguration(GameObject instance, EntityDef def, CharacterAppearanceIndices indices)
@@ -185,7 +200,10 @@ public static class CharacterSpriteGenerator
         texture.ReadPixels(new Rect(0, 0, RENDER_SIZE, RENDER_SIZE), 0, 0);
         texture.Apply();
         RenderTexture.active = null;
-        
+
+        // Bake a black silhouette outline into the icon so it matches the world black outline.
+        AddSilhouetteOutline(texture, ICON_OUTLINE_TEXELS, IconOutlineColor);
+
         // Create sprite from texture
         Sprite sprite = Sprite.Create(
             texture,
@@ -198,6 +216,50 @@ public static class CharacterSpriteGenerator
         return sprite;
     }
     
+    /// <summary>
+    /// Dilates the silhouette's alpha outward by <paramref name="radius"/> texels and fills the
+    /// new ring with <paramref name="color"/>, producing an outline that sits OUTSIDE the
+    /// character (matching the world outline pass). Runs once per unique config — the result is
+    /// cached with the sprite.
+    /// </summary>
+    private static void AddSilhouetteOutline(Texture2D tex, int radius, Color32 color)
+    {
+        if (radius <= 0) return;
+
+        int w = tex.width, h = tex.height;
+        Color32[] src = tex.GetPixels32();
+        Color32[] dst = src.Clone() as Color32[];
+        const byte alphaThreshold = 16;
+
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                int i = y * w + x;
+                if (src[i].a > alphaThreshold) continue;   // inside the silhouette — keep the character pixel
+
+                // Square (Chebyshev) dilation: outline if any opaque texel sits within the
+                // [-radius, radius] box. A box, not a circle, gives crisp right-angle corners.
+                bool nearSilhouette = false;
+                for (int dy = -radius; dy <= radius && !nearSilhouette; dy++)
+                {
+                    int ny = y + dy;
+                    if (ny < 0 || ny >= h) continue;
+                    for (int dx = -radius; dx <= radius; dx++)
+                    {
+                        int nx = x + dx;
+                        if (nx < 0 || nx >= w) continue;
+                        if (src[ny * w + nx].a > alphaThreshold) { nearSilhouette = true; break; }
+                    }
+                }
+                if (nearSilhouette) dst[i] = color;
+            }
+        }
+
+        tex.SetPixels32(dst);
+        tex.Apply();
+    }
+
     /// <summary>
     /// Generate hash from visual configuration for cache lookup.
     /// Collision-resistant enough for typical use cases.
