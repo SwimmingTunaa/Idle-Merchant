@@ -141,6 +141,35 @@ public class DamageNumberManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Float an arbitrary text hint above an entity (e.g. a one-time UI nudge).
+    /// </summary>
+    public void ShowText(string message, Transform entityTransform)
+    {
+        if (damageNumberPrefab == null || entityTransform == null)
+            return;
+
+        float offset = verticalOffset;
+        Collider2D col = entityTransform.GetComponent<Collider2D>();
+        if (col != null)
+            offset = col.bounds.extents.y + 0.2f;
+
+        Vector3 spawnPos = entityTransform.position + Vector3.up * offset;
+
+        GameObject numberObj = ObjectPoolManager.Instance.SpawnObject(
+            damageNumberPrefab,
+            spawnPos,
+            Quaternion.identity,
+            ObjectPoolManager.PoolType.GameObject
+        );
+
+        if (numberObj == null)
+            return;
+
+        if (numberObj.TryGetComponent(out DamageNumber damageNumber))
+            damageNumber.ShowText(message, spawnPos);
+    }
+
+    /// <summary>
     /// Show gold gain from click with random offset to avoid overlap with damage numbers
     /// </summary>
     public void ShowGoldGain(float gold, Transform entityTransform, bool isCrit = false)

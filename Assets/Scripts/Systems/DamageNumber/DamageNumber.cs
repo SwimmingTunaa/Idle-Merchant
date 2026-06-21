@@ -81,6 +81,22 @@ public class DamageNumber : MonoBehaviour
     }
 
     /// <summary>
+    /// Show an arbitrary text hint that floats up (e.g. a one-time UI nudge).
+    /// </summary>
+    public void ShowText(string message, Vector3 worldPosition)
+    {
+        transform.position = worldPosition;
+        velocity = new Vector3(0f, floatSpeed, 0f);
+        textMesh.text = message;
+        textMesh.fontSize = normalFontSize;
+        textMesh.color = normalColor;
+        baseColor = normalColor;
+        if (goldSpriteRenderer != null)
+            goldSpriteRenderer.enabled = false;
+        elapsed = 0f;
+    }
+
+    /// <summary>
     /// Show loot collection multiplier with green styling (e.g., x1.25)
     /// </summary>
     public void ShowLootMultiplier(float multiplier, Vector3 worldPosition)

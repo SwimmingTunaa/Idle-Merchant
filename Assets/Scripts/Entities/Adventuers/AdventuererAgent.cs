@@ -104,6 +104,40 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         combat = GetComponent<CombatBehavior>();
     }
 
+    // ── Hover highlight (world right-click affordance) ───────────────────────
+    private SpriteRenderer[] hoverRenderers;
+    private Color[] hoverBaseColors;
+    private bool isHovered;
+
+    /// <summary>Brighten the character while the cursor is over it, so the player can
+    /// tell it's interactable (right-click opens the Roster to this hero). Tint-only —
+    /// deliberately avoids localScale (used for facing) and the damage-flash material
+    /// channel, so it can't fight either.</summary>
+    public void SetHovered(bool on)
+    {
+        if (on == isHovered) return;
+        isHovered = on;
+
+        hoverRenderers ??= GetComponentsInChildren<SpriteRenderer>(true);
+
+        if (on)
+        {
+            if (hoverBaseColors == null || hoverBaseColors.Length != hoverRenderers.Length)
+                hoverBaseColors = new Color[hoverRenderers.Length];
+            for (int i = 0; i < hoverRenderers.Length; i++)
+            {
+                if (hoverRenderers[i] == null) continue;
+                hoverBaseColors[i] = hoverRenderers[i].color;
+                hoverRenderers[i].color = Color.Lerp(hoverBaseColors[i], Color.white, 0.35f);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < hoverRenderers.Length; i++)
+                if (hoverRenderers[i] != null) hoverRenderers[i].color = hoverBaseColors[i];
+        }
+    }
+
     public override void Init(EntityDef entityDef, int layer, Spawner spawner, Collider2D playArea)
     {
         base.Init(entityDef, layer, spawner, playArea);
