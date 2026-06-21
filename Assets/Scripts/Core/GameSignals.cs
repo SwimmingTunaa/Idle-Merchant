@@ -30,6 +30,7 @@ public static class GameSignals
     public static event Action<EntityBase, string, string> OnAdventurerPromoted;
     public static event Action<AdventurerAgent, float> OnAdventurerXPChanged;
     public static event Action<AdventurerAgent, int> OnAdventurerLeveledUp;
+    public static event Action<AdventurerAgent> OnAdventurerFocusRequested;  // world right-click → open Roster to this hero
     public static event Action<int> OnLayerUnlocked;
     public static event Action<int> OnStarEarned;
     public static event Action    OnMarkedForSaleChanged;
@@ -55,6 +56,7 @@ public static class GameSignals
     public static void RaiseAdventurerPromoted(EntityBase adventurer, string oldRole, string newRole) => OnAdventurerPromoted?.Invoke(adventurer, oldRole, newRole);
     public static void RaiseAdventurerXPChanged(AdventurerAgent agent, float newXP) => OnAdventurerXPChanged?.Invoke(agent, newXP);
     public static void RaiseAdventurerLeveledUp(AdventurerAgent agent, int newLevel) => OnAdventurerLeveledUp?.Invoke(agent, newLevel);
+    public static void RaiseAdventurerFocusRequested(AdventurerAgent agent) => OnAdventurerFocusRequested?.Invoke(agent);
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
     public static void RaiseStarEarned(int star) => OnStarEarned?.Invoke(star);
     public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
@@ -79,6 +81,7 @@ public static class GameSignals
         OnAdventurerPromoted = null;
         OnAdventurerXPChanged = null;
         OnAdventurerLeveledUp = null;
+        OnAdventurerFocusRequested = null;
         OnLayerUnlocked = null;
         OnStarEarned = null;
         OnMarkedForSaleChanged = null;

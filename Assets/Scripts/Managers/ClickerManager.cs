@@ -41,6 +41,10 @@ public class ClickerManager : MonoBehaviour
             secondTimer = 0f;
             clicksThisSecond = 0;
         }
+
+        // Right-click is a separate channel from the left-click clicker.
+        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+            OnPlayerInspect();
     }
 
     /// <summary>World-space position under the mouse cursor (raw camera z). Shared by
@@ -48,6 +52,24 @@ public class ClickerManager : MonoBehaviour
     private static Vector3 GetCursorWorldPos()
     {
         return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+    }
+
+    /// <summary>Right-click a friendly adventurer to open the Roster focused on them.
+    /// A separate input channel from the left-click clicker so the two never collide.</summary>
+    public void OnPlayerInspect()
+    {
+        // Already viewing the book? Don't inspect through it.
+        if (UIManager.Instance != null && UIManager.Instance.IsPanelOpen("BookPanel")) return;
+
+        var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent(out AdventurerAgent adv))
+            {
+                GameSignals.RaiseAdventurerFocusRequested(adv);
+                return;
+            }
+        }
     }
 
     public void OnPlayerClick()
