@@ -43,13 +43,19 @@ public class ClickerManager : MonoBehaviour
         }
     }
 
+    /// <summary>World-space position under the mouse cursor (raw camera z). Shared by
+    /// every world-pointer action so the screen→world conversion lives in one place.</summary>
+    private static Vector3 GetCursorWorldPos()
+    {
+        return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+    }
+
     public void OnPlayerClick()
     {
         if (clicksThisSecond >= clicksPerSecondCap) return;
         clicksThisSecond++;
 
-        Vector2 screenPos = Mouse.current.position.ReadValue();
-        Vector3 world = Camera.main.ScreenToWorldPoint(screenPos);
+        Vector3 world = GetCursorWorldPos();
         lastClickPosition = world;
 
         var directHit = Physics2D.OverlapPoint(world);
@@ -187,8 +193,7 @@ public class ClickerManager : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             
-            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+            Vector3 mouseWorldPos = GetCursorWorldPos();
             mouseWorldPos.z = 0f;
 
             float t = elapsed / lootVacuumSpeed;
