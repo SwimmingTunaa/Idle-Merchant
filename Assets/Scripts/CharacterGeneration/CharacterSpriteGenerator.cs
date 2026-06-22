@@ -16,10 +16,11 @@ public static class CharacterSpriteGenerator
     private const int RENDER_SIZE = 256;
     private const int SPRITE_PIXELS_PER_UNIT = 100;
 
-    // Baked black outline width in render-texture texels. Tuned to read like the world outline
-    // at the small slot-icon size; the detail portrait shows the same sprite larger so its line
-    // appears proportionally bolder (see RosterPanelController — same cached sprite, scaled).
-    private const int ICON_OUTLINE_TEXELS = 6;
+    // Baked black outline width in render-texture texels, calibrated to match the live world
+    // outline's thickness relative to the character. The capture renders at ~128 px/world-unit
+    // (256px / 2 units at orthoSize 1) vs the game's ~32 px/unit (1080 / 2x17), so 1 live screen
+    // pixel ≈ 4 capture texels → the live 3px outline ≈ 12 capture texels.
+    private const int ICON_OUTLINE_TEXELS = 12;
     private static readonly Color32 IconOutlineColor = new Color32(0, 0, 0, 255);
     private static readonly Vector3 PREVIEW_POSITION = new Vector3(9999f, 9999f, 0f); // Off-screen
 
@@ -114,7 +115,7 @@ public static class CharacterSpriteGenerator
         Object.DontDestroyOnLoad(cameraObj);
     }
     
-    private static void ConfigurePreviewCharacter(EntityDef def, CharacterAppearanceIndices indices)
+    private static void ConfigurePreviewCharacter(EntityDef def, CharacterAppearanceIndices indices, bool withClothes = true)
     {
         if (_previewInstance == null)
         {
@@ -128,7 +129,7 @@ public static class CharacterSpriteGenerator
 
         _previewInstance.transform.position = PREVIEW_POSITION;
 
-        ApplyVisualConfiguration(_previewInstance, def, indices);
+        ApplyVisualConfiguration(_previewInstance, def, indices, withClothes);
     }
     
     private static void DisableGameplayComponents(GameObject obj)
@@ -156,7 +157,7 @@ public static class CharacterSpriteGenerator
         }
     }
     
-    private static void ApplyVisualConfiguration(GameObject instance, EntityDef def, CharacterAppearanceIndices indices)
+    private static void ApplyVisualConfiguration(GameObject instance, EntityDef def, CharacterAppearanceIndices indices, bool withClothes = true)
     {
         var spriteLibraries = instance.GetComponentsInChildren<SpriteLibrary>(true);
         var spriteResolvers = instance.GetComponentsInChildren<SpriteResolver>(true);
@@ -164,7 +165,8 @@ public static class CharacterSpriteGenerator
         appearanceManager.SetEntityDef(def);
         appearanceManager.SetAppearanceIndices(indices);
         appearanceManager.ApplyAppearance();
-        
+        appearanceManager.SetClothingVisible(withClothes);   // false = base body only
+
         // Refresh sprite resolvers
         foreach (var resolver in spriteResolvers)
         {
@@ -187,6 +189,101 @@ public static class CharacterSpriteGenerator
         Sprite generatedSprite = CaptureSprite();
         _spriteCache[configHash] = generatedSprite;
         return generatedSprite;
+    }
+
+    /// <summary>
+    /// Bakes every frame of an animation clip into a sprite strip (each frame outlined, like the
+    /// single-icon bake). NOT cached — the caller owns the returned sprites and must destroy their
+    /// textures when done. Set <paramref name="withClothes"/> false to preview the base body only.
+    /// </summary>
+    public static Sprite[] GenerateAnimationStrip(EntityDef def, CharacterAppearanceIndices indices, AnimationClip clip, int maxFrames, bool withClothes = true)
+    {
+        if (def == null || clip == null) return System.Array.Empty<Sprite>();
+
+        EnsureRenderSetup();
+        ConfigurePreviewCharacter(def, indices, withClothes);
+
+        // Clip paths are relative to the body Animator's GameObject (a child, not the root).
+        var bodyAnimator = FindBodyAnimator(_previewInstance);
+        GameObject sampleTarget = bodyAnimator != null ? bodyAnimator.gameObject : _previewInstance;
+        if (bodyAnimator != null) bodyAnimator.enabled = false;   // we pose it via SampleAnimation
+
+        // One capture per DISTINCT animation frame (the artist's keyframes), not per 60fps tick —
+        // so every frame shows up exactly once with no duplicates or truncation.
+        float[] times = GetFrameSampleTimes(clip, maxFrames);
+        var resolvers = _previewInstance.GetComponentsInChildren<SpriteResolver>(true);
+
+        var frames = new Sprite[times.Length];
+        for (int f = 0; f < times.Length; f++)
+        {
+            clip.SampleAnimation(sampleTarget, times[f]);
+
+            // SampleAnimation sets the SpriteResolver keys; push them to the renderers before capture.
+            foreach (var resolver in resolvers)
+                resolver.ResolveSpriteToSpriteRenderer();
+
+            frames[f] = CaptureSprite();
+        }
+        return frames;
+    }
+
+    /// <summary>The modular character's body Animator (a child, e.g. "BaseCharacterRoot") — the
+    /// one with the most clips, so it wins over small effect animators like the soul sprite.</summary>
+    public static Animator FindBodyAnimator(GameObject instance)
+    {
+        Animator best = null;
+        int bestClips = -1;
+        foreach (var a in instance.GetComponentsInChildren<Animator>(true))
+        {
+            int n = a.runtimeAnimatorController != null ? a.runtimeAnimatorController.animationClips.Length : 0;
+            if (n > bestClips) { bestClips = n; best = a; }
+        }
+        return best;
+    }
+
+    /// <summary>
+    /// Times to sample for "every frame" of a clip. Sprite-swap clips run at a high frame rate
+    /// but only change sprite on a handful of keyframes, so we sample the MIDDLE of each held
+    /// keyframe interval — one time per distinct frame, in order, capped at <paramref name="maxFrames"/>.
+    /// In a build (no AnimationUtility), falls back to uniform sampling at the clip's frame rate.
+    /// </summary>
+    public static float[] GetFrameSampleTimes(AnimationClip clip, int maxFrames)
+    {
+        if (clip == null) return System.Array.Empty<float>();
+        maxFrames = Mathf.Max(1, maxFrames);
+
+#if UNITY_EDITOR
+        var keyTimes = new System.Collections.Generic.SortedSet<float>();
+        foreach (var binding in UnityEditor.AnimationUtility.GetCurveBindings(clip))
+        {
+            var curve = UnityEditor.AnimationUtility.GetEditorCurve(clip, binding);
+            if (curve == null) continue;
+            foreach (var key in curve.keys) keyTimes.Add(key.time);
+        }
+
+        if (keyTimes.Count > 0)
+        {
+            var starts = new System.Collections.Generic.List<float>(keyTimes);
+            var mids = new System.Collections.Generic.List<float>(starts.Count);
+            for (int i = 0; i < starts.Count; i++)
+            {
+                float end = (i + 1 < starts.Count) ? starts[i + 1] : clip.length;
+                mids.Add((starts[i] + end) * 0.5f);   // middle of each held frame → robust against step boundaries
+            }
+
+            if (mids.Count <= maxFrames) return mids.ToArray();
+
+            var capped = new float[maxFrames];   // too many frames → evenly subsample
+            for (int i = 0; i < maxFrames; i++)
+                capped[i] = mids[Mathf.RoundToInt(i * (mids.Count - 1) / (float)(maxFrames - 1))];
+            return capped;
+        }
+#endif
+
+        int n = Mathf.Clamp(Mathf.RoundToInt(clip.length * clip.frameRate), 1, maxFrames);
+        var times = new float[n];
+        for (int i = 0; i < n; i++) times[i] = (i / (float)n) * clip.length;
+        return times;
     }
 
     private static Sprite CaptureSprite()

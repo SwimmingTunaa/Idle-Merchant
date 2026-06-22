@@ -74,7 +74,8 @@ MonoBehaviour:
     renderPassEvent: 500
     selectedRenderingLayer: 2
     outlineColor: {r: 1, g: 0.92, b: 0.35, a: 1}
-    outlineWidthPixels: 2.5
+    outlineWidthPixels: 4
+    referenceHeight: 1080
     outlineMaterial: {fileID: 2100000, guid: 85cf850c4086c43d3a5d0fca7991ec4b, type: 2}
 --- !u!114 &4421436736012832778
 MonoBehaviour:
@@ -93,5 +94,6 @@ MonoBehaviour:
     renderPassEvent: 500
     selectedRenderingLayer: 4
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
-    outlineWidthPixels: 3.1
+    outlineWidthPixels: 5
+    referenceHeight: 1080
     outlineMaterial: {fileID: 2100000, guid: 0c416d3ab25004b978e77300c44158ac, type: 2}

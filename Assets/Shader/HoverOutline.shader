@@ -28,9 +28,10 @@ Shader "Hidden/HoverOutline"
             float4 _OutlineColor;
             float  _OutlineWidthPixels;
 
-            // Largest outline width (in texels) the box dilation supports. The sample grid is
-            // (2*MAX+1)^2 and is unrolled at compile time; raise only if you need thicker outlines.
-            #define OUTLINE_MAX_RADIUS 4
+            // Largest outline width (in texels) the box dilation supports — matches the feature's
+            // Outline Width Pixels Range(1,8). The sample grid is (2*MAX+1)^2 unrolled at compile
+            // time, so larger values cost more per pixel; raise only if you need thicker outlines.
+            #define OUTLINE_MAX_RADIUS 8
 
             float SampleMask(float2 uv)
             {

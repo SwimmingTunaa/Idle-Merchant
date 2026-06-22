@@ -109,13 +109,18 @@ public class CharacterAppearanceManager : MonoBehaviour
 
     public void ChangeRandomSkin()
     {
-        Color randomColour = entityDef.skinColourPalette.GetRandomPaletteColour();
+        // Skin is a Gradient palette — its colourSet is just the default {white}, so the palette
+        // path would tint everyone white. Pick from the gradient (fall back to palette for a
+        // genuinely palette-typed skin).
+        var palette = entityDef.skinColourPalette;
+        Color randomColour = palette.colourType == ColourType.Gradient
+            ? palette.GetRandomGradientColour()
+            : palette.GetRandomPaletteColour();
+
         for (int i = 0; i < skinMaterials.Length; i++)
         {
             skinMaterials[i].SetColor("_New_Colour", randomColour);
         }
-
-        Debug.Log($"Changed skin colour to {randomColour}");
     }
 
     public void ChangeRandomFrontWeapon()
@@ -180,5 +185,24 @@ public class CharacterAppearanceManager : MonoBehaviour
 
         for (int i = 0; i < hairMaterials.Length; i++)
             hairMaterials[i].SetColor("_New_Colour", hairColour);
+    }
+
+    /// <summary>Show/hide the clothing layers (shirt, pants, hair, weapons), leaving the base
+    /// body visible. Used by the character preview tool to compare dressed vs base body.</summary>
+    public void SetClothingVisible(bool visible)
+    {
+        SetReferenceVisible(shirtReference, visible);
+        SetReferenceVisible(pantsReference, visible);
+        SetReferenceVisible(hairTopReference, visible);
+        SetReferenceVisible(hairBackReference, visible);
+        SetReferenceVisible(frontWeaponReference, visible);
+        SetReferenceVisible(backWeaponReference, visible);
+    }
+
+    private static void SetReferenceVisible(SpriteLibrary reference, bool visible)
+    {
+        if (reference == null) return;
+        foreach (var sr in reference.GetComponentsInChildren<SpriteRenderer>(true))
+            sr.enabled = visible;
     }
 }

@@ -33,7 +33,14 @@ public class HoverOutlineFeature : ScriptableRendererFeature
         public uint selectedRenderingLayer = 2;
 
         public Color outlineColor = Color.white;
-        [Range(1f, 8f)] public float outlineWidthPixels = 2f;
+        [Tooltip("Outline thickness in screen pixels, at Reference Height. It scales with render " +
+                 "resolution so it stays a constant on-screen thickness as the window resizes " +
+                 "(independent of camera zoom).")]
+        [Range(1f, 8f)] public float outlineWidthPixels = 3f;
+
+        [Tooltip("Render height (px) the width is calibrated at; width scales by " +
+                 "currentRenderHeight / referenceHeight. Set 0 for a raw, unscaled screen-pixel width.")]
+        public float referenceHeight = 1080f;
 
         [Tooltip("Material using the Hidden/HoverOutline shader.")]
         public Material outlineMaterial;
@@ -117,8 +124,15 @@ public class HoverOutlineFeature : ScriptableRendererFeature
             // ── Pass 2: composite the outline over the camera colour (URP 6 material blit) ──
             // The mask is bound as _BlitTexture; the shader reads it and alpha-blends the
             // outline over the (loaded) camera colour via its Blend SrcAlpha OneMinusSrcAlpha.
+            // Scale the screen-pixel width by render resolution so the outline keeps a constant
+            // on-screen thickness as the window resizes (referenceHeight <= 0 = raw screen pixels).
+            float widthPixels = _s.outlineWidthPixels;
+            if (_s.referenceHeight > 0f)
+                widthPixels *= desc.height / _s.referenceHeight;
+            widthPixels = Mathf.Max(1f, widthPixels);
+
             _s.outlineMaterial.SetColor(OutlineColorID, _s.outlineColor);
-            _s.outlineMaterial.SetFloat(OutlineWidthID, _s.outlineWidthPixels);
+            _s.outlineMaterial.SetFloat(OutlineWidthID, widthPixels);
             var blit = new RenderGraphUtils.BlitMaterialParameters(mask, resource.activeColorTexture, _s.outlineMaterial, 0);
             renderGraph.AddBlitPass(blit, "Hover Outline Composite");
         }
