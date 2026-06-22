@@ -16,12 +16,18 @@ public static class CharacterSpriteGenerator
     private const int RENDER_SIZE = 256;
     private const int SPRITE_PIXELS_PER_UNIT = 100;
 
-    // Baked black outline width in render-texture texels, calibrated to match the live world
-    // outline's thickness relative to the character. The capture renders at ~128 px/world-unit
-    // (256px / 2 units at orthoSize 1) vs the game's ~32 px/unit (1080 / 2x17), so 1 live screen
-    // pixel ≈ 4 capture texels → the live 3px outline ≈ 12 capture texels.
-    private const int ICON_OUTLINE_TEXELS = 12;
-    private static readonly Color32 IconOutlineColor = new Color32(0, 0, 0, 255);
+    // Baked outline settings come from a Resources-loaded ScriptableObject so they're tunable in
+    // the inspector (Assets/Resources/CharacterIconSettings). Falls back to sane defaults if the
+    // asset is missing.
+    private const int DEFAULT_ICON_OUTLINE_TEXELS = 18;
+    private static CharacterIconSettings _iconSettings;
+    private static CharacterIconSettings IconSettings =>
+        _iconSettings != null ? _iconSettings : (_iconSettings = Resources.Load<CharacterIconSettings>("CharacterIconSettings"));
+
+    private static int IconOutlineTexels => IconSettings != null ? IconSettings.outlineTexels : DEFAULT_ICON_OUTLINE_TEXELS;
+    private static Color32 IconOutlineColor => IconSettings != null ? (Color32)IconSettings.outlineColor : new Color32(0, 0, 0, 255);
+    private static OutlineShape IconOutlineShape => IconSettings != null ? IconSettings.outlineShape : OutlineShape.Cross;
+    private static int IconCornerCut => IconSettings != null ? IconSettings.cornerCut : 1;
     private static readonly Vector3 PREVIEW_POSITION = new Vector3(9999f, 9999f, 0f); // Off-screen
 
     /// <summary>
@@ -299,7 +305,7 @@ public static class CharacterSpriteGenerator
         RenderTexture.active = null;
 
         // Bake a black silhouette outline into the icon so it matches the world black outline.
-        AddSilhouetteOutline(texture, ICON_OUTLINE_TEXELS, IconOutlineColor);
+        AddSilhouetteOutline(texture, IconOutlineTexels, IconOutlineColor, IconOutlineShape, IconCornerCut);
 
         // Create sprite from texture
         Sprite sprite = Sprite.Create(
@@ -319,42 +325,72 @@ public static class CharacterSpriteGenerator
     /// character (matching the world outline pass). Runs once per unique config — the result is
     /// cached with the sprite.
     /// </summary>
-    private static void AddSilhouetteOutline(Texture2D tex, int radius, Color32 color)
+    private static void AddSilhouetteOutline(Texture2D tex, int radius, Color32 color, OutlineShape shape, int cornerCut)
     {
         if (radius <= 0) return;
 
         int w = tex.width, h = tex.height;
         Color32[] src = tex.GetPixels32();
-        Color32[] dst = src.Clone() as Color32[];
         const byte alphaThreshold = 16;
+        bool[] solid = new bool[w * h];
+        for (int i = 0; i < src.Length; i++) solid[i] = src[i].a > alphaThreshold;
 
-        for (int y = 0; y < h; y++)
+        // Distance transforms (two-pass chamfer, O(n) at any width — a full box kernel was
+        // O(radius^2) and crashed the editor at thick widths).
+        //   Square : Chebyshev (diag 1) <= r            → full 90° corners
+        //   Circle : Euclidean (diag 1.414) <= r        → rounded corners
+        //   Cross  : Chebyshev <= r AND Manhattan <= 2r-cornerCut → 90° corners with the tips
+        //            notched by `cornerCut` px (Aseprite "+"/non-diagonal look)
+        float[] primary = ChamferDistance(solid, w, h, shape == OutlineShape.Circle ? 1.41421356f : 1f);
+        float[] manhattan = shape == OutlineShape.Cross ? ChamferDistance(solid, w, h, 2f) : null;
+        float crossLimit = 2f * radius - Mathf.Max(0, cornerCut);
+
+        Color32[] dst = src.Clone() as Color32[];
+        for (int i = 0; i < src.Length; i++)
         {
-            for (int x = 0; x < w; x++)
-            {
-                int i = y * w + x;
-                if (src[i].a > alphaThreshold) continue;   // inside the silhouette — keep the character pixel
-
-                // Square (Chebyshev) dilation: outline if any opaque texel sits within the
-                // [-radius, radius] box. A box, not a circle, gives crisp right-angle corners.
-                bool nearSilhouette = false;
-                for (int dy = -radius; dy <= radius && !nearSilhouette; dy++)
-                {
-                    int ny = y + dy;
-                    if (ny < 0 || ny >= h) continue;
-                    for (int dx = -radius; dx <= radius; dx++)
-                    {
-                        int nx = x + dx;
-                        if (nx < 0 || nx >= w) continue;
-                        if (src[ny * w + nx].a > alphaThreshold) { nearSilhouette = true; break; }
-                    }
-                }
-                if (nearSilhouette) dst[i] = color;
-            }
+            if (solid[i]) continue;                       // keep the character pixel
+            if (primary[i] <= 0f || primary[i] > radius) continue;
+            if (shape == OutlineShape.Cross && manhattan[i] > crossLimit) continue;   // notch the corner tips
+            dst[i] = color;
         }
 
         tex.SetPixels32(dst);
         tex.Apply();
+    }
+
+    /// <summary>Two-pass chamfer distance transform: distance (in `diag`-weighted steps) from each
+    /// empty texel to the nearest solid texel. diag 1 = Chebyshev, 1.414 = Euclidean, 2 = Manhattan.</summary>
+    private static float[] ChamferDistance(bool[] solid, int w, int h, float diag)
+    {
+        const float INF = 1e9f, ortho = 1f;
+        float[] d = new float[w * h];
+        for (int i = 0; i < solid.Length; i++) d[i] = solid[i] ? 0f : INF;
+
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                int i = y * w + x;
+                float v = d[i];
+                if (x > 0)              v = Mathf.Min(v, d[i - 1] + ortho);
+                if (y > 0)              v = Mathf.Min(v, d[i - w] + ortho);
+                if (x > 0 && y > 0)     v = Mathf.Min(v, d[i - w - 1] + diag);
+                if (x < w - 1 && y > 0) v = Mathf.Min(v, d[i - w + 1] + diag);
+                d[i] = v;
+            }
+
+        for (int y = h - 1; y >= 0; y--)
+            for (int x = w - 1; x >= 0; x--)
+            {
+                int i = y * w + x;
+                float v = d[i];
+                if (x < w - 1)              v = Mathf.Min(v, d[i + 1] + ortho);
+                if (y < h - 1)              v = Mathf.Min(v, d[i + w] + ortho);
+                if (x < w - 1 && y < h - 1) v = Mathf.Min(v, d[i + w + 1] + diag);
+                if (x > 0 && y < h - 1)     v = Mathf.Min(v, d[i + w - 1] + diag);
+                d[i] = v;
+            }
+
+        return d;
     }
 
     /// <summary>
@@ -372,6 +408,9 @@ public static class CharacterSpriteGenerator
         {
             int hash = 17;
             hash = hash * 31 + def.GetHashCode();
+            hash = hash * 31 + IconOutlineTexels;          // re-bake when the outline width changes
+            hash = hash * 31 + (int)IconOutlineShape;      // ...or the corner shape
+            hash = hash * 31 + IconCornerCut;              // ...or the corner-cut amount
             hash = hash * 31 + indices.pants;
             hash = hash * 31 + indices.shirt;
             hash = hash * 31 + indices.hairTop;
