@@ -43,8 +43,9 @@ public class CandidatePool
 
     /// <summary>
     /// Update refresh timer. Call from HireController.Update().
+    /// Returns true when the pool regenerated this tick.
     /// </summary>
-    public void Update(float deltaTime)
+    public bool Update(float deltaTime)
     {
         refreshTimer -= deltaTime;
 
@@ -52,7 +53,10 @@ public class CandidatePool
         {
             RegeneratePool();
             refreshTimer = refreshInterval;
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>

@@ -136,9 +136,14 @@ public class HireController : BasePanelController
 
     void Update()
     {
-        // Update candidate pools
+        // Update candidate pools; badge the top-bar sign when fresh candidates
+        // arrive while the player isn't looking (cleared on open).
+        bool poolRefreshed = false;
         foreach (var pool in candidatePools.Values)
-            pool.Update(Time.deltaTime);
+            poolRefreshed |= pool.Update(Time.deltaTime);
+
+        if (poolRefreshed && State != PanelState.Open)
+            SetHiringBadge(true);
 
         if (State == PanelState.Open)
             UpdateEmptyTimer();
