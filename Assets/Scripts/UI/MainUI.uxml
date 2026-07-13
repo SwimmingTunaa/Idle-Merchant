@@ -1,66 +1,20 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:Template name="MilestoneTracker" src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uxml?fileID=9197481963319205126&amp;guid=c986dfdbce2d64a2a9ee5099f22caa9e&amp;type=3#MilestoneTracker" />
-    <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel" />
-    <ui:Template name="PausePanel" src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/Pause_Panel.uxml?fileID=9197481963319205126&amp;guid=d86de3818b09844edb6036a25b22e634&amp;type=3#Pause_Panel" />
-    <ui:Template name="BookPanel" src="project://database/Assets/Scripts/UI/Panels/Book/BookPanel.uxml?fileID=9197481963319205126&amp;guid=c8a56a18023e84d3f9f6a7058be5abba&amp;type=3#BookPanel" />
-    <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI" />
-    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel" />
-    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
-    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <ui:Template name="BookPanel" src="project://database/Assets/Scripts/UI/Panels/Book/BookPanel.uxml?fileID=9197481963319205126&amp;guid=c8a56a18023e84d3f9f6a7058be5abba&amp;type=3#BookPanel"/>
+    <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel"/>
+    <ui:Template name="MilestoneTracker" src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uxml?fileID=9197481963319205126&amp;guid=c986dfdbce2d64a2a9ee5099f22caa9e&amp;type=3#MilestoneTracker"/>
+    <ui:Template name="PausePanel" src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/Pause_Panel.uxml?fileID=9197481963319205126&amp;guid=d86de3818b09844edb6036a25b22e634&amp;type=3#Pause_Panel"/>
+    <ui:Template name="TopNavigation" src="project://database/Assets/Scripts/UI/TopNavigation.uxml?fileID=9197481963319205126&amp;guid=ea5112a68ff84455992e270c7a46c49f&amp;type=3#TopNavigation"/>
+    <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI"/>
+    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel"/>
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables"/>
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button"/>
     <ui:VisualElement name="main-root" class="main-ui-root">
-        <ui:VisualElement name="top-bar" class="top-bar">
-            <ui:VisualElement name="bookmark-tabs-container" class="bookmark-tabs-container" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/book%20bottom.png?fileID=2800000&amp;guid=fcbcf17aa828c416d9a29f93248e9b33&amp;type=3#book bottom&quot;); background-size: cover; background-position-x: left 0; background-position-y: top -90px; height: 89px; padding-top: 31px;">
-                <ui:Button name="hiring-board-button" class="bookmark-button">
-                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Misc/Book%203.png?fileID=21300000&amp;guid=6b22156af64babe4f9bff6441c5b942f&amp;type=3#Book 3&quot;); rotate: -90deg;" />
-                </ui:Button>
-                <ui:Button name="inventory-button" data-source-type="UnityEditor.SerializedPropertyFilters+None, UnityEditor.CoreModule" class="bookmark-button">
-                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Equipment/Bag.png?fileID=21300000&amp;guid=93dbc8f96dc6c00418ba8f1a8e8992e4&amp;type=3#Bag&quot;); rotate: -90deg;" />
-                </ui:Button>
-                <ui:Button name="units-button" class="bookmark-button">
-                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Weapon%20&amp;%20Tool/Silver%20Sword.png?fileID=21300000&amp;guid=95052c6b62fb3de4695beaa99f842ac2&amp;type=3#Silver Sword&quot;); rotate: -90deg;" />
-                </ui:Button>
-                <ui:Button name="crafting-button" class="bookmark-button">
-                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Weapon%20&amp;%20Tool/Hammer.png?fileID=21300000&amp;guid=7b8e0222a006d824e930445c7d435ac3&amp;type=3#Hammer&quot;); rotate: -90deg;" />
-                </ui:Button>
-                <ui:Button name="research-bookmark-button" class="bookmark-button">
-                    <ui:VisualElement name="button-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/Loot/Pixel%20Art%20Icon%20Pack%20-%20RPG/Texture/Potion/Blue%20Potion%203.png?fileID=21300000&amp;guid=ace8a02646afeda4880fc3cb14cad705&amp;type=3#Blue Potion 3&quot;); rotate: -90deg;" />
-                </ui:Button>
-            </ui:VisualElement>
-            <ui:VisualElement name="guild-section" class="guild-section bookmark-icon">
-                <ui:Button name="guild-button" class="guild-banner-button">
-                    <ui:Label name="guild-name-label" text="The Rusty Dagger" class="guild-name-label" />
-                </ui:Button>
-                <ui:VisualElement name="stars-container" class="stars-container">
-                    <ui:VisualElement name="star-1" class="star star-filled" />
-                    <ui:VisualElement name="star-2" class="star star-filled" />
-                    <ui:VisualElement name="star-3" class="star star-filled" />
-                    <ui:VisualElement name="star-4" class="star star-empty" />
-                    <ui:VisualElement name="star-5" class="star star-empty" />
-                </ui:VisualElement>
-                <ui:Label name="milestone-progress-label" text="Progress: 2/6" class="milestone-progress-label" />
-            </ui:VisualElement>
-            <ui:VisualElement name="stats-section" class="stats-section" style="background-position-y: center;">
-                <ui:VisualElement name="utility-buttons" class="utility-buttons" style="margin-right: 32px;">
-                    <ui:Button name="settings-button" text="⚙" class="utility-button settings-button" />
-                    <ui:Button name="pause-button" text="⏸" class="utility-button pause-button" />
-                    <ui:Button name="speed-1x-button" text="1x" class="utility-button speed-button speed-selected" />
-                    <ui:Button name="speed-2x-button" text="2x" class="utility-button speed-button" />
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-grow: 1;">
-                    <ui:VisualElement name="coin-container" style="flex-grow: 0; flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="coin-icon" class="coin-icon pulse-target" style="background-image: url(&quot;project://database/Assets/Sprites/Icons/Coin.png?fileID=-992178750&amp;guid=0b3c0a61816effa42a7f2e43fdd2d5bf&amp;type=3#Coin_1&quot;);" />
-                        <ui:Label name="coin-label" text="5,240g" class="gold-amount-label text-h2" style="background-color: rgb(195, 137, 93); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 8px; padding-right: 16px; padding-bottom: 8px; padding-left: 16px; -unity-text-align: upper-right; border-left-color: rgb(51, 50, 61); border-right-color: rgb(51, 50, 61); border-top-color: rgb(51, 50, 61); border-bottom-color: rgb(51, 50, 61); border-top-width: 4px; border-right-width: 4px; border-bottom-width: 4px; border-left-width: 4px; flex-grow: 1; color: rgb(250, 175, 84); -unity-text-outline-width: 0; letter-spacing: 2px; text-shadow: 2px 3px 0 rgb(118, 75, 1);" />
-                    </ui:VisualElement>
-                    <ui:Label name="income-rate-label" text="+15/s" class="income-rate-label" style="color: rgb(50, 30, 10); -unity-text-align: upper-right; visibility: hidden; display: none;" />
-                    <ui:Label name="layer-status-label" text="L1-3" class="layer-status-label" style="color: rgb(50, 30, 10); -unity-text-align: upper-right; display: none;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
+        <ui:Instance template="TopNavigation" name="TopNavigation"/>
         <ui:VisualElement name="body" class="game-view-area" style="flex-grow: 1;">
-            <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 0; top: 20%;" />
-            <ui:Instance template="HirePanel" name="HirePanel" style="display: none;" />
-            <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1; display: none;" />
-            <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;" />
+            <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 0; top: 20%;"/>
+            <ui:Instance template="HirePanel" name="HirePanel" style="display: none;"/>
+            <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1; display: none;"/>
+            <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

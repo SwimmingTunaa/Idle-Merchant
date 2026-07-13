@@ -1,0 +1,74 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI"/>
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables"/>
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button"/>
+    <ui:VisualElement name="top-bar" class="top-bar">
+        <ui:VisualElement name="left-container" class="left-container">
+            <ui:VisualElement name="bookmarks-container" class="bookmarks-container" style="width: 550px;">
+                <ui:VisualElement name="bookmarks-shelf" picking-mode="Ignore" class="bookmarks-shelf" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/BookSprite_Animation/Page1_trimmed-menu.png?fileID=2800000&amp;guid=897d89fa15ddd4878bbc83d29d1cc134&amp;type=3#Page1_trimmed-menu&quot;); top: 0; left: 1px; height: 65px; width: 550px;"/>
+                <ui:Button name="units-button" class="bookmark-button">
+                    <ui:VisualElement name="bookmark-banner" class="bookmark-banner" style="-unity-background-image-tint-color: rgb(34, 125, 176);">
+                        <ui:VisualElement name="bookmark-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-8179040606652740800&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#adv&quot;); -unity-background-image-tint-color: rgb(117, 180, 224);"/>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="inventory-button" class="bookmark-button">
+                    <ui:VisualElement name="bookmark-banner" class="bookmark-banner" style="-unity-background-image-tint-color: rgb(145, 66, 156);">
+                        <ui:VisualElement name="bookmark-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-855792293&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#bag&quot;); -unity-background-image-tint-color: rgb(188, 112, 171);"/>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="crafting-button" class="bookmark-button">
+                    <ui:VisualElement name="bookmark-banner" class="bookmark-banner" style="-unity-background-image-tint-color: rgb(178, 51, 51);">
+                        <ui:VisualElement name="bookmark-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-2112496779&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#hammer&quot;); -unity-background-image-tint-color: rgb(231, 139, 119);"/>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="research-bookmark-button" class="bookmark-button">
+                    <ui:VisualElement name="bookmark-banner" class="bookmark-banner" style="-unity-background-image-tint-color: rgb(178, 178, 178);">
+                        <ui:VisualElement name="bookmark-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=1161201145128540330&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#Icons_0&quot;); -unity-background-image-tint-color: rgb(108, 115, 112);"/>
+                    </ui:VisualElement>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement name="hiring-menu-container" class="hiring-menu-container">
+                <ui:VisualElement name="pols" class="pols">
+                    <ui:VisualElement name="pole-1" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
+                    <ui:VisualElement name="pole-2" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
+                </ui:VisualElement>
+                <ui:Button name="hiring-board-button" text="" class="hiring-menu-button" style="height: 100px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/wooden%20board.png?fileID=2800000&amp;guid=ffabd942f6347418b9a274ff2a8ac207&amp;type=3#wooden board&quot;);">
+                    <ui:VisualElement name="hiring-badge" picking-mode="Ignore" class="hiring-badge"/>
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="middle" class="middle">
+            <ui:VisualElement name="banner-and-stars" class="guild-section">
+                <ui:VisualElement name="stars-container" class="stars-container" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/box-outline.png?fileID=2800000&amp;guid=80cf7c2e4874449dc844f214777954a9&amp;type=3#box-outline&quot;); -unity-background-image-tint-color: rgb(113, 65, 59); -unity-slice-left: 1; -unity-slice-top: 1; -unity-slice-right: 1; -unity-slice-bottom: 1; -unity-slice-scale: 5px;">
+                    <ui:VisualElement name="star-1" class="star star-filled"/>
+                    <ui:VisualElement name="star-2" class="star star-filled"/>
+                    <ui:VisualElement name="star-3" class="star star-filled"/>
+                    <ui:VisualElement name="star-4" class="star star-empty"/>
+                    <ui:VisualElement name="star-5" class="star star-empty"/>
+                </ui:VisualElement>
+                <ui:Button name="guild-button" text="" class="guild-flag" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; width: auto; min-width: 185px; min-height: 205px; height: 205px;">
+                    <ui:VisualElement name="label-container" class="label-container">
+                        <ui:Label name="guild-name-label" text="guild&#10;name" class="guild-name-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 56px; padding-right: 24px; padding-bottom: 90px; padding-left: 24px;"/>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Label name="milestone-progress-label" text="Progress: 2/6" class="milestone-progress-label" style="display: none;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="right" class="stats-section">
+            <ui:VisualElement name="coin-container" class="coin-plate">
+                <ui:VisualElement name="coin" class="coin">
+                    <ui:Label name="coin-label" text="100k" class="coin-label"/>
+                    <ui:VisualElement name="coin-icon" class="coin-icon pulse-target" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&amp;guid=16798bfa02f8d44348f9fffdaf153786&amp;type=3#Copper Coin_0&quot;);"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="utility-buttons" class="utility-buttons" style="display: none;">
+                <ui:Button name="settings-button" text="⚙" class="utility-button settings-button"/>
+                <ui:Button name="pause-button" text="⏸" class="utility-button pause-button"/>
+                <ui:Button name="speed-1x-button" text="1x" class="utility-button speed-button speed-selected"/>
+                <ui:Button name="speed-2x-button" text="2x" class="utility-button speed-button"/>
+            </ui:VisualElement>
+            <ui:Label name="income-rate-label" text="+15/s" class="income-rate-label" style="display: none;"/>
+            <ui:Label name="layer-status-label" text="L1-3" class="layer-status-label" style="display: none;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

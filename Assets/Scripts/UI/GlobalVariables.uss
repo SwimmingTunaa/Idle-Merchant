@@ -19,6 +19,24 @@
     --blue-700: rgb(42, 93, 143);        /* #2A5D8F — Figma Blue/700 */
     --blue-800: rgb(28, 63, 99);         /* #1C3F63 — Figma Blue/800 */
 
+    --secondary-300: rgb(255, 210, 140); /* #FFD28C — Figma Secondary/300 */
+
+    /* Neutral greyscale — pure neutrals (R=G=B), mirrors Figma Grey/* (Color Primitives).
+       Distinct from Figma Neutral/* which is warm/beige. --black is a soft black (very dark
+       grey), never pure #000; --white is the lightest. */
+    --white:    rgb(255, 255, 255);      /* #FFFFFF — Figma Grey/White */
+    --grey-50:  rgb(245, 245, 245);      /* #F5F5F5 — Figma Grey/50 */
+    --grey-100: rgb(230, 230, 230);      /* #E6E6E6 — Figma Grey/100 */
+    --grey-200: rgb(204, 204, 204);      /* #CCCCCC — Figma Grey/200 */
+    --grey-300: rgb(176, 176, 176);      /* #B0B0B0 — Figma Grey/300 */
+    --grey-400: rgb(144, 144, 144);      /* #909090 — Figma Grey/400 */
+    --grey-500: rgb(110, 110, 110);      /* #6E6E6E — Figma Grey/500 */
+    --grey-600: rgb(85, 85, 85);         /* #555555 — Figma Grey/600 */
+    --grey-700: rgb(61, 61, 61);         /* #3D3D3D — Figma Grey/700 */
+    --grey-800: rgb(43, 43, 43);         /* #2B2B2B — Figma Grey/800 */
+    --grey-900: rgb(31, 31, 31);         /* #1F1F1F — Figma Grey/900 */
+    --black:    rgb(26, 26, 26);         /* #1A1A1A — Figma Grey/Black (soft black, not pure #000) */
+
     /* ═════════ Semantic colour tokens ═════════ */
     --color-bg-dark: rgb(101, 67, 33);
     --color-bg-medium: rgb(139, 90, 60);

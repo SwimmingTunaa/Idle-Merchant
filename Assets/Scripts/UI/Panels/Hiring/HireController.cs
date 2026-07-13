@@ -177,6 +177,40 @@ public class HireController : BasePanelController
     }
 
     // ═════════════════════════════════════════════
+    // TOP-BAR SIGN STATE (hiring-board-button affordances)
+    // ═════════════════════════════════════════════
+
+    protected override void OnOpenStart()
+    {
+        base.OnOpenStart();
+        SetSignOpenState(true);
+        SetHiringBadge(false); // player is looking — clear the attention badge
+    }
+
+    protected override void OnCloseStart()
+    {
+        base.OnCloseStart();
+        SetSignOpenState(false);
+    }
+
+    // Keeps the top-bar hanging sign visually "pressed" while the panel is open.
+    private void SetSignOpenState(bool open)
+    {
+        uiDocument?.rootVisualElement?.Q<Button>("hiring-board-button")
+            ?.EnableInClassList("hiring-menu-button--open", open);
+    }
+
+    /// <summary>
+    /// Shows/hides the new-candidates badge on the top-bar hiring sign.
+    /// Cleared automatically when the panel opens.
+    /// </summary>
+    public void SetHiringBadge(bool visible)
+    {
+        uiDocument?.rootVisualElement?.Q<VisualElement>("hiring-badge")
+            ?.EnableInClassList("hiring-badge--visible", visible);
+    }
+
+    // ═════════════════════════════════════════════
     // OVERRIDE CANCLOSE TO PREVENT CLOSE DURING HIRE
     // ═════════════════════════════════════════════
 

@@ -71,13 +71,22 @@ public class UIManager : PersistentSingleton<UIManager>
             uiDocument = GetComponent<UIDocument>();
     }
 
-    void Start() => SetUpUIBindings();
+    void Start()
+    {
+        SetUpUIBindings();
+
+        // Sync the top-bar guild stars to actual progression on game start
+        // (clears the placeholder markup) and keep them in sync as stars are earned.
+        ProgressionManager.OnStarEarned += OnStarEarned;
+        RefreshGuildStars();
+    }
 
     private void OnDisable() => CleanupInputActions();
 
     void OnDestroy()
     {
         CleanupInputActions();
+        ProgressionManager.OnStarEarned -= OnStarEarned;
     }
 
     void Update()
@@ -186,6 +195,43 @@ public class UIManager : PersistentSingleton<UIManager>
         buttonCallbacks.Clear();
     }
     
+    // ═════════════════════════════════════════════
+    // GUILD STARS (top bar)
+    // ═════════════════════════════════════════════
+
+    private void OnStarEarned(int newStarCount) => RefreshGuildStars();
+
+    /// <summary>
+    /// Syncs the top-bar guild star icons to the current guild rating.
+    /// Runs on game start — resetting the hardcoded placeholder stars to the
+    /// real count (0 for a fresh guild) — and again whenever a star is earned.
+    /// </summary>
+    private void RefreshGuildStars()
+    {
+        if (uiDocument == null || uiDocument.rootVisualElement == null)
+            return;
+
+        // Scoped to the top-bar container ("stars-container"); the Guild book page
+        // uses a separate "stars-display" container with its own star-1..5 icons.
+        var starsContainer = uiDocument.rootVisualElement.Q<VisualElement>("stars-container");
+        if (starsContainer == null)
+            return;
+
+        int currentStars = ProgressionManager.Instance != null
+            ? ProgressionManager.Instance.GetCurrentStars()
+            : 0;
+
+        for (int i = 1; i <= 5; i++)
+        {
+            var star = starsContainer.Q<VisualElement>($"star-{i}");
+            if (star == null)
+                continue;
+
+            star.EnableInClassList("star-filled", i <= currentStars);
+            star.EnableInClassList("star-empty", i > currentStars);
+        }
+    }
+
     // ═════════════════════════════════════════════
     // PANEL REGISTRATION
     // ═════════════════════════════════════════════
