@@ -137,24 +137,18 @@ public class DamageNumber : MonoBehaviour
         // Random horizontal drift
         float randomX = Random.Range(-horizontalSpread, horizontalSpread);
         velocity = new Vector3(randomX, floatSpeed, 0f);
-        textMesh.enabled = false;
-        // // Text content
-        // int goldInt = Mathf.RoundToInt(amount);
-        // textMesh.text = goldInt.ToString();
+        textMesh.enabled = true;
+        // Text content
+        int goldInt = Mathf.RoundToInt(amount);
+        textMesh.text = goldInt.ToString();
         
-        // // Style based on crit
-        // if (isCrit)
-        // {
-        //     textMesh.fontSize = critFontSize;
-        //     textMesh.color = critColor;
-        //     baseColor = critColor;
-        // }
-        // else
-        // {
-        //     textMesh.fontSize = goldFontSize;
-        //     textMesh.color = goldColor;
-        //     baseColor = goldColor;
-        // }
+        // Style based on crit
+        if (isCrit)
+        {
+            textMesh.fontSize = critFontSize;
+            textMesh.color = critColor;
+            baseColor = critColor;
+        }
         
         // Show gold sprite if available
         if (goldSpriteRenderer != null)
@@ -182,17 +176,23 @@ public class DamageNumber : MonoBehaviour
         color.a = alpha;
         textMesh.color = color;
         
-        // Fade gold sprite if present
+        // Gold sprite stays at full alpha — it hands off to the fly-to VFX, so fading it
+        // out and popping a fresh coin in would break the transition
         if (goldSpriteRenderer != null && goldSpriteRenderer.enabled)
         {
             Color spriteColor = goldSpriteRenderer.color;
-            spriteColor.a = alpha;
+            spriteColor.a = 1f;
             goldSpriteRenderer.color = spriteColor;
         }
-        
+
         // Return to pool when done
         if (elapsed >= lifetime)
         {
+            // Gold numbers hand their coin off to the counter fly-to VFX (same as customer
+            // purchases), matching its size so the swap is invisible
+            if (goldSpriteRenderer != null && goldSpriteRenderer.enabled && ItemExplosionVFX.Instance != null)
+                ItemExplosionVFX.Instance.SpawnExplosion(goldSpriteRenderer.sprite, goldSpriteRenderer.transform.position,
+                    1, scale: goldSpriteRenderer.transform.lossyScale.x);
             ObjectPoolManager.Instance.ReturnObjectToPool(gameObject);
         }
     }

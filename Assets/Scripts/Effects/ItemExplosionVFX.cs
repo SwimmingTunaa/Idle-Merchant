@@ -19,7 +19,7 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
     // [SerializeField] private float rotationSpeed = 540f;
     [SerializeField] private float spawnStagger = 0.02f;
 
-    public void SpawnExplosion(Sprite sprite, Vector3 worldPosition, int count, int maxCount = 15)
+    public void SpawnExplosion(Sprite sprite, Vector3 worldPosition, int count, int maxCount = 15, float scale = 1f)
     {
         if (itemPrefab == null)
         {
@@ -44,10 +44,10 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
 
         int spawnCount = Mathf.Min(count, maxCount);
 
-        StartCoroutine(SpawnSequence(spriteToUse, worldPosition, screenTarget, spawnCount));
+        StartCoroutine(SpawnSequence(spriteToUse, worldPosition, screenTarget, spawnCount, scale));
     }
 
-    private System.Collections.IEnumerator SpawnSequence(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, int count)
+    private System.Collections.IEnumerator SpawnSequence(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, int count, float scale)
     {
         // Cache IconPulse reference once
         IconPulse iconPulse = FindAnyObjectByType<IconPulse>();
@@ -57,14 +57,14 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
             // Every coin just pulses icon (visual feedback only)
             System.Action callback = () => iconPulse?.Pulse();
             
-            SpawnSingleItem(sprite, worldPos, screenTarget, callback);
+            SpawnSingleItem(sprite, worldPos, screenTarget, callback, scale);
             
             if (i < count - 1)
                 yield return new WaitForSeconds(spawnStagger);
         }
     }
 
-    private void SpawnSingleItem(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, System.Action onComplete)
+    private void SpawnSingleItem(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, System.Action onComplete, float scale = 1f)
     {
         GameObject itemObj = ObjectPoolManager.Instance.SpawnObject(
             itemPrefab,
@@ -82,7 +82,7 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
             sr.color = Color.white;
         }
 
-        itemObj.transform.localScale = Vector3.one;
+        itemObj.transform.localScale = Vector3.one * scale;
 
         float angle = Random.Range(0f, 360f);
         Vector3 direction = new Vector3(
