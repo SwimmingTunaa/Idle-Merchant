@@ -27,6 +27,13 @@
     padding-top: var(--space-sm);
 }
 
+/* Hidden while the Book UI is open — its own tabs take over. visibility (not
+   display) keeps the layout so the hiring sign doesn't shift. Toggled by
+   BookPanelController. */
+.bookmarks-container--hidden {
+    visibility: hidden;
+}
+
 .bookmarks-shelf {
     position: absolute;
     left: 0;

@@ -137,6 +137,7 @@ public class BookPanelController : BasePanelController
         if (State == PanelState.Opening || State == PanelState.Open) return false;
         State = PanelState.Opening;
         if (panel.parent != null) panel.parent.style.display = DisplayStyle.Flex;
+        SetTopNavBookmarksVisible(false);
         SwitchToTab(lastActiveTab);
         State = PanelState.Open;
         InvokeOnOpenComplete();
@@ -151,9 +152,17 @@ public class BookPanelController : BasePanelController
         if (pageContainers[lastActiveTab] != null) pageContainers[lastActiveTab].style.display = DisplayStyle.None;
         if (inventoryFilterBar != null) inventoryFilterBar.style.display = DisplayStyle.None;
         if (panel.parent != null) panel.parent.style.display = DisplayStyle.None;
+        SetTopNavBookmarksVisible(true);
         State = PanelState.Closed;
         InvokeOnCloseComplete();
         return true;
+    }
+
+    // The book's own edge tabs replace the top-nav bookmarks while it's open.
+    private void SetTopNavBookmarksVisible(bool visible)
+    {
+        uiDocument?.rootVisualElement?.Q<VisualElement>("bookmarks-container")
+            ?.EnableInClassList("bookmarks-container--hidden", !visible);
     }
 
     // ═════════════════════════════════════════════
