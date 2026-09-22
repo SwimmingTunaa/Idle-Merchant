@@ -43,7 +43,9 @@ ScriptedImporter:
     cubemapConvolution: 0
     seamlessCubemap: 0
     alphaIsTransparency: 1
+    spriteTessellationMethod: 0
     spriteTessellationDetail: -1
+    spriteGeometrySubdivision: 0
     textureType: 8
     textureShape: 1
     singleChannelComponent: 0
@@ -127,7 +129,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Tileset
     originalName: 
-    pivot: {x: 0.9241877, y: -2.8923078}
+    pivot: {x: 0.9241877, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
