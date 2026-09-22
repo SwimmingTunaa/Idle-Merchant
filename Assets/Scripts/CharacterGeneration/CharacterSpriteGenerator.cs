@@ -19,7 +19,7 @@ public static class CharacterSpriteGenerator
     // Baked outline settings come from a Resources-loaded ScriptableObject so they're tunable in
     // the inspector (Assets/Resources/CharacterIconSettings). Falls back to sane defaults if the
     // asset is missing.
-    private const int DEFAULT_ICON_OUTLINE_TEXELS = 18;
+    private const int DEFAULT_ICON_OUTLINE_TEXELS = 2;   // art pixels (true-scale capture)
     private static CharacterIconSettings _iconSettings;
     private static CharacterIconSettings IconSettings =>
         _iconSettings != null ? _iconSettings : (_iconSettings = Resources.Load<CharacterIconSettings>("CharacterIconSettings"));
@@ -112,7 +112,9 @@ public static class CharacterSpriteGenerator
         
         _renderCamera = cameraObj.AddComponent<Camera>();
         _renderCamera.orthographic = true;
-        _renderCamera.orthographicSize = 1f;
+        // Capture at the sprite's TRUE scale: pixels-per-world-unit == sprite PPU, so 1 texel = 1
+        // art-pixel. Outline widths are then real art-pixels and the icon is pixel-perfect.
+        _renderCamera.orthographicSize = RENDER_SIZE / (2f * SPRITE_PIXELS_PER_UNIT);
         _renderCamera.clearFlags = CameraClearFlags.SolidColor;
         _renderCamera.backgroundColor = new Color(0, 0, 0, 0); // Transparent
         _renderCamera.cullingMask = 1 << LayerMask.NameToLayer("Default"); // Render only default layer
@@ -299,24 +301,63 @@ public static class CharacterSpriteGenerator
         
         // Convert RenderTexture to Texture2D
         RenderTexture.active = _renderTexture;
-        Texture2D texture = new Texture2D(RENDER_SIZE, RENDER_SIZE, TextureFormat.ARGB32, false);
-        texture.ReadPixels(new Rect(0, 0, RENDER_SIZE, RENDER_SIZE), 0, 0);
-        texture.Apply();
+        Texture2D full = new Texture2D(RENDER_SIZE, RENDER_SIZE, TextureFormat.ARGB32, false);
+        full.ReadPixels(new Rect(0, 0, RENDER_SIZE, RENDER_SIZE), 0, 0);
+        full.Apply();
         RenderTexture.active = null;
 
         // Bake a black silhouette outline into the icon so it matches the world black outline.
-        AddSilhouetteOutline(texture, IconOutlineTexels, IconOutlineColor, IconOutlineShape, IconCornerCut);
+        AddSilhouetteOutline(full, IconOutlineTexels, IconOutlineColor, IconOutlineShape, IconCornerCut);
 
-        // Create sprite from texture
+        // Crop to the character (incl. its outline) so the icon is a tight, native-resolution
+        // sprite — captured at true scale, it'd otherwise sit small in a big transparent canvas.
+        Texture2D texture = CropToContent(full, padding: 1);
+        if (texture != full) Object.Destroy(full);
+
         Sprite sprite = Sprite.Create(
             texture,
-            new Rect(0, 0, RENDER_SIZE, RENDER_SIZE),
+            new Rect(0, 0, texture.width, texture.height),
             new Vector2(0.5f, 0.5f),
             SPRITE_PIXELS_PER_UNIT
         );
         sprite.name = "GeneratedShopSprite";
-        
+
         return sprite;
+    }
+
+    /// <summary>Returns a new texture cropped to the non-transparent content (plus `padding` px of
+    /// transparent border), point-filtered for crisp pixel-art upscaling. Returns the input
+    /// unchanged if it's fully transparent.</summary>
+    private static Texture2D CropToContent(Texture2D tex, int padding)
+    {
+        int w = tex.width, h = tex.height;
+        Color32[] px = tex.GetPixels32();
+
+        int minX = w, minY = h, maxX = -1, maxY = -1;
+        for (int y = 0; y < h; y++)
+        {
+            int row = y * w;
+            for (int x = 0; x < w; x++)
+            {
+                if (px[row + x].a == 0) continue;
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+        if (maxX < 0) return tex;   // nothing drawn
+
+        minX = Mathf.Max(0, minX - padding);
+        minY = Mathf.Max(0, minY - padding);
+        maxX = Mathf.Min(w - 1, maxX + padding);
+        maxY = Mathf.Min(h - 1, maxY + padding);
+        int cw = maxX - minX + 1, ch = maxY - minY + 1;
+
+        var outTex = new Texture2D(cw, ch, TextureFormat.ARGB32, false) { filterMode = FilterMode.Point };
+        outTex.SetPixels(tex.GetPixels(minX, minY, cw, ch));
+        outTex.Apply();
+        return outTex;
     }
     
     /// <summary>

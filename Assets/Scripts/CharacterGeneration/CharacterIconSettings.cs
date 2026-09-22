@@ -20,9 +20,9 @@ public enum OutlineShape
 [CreateAssetMenu(menuName = "Data/Character Icon Settings", fileName = "CharacterIconSettings")]
 public class CharacterIconSettings : ScriptableObject
 {
-    [Tooltip("Baked outline width in render-texture texels (icons are rendered at 256px). " +
-             "Higher = thicker. ~12 roughly matches the live world outline at the default game zoom.")]
-    [Range(0, 48)] public int outlineTexels = 18;
+    [Tooltip("Baked outline width in sprite pixels (icons are captured at true 1:1 scale, so this " +
+             "is real art pixels). 1-2 is a typical pixel outline.")]
+    [Range(0, 16)] public int outlineTexels = 2;
 
     [Tooltip("Baked outline colour.")]
     public Color outlineColor = Color.black;
