@@ -33,6 +33,8 @@ public class DamageNumber : MonoBehaviour
     private float elapsed;
     private Vector3 velocity;
     private Color baseColor;
+    // Gold carried by this number, banked into Inventory when its coin reaches the counter
+    private float pendingGold;
 
     void Awake()
     {
@@ -131,6 +133,8 @@ public class DamageNumber : MonoBehaviour
     /// </summary>
     public void ShowGold(float amount, Vector3 worldPosition, bool isCrit = false)
     {
+        pendingGold = amount;
+
         // Position
         transform.position = worldPosition;
         
@@ -189,11 +193,26 @@ public class DamageNumber : MonoBehaviour
         if (elapsed >= lifetime)
         {
             // Gold numbers hand their coin off to the counter fly-to VFX (same as customer
-            // purchases), matching its size so the swap is invisible
+            // purchases), matching its size so the swap is invisible. The gold itself is
+            // banked when the coin arrives at the counter.
             if (goldSpriteRenderer != null && goldSpriteRenderer.enabled && ItemExplosionVFX.Instance != null)
+            {
+                float gold = pendingGold;
+                pendingGold = 0f;
                 ItemExplosionVFX.Instance.SpawnExplosion(goldSpriteRenderer.sprite, goldSpriteRenderer.transform.position,
-                    1, scale: goldSpriteRenderer.transform.lossyScale.x);
+                    1, scale: goldSpriteRenderer.transform.lossyScale.x,
+                    onEachArrival: gold > 0f ? () => Inventory.Instance.AddGoldFloat(gold) : null);
+            }
             ObjectPoolManager.Instance.ReturnObjectToPool(gameObject);
         }
+    }
+
+    // Safety net: if this number is despawned by any other path, bank its gold immediately
+    // rather than losing it. Normal handoff clears pendingGold first, so no double-count.
+    void OnDisable()
+    {
+        if (pendingGold > 0f && Inventory.Instance != null)
+            Inventory.Instance.AddGoldFloat(pendingGold);
+        pendingGold = 0f;
     }
 }

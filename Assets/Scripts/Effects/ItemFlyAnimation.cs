@@ -45,6 +45,9 @@ public class ItemFlyAnimation : MonoBehaviour
             StopCoroutine(flyCoroutine);
             flyCoroutine = null;
         }
+        // Deliver the pending callback even on premature despawn — it may carry gold
+        onArrivalCallback?.Invoke();
+        onArrivalCallback = null;
     }
     
     public void StartFlight(Vector2 screenTarget, Vector3 randomExplosionDir, System.Action onComplete = null)

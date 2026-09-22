@@ -19,7 +19,8 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
     // [SerializeField] private float rotationSpeed = 540f;
     [SerializeField] private float spawnStagger = 0.02f;
 
-    public void SpawnExplosion(Sprite sprite, Vector3 worldPosition, int count, int maxCount = 15, float scale = 1f)
+    public void SpawnExplosion(Sprite sprite, Vector3 worldPosition, int count, int maxCount = 15, float scale = 1f,
+        System.Action onEachArrival = null)
     {
         if (itemPrefab == null)
         {
@@ -44,18 +45,18 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
 
         int spawnCount = Mathf.Min(count, maxCount);
 
-        StartCoroutine(SpawnSequence(spriteToUse, worldPosition, screenTarget, spawnCount, scale));
+        StartCoroutine(SpawnSequence(spriteToUse, worldPosition, screenTarget, spawnCount, scale, onEachArrival));
     }
 
-    private System.Collections.IEnumerator SpawnSequence(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, int count, float scale)
+    private System.Collections.IEnumerator SpawnSequence(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, int count, float scale,
+        System.Action onEachArrival)
     {
         // Cache IconPulse reference once
         IconPulse iconPulse = FindAnyObjectByType<IconPulse>();
-        
+
         for (int i = 0; i < count; i++)
         {
-            // Every coin just pulses icon (visual feedback only)
-            System.Action callback = () => iconPulse?.Pulse();
+            System.Action callback = () => { iconPulse?.Pulse(); onEachArrival?.Invoke(); };
             
             SpawnSingleItem(sprite, worldPos, screenTarget, callback, scale);
             
@@ -73,7 +74,7 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
             ObjectPoolManager.PoolType.GameObject
         );
 
-        if (itemObj == null) return;
+        if (itemObj == null) { onComplete?.Invoke(); return; }   // never swallow the callback — it may carry gold
 
         SpriteRenderer sr = itemObj.GetComponent<SpriteRenderer>();
         if (sr != null)
@@ -95,6 +96,10 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
         if (animation != null)
         {
             animation.StartFlight(screenTarget, direction, onComplete);
+        }
+        else
+        {
+            onComplete?.Invoke();
         }
     }
 }

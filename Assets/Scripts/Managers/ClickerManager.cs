@@ -144,9 +144,11 @@ public class ClickerManager : MonoBehaviour
                 float applied = enemy.OnDamage(clickDamage);
                 if (applied > 0f)
                 {
+                    // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
                     if (DamageNumberManager.Instance != null)
                         DamageNumberManager.Instance.ShowGoldGain(applied, hit.transform);
-                    Inventory.Instance.AddGoldFloat(applied);
+                    else
+                        Inventory.Instance.AddGoldFloat(applied);
                 }
             }
             return;
@@ -189,13 +191,12 @@ public class ClickerManager : MonoBehaviour
                     float applied = enemy.OnDamage(clickDamage);
                     if (applied > 0f)
                     {
-                        // Show gold number
+                        // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
                         if (DamageNumberManager.Instance != null)
-                        {
                             DamageNumberManager.Instance.ShowGoldGain(applied, hit.transform);
-                        }
-                        
-                        Inventory.Instance.AddGoldFloat(applied);
+                        else
+                            Inventory.Instance.AddGoldFloat(applied);
+
                         alreadyDamaged.Add(enemy);
                     }
                 }

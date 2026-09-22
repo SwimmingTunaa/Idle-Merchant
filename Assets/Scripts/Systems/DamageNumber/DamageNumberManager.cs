@@ -177,6 +177,7 @@ public class DamageNumberManager : MonoBehaviour
         if (damageNumberPrefab == null || entityTransform == null)
         {
             Debug.LogWarning("[DamageNumberManager] Cannot show gold gain - prefab or transform is null");
+            BankGold(gold);   // VFX failed, but the gold is real — never drop it
             return;
         }
 
@@ -206,6 +207,7 @@ public class DamageNumberManager : MonoBehaviour
         if (numberObj == null)
         {
             Debug.LogError("[DamageNumberManager] Failed to spawn gold number!");
+            BankGold(gold);
             return;
         }
 
@@ -216,6 +218,13 @@ public class DamageNumberManager : MonoBehaviour
         else
         {
             Debug.LogError("[DamageNumberManager] No DamageNumber component on spawned object!");
+            BankGold(gold);
         }
+    }
+
+    private static void BankGold(float gold)
+    {
+        if (gold > 0f && Inventory.Instance != null)
+            Inventory.Instance.AddGoldFloat(gold);
     }
 }
