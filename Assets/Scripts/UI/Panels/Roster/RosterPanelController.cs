@@ -86,7 +86,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         layersContainer.Clear();
         agentSlots.Clear();
 
-        var managers = FindObjectsByType<AdventurerManager>(FindObjectsSortMode.None)
+        var managers = FindObjectsByType<AdventurerManager>()
             .OrderBy(m => m.LayerIndex)
             .ToList();
 

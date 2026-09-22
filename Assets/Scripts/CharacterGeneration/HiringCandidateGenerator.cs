@@ -11,7 +11,7 @@ public static class HiringCandidateGenerator
     private const float NEGATIVE_MODIFIER_PRICE_DELTA = -0.10f;
     private const float MAX_POSITIVE_TRAIT_DELTA = 0.30f;
     private const float MAX_NEGATIVE_TRAIT_DELTA = -0.10f;
-    private const bool ENABLE_GENERATION_LOGS = false;
+    private static readonly bool ENABLE_GENERATION_LOGS = false;
 
     private static readonly string[] NewspaperNames =
     {

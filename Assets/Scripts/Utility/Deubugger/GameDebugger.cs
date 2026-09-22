@@ -276,7 +276,7 @@ public class GameDebugger : EditorWindow
         GUI.enabled = Application.isPlaying;
         if (GUILayout.Button("Trigger All Spawners Once"))
         {
-            var spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
+            var spawners = FindObjectsByType<Spawner>();
             foreach (var spawner in spawners)
             {
                 spawner.TrySpawn();
@@ -836,19 +836,19 @@ public class GameDebugger : EditorWindow
 
     AdventurerManager FindAdventurerManager(int layer)
     {
-        var managers = FindObjectsByType<AdventurerManager>(FindObjectsSortMode.None);
+        var managers = FindObjectsByType<AdventurerManager>();
         return managers.FirstOrDefault(m => m.LayerIndex == layer);
     }
 
     PorterManager FindPorterManager(int layer)
     {
-        var managers = FindObjectsByType<PorterManager>(FindObjectsSortMode.None);
+        var managers = FindObjectsByType<PorterManager>();
         return managers.FirstOrDefault(m => m.LayerIndex == layer);
     }
 
     Spawner FindSpawner(int layer, SpawnerType type)
     {
-        var spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
+        var spawners = FindObjectsByType<Spawner>();
         return spawners.FirstOrDefault(s => s.layerIndex == layer && s.spawnerType == type);
     }
 

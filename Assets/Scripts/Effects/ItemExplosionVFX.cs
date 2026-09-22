@@ -50,7 +50,7 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
     private System.Collections.IEnumerator SpawnSequence(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, int count)
     {
         // Cache IconPulse reference once
-        IconPulse iconPulse = FindFirstObjectByType<IconPulse>();
+        IconPulse iconPulse = FindAnyObjectByType<IconPulse>();
         
         for (int i = 0; i < count; i++)
         {
