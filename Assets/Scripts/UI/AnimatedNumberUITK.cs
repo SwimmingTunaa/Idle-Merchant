@@ -43,9 +43,11 @@ public class AnimatedNumberUITK : MonoBehaviour
             animating = false;
         }
 
+        // Round, not floor: a +1 change flips at the lerp's halfway point instead of
+        // stalling on the old value until the exponential tail finishes
         label.text = abbreviate
-            ? Abbrev(Mathf.FloorToInt(currentValue))
-            : Mathf.FloorToInt(currentValue).ToString(format);
+            ? Abbrev(Mathf.RoundToInt(currentValue))
+            : Mathf.RoundToInt(currentValue).ToString(format);
     }
 
     public void SetTargetValue(int value)
