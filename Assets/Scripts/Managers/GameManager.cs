@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -20,6 +21,18 @@ public class GameManager : PersistentSingleton<GameManager>
     private void OnDestroy()
     {
         CharacterSpriteGenerator.Cleanup();
+    }
+
+    // Number keys 1/2/3 set game speed (1x/2x/3x). Ignored while paused (SetTimeScale
+    // stores the speed and PauseGame/UnpauseGame restore it).
+    private void Update()
+    {
+        var kb = Keyboard.current;
+        if (kb == null) return;
+
+        if (kb.digit1Key.wasPressedThisFrame) SetTimeScale(1f);
+        else if (kb.digit2Key.wasPressedThisFrame) SetTimeScale(2f);
+        else if (kb.digit3Key.wasPressedThisFrame) SetTimeScale(3f);
     }
 
 
