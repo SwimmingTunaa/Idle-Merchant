@@ -543,6 +543,9 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
                 currentLevel++;
                 ApplyLevelBonus();
                 GameSignals.RaiseAdventurerLeveledUp(this, currentLevel);
+                // ponytail: "lvl +" not "lvl ↑" — BrightLinger SDF has no U+2191; rebake the font to upgrade
+                if (DamageNumberManager.Instance != null)
+                    DamageNumberManager.Instance.ShowText("lvl +", transform, new Color(0.45f, 0.85f, 0.3f));
             }
 
             // At the rank's top level there is no further auto-level — keep the bar full

@@ -143,7 +143,7 @@ public class DamageNumberManager : MonoBehaviour
     /// <summary>
     /// Float an arbitrary text hint above an entity (e.g. a one-time UI nudge).
     /// </summary>
-    public void ShowText(string message, Transform entityTransform)
+    public void ShowText(string message, Transform entityTransform, Color? color = null)
     {
         if (damageNumberPrefab == null || entityTransform == null)
             return;
@@ -166,7 +166,7 @@ public class DamageNumberManager : MonoBehaviour
             return;
 
         if (numberObj.TryGetComponent(out DamageNumber damageNumber))
-            damageNumber.ShowText(message, spawnPos);
+            damageNumber.ShowText(message, spawnPos, color);
     }
 
     /// <summary>

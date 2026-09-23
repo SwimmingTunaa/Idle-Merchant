@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 5893874100683847255}
   - component: {fileID: 4170936427891067786}
   - component: {fileID: 3006652510643543329}
+  - component: {fileID: 7345689234170259301}
   m_Layer: 9
   m_Name: Adventuer Agent
   m_TagString: Untagged
@@ -355,33 +356,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 864351943027441043, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 6918b23845a8140e0be10a6bd97d2bb3, type: 2}
-    - target: {fileID: 4250516778657953563, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -1645501144, guid: 075443c860096487783eb5987b84fb3c, type: 3}
-    - target: {fileID: 6323932363702626183, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
-      propertyPath: m_labelHash
-      value: 0.011353224
-      objectReference: {fileID: 0}
-    - target: {fileID: 6339281551565971081, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
-      propertyPath: autoChangeOnStart
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6734946296550151143, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
       propertyPath: m_Name
       value: BaseCharacterRoot
-      objectReference: {fileID: 0}
-    - target: {fileID: 8840193133850232631, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
-      propertyPath: m_labelHash
-      value: 0.000011785342
-      objectReference: {fileID: 0}
-    - target: {fileID: 8840193133850232631, guid: 31719c9edc7944570a8a158932f2999f, type: 3}
-      propertyPath: m_SpriteHash
-      value: 771982917
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -409,3 +386,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a6d62eea44444ca698899ec5681a7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteChanger
+--- !u!114 &7345689234170259301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440394158813992520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27681a61c44f47d9898236c595005130, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PromoteIndicator
+  rankBadges:
+  - {fileID: 217491548971362121, guid: d825792e71a5342959a9c727f20b2749, type: 3}
+  arrowSprite: {fileID: 0}
+  height: 1.15
+  bobAmplitude: 0.06
+  bobSpeed: 3
+  badgeScale: 0.5
+  arrowColor: {r: 0.45, g: 0.85, b: 0.3, a: 1}

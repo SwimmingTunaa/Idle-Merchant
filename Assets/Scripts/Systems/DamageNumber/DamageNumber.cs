@@ -85,14 +85,15 @@ public class DamageNumber : MonoBehaviour
     /// <summary>
     /// Show an arbitrary text hint that floats up (e.g. a one-time UI nudge).
     /// </summary>
-    public void ShowText(string message, Vector3 worldPosition)
+    public void ShowText(string message, Vector3 worldPosition, Color? color = null)
     {
         transform.position = worldPosition;
         velocity = new Vector3(0f, floatSpeed, 0f);
         textMesh.text = message;
         textMesh.fontSize = normalFontSize;
-        textMesh.color = normalColor;
-        baseColor = normalColor;
+        textMesh.enabled = true;
+        baseColor = color ?? normalColor;
+        textMesh.color = baseColor;
         if (goldSpriteRenderer != null)
             goldSpriteRenderer.enabled = false;
         elapsed = 0f;
