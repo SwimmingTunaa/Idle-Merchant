@@ -37,8 +37,8 @@
             </ui:VisualElement>
             <ui:VisualElement name="footer" style="flex-grow: 0; flex-direction: row; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px; margin-bottom: 8px; width: 100%; justify-content: center;">
                 <ui:Button name="hire-button" class="btn-primary" style="flex-direction: row; min-width: 50%; justify-content: center;">
-                    <ui:VisualElement name="gold-icon" style="flex-grow: 0; height: 48px; width: 48px; background-image: url(&quot;project://database/Assets/Sprites/Icons/Coin.png?fileID=-3338749442709606003&amp;guid=0b3c0a61816effa42a7f2e43fdd2d5bf&amp;type=3#Coin_0&quot;); margin-right: 4px;" />
                     <ui:Label text="50&#10;" name="cost" style="font-size: 24px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-grow: 0; -unity-text-align: middle-left; flex-shrink: 1; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&amp;guid=2c162277ddf0d4f9fa96298d0a4c7a84&amp;type=3#Salmon Typewriter 9 Regular&quot;); padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                    <ui:VisualElement name="gold-icon" style="flex-grow: 0; height: 32px; width: 32px; background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&amp;guid=16798bfa02f8d44348f9fffdaf153786&amp;type=3#Copper Coin_0&quot;); -unity-background-scale-mode: scale-to-fit; margin-left: 8px;" />
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>

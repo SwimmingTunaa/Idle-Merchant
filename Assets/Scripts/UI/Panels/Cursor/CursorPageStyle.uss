@@ -26,13 +26,13 @@
 .cursor-stat-key {
     font-size: 32px;
     color: rgb(128, 75, 24);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
 .cursor-stat-value {
     font-size: 32px;
     color: rgb(101, 67, 33);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
 .cursor-stat-value--muted {
@@ -43,7 +43,7 @@
     font-size: 16px;
     color: rgb(155, 112, 72);
     margin-top: 20px;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
 .cursor-upgrade-list {
@@ -53,15 +53,29 @@
 /* ── upgrade card: pixel box-outline 9-slice frame (image + slices set from
    CursorUpgradePage code — the USS importer dropped the url() reference) ── */
 .cursor-card {
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     margin-bottom: 20px;
     padding: 20px;
-    -unity-background-image-tint-color: rgb(179, 145, 111);
+}
+
+/* row 1: icon slot + name/level block */
+.cursor-card-header {
+    flex-direction: row;
+    align-items: center;
+}
+
+.cursor-card-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    margin-right: 16px;
+    border-width: 1px;
+    border-color: rgba(101, 67, 33, 0.35);
 }
 
 .cursor-card--locked {
-    opacity: 0.65;
+    opacity: 0.85;
 }
 
 .cursor-card-info {
@@ -71,38 +85,43 @@
 .cursor-card-name {
     font-size: 32px;
     color: rgb(101, 67, 33);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
 .cursor-card-level {
     font-size: 16px;
     color: rgb(155, 112, 72);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
 .cursor-card-stat {
     font-size: 32px;
     color: rgb(128, 75, 24);
-    margin-top: 4px;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    margin-top: 8px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
 .cursor-card-substat {
     font-size: 16px;
     color: rgb(155, 112, 72);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    margin-top: 8px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 
-/* sizing overrides on top of the Button component classes */
+/* sizing overrides on top of the Button component classes — row 3, full card width */
 .cursor-card-buy {
-    min-width: 220px;
-    margin-left: 20px;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 12px;
     flex-shrink: 0;
 }
 
 .cursor-card-lockpill {
-    margin-left: 20px;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 12px;
     flex-shrink: 0;
+    -unity-text-align: middle-center;
 }
 
 .cursor-page-title {

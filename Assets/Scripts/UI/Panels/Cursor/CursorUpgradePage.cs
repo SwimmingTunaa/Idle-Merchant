@@ -28,6 +28,7 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     private Label dmgLevelLabel;
     private Label dmgStatLabel;
     private Button dmgBuyButton;
+    private Label dmgBuyLabel;
 
     void Awake() => hideFlags = HideFlags.HideInInspector;
 
@@ -62,6 +63,7 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         dmgLevelLabel = null;
         dmgStatLabel = null;
         dmgBuyButton = null;
+        dmgBuyLabel = null;
     }
 
     private void OnGoldChanged(int _) => Refresh();
@@ -78,25 +80,30 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         // Click Damage — live
         var dmgCard = NewCard("Click Damage", locked: false);
-        var info = dmgCard.Q<VisualElement>("card-info");
-        dmgLevelLabel = AddLabel(info, "cursor-card-level");
-        dmgStatLabel = AddLabel(info, "cursor-card-stat");
+        dmgLevelLabel = AddLabel(dmgCard.Q<VisualElement>("card-info"), "cursor-card-level");
+        dmgStatLabel = AddLabel(dmgCard, "cursor-card-stat");   // row 2: stat line
 
         dmgBuyButton = new Button(OnBuyDamageClicked);
         dmgBuyButton.AddToClassList("btn-success");
         dmgBuyButton.AddToClassList("cursor-card-buy");
+        dmgBuyLabel = new Label();
+        dmgBuyLabel.AddToClassList("btn-label");
+        dmgBuyButton.Add(dmgBuyLabel);
+        var coin = new VisualElement();
+        coin.AddToClassList("btn-coin");    // trailing gold icon, same as the wallet/hire cost
+        dmgBuyButton.Add(coin);
         dmgCard.Add(dmgBuyButton);
         list.Add(dmgCard);
 
         // Pickup Radius — locked preview (no upgrade path built yet)
         var radiusCard = NewCard("Pickup Radius", locked: true);
-        AddLabel(radiusCard.Q<VisualElement>("card-info"), "cursor-card-substat").text = "loot vacuum area on click";
+        AddLabel(radiusCard, "cursor-card-substat").text = "loot vacuum area on click";
         radiusCard.Add(LockPill("Coming soon"));
         list.Add(radiusCard);
 
         // Damage AOE — locked preview, star gated per GDD mouse upgrades
         var aoeCard = NewCard("Damage AOE", locked: true);
-        AddLabel(aoeCard.Q<VisualElement>("card-info"), "cursor-card-substat").text = "clicks damage nearby mobs";
+        AddLabel(aoeCard, "cursor-card-substat").text = "clicks damage nearby mobs";
         aoeCard.Add(LockPill("Unlocks at 2★"));
         list.Add(aoeCard);
     }
@@ -109,13 +116,22 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         if (cardFrame != null)
         {
+            // card-torn.png: 8px slices keep the periodic torn top + baked shadow intact
             card.style.backgroundImage = new StyleBackground(cardFrame);
-            card.style.unitySliceLeft = 1;
-            card.style.unitySliceTop = 1;
-            card.style.unitySliceRight = 1;
-            card.style.unitySliceBottom = 1;
-            card.style.unitySliceScale = 5f;
+            card.style.unitySliceLeft = 8;
+            card.style.unitySliceTop = 8;
+            card.style.unitySliceRight = 8;
+            card.style.unitySliceBottom = 8;
+            card.style.unitySliceScale = 3f;
         }
+
+        // Row 1: icon placeholder beside name + level block
+        var header = new VisualElement { name = "card-header" };
+        header.AddToClassList("cursor-card-header");
+
+        var icon = new VisualElement { name = "card-icon" };
+        icon.AddToClassList("cursor-card-icon");
+        header.Add(icon);
 
         var info = new VisualElement { name = "card-info" };
         info.AddToClassList("cursor-card-info");
@@ -124,7 +140,8 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         nameLabel.AddToClassList("cursor-card-name");
         info.Add(nameLabel);
 
-        card.Add(info);
+        header.Add(info);
+        card.Add(header);
         return card;
     }
 
@@ -164,12 +181,13 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         if (dmgLevelLabel != null) dmgLevelLabel.text = $"Level {clicker.ClickDamageLevel}";
         if (dmgStatLabel != null)
-            dmgStatLabel.text = $"{clicker.EffectiveClickDamage:0.#} ➜ {clicker.NextClickDamage:0.#} dmg";
+            // next value in success green (UITK rich text; colour = --color-text-success)
+            dmgStatLabel.text = $"{clicker.EffectiveClickDamage:0.#} ➜ <color=#376C2D>{clicker.NextClickDamage:0.#} dmg</color>";
 
         if (dmgBuyButton != null)
         {
             int cost = clicker.ClickUpgradeCost;
-            dmgBuyButton.text = $"Upgrade  {AnimatedNumberUITK.Abbrev(cost)}g";
+            if (dmgBuyLabel != null) dmgBuyLabel.text = AnimatedNumberUITK.Abbrev(cost);
             bool affordable = Inventory.Instance != null && Inventory.Instance.Gold >= cost;
             dmgBuyButton.SetEnabled(affordable);
         }
