@@ -203,6 +203,14 @@ public class ClickerManager : MonoBehaviour
                 float applied = enemy.OnDamage(EffectiveClickDamage);
                 if (applied > 0f)
                 {
+                    // Health.OnDamage flips IsAlive synchronously, so this reads the kill blow.
+                    bool killed = enemy is Health hp && !hp.IsAlive;
+                    if (ClickHitVFX.Instance != null)
+                    {
+                        ClickHitVFX.Instance.PlayHit(world, hit.transform);
+                        if (killed) ClickHitVFX.Instance.PlayKill(hit.transform.position);
+                    }
+
                     float gold = applied * goldPerDamage;
                     // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
                     if (DamageNumberManager.Instance != null)
@@ -251,6 +259,14 @@ public class ClickerManager : MonoBehaviour
                     float applied = enemy.OnDamage(EffectiveClickDamage);
                     if (applied > 0f)
                     {
+                        // AOE has no single cursor point — sparks spawn on each struck mob.
+                        bool killed = enemy is Health hp && !hp.IsAlive;
+                        if (ClickHitVFX.Instance != null)
+                        {
+                            ClickHitVFX.Instance.PlayHit(hit.transform.position, hit.transform);
+                            if (killed) ClickHitVFX.Instance.PlayKill(hit.transform.position);
+                        }
+
                         float gold = applied * goldPerDamage;
                         // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
                         if (DamageNumberManager.Instance != null)
@@ -274,6 +290,9 @@ public class ClickerManager : MonoBehaviour
 
     private void VacuumLootToMouse(Vector3 clickPos, float radius)
     {
+        if (ClickHitVFX.Instance != null)
+            ClickHitVFX.Instance.PlayVacuumRing(clickPos, radius);
+
         Collider2D[] hits = Physics2D.OverlapCircleAll(clickPos, radius);
         
         foreach (var hit in hits)
@@ -306,6 +325,8 @@ public class ClickerManager : MonoBehaviour
             {
                 if (lootObj.TryGetComponent(out IClickableLoot loot))
                 {
+                    if (ClickHitVFX.Instance != null)
+                        ClickHitVFX.Instance.PlayAbsorb(lootObj.transform.position);
                     loot.OnManualCollect();
                 }
                 yield break;
@@ -316,6 +337,8 @@ public class ClickerManager : MonoBehaviour
 
         if (lootObj != null && lootObj.TryGetComponent(out IClickableLoot finalLoot))
         {
+            if (ClickHitVFX.Instance != null)
+                ClickHitVFX.Instance.PlayAbsorb(lootObj.transform.position);
             finalLoot.OnManualCollect();
         }
     }
