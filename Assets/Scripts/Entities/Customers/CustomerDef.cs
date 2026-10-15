@@ -23,7 +23,7 @@ public class CustomerDef : EntityDef
     public Vector2 wanderPauseDuration = new Vector2(0.5f, 2f);
 
     [Header("Budget")]
-    public Vector2 budget = new Vector2(8, 16);
+    public Vector2 budget = new Vector2(80, 160);
     public Vector2Int batchRange = new Vector2Int(1, 3); // items per visit
 
 }

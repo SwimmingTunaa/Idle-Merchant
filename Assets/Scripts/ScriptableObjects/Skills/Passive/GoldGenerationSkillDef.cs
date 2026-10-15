@@ -20,7 +20,7 @@ public class GoldGenerationSkillDef : SkillDef
     [Header("Gold Generation Settings")]
     [Tooltip("Gold generated per tick")]
     [Min(1)]
-    public int goldPerTick = 1;
+    public int goldPerTick = 10;
 
     [Tooltip("Seconds between gold generation ticks (1.0 = once per second)")]
     [Range(0.1f, 10f)]

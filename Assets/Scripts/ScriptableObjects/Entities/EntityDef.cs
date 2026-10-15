@@ -16,7 +16,7 @@ public class EntityDef : ScriptableObject
     public string displayName;
     [TextArea(2, 4)]
     public string description;
-    public int hireCost = 50;
+    public int hireCost = 500;
     public int rank = 1;
 
     [Header("Skills")]

@@ -55,7 +55,7 @@ public class AdventurerDef : EntityDef
     public int maxRank = 5;
 
     [Tooltip("Gold cost to promote from rank 1; multiplied by Promote Cost Growth each rank.")]
-    public int basePromoteCost = 150;
+    public int basePromoteCost = 1500;
 
     [Tooltip("Exponential growth of the promote gold cost per rank (2.5 = ×2.5 each rank).")]
     public float promoteCostGrowth = 2.5f;

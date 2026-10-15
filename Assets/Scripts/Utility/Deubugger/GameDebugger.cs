@@ -14,7 +14,7 @@ public class GameDebugger : EditorWindow
     private DebugTab currentTab = DebugTab.Economy;
 
     // Economy
-    private int goldAmount = 100;
+    private int goldAmount = 1000;
 
     // Inventory
     private ItemDef selectedItem;

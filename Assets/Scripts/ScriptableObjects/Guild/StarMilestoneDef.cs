@@ -25,7 +25,7 @@ public class StarMilestoneDef : ScriptableObject
     public MilestoneType milestoneType = MilestoneType.GoldEarned;
     
     [Tooltip("Target value to complete this milestone (1000 gold, 100 mobs, etc.)")]
-    public int targetValue = 1000;
+    public int targetValue = 10000;
 
     [Header("Upgrade Purchase (if applicable)")]
     [Tooltip("If milestoneType is UpgradePurchased, which upgrade is required?")]

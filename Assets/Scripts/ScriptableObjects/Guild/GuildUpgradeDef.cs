@@ -20,7 +20,7 @@ public class GuildUpgradeDef : ScriptableObject
 
     [Header("Requirements")]
     [Tooltip("Gold cost to purchase this upgrade")]
-    public int goldCost = 500;
+    public int goldCost = 5000;
     
     [Tooltip("Minimum stars required to see/purchase this upgrade (0 = always available)")]
     [Range(0, 5)]

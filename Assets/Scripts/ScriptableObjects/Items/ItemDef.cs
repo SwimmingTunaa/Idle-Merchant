@@ -42,10 +42,10 @@ public class ItemDef : ScriptableObject
 
     [Header("Economy")]
     [Tooltip("Base sell price at shop counter")]
-    public int sellPrice = 1;
+    public int sellPrice = 10;
     
     [Tooltip("Base value used for calculations (may differ from sell price)")]
-    public int baseValue = 1;
+    public int baseValue = 10;
 
     void OnValidate()
     {

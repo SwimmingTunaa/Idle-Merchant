@@ -811,10 +811,10 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         AwardStar(2);
     }
 
-    [ContextMenu("Debug: Grant 1000 Gold Progress")]
+    [ContextMenu("Debug: Grant 10000 Gold Progress")]
     private void Debug_Grant1000Gold()
     {
-        IncrementGoldEarned(1000);
+        IncrementGoldEarned(10000);
     }
 
     [ContextMenu("Debug: Complete All 2★ Milestones")]
