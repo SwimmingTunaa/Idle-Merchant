@@ -23,7 +23,7 @@ public class RegenerationSkillDef : SkillDef
     [Header("Regeneration Settings")]
     [Tooltip("Health restored per tick")]
     [Min(0.1f)]
-    public float hpPerTick = 5f;
+    public float hpPerTick = 50f;
 
     [Tooltip("Seconds between heal ticks (1.0 = once per second)")]
     [Range(0.1f, 10f)]

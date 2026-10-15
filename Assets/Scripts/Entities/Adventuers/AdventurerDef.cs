@@ -8,7 +8,7 @@ public class AdventurerDef : EntityDef
     [Tooltip("Display type name (Miner, Militia, Scout, etc.)")]
     public string adventurerType = "Miner";
     
-    public float baseHealth = 10f;
+    public float baseHealth = 100f;
     public float reviveDelay = 5f;
     public float hitStaggerDuration = 0.2f;
     public float hitStaggerCooldown = 1f;

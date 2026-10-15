@@ -6,12 +6,12 @@ using System.Collections.Generic;
 public class ClickerManager : MonoBehaviour
 {
     [Header("Damage")]
-    [SerializeField] private float clickDamage = 1f;
+    [SerializeField] private float clickDamage = 10f;
     [SerializeField] private int clicksPerSecondCap = 10;
 
     [Header("Click Economy")]
     [Tooltip("Multiplier applied to the gold shown/banked per point of click damage. Scales the displayed and banked gold without touching damage balance.")]
-    [SerializeField] private float goldPerDamage = 10f;
+    [SerializeField] private float goldPerDamage = 1f;   // combat stats are x10, so gold == damage 1:1
 
     [Tooltip("Click damage upgrade level. Effective click damage = clickDamage * (1 + 0.1 * level).")]
     [SerializeField] private int clickDamageLevel = 0;
@@ -43,7 +43,11 @@ public class ClickerManager : MonoBehaviour
     private AdventurerAgent hoveredAdv;
 
     /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
-    private float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
+    public float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
+
+    public int ClickDamageLevel => clickDamageLevel;
+    public float NextClickDamage => clickDamage * (1f + 0.1f * (clickDamageLevel + 1));
+    public float LootPickupRadius => lootPickupRadius;
 
     /// <summary>Gold cost of the next click damage upgrade: round(100 * 1.15^level).</summary>
     public int ClickUpgradeCost => Mathf.RoundToInt(100f * Mathf.Pow(1.15f, clickDamageLevel));

@@ -55,9 +55,8 @@ public class DamageNumber : MonoBehaviour
         float randomX = Random.Range(-horizontalSpread, horizontalSpread);
         velocity = new Vector3(randomX, floatSpeed, 0f);
         
-        // Text content
-        // Format damage with 1 decimal place
-        textMesh.text = damage.ToString("F1");
+        // Text content — whole numbers at the x10 combat scale, one decimal only when fractional
+        textMesh.text = damage.ToString("0.#");
         
         
         // Style based on crit

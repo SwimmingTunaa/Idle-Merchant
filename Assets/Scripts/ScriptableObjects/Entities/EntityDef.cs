@@ -37,7 +37,7 @@ public class EntityDef : ScriptableObject
 
     [Header("Combat Stats")]
     [Tooltip("Damage dealt per attack")]
-    public float attackDamage = 1f;
+    public float attackDamage = 10f;
     
     [Tooltip("Time between attacks (lower = faster)")]
     public float attackInterval = 1f;

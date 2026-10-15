@@ -25,7 +25,7 @@ public class AOEDamageSkillDef : SkillDef
     [Header("AOE Damage Settings")]
     [Tooltip("Damage dealt to each enemy per tick")]
     [Min(0.1f)]
-    public float damagePerTick = 10f;
+    public float damagePerTick = 100f;
 
     [Tooltip("Radius of damage area")]
     [Range(0.5f, 20f)]

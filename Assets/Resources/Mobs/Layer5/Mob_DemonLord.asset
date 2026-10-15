@@ -28,7 +28,7 @@ MonoBehaviour:
   moveSpeed: 1.2
   stopDistance: 0.05
   idleTimeRange: {x: 0, y: 0}
-  attackDamage: 30
+  attackDamage: 300
   attackInterval: 1.5
   attackRange: 1.5
   chaseBreakRange: 2.5
@@ -49,7 +49,7 @@ MonoBehaviour:
   HairColourPalette: {fileID: 0}
   startingState: 0
   isBoss: 0
-  baseHealth: 500
+  baseHealth: 5000
   hpMultiplierByLayer:
     serializedVersion: 2
     m_Curve:

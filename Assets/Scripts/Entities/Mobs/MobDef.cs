@@ -9,7 +9,7 @@ public class MobDef : EntityDef
     public bool isBoss = false;
 
     [Header("Stats")]
-    public float baseHealth = 1;
+    public float baseHealth = 10;
     public AnimationCurve hpMultiplierByLayer = AnimationCurve.Linear(1, 1, 10, 3);
     [Tooltip("Base XP rewarded to the adventurer that lands the killing blow.")]
     public float baseXPReward = 10f;

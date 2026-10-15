@@ -29,7 +29,7 @@ MonoBehaviour:
   moveSpeed: 2
   stopDistance: 0.05
   idleTimeRange: {x: 2, y: 4}
-  attackDamage: 5
+  attackDamage: 50
   attackInterval: 1
   attackRange: 2
   chaseBreakRange: 3
@@ -56,7 +56,7 @@ MonoBehaviour:
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 11400000, guid: 3f1982374d0784930aea64f7e170ad9c, type: 2}
   adventurerType: Novice
-  baseHealth: 20
+  baseHealth: 200
   reviveDelay: 5
   hitStaggerDuration: 0.4
   hitStaggerCooldown: 3
