@@ -221,6 +221,11 @@ Early levels arrive fast (frequent small wins); the rank gate at Level V is the 
 
 - Levels cap at V within a rank; ranks cap at Gold (`maxRank` 5) — Gold V is the ceiling, no further gates after that
 
+**In-world feedback (implemented):**
+- Each level-up floats a green **"lvl +"** text above the adventurer (via the damage-number system)
+- When an adventurer reaches a rank's top level, a **persistent promote indicator** — the next rank's badge plus a green up-arrow — bobs above their head until promoted (`PromoteIndicator`). This is the standing prompt to open the Roster and spend the gold; it disappears on promotion.
+- Rank badge art exists for Rank 1 only — ranks 2–5 badges are pending art (the indicator clamps to the last available badge)
+
 ---
 
 ### 4.3 Mob
@@ -342,6 +347,12 @@ Parties are punctuation marks in the shop loop. Regular customers are the steady
 - Clicking a mob deals damage to it directly
 - Early game this is the primary kill method before adventurers are strong enough
 - Late game it's a tactical tool: burst-kill a priority mob, accelerate a tough fight on a deep layer
+- **Gold feedback chain (implemented):** each damaging click floats a gold number + coin above the mob; when the float ends the coin flies to the gold counter (same VFX as customer purchases), and the gold is **banked on arrival** — the counter ticks up exactly when the coin lands, never before
+
+**Click — Friendly units:**
+- Adventurers, porters and customers are **transparent to the left-click** — a hero standing over a mob never eats the damage click
+- **Hovering** an adventurer shows a yellow outline (interactability hint)
+- **Right-clicking** an adventurer opens the Roster focused on them — a separate input channel from the left-click clicker
 
 **Click — Loot:**
 - Clicking a loot drop instantly collects it into `Inventory`
@@ -925,9 +936,9 @@ Crafting adds a secondary economy loop: instead of selling raw loot directly, th
 All panels use **Unity UI Toolkit** (UXML/USS). Panels are orchestrated by `UIManager`. Each panel has a controller inheriting `BasePanelController`.
 
 **Key Panels:**
-- **Main HUD** — gold display, star indicator, quick stats
-- **Hiring Panel** — tabs per unit type, candidate cards, layer selector
-- **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met)
+- **Main HUD / Top Navigation** — gold display (animated count-up), star indicator, bookmark tabs, hiring sign with candidate badge; the bookmarks hide while the Book UI is open (its own edge tabs take over)
+- **Hiring Panel** — tabs per unit type, candidate cards, layer selector; hiring badge refreshes with the candidate pool
+- **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met); right-page detail panel aligned to Figma, selecting a unit outlines them in-world and locks the camera to them
 - **Progression Panel** — milestone tracker, star progress
 - **Upgrade Panel** — available upgrades, cost display
 - **Crafting Panel** — recipe list, input/output display, reserve settings
@@ -941,6 +952,7 @@ The dungeon is a **vertical side-scrolling 2D world**. The shop sits at the top;
 - **WASD** — pan camera horizontally (left/right within a layer) and vertically (up/down between layers)
 - **Mouse edge pan** — moving the cursor to the screen edge pans the camera in that direction
 - Both input methods work simultaneously
+- **Game speed:** number keys **1 / 2 / 3** set 1× / 2× / 3× time scale (a speed chosen while paused applies on unpause)
 
 **Layer navigation intent:**
 At low layer counts this is trivial. As the player reaches 5–10 active layers, vertical panning becomes a meaningful part of interacting with the game — jumping from the shop counter down to the deep dungeon layers and back. This also means all action is visible and the player can always observe bottlenecks directly (a full loot floor, a struggling adventurer, an idle porter).
@@ -957,6 +969,8 @@ Characters are assembled from modular sprite parts:
 - Randomised from pools in `EntityDef` at hire time
 - Higher-rank adventurers use progressively better equipment sprites (better weapon, armour overlay) so rank is readable at a glance without opening the roster
 
+**Outlines (implemented):** friendly units (adventurers, porters) carry a **permanent near-black silhouette outline** via a URP render feature (`PermanentOutline` + `HoverOutlineFeature` on `Renderer2D`), reading them as "ours" against the background; mobs deliberately don't get it. Hover and Roster selection draw a **yellow outline** on a separate rendering-layer bit, compositing over the black one. Baked character icons (hire cards, roster portraits) are captured at true 1:1 sprite scale with a matching baked outline (`CharacterIconSettings`), so icons match the world look pixel-perfectly.
+
 ### 14.5 Sorting
 
 `EntitySortingManager` manages sprite draw order. Entities closer to the foreground sort in front of those further back. `SortingGroup` per entity prevents z-fighting between modular sprite layers.
@@ -970,9 +984,15 @@ Key animation states (via `AnimatorOverrideController`):
 
 `AnimatorOverrideController` is randomised per entity at spawn, providing visual variety within the same animation set.
 
-### 14.7 Damage Numbers
+### 14.7 Damage Numbers & Floating Text
 
-`DamageNumberManager` spawns floating damage indicators above mobs when hit. Pooled for performance.
+`DamageNumberManager` spawns pooled floating indicators above entities (BrightLinger pixel font):
+- **Damage** (white) — adventurer attacks, driven by the attacker in `CombatBehavior`
+- **Gold + coin** (warm gold) — player clicks; the coin hands off to `ItemExplosionVFX` at the end of its float and flies to the gold counter, banking the gold on arrival
+- **Level-up** (green "lvl +") and arbitrary hint text via `ShowText(message, transform, colour)`
+- **Loot multiplier** (green ×N) — manual pickup bonus
+
+Gold integrity rule: gold carried by a flying coin is banked by the arrival callback, and every failure path (spawn failure, mid-flight despawn) banks it immediately — visual effects may be skipped, gold is never lost.
 
 ### 14.8 Damage Flash
 

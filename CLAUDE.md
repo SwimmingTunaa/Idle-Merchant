@@ -122,6 +122,12 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/CharacterGeneration/HiringCandidateGenerator.cs` | Generates `HiringCandidate` structs with identity/traits |
 | `Scripts/Entities/Health.cs` | Reusable health, damage flash, death/revive |
 | `Scripts/Utility/ProgressionActivator.cs` | Activates GameObjects on layer/star/upgrade events |
+| `Scripts/Managers/ClickerManager.cs` | Left-click damage/loot (friendlies transparent), right-click inspect, hover outline |
+| `Scripts/Systems/DamageNumber/DamageNumberManager.cs` | Floating damage/gold/text numbers (pooled); gold banks on coin arrival |
+| `Scripts/Effects/ItemExplosionVFX.cs` | Coins/items fly from world to UI counter (`ItemFlyAnimation`, `UITargetMarker`) |
+| `Scripts/Entities/Adventuers/PromoteIndicator.cs` | Persistent badge+arrow above promote-ready adventurers |
+| `Scripts/Rendering/HoverOutlineFeature.cs` | URP outline render feature — two instances on `Renderer2D`: hover/selection (layer bit 2, yellow) and permanent friendly outline (bit 4, near-black via `PermanentOutline`) |
+| `Scripts/UI/AnimatedNumberUITK.cs` | Lerped count-up for the gold label |
 
 ---
 
@@ -142,6 +148,9 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **Dirty flags for frequent checks** — set a `bool pending` flag on high-frequency events (gold earned, loot collected, etc.) and flush once per frame in `Update`; never call an O(n) scan directly from every increment
 - **Count before list** — expose a `FooCount` property for callers that only need a count; reserve `GetFoos()` (allocates) for callers that iterate; e.g. `CandidatePool.CandidateCount`
 - **Reuse timers** — call `timer.Reset(duration); timer.Start()` on an existing `CountdownTimer` instead of `new CountdownTimer(duration)` on every event
+- **Click gold banks on coin arrival** — `ShowGoldGain` owns the gold; it's added via the fly-to-counter arrival callback. Any new failure path in that chain (DamageNumber, ItemExplosionVFX, ItemFlyAnimation) must bank the gold directly — VFX may be skipped, gold is never dropped
+- **Pooled visual toggles must be symmetric** — anything a `Show*`/spawn path disables (e.g. `textMesh.enabled`) must be re-enabled by every sibling path; pooled reuse otherwise leaks the off state into unrelated displays
+- **Outline rendering-layer bits** — bit 2 = hover/selection (yellow), bit 4 = permanent friendly outline (near-black); world-space markers that shouldn't be stroked must clear these bits on their renderers
 
 ---
 
