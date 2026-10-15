@@ -25,6 +25,14 @@
                     <ui:Label text="Damage AOE" class="cursor-stat-key" />
                     <ui:Label name="stat-aoe" text="locked" class="cursor-stat-value cursor-stat-value--muted" />
                 </ui:VisualElement>
+                <ui:VisualElement class="cursor-stat-row">
+                    <ui:Label text="Auto click" class="cursor-stat-key" />
+                    <ui:Label name="stat-autoclick" text="locked" class="cursor-stat-value cursor-stat-value--muted" />
+                </ui:VisualElement>
+                <ui:VisualElement class="cursor-stat-row">
+                    <ui:Label text="Auto collect" class="cursor-stat-key" />
+                    <ui:Label name="stat-autoloot" text="locked" class="cursor-stat-value cursor-stat-value--muted" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 24px 8px 24px 55px; margin-left: 4px;">

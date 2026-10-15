@@ -37,6 +37,26 @@ public class ClickerManager : MonoBehaviour
     [Tooltip("Guild stars required before Damage AOE can be bought.")]
     [SerializeField] private int aoeStarRequirement = 2;
     
+    [Header("Automation")]
+    [Tooltip("Auto Click level (0 = off). Every interval one random alive mob takes a click. Star gated.")]
+    [SerializeField] private int autoClickLevel = 0;
+    [Tooltip("Auto Click max level. 21 = the level where the interval hits the 1.0s floor (3.0 − 0.1×20).")]
+    [SerializeField] private int maxAutoClickLevel = 21;
+    [Tooltip("Guild stars required before Auto Click can be bought.")]
+    [SerializeField] private int autoClickStarRequirement = 3;
+
+    [Tooltip("Auto Collect level (0 = off). Every interval one random loot is vacuumed with the pickup radius. Star gated.")]
+    [SerializeField] private int autoCollectLevel = 0;
+    [Tooltip("Auto Collect max level. 21 = the level where the interval hits the 1.0s floor (3.0 − 0.1×20).")]
+    [SerializeField] private int maxAutoCollectLevel = 21;
+    [Tooltip("Guild stars required before Auto Collect can be bought.")]
+    [SerializeField] private int autoCollectStarRequirement = 4;
+
+    [Tooltip("Seconds between automatic ticks at level 1; each further level subtracts autoIntervalStep, floored at 1.0s. Shared by Auto Click and Auto Collect.")]
+    [SerializeField] private float autoBaseInterval = 3f;
+    [Tooltip("Seconds shaved off the interval per level after 1 (3.0, 2.9, 2.8 … 1.0). Keep max levels in sync: (base − 1.0) / step + 1.")]
+    [SerializeField] private float autoIntervalStep = 0.1f;
+
     [Tooltip("Duration of shockwave expansion for damage AOE (seconds)")]
     [SerializeField] private float shockwaveDuration = 0.2f;
     
@@ -51,6 +71,8 @@ public class ClickerManager : MonoBehaviour
 
     private int clicksThisSecond;
     private float secondTimer;
+    private float autoClickTimer;
+    private float autoCollectTimer;
     private Vector3 lastClickPosition;
     
     private Coroutine activeShockwave;
@@ -89,8 +111,10 @@ public class ClickerManager : MonoBehaviour
     public int AOELevel => damageAOELevel;
     public bool AOEMaxed => damageAOELevel >= maxDamageAOELevel;
     public int AOEStarRequirement => aoeStarRequirement;
-    public bool AOEUnlocked =>
-        ProgressionManager.Instance != null && ProgressionManager.Instance.GetCurrentStars() >= aoeStarRequirement;
+    public bool AOEUnlocked => HasStars(aoeStarRequirement);
+
+    private static bool HasStars(int required) =>
+        ProgressionManager.Instance != null && ProgressionManager.Instance.GetCurrentStars() >= required;
 
     /// <summary>Shockwave radius at the current AOE level; 0 = single target.</summary>
     public float EffectiveDamageRadius =>
@@ -111,11 +135,60 @@ public class ClickerManager : MonoBehaviour
         return true;
     }
 
+    // ── Automation ladders (star gated): level 1 = autoBaseInterval, −autoIntervalStep per further level, 1.0s design floor ──
+    private float AutoInterval(int level) => Mathf.Max(1f, autoBaseInterval - autoIntervalStep * (level - 1));
+
+    public int AutoClickLevel => autoClickLevel;
+    public bool AutoClickMaxed => autoClickLevel >= maxAutoClickLevel;
+    public int AutoClickStarRequirement => autoClickStarRequirement;
+    public bool AutoClickUnlocked => HasStars(autoClickStarRequirement);
+    /// <summary>Seconds between auto clicks at the current level (meaningless while level is 0 = off).</summary>
+    public float AutoClickInterval => AutoInterval(autoClickLevel);
+    public float NextAutoClickInterval => AutoInterval(autoClickLevel + 1);
+
+    /// <summary>Gold cost of the next Auto Click level: 10000 * 1.35^level.</summary>
+    public int AutoClickUpgradeCost => Mathf.RoundToInt(10000f * Mathf.Pow(1.35f, autoClickLevel));
+
+    /// <summary>Spends gold on the next Auto Click level. Requires the star gate; returns false if locked, maxed or unaffordable.</summary>
+    public bool TryBuyAutoClickUpgrade()
+    {
+        if (!AutoClickUnlocked || AutoClickMaxed) return false;
+        if (!Inventory.Instance.TrySpendGold(AutoClickUpgradeCost)) return false;
+
+        autoClickLevel++;
+        GameSignals.RaiseClickUpgradePurchased(autoClickLevel);
+        return true;
+    }
+
+    public int AutoCollectLevel => autoCollectLevel;
+    public bool AutoCollectMaxed => autoCollectLevel >= maxAutoCollectLevel;
+    public int AutoCollectStarRequirement => autoCollectStarRequirement;
+    public bool AutoCollectUnlocked => HasStars(autoCollectStarRequirement);
+    /// <summary>Seconds between auto collects at the current level (meaningless while level is 0 = off).</summary>
+    public float AutoCollectInterval => AutoInterval(autoCollectLevel);
+    public float NextAutoCollectInterval => AutoInterval(autoCollectLevel + 1);
+
+    /// <summary>Gold cost of the next Auto Collect level: 20000 * 1.35^level.</summary>
+    public int AutoCollectUpgradeCost => Mathf.RoundToInt(20000f * Mathf.Pow(1.35f, autoCollectLevel));
+
+    /// <summary>Spends gold on the next Auto Collect level. Requires the star gate; returns false if locked, maxed or unaffordable.</summary>
+    public bool TryBuyAutoCollectUpgrade()
+    {
+        if (!AutoCollectUnlocked || AutoCollectMaxed) return false;
+        if (!Inventory.Instance.TrySpendGold(AutoCollectUpgradeCost)) return false;
+
+        autoCollectLevel++;
+        GameSignals.RaiseClickUpgradePurchased(autoCollectLevel);
+        return true;
+    }
+
     /// <summary>True while any cursor upgrade is purchasable with the given gold (drives the board badge).</summary>
     public bool AnyCursorUpgradeAffordable(int gold) =>
         gold >= ClickUpgradeCost
         || (!PickupRadiusMaxed && gold >= RadiusUpgradeCost)
-        || (AOEUnlocked && !AOEMaxed && gold >= AOEUpgradeCost);
+        || (AOEUnlocked && !AOEMaxed && gold >= AOEUpgradeCost)
+        || (AutoClickUnlocked && !AutoClickMaxed && gold >= AutoClickUpgradeCost)
+        || (AutoCollectUnlocked && !AutoCollectMaxed && gold >= AutoCollectUpgradeCost);
 
     /// <summary>Gold cost of the next click damage upgrade: round(100 * 1.15^level).</summary>
     public int ClickUpgradeCost => Mathf.RoundToInt(100f * Mathf.Pow(1.15f, clickDamageLevel));
@@ -137,6 +210,19 @@ public class ClickerManager : MonoBehaviour
         {
             secondTimer = 0f;
             clicksThisSecond = 0;
+        }
+
+        // Automation ticks run on scaled time (game-speed keys speed them up) and bypass the
+        // player's clicks-per-second budget.
+        if (autoClickLevel > 0 && (autoClickTimer += Time.deltaTime) >= AutoClickInterval)
+        {
+            autoClickTimer = 0f;
+            AutoClickTick();
+        }
+        if (autoCollectLevel > 0 && (autoCollectTimer += Time.deltaTime) >= AutoCollectInterval)
+        {
+            autoCollectTimer = 0f;
+            AutoCollectTick();
         }
 
         // Right-click is a separate channel from the left-click clicker.
@@ -211,9 +297,9 @@ public class ClickerManager : MonoBehaviour
             if (hit.TryGetComponent(out IClickableLoot _))
             {
                 if (LootPickupRadius > 0f)
-                    VacuumLootToMouse(world, LootPickupRadius);
+                    VacuumLoot(world, LootPickupRadius, null);
                 else
-                    StartCoroutine(MoveLootToMouse(hit.gameObject));
+                    StartCoroutine(MoveLootTo(hit.gameObject));
                 return;
             }
         }
@@ -227,40 +313,70 @@ public class ClickerManager : MonoBehaviour
             if (!hit.TryGetComponent(out IDamageable enemy)) continue;
             if (hit.TryGetComponent(out EntityBase entity) && entity.IsDying) continue;
 
-            if (EffectiveDamageRadius > 0f)
-            {
-                // AOE shockwave centered on the mob you clicked
-                if (activeShockwave != null) StopCoroutine(activeShockwave);
-                if (ClickHitVFX.Instance != null)
-                    ClickHitVFX.Instance.PlayShockRing(hit.transform.position, EffectiveDamageRadius, shockwaveDuration);
-                activeShockwave = StartCoroutine(DamageShockwave(hit.transform.position, EffectiveDamageRadius, shockwaveDuration));
-            }
-            else
-            {
-                // Single target damage
-                float applied = enemy.OnDamage(EffectiveClickDamage);
-                if (applied > 0f)
-                {
-                    // Health.OnDamage flips IsAlive synchronously, so this reads the kill blow.
-                    bool killed = enemy is Health hp && !hp.IsAlive;
-                    if (ClickHitVFX.Instance != null)
-                    {
-                        ClickHitVFX.Instance.PlayHit(world, hit.transform);
-                        if (killed) ClickHitVFX.Instance.PlayKill(hit.transform.position);
-                    }
-
-                    float gold = applied * goldPerDamage;
-                    // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
-                    if (DamageNumberManager.Instance != null)
-                        DamageNumberManager.Instance.ShowGoldGain(gold, hit.transform);
-                    else
-                        Inventory.Instance.AddGoldFloat(gold);
-                }
-            }
+            ClickAttackMob(enemy, hit.transform, world);
             return;
         }
 
         // Click on empty space (or only friendly units) = no action
+    }
+
+    /// <summary>Attack a mob exactly like a click: an AOE shockwave centered on it when Damage AOE
+    /// is owned, otherwise a single-target hit (sparks at hitPos). Shared by manual and auto clicks.</summary>
+    private void ClickAttackMob(IDamageable enemy, Transform mob, Vector3 hitPos)
+    {
+        if (EffectiveDamageRadius > 0f)
+        {
+            if (activeShockwave != null) StopCoroutine(activeShockwave);
+            if (ClickHitVFX.Instance != null)
+                ClickHitVFX.Instance.PlayShockRing(mob.position, EffectiveDamageRadius, shockwaveDuration);
+            activeShockwave = StartCoroutine(DamageShockwave(mob.position, EffectiveDamageRadius, shockwaveDuration));
+        }
+        else
+        {
+            ClickDamageMob(enemy, mob, hitPos);
+        }
+    }
+
+    /// <summary>One click's worth of damage on a single mob: VFX, kill check and gold paid via the
+    /// coin-arrival path. Shared by manual, AOE and auto clicks. Returns false if nothing was applied.</summary>
+    private bool ClickDamageMob(IDamageable enemy, Transform mob, Vector3 hitPos)
+    {
+        float applied = enemy.OnDamage(EffectiveClickDamage);
+        if (applied <= 0f) return false;
+
+        // Health.OnDamage flips IsAlive synchronously, so this reads the kill blow.
+        bool killed = enemy is Health hp && !hp.IsAlive;
+        if (ClickHitVFX.Instance != null)
+        {
+            ClickHitVFX.Instance.PlayHit(hitPos, mob);
+            if (killed) ClickHitVFX.Instance.PlayKill(mob.position);
+        }
+
+        float gold = applied * goldPerDamage;
+        // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
+        if (DamageNumberManager.Instance != null)
+            DamageNumberManager.Instance.ShowGoldGain(gold, mob);
+        else
+            Inventory.Instance.AddGoldFloat(gold);
+        return true;
+    }
+
+    // ===== AUTOMATION =====
+
+    private void AutoClickTick()
+    {
+        MobAgent mob = MobManager.Instance != null ? MobManager.Instance.GetRandomMob() : null;
+        if (mob == null || mob.IsDying || !mob.TryGetComponent(out Health health)) return;
+        ClickAttackMob(health, mob.transform, mob.transform.position);
+    }
+
+    private void AutoCollectTick()
+    {
+        Loot loot = LootManager.Instance != null ? LootManager.Instance.GetRandomLoot() : null;
+        if (loot == null) return;
+        Vector3 center = loot.transform.position;
+        center.z = 0f;
+        VacuumLoot(center, LootPickupRadius, center);
     }
 
     // ===== AOE DAMAGE SHOCKWAVE =====
@@ -294,26 +410,9 @@ public class ClickerManager : MonoBehaviour
                     if (!hit.TryGetComponent(out MobAgent _))
                         continue;
 
-                    float applied = enemy.OnDamage(EffectiveClickDamage);
-                    if (applied > 0f)
-                    {
-                        // AOE has no single cursor point — sparks spawn on each struck mob.
-                        bool killed = enemy is Health hp && !hp.IsAlive;
-                        if (ClickHitVFX.Instance != null)
-                        {
-                            ClickHitVFX.Instance.PlayHit(hit.transform.position, hit.transform);
-                            if (killed) ClickHitVFX.Instance.PlayKill(hit.transform.position);
-                        }
-
-                        float gold = applied * goldPerDamage;
-                        // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
-                        if (DamageNumberManager.Instance != null)
-                            DamageNumberManager.Instance.ShowGoldGain(gold, hit.transform);
-                        else
-                            Inventory.Instance.AddGoldFloat(gold);
-
+                    // AOE has no single cursor point — sparks spawn on each struck mob.
+                    if (ClickDamageMob(enemy, hit.transform, hit.transform.position))
                         alreadyDamaged.Add(enemy);
-                    }
                 }
             }
 
@@ -326,34 +425,37 @@ public class ClickerManager : MonoBehaviour
 
     // ===== LOOT VACUUM SYSTEM =====
 
-    private void VacuumLootToMouse(Vector3 clickPos, float radius)
+    /// <summary>Pulls every loot within radius of center toward a target and collects it.
+    /// target null = follow the mouse cursor (manual click); otherwise a fixed world point (auto collect).</summary>
+    private void VacuumLoot(Vector3 center, float radius, Vector3? target)
     {
         if (ClickHitVFX.Instance != null)
-            ClickHitVFX.Instance.PlayVacuumRing(clickPos, radius);
+            ClickHitVFX.Instance.PlayVacuumRing(center, radius);
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(clickPos, radius);
-        
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
+
         foreach (var hit in hits)
         {
             if (hit.TryGetComponent(out IClickableLoot loot))
             {
-                StartCoroutine(MoveLootToMouse(hit.gameObject));
+                StartCoroutine(MoveLootTo(hit.gameObject, target));
             }
         }
     }
 
-    private IEnumerator MoveLootToMouse(GameObject lootObj)
+    private IEnumerator MoveLootTo(GameObject lootObj, Vector3? target = null)
     {
         if (lootObj == null) yield break;
 
         float elapsed = 0f;
         Vector3 startPos = lootObj.transform.position;
 
-        while (elapsed < lootVacuumSpeed && lootObj != null)
+        // activeInHierarchy: a pooled loot already collected by another vacuum / porter must not be collected twice.
+        while (elapsed < lootVacuumSpeed && lootObj != null && lootObj.activeInHierarchy)
         {
             elapsed += Time.deltaTime;
-            
-            Vector3 mouseWorldPos = GetCursorWorldPos();
+
+            Vector3 mouseWorldPos = target ?? GetCursorWorldPos();
             mouseWorldPos.z = 0f;
 
             float t = elapsed / lootVacuumSpeed;
@@ -373,7 +475,7 @@ public class ClickerManager : MonoBehaviour
             yield return null;
         }
 
-        if (lootObj != null && lootObj.TryGetComponent(out IClickableLoot finalLoot))
+        if (lootObj != null && lootObj.activeInHierarchy && lootObj.TryGetComponent(out IClickableLoot finalLoot))
         {
             if (ClickHitVFX.Instance != null)
                 ClickHitVFX.Instance.PlayAbsorb(lootObj.transform.position);

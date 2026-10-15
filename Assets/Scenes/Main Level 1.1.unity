@@ -32081,6 +32081,8 @@ MonoBehaviour:
   iconClickDamage: {fileID: 21300000, guid: 940bc9760f364ee89ed87856cff611c7, type: 3}
   iconPickupRadius: {fileID: 21300000, guid: 00d468b75f524988a8eb0aac34ebe881, type: 3}
   iconDamageAOE: {fileID: 21300000, guid: 08563c6efd5e4654803a1d70cf766a83, type: 3}
+  iconAutoClick: {fileID: 21300000, guid: e991a2d095dc45f799bfe879cf2a83cd, type: 3}
+  iconAutoCollect: {fileID: 21300000, guid: 738579583e144efebf74c87c6537ebe1, type: 3}
   showDebugLogs: 0
 --- !u!1 &1671205707
 GameObject:
@@ -44454,7 +44456,19 @@ MonoBehaviour:
   pickupRadiusLevel: 0
   radiusPerLevel: 0.2
   maxPickupRadiusLevel: 5
-  damageRadius: 0
+  damageAOELevel: 0
+  aoeBaseRadius: 0.8
+  aoeRadiusPerLevel: 0.3
+  maxDamageAOELevel: 3
+  aoeStarRequirement: 2
+  autoClickLevel: 0
+  maxAutoClickLevel: 21
+  autoClickStarRequirement: 3
+  autoCollectLevel: 0
+  maxAutoCollectLevel: 21
+  autoCollectStarRequirement: 4
+  autoBaseInterval: 3
+  autoIntervalStep: 0.1
   shockwaveDuration: 0.2
   lootPickupRadius: 0.3
   lootVacuumSpeed: 0.1

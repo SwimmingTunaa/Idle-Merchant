@@ -284,6 +284,18 @@ public class MobManager : MonoBehaviour
         return new List<MobAgent>();
     }
 
+    /// <summary>Uniformly random registered mob across all layers (reservoir pick, no alloc); null if none.
+    /// Dying mobs unregister in Despawn, so anything returned is alive.</summary>
+    public MobAgent GetRandomMob()
+    {
+        MobAgent pick = null;
+        int seen = 0;
+        foreach (var layer in mobsByLayer.Values)
+            foreach (var mob in layer)
+                if (mob != null && Random.Range(0, ++seen) == 0) pick = mob;
+        return pick;
+    }
+
     public int GetTotalMobCount()
     {
         int count = 0;

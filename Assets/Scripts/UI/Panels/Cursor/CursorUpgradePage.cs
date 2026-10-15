@@ -17,6 +17,8 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     [SerializeField] private Sprite iconClickDamage;
     [SerializeField] private Sprite iconPickupRadius;
     [SerializeField] private Sprite iconDamageAOE;
+    [SerializeField] private Sprite iconAutoClick;
+    [SerializeField] private Sprite iconAutoCollect;
 
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
@@ -29,6 +31,8 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     private Label statDamage;
     private Label statRadius;
     private Label statAOE;
+    private Label statAutoClick;
+    private Label statAutoCollect;
 
     // Per-card bindings, re-run on every refresh
     private readonly List<System.Action> cardRefreshers = new List<System.Action>();
@@ -46,6 +50,8 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         statDamage = leftPage.Q<Label>("stat-damage");
         statRadius = leftPage.Q<Label>("stat-radius");
         statAOE = leftPage.Q<Label>("stat-aoe");
+        statAutoClick = leftPage.Q<Label>("stat-autoclick");
+        statAutoCollect = leftPage.Q<Label>("stat-autoloot");
 
         BuildCards(rightPage.Q<VisualElement>("cursor-upgrade-list"));
 
@@ -67,6 +73,8 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         statDamage = null;
         statRadius = null;
         statAOE = null;
+        statAutoClick = null;
+        statAutoCollect = null;
         cardRefreshers.Clear();
     }
 
@@ -100,44 +108,42 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
             maxed: () => clicker.PickupRadiusMaxed,
             buy: () => clicker.TryBuyRadiusUpgrade());
 
-        // Damage AOE — star gated: lock pill until unlocked, then a live buy card
-        var aoe = NewCard(list, "Damage AOE", iconDamageAOE);
-        aoe.Q<Label>("card-substat").text = "clicks damage nearby mobs";
-        aoe.Q<Label>("card-lock-label").text = $"Unlocks at {clicker.AOEStarRequirement}";
-        var aoeRoot = aoe.Q<VisualElement>("card-root");
-        var aoeStat = aoe.Q<Label>("card-stat");
-        var aoePill = aoe.Q<VisualElement>("card-lockpill");
-        var aoeBuy = aoe.Q<Button>("card-buy");
-        var aoeBuyLabel = aoe.Q<Label>("card-buy-label");
-        var aoeCoin = aoe.Q<VisualElement>("card-buy-coin");
-        aoeBuy.clicked += () => clicker.TryBuyAOEUpgrade();
+        // Star-gated cards: lock pill until unlocked, then a live buy card
+        AddBuyableCard(list, "Damage AOE", iconDamageAOE,
+            stat: () => clicker.AOEMaxed ? $"{clicker.EffectiveDamageRadius:0.0} radius (max)"
+                : clicker.AOELevel == 0 ? $"single ➜ <color=#376C2D>{clicker.NextDamageRadius:0.0} radius</color>"
+                : $"{clicker.EffectiveDamageRadius:0.0} ➜ <color=#376C2D>{clicker.NextDamageRadius:0.0} radius</color>",
+            cost: () => clicker.AOEUpgradeCost,
+            maxed: () => clicker.AOEMaxed,
+            buy: () => clicker.TryBuyAOEUpgrade(),
+            substat: "clicks damage nearby mobs",
+            starRequirement: clicker.AOEStarRequirement,
+            unlocked: () => clicker.AOEUnlocked);
 
-        cardRefreshers.Add(() =>
-        {
-            bool unlocked = clicker.AOEUnlocked;
-            aoeRoot.EnableInClassList("cursor-card--locked", !unlocked);
-            aoePill.style.display = unlocked ? DisplayStyle.None : DisplayStyle.Flex;
-            aoeBuy.style.display = unlocked ? DisplayStyle.Flex : DisplayStyle.None;
-            aoeStat.style.display = unlocked ? DisplayStyle.Flex : DisplayStyle.None;
-            if (!unlocked) return;
+        AddBuyableCard(list, "Auto Click", iconAutoClick,
+            stat: () => IntervalStat(clicker.AutoClickLevel, clicker.AutoClickMaxed, clicker.AutoClickInterval, clicker.NextAutoClickInterval),
+            cost: () => clicker.AutoClickUpgradeCost,
+            maxed: () => clicker.AutoClickMaxed,
+            buy: () => clicker.TryBuyAutoClickUpgrade(),
+            substat: "auto-clicks a random mob",
+            starRequirement: clicker.AutoClickStarRequirement,
+            unlocked: () => clicker.AutoClickUnlocked);
 
-            if (clicker.AOEMaxed)
-            {
-                aoeStat.text = $"{clicker.EffectiveDamageRadius:0.0} radius (max)";
-                aoeBuyLabel.text = "Maxed";
-                aoeCoin.style.display = DisplayStyle.None;
-                aoeBuy.SetEnabled(false);
-                return;
-            }
-            aoeStat.text = clicker.AOELevel == 0
-                ? $"single ➜ <color=#376C2D>{clicker.NextDamageRadius:0.0} radius</color>"
-                : $"{clicker.EffectiveDamageRadius:0.0} ➜ <color=#376C2D>{clicker.NextDamageRadius:0.0} radius</color>";
-            aoeCoin.style.display = DisplayStyle.Flex;
-            int c = clicker.AOEUpgradeCost;
-            aoeBuyLabel.text = AnimatedNumberUITK.Abbrev(c);
-            aoeBuy.SetEnabled(Inventory.Instance != null && Inventory.Instance.Gold >= c);
-        });
+        AddBuyableCard(list, "Auto Collect", iconAutoCollect,
+            stat: () => IntervalStat(clicker.AutoCollectLevel, clicker.AutoCollectMaxed, clicker.AutoCollectInterval, clicker.NextAutoCollectInterval),
+            cost: () => clicker.AutoCollectUpgradeCost,
+            maxed: () => clicker.AutoCollectMaxed,
+            buy: () => clicker.TryBuyAutoCollectUpgrade(),
+            substat: "auto-collects nearby loot",
+            starRequirement: clicker.AutoCollectStarRequirement,
+            unlocked: () => clicker.AutoCollectUnlocked);
     }
+
+    /// <summary>Automation ladder stat line: "off ➜ every 3.0s", "3.0s ➜ 2.9s", "every 1.0s (max)".</summary>
+    private static string IntervalStat(int level, bool maxed, float interval, float next) =>
+        maxed ? $"every {interval:0.0}s (max)"
+        : level == 0 ? $"off ➜ <color=#376C2D>every {next:0.0}s</color>"
+        : $"{interval:0.0}s ➜ <color=#376C2D>{next:0.0}s</color>";
 
     /// <summary>Clone the template into the list and bind the shared bits (icon, name).</summary>
     private VisualElement NewCard(VisualElement list, string name, Sprite icon)
@@ -160,13 +166,20 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         return card;
     }
 
+    /// <summary>Card with a stat line and a buy button. Pass unlocked (+ starRequirement) for a star-gated
+    /// card that shows a lock pill until the gate opens; substat null hides the substat line.</summary>
     private void AddBuyableCard(VisualElement list, string name, Sprite icon,
-        System.Func<string> stat, System.Func<int> cost, System.Func<bool> maxed, System.Func<bool> buy)
+        System.Func<string> stat, System.Func<int> cost, System.Func<bool> maxed, System.Func<bool> buy,
+        string substat = null, int starRequirement = 0, System.Func<bool> unlocked = null)
     {
         var card = NewCard(list, name, icon);
-        card.Q<Label>("card-substat").style.display = DisplayStyle.None;
-        card.Q<VisualElement>("card-lockpill").style.display = DisplayStyle.None;
+        var substatLabel = card.Q<Label>("card-substat");
+        if (substat != null) substatLabel.text = substat;
+        else substatLabel.style.display = DisplayStyle.None;
+        card.Q<Label>("card-lock-label").text = $"Unlocks at {starRequirement}";
 
+        var root = card.Q<VisualElement>("card-root");
+        var pill = card.Q<VisualElement>("card-lockpill");
         var statLabel = card.Q<Label>("card-stat");
         var buyButton = card.Q<Button>("card-buy");
         var buyLabel = card.Q<Label>("card-buy-label");
@@ -176,6 +189,13 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         cardRefreshers.Add(() =>
         {
+            bool open = unlocked == null || unlocked();
+            root.EnableInClassList("cursor-card--locked", !open);
+            pill.style.display = open ? DisplayStyle.None : DisplayStyle.Flex;
+            buyButton.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            statLabel.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!open) return;
+
             statLabel.text = stat();
             if (maxed())
             {
@@ -201,14 +221,18 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         if (statDamage != null) statDamage.text = clicker.EffectiveClickDamage.ToString("0.#");
         if (statRadius != null) statRadius.text = clicker.LootPickupRadius.ToString("0.0");
-        if (statAOE != null)
-        {
-            statAOE.text = !clicker.AOEUnlocked ? "locked"
-                : clicker.AOELevel == 0 ? "off"
-                : clicker.EffectiveDamageRadius.ToString("0.0");
-            statAOE.EnableInClassList("cursor-stat-value--muted", !clicker.AOEUnlocked || clicker.AOELevel == 0);
-        }
+        SetGatedStat(statAOE, clicker.AOEUnlocked, clicker.AOELevel, clicker.EffectiveDamageRadius.ToString("0.0"));
+        SetGatedStat(statAutoClick, clicker.AutoClickUnlocked, clicker.AutoClickLevel, $"{clicker.AutoClickInterval:0.0}s");
+        SetGatedStat(statAutoCollect, clicker.AutoCollectUnlocked, clicker.AutoCollectLevel, $"{clicker.AutoCollectInterval:0.0}s");
 
         foreach (var refresh in cardRefreshers) refresh();
+    }
+
+    /// <summary>Left-page stat for a star-gated ladder: "locked" / "off" (muted) or the live value.</summary>
+    private static void SetGatedStat(Label label, bool unlocked, int level, string value)
+    {
+        if (label == null) return;
+        label.text = !unlocked ? "locked" : level == 0 ? "off" : value;
+        label.EnableInClassList("cursor-stat-value--muted", !unlocked || level == 0);
     }
 }

@@ -15,7 +15,7 @@ public class GameDebugger : EditorWindow
 
     // Economy
     private int goldAmount = 1000;
-    private int dbgDmgLevel, dbgRadiusLevel, dbgAOELevel;
+    private int dbgDmgLevel, dbgRadiusLevel, dbgAOELevel, dbgAutoClickLevel, dbgAutoCollectLevel;
 
     // Inventory
     private ItemDef selectedItem;
@@ -176,12 +176,18 @@ public class GameDebugger : EditorWindow
                 $"lvl {clicker.PickupRadiusLevel}{(clicker.PickupRadiusMaxed ? " (max)" : "")} — {clicker.LootPickupRadius:0.0} wu (next {clicker.RadiusUpgradeCost}g)");
             DrawClickerLadder(clicker, "Damage AOE", "damageAOELevel", ref dbgAOELevel,
                 $"lvl {clicker.AOELevel}{(clicker.AOEMaxed ? " (max)" : clicker.AOEUnlocked ? "" : " (locked)")} — {clicker.EffectiveDamageRadius:0.0} wu (next {clicker.AOEUpgradeCost}g)");
+            DrawClickerLadder(clicker, "Auto Click", "autoClickLevel", ref dbgAutoClickLevel,
+                $"lvl {clicker.AutoClickLevel}{(clicker.AutoClickMaxed ? " (max)" : clicker.AutoClickUnlocked ? "" : " (locked)")} — {(clicker.AutoClickLevel == 0 ? "off" : $"every {clicker.AutoClickInterval:0.0}s")} (next {clicker.AutoClickUpgradeCost}g)");
+            DrawClickerLadder(clicker, "Auto Collect", "autoCollectLevel", ref dbgAutoCollectLevel,
+                $"lvl {clicker.AutoCollectLevel}{(clicker.AutoCollectMaxed ? " (max)" : clicker.AutoCollectUnlocked ? "" : " (locked)")} — {(clicker.AutoCollectLevel == 0 ? "off" : $"every {clicker.AutoCollectInterval:0.0}s")} (next {clicker.AutoCollectUpgradeCost}g)");
 
             if (GUILayout.Button("Reset All Levels"))
             {
                 BumpClickerLevel(clicker, "clickDamageLevel", 0, reset: true);
                 BumpClickerLevel(clicker, "pickupRadiusLevel", 0, reset: true);
                 BumpClickerLevel(clicker, "damageAOELevel", 0, reset: true);
+                BumpClickerLevel(clicker, "autoClickLevel", 0, reset: true);
+                BumpClickerLevel(clicker, "autoCollectLevel", 0, reset: true);
             }
             GUI.enabled = true;
         }

@@ -236,6 +236,18 @@ public class LootManager : PersistentSingleton<LootManager>
         return new List<Loot>();
     }
 
+    /// <summary>Uniformly random uncollected loot across all layers (reservoir pick, no alloc); null if none.
+    /// Collected loot unregisters in OnDisable, so anything returned is still on the ground.</summary>
+    public Loot GetRandomLoot()
+    {
+        Loot pick = null;
+        int seen = 0;
+        foreach (var layer in lootByLayer.Values)
+            foreach (var loot in layer)
+                if (loot != null && Random.Range(0, ++seen) == 0) pick = loot;
+        return pick;
+    }
+
     public int GetTotalLootCount()
     {
         int count = 0;
