@@ -406,7 +406,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
         // Revive
         if (health != null)
-            health.Revive(adventurerDef.baseHealth);
+            health.Revive(health.MaxHP);
 
         // Re-enable interactions
         if (col != null)
