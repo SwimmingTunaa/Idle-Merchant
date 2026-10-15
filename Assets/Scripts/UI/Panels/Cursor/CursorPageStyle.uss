@@ -66,8 +66,8 @@
 }
 
 .cursor-card-icon {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     flex-shrink: 0;
     margin-right: 16px;
     border-width: 1px;
@@ -85,12 +85,6 @@
 .cursor-card-name {
     font-size: 32px;
     color: rgb(101, 67, 33);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
-}
-
-.cursor-card-level {
-    font-size: 16px;
-    color: rgb(155, 112, 72);
     -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
 }
 

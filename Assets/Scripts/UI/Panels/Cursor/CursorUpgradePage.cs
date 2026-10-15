@@ -13,6 +13,11 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
              "the USS importer silently dropped the url() reference for this sheet.")]
     [SerializeField] private Sprite cardFrame;
 
+    [Header("Upgrade Icons")]
+    [SerializeField] private Sprite iconClickDamage;
+    [SerializeField] private Sprite iconPickupRadius;
+    [SerializeField] private Sprite iconDamageAOE;
+
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
 
@@ -25,7 +30,6 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     private Label statRadius;
 
     // Right page — damage card live elements
-    private Label dmgLevelLabel;
     private Label dmgStatLabel;
     private Button dmgBuyButton;
     private Label dmgBuyLabel;
@@ -60,7 +64,6 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         statDamage = null;
         statRadius = null;
-        dmgLevelLabel = null;
         dmgStatLabel = null;
         dmgBuyButton = null;
         dmgBuyLabel = null;
@@ -79,9 +82,8 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         list.Clear();
 
         // Click Damage — live
-        var dmgCard = NewCard("Click Damage", locked: false);
-        dmgLevelLabel = AddLabel(dmgCard.Q<VisualElement>("card-info"), "cursor-card-level");
-        dmgStatLabel = AddLabel(dmgCard, "cursor-card-stat");   // row 2: stat line
+        var dmgCard = NewCard("Click Damage", locked: false, icon: iconClickDamage);
+        dmgStatLabel = AddLabel(dmgCard.Q<VisualElement>("card-info"), "cursor-card-stat");
 
         dmgBuyButton = new Button(OnBuyDamageClicked);
         dmgBuyButton.AddToClassList("btn-success");
@@ -96,19 +98,19 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         list.Add(dmgCard);
 
         // Pickup Radius — locked preview (no upgrade path built yet)
-        var radiusCard = NewCard("Pickup Radius", locked: true);
-        AddLabel(radiusCard, "cursor-card-substat").text = "loot vacuum area on click";
+        var radiusCard = NewCard("Pickup Radius", locked: true, icon: iconPickupRadius);
+        AddLabel(radiusCard.Q<VisualElement>("card-info"), "cursor-card-substat").text = "loot vacuum area on click";
         radiusCard.Add(LockPill("Coming soon"));
         list.Add(radiusCard);
 
         // Damage AOE — locked preview, star gated per GDD mouse upgrades
-        var aoeCard = NewCard("Damage AOE", locked: true);
-        AddLabel(aoeCard, "cursor-card-substat").text = "clicks damage nearby mobs";
+        var aoeCard = NewCard("Damage AOE", locked: true, icon: iconDamageAOE);
+        AddLabel(aoeCard.Q<VisualElement>("card-info"), "cursor-card-substat").text = "clicks damage nearby mobs";
         aoeCard.Add(LockPill("Unlocks at 2★"));
         list.Add(aoeCard);
     }
 
-    private VisualElement NewCard(string name, bool locked)
+    private VisualElement NewCard(string name, bool locked, Sprite icon = null)
     {
         var card = new VisualElement();
         card.AddToClassList("cursor-card");
@@ -129,9 +131,17 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         var header = new VisualElement { name = "card-header" };
         header.AddToClassList("cursor-card-header");
 
-        var icon = new VisualElement { name = "card-icon" };
-        icon.AddToClassList("cursor-card-icon");
-        header.Add(icon);
+        var iconSlot = new VisualElement { name = "card-icon" };
+        iconSlot.AddToClassList("cursor-card-icon");
+        if (icon != null)
+        {
+            iconSlot.style.backgroundImage = new StyleBackground(icon);
+            iconSlot.style.borderLeftWidth = 0;   // placeholder border only while empty
+            iconSlot.style.borderRightWidth = 0;
+            iconSlot.style.borderTopWidth = 0;
+            iconSlot.style.borderBottomWidth = 0;
+        }
+        header.Add(iconSlot);
 
         var info = new VisualElement { name = "card-info" };
         info.AddToClassList("cursor-card-info");
@@ -179,7 +189,6 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         if (statDamage != null) statDamage.text = clicker.EffectiveClickDamage.ToString("0.#");
         if (statRadius != null) statRadius.text = clicker.LootPickupRadius.ToString("0.0");
 
-        if (dmgLevelLabel != null) dmgLevelLabel.text = $"Level {clicker.ClickDamageLevel}";
         if (dmgStatLabel != null)
             // next value in success green (UITK rich text; colour = --color-text-success)
             dmgStatLabel.text = $"{clicker.EffectiveClickDamage:0.#} ➜ <color=#376C2D>{clicker.NextClickDamage:0.#} dmg</color>";
