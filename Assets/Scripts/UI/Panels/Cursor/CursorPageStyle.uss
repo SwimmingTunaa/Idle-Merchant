@@ -1,0 +1,110 @@
+/* Cursor page — status left, purchases right. Pixel look: BrightLinger at 1x/2x (16/32px),
+   box-outline 9-slice cards, Button component (btn-*) for actions. */
+
+.cursor-art {
+    width: 96px;
+    height: 96px;
+    align-self: center;
+    margin-bottom: 24px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.cursor-stats {
+    flex-direction: column;
+}
+
+.cursor-stat-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(200, 180, 150);
+}
+
+.cursor-stat-key {
+    font-size: 32px;
+    color: rgb(128, 75, 24);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.cursor-stat-value {
+    font-size: 32px;
+    color: rgb(101, 67, 33);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.cursor-stat-value--muted {
+    color: rgb(170, 160, 140);
+}
+
+.upgrades-owned-label {
+    font-size: 16px;
+    color: rgb(155, 112, 72);
+    margin-top: 20px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.cursor-upgrade-list {
+    flex-direction: column;
+}
+
+/* ── upgrade card: pixel box-outline 9-slice frame (image + slices set from
+   CursorUpgradePage code — the USS importer dropped the url() reference) ── */
+.cursor-card {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    -unity-background-image-tint-color: rgb(179, 145, 111);
+}
+
+.cursor-card--locked {
+    opacity: 0.65;
+}
+
+.cursor-card-info {
+    flex-grow: 1;
+}
+
+.cursor-card-name {
+    font-size: 32px;
+    color: rgb(101, 67, 33);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.cursor-card-level {
+    font-size: 16px;
+    color: rgb(155, 112, 72);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.cursor-card-stat {
+    font-size: 32px;
+    color: rgb(128, 75, 24);
+    margin-top: 4px;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+.cursor-card-substat {
+    font-size: 16px;
+    color: rgb(155, 112, 72);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+}
+
+/* sizing overrides on top of the Button component classes */
+.cursor-card-buy {
+    min-width: 220px;
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.cursor-card-lockpill {
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.cursor-page-title {
+    color: rgb(128, 75, 24);
+}

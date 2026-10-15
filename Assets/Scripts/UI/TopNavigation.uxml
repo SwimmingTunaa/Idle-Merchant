@@ -27,17 +27,17 @@
                     </ui:VisualElement>
                 </ui:Button>
             </ui:VisualElement>
-            <ui:VisualElement name="hiring-menu-container" class="hiring-menu-container">
-                <ui:VisualElement name="pols" class="pols">
-                    <ui:VisualElement name="pole-1" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
-                    <ui:VisualElement name="pole-2" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
-                </ui:VisualElement>
-                <ui:Button name="hiring-board-button" text="" class="hiring-menu-button" style="height: 100px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/wooden%20board.png?fileID=2800000&amp;guid=ffabd942f6347418b9a274ff2a8ac207&amp;type=3#wooden board&quot;);">
-                    <ui:VisualElement name="hiring-badge" picking-mode="Ignore" class="hiring-badge"/>
-                </ui:Button>
-            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="middle" class="middle">
+        <ui:VisualElement name="hiring-menu-container" class="hiring-menu-container">
+            <ui:VisualElement name="pols" class="pols">
+                <ui:VisualElement name="pole-1" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
+                <ui:VisualElement name="pole-2" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
+            </ui:VisualElement>
+            <ui:Button name="hiring-board-button" text="" class="hiring-menu-button" style="height: 100px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/wooden%20board.png?fileID=2800000&amp;guid=ffabd942f6347418b9a274ff2a8ac207&amp;type=3#wooden board&quot;);">
+                <ui:VisualElement name="hiring-badge" picking-mode="Ignore" class="hiring-badge"/>
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="middle" class="middle" style="margin-right: 32px; margin-left: 32px;">
             <ui:VisualElement name="banner-and-stars" class="guild-section">
                 <ui:VisualElement name="stars-container" class="stars-container" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/box-outline.png?fileID=2800000&amp;guid=80cf7c2e4874449dc844f214777954a9&amp;type=3#box-outline&quot;); -unity-background-image-tint-color: rgb(113, 65, 59); -unity-slice-left: 1; -unity-slice-top: 1; -unity-slice-right: 1; -unity-slice-bottom: 1; -unity-slice-scale: 5px;">
                     <ui:VisualElement name="star-1" class="star star-filled"/>
@@ -54,11 +54,16 @@
                 <ui:Label name="milestone-progress-label" text="Progress: 2/6" class="milestone-progress-label" style="display: none;"/>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="right" class="stats-section">
-            <ui:Button name="click-upgrade-button" class="btn-success btn-sm click-upgrade-button">
-                <ui:Label name="click-upgrade-label" text="DMG +10%" class="btn-label"/>
-                <ui:Label name="click-upgrade-cost" text="100g" class="btn-label click-upgrade-cost"/>
+        <ui:VisualElement name="cursor-menu-container" class="hiring-menu-container cursor-menu-container">
+            <ui:VisualElement name="pols" class="pols">
+                <ui:VisualElement name="pole-1" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
+                <ui:VisualElement name="pole-2" class="pole" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/pole.png?fileID=2800000&amp;guid=52d8f14987736491ba4c8a67e70b9733&amp;type=3#pole&quot;);"/>
+            </ui:VisualElement>
+            <ui:Button name="cursor-board-button" text="" class="hiring-menu-button" style="height: 100px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/cursor%20board.png?fileID=21300000&amp;guid=a752d7567143419299235390deff0e95&amp;type=3#cursor board&quot;);">
+                <ui:VisualElement name="cursor-badge" picking-mode="Ignore" class="hiring-badge"/>
             </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="right" class="stats-section">
             <ui:VisualElement name="coin-container" class="coin-plate">
                 <ui:VisualElement name="coin" class="coin">
                     <ui:Label name="coin-label" text="100k" class="coin-label"/>

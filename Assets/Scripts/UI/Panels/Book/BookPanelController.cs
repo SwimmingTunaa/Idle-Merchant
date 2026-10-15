@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Hosts the unified Book UI — a 1200x900 open-book overlay with 5 bookmark tabs.
-/// Tabs: 0=Roster, 1=Guild, 2=Inventory, 3=Crafting, 4=Settings.
+/// Hosts the unified Book UI — a 1200x900 open-book overlay with bookmark tabs.
+/// Tabs: 0=Roster, 1=Guild, 2=Inventory, 3=Crafting, 4=Settings, 5=Cursor.
 /// All page content is embedded in BookPanel.uxml as merged page-N instances.
 /// SwitchToTab shows/hides the active page TemplateContainer and passes
 /// its left-content / right-content children to the IBookPage controller.
@@ -16,13 +16,16 @@ public class BookPanelController : BasePanelController
     [SerializeField] private MonoBehaviour inventoryPage;
     [SerializeField] private MonoBehaviour craftingPage;
     [SerializeField] private MonoBehaviour settingsPage;
+    [SerializeField] private MonoBehaviour cursorPage;
 
     public override string PanelID => "BookPanel";
 
+    private const int TAB_COUNT = 6;
+
     // Cached UI elements
-    private readonly Button[] tabButtons = new Button[5];
-    private readonly VisualElement[] tabBadges = new VisualElement[5];
-    private readonly VisualElement[] pageContainers = new VisualElement[5];
+    private readonly Button[] tabButtons = new Button[TAB_COUNT];
+    private readonly VisualElement[] tabBadges = new VisualElement[TAB_COUNT];
+    private readonly VisualElement[] pageContainers = new VisualElement[TAB_COUNT];
 
     private VisualElement inventoryFilterBar;
 
@@ -39,7 +42,7 @@ public class BookPanelController : BasePanelController
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        _pages = new MonoBehaviour[] { rosterPage, guildPage, inventoryPage, craftingPage, settingsPage };
+        _pages = new MonoBehaviour[] { rosterPage, guildPage, inventoryPage, craftingPage, settingsPage, cursorPage };
 
         GameSignals.OnAdventurerFocusRequested += OnAdventurerFocusRequested;
     }
@@ -86,15 +89,15 @@ public class BookPanelController : BasePanelController
         panel.style.opacity = 1f;
 
         // Cache per-tab page containers (TemplateContainers) and hide all of them
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < TAB_COUNT; i++)
         {
             pageContainers[i] = panel.Q<VisualElement>($"page-{i}");
             if (pageContainers[i] != null) pageContainers[i].style.display = DisplayStyle.None;
         }
 
         // Wire tab buttons and collect badge refs
-        string[] tabNames = { "tab-roster", "tab-guild", "tab-inventory", "tab-crafting", "tab-settings" };
-        for (int i = 0; i < 5; i++)
+        string[] tabNames = { "tab-roster", "tab-guild", "tab-inventory", "tab-crafting", "tab-settings", "tab-cursor" };
+        for (int i = 0; i < TAB_COUNT; i++)
         {
             int idx = i;
             tabButtons[i] = panel.Q<Button>(tabNames[i]);
@@ -171,7 +174,7 @@ public class BookPanelController : BasePanelController
 
     public void OpenToTab(int index)
     {
-        if (index < 0 || index >= 5) return;
+        if (index < 0 || index >= TAB_COUNT) return;
 
         if (State == PanelState.Closed)
         {
@@ -190,7 +193,7 @@ public class BookPanelController : BasePanelController
 
     private void SwitchToTab(int index)
     {
-        if (index < 0 || index >= 5) return;
+        if (index < 0 || index >= TAB_COUNT) return;
 
         // Hide previous page
         (_pages[lastActiveTab] as IBookPage)?.OnPageHidden();
@@ -202,7 +205,7 @@ public class BookPanelController : BasePanelController
         if (pageContainers[index] != null) pageContainers[index].style.display = DisplayStyle.Flex;
 
         // Update tab active class
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < TAB_COUNT; i++)
             tabButtons[i]?.EnableInClassList("book-tab--active", i == index);
 
         // Show inventory filter bar only when on inventory tab

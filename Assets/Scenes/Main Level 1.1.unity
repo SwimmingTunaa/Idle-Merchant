@@ -28746,8 +28746,7 @@ MonoBehaviour:
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 9197481963319205126, guid: d86de3818b09844edb6036a25b22e634, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -28801,8 +28800,7 @@ MonoBehaviour:
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 9197481963319205126, guid: c1ede03fd56874438b8360843c981f3d, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset,
-              UnityEngine
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.UIElements.VisualTreeAsset, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -31778,7 +31776,7 @@ Sprite:
       localAABB:
         m_Center: {x: 0, y: 0, z: 0}
         m_Extent: {x: 0, y: 0, z: 0}
-    m_IndexBuffer: 000001000200020001000300
+    m_IndexBuffer: 000001000200020001000300y
     m_VertexData:
       serializedVersion: 3
       m_VertexCount: 4
@@ -31874,7 +31872,7 @@ Sprite:
       localAABB:
         m_Center: {x: 0, y: 0, z: 0}
         m_Extent: {x: 0, y: 0, z: 0}
-    m_IndexBuffer: 000001000200020001000300
+    m_IndexBuffer: 000001000200020001000300y
     m_VertexData:
       serializedVersion: 3
       m_VertexCount: 4
@@ -32018,6 +32016,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1657271962}
   - component: {fileID: 1657271963}
+  - component: {fileID: 1657271964}
   m_Layer: 0
   m_Name: Book UI
   m_TagString: Untagged
@@ -32065,6 +32064,21 @@ MonoBehaviour:
   inventoryPage: {fileID: 1698155367}
   craftingPage: {fileID: 811366031}
   settingsPage: {fileID: 1875925581}
+  cursorPage: {fileID: 1657271964}
+--- !u!114 &1657271964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657271961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20e7700408f54ba9a13ba4de6c057974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CursorUpgradePage
+  cardFrame: {fileID: 21300000, guid: 80cf7c2e4874449dc844f214777954a9, type: 3}
+  showDebugLogs: 0
 --- !u!1 &1671205707
 GameObject:
   m_ObjectHideFlags: 0
@@ -44378,8 +44392,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bef504b6d7780b4297c3bc2aef32cdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClickManager
-  clickDamage: 1
+  clickDamage: 10
   clicksPerSecondCap: 10
+  goldPerDamage: 1
+  clickDamageLevel: 0
   damageRadius: 0
   shockwaveDuration: 0.2
   lootPickupRadius: 0.3
@@ -44736,7 +44752,7 @@ Sprite:
       localAABB:
         m_Center: {x: 0, y: 0, z: 0}
         m_Extent: {x: 0, y: 0, z: 0}
-    m_IndexBuffer: 000001000200020001000300
+    m_IndexBuffer: 000001000200020001000300y
     m_VertexData:
       serializedVersion: 3
       m_VertexCount: 4
@@ -44832,7 +44848,7 @@ Sprite:
       localAABB:
         m_Center: {x: 0, y: 0, z: 0}
         m_Extent: {x: 0, y: 0, z: 0}
-    m_IndexBuffer: 000001000200020001000300
+    m_IndexBuffer: 000001000200020001000300y
     m_VertexData:
       serializedVersion: 3
       m_VertexCount: 4

@@ -90,8 +90,8 @@ public class UIManager : PersistentSingleton<UIManager>
         CleanupInputActions();
         ProgressionManager.OnStarEarned -= OnStarEarned;
 
-        if (clickUpgradeButton != null)
-            clickUpgradeButton.clicked -= OnClickUpgradeClicked;
+        if (cursorBoardButton != null)
+            cursorBoardButton.clicked -= OnCursorBoardClicked;
         GameSignals.GoldChanged -= OnGoldChangedForClickUpgrade;
         GameSignals.OnClickUpgradePurchased -= OnClickUpgradePurchased;
     }
@@ -240,11 +240,11 @@ public class UIManager : PersistentSingleton<UIManager>
     }
 
     // ═════════════════════════════════════════════
-    // CLICK UPGRADE BUTTON (top bar)
+    // CURSOR BOARD (top bar) — opens the Book's Cursor page; badge = upgrade affordable
     // ═════════════════════════════════════════════
 
-    private Button clickUpgradeButton;
-    private Label clickUpgradeCostLabel;
+    private Button cursorBoardButton;
+    private VisualElement cursorBadge;
     private ClickerManager clickerManager;
 
     private void SetUpClickUpgradeButton()
@@ -252,46 +252,39 @@ public class UIManager : PersistentSingleton<UIManager>
         if (uiDocument == null || uiDocument.rootVisualElement == null)
             return;
 
-        clickUpgradeButton = uiDocument.rootVisualElement.Q<Button>("click-upgrade-button");
-        if (clickUpgradeButton == null)
+        cursorBoardButton = uiDocument.rootVisualElement.Q<Button>("cursor-board-button");
+        if (cursorBoardButton == null)
         {
-            Debug.LogWarning("[UIManager] 'click-upgrade-button' not found in UXML");
+            Debug.LogWarning("[UIManager] 'cursor-board-button' not found in UXML");
             return;
         }
 
-        clickUpgradeCostLabel = clickUpgradeButton.Q<Label>("click-upgrade-cost");
-        clickerManager = FindFirstObjectByType<ClickerManager>();
+        cursorBadge = cursorBoardButton.Q<VisualElement>("cursor-badge");
+        clickerManager = FindAnyObjectByType<ClickerManager>();
 
-        clickUpgradeButton.clicked += OnClickUpgradeClicked;
+        cursorBoardButton.clicked += OnCursorBoardClicked;
         GameSignals.GoldChanged += OnGoldChangedForClickUpgrade;
         GameSignals.OnClickUpgradePurchased += OnClickUpgradePurchased;
 
-        RefreshClickUpgradeButton();
+        RefreshCursorBadge();
     }
 
-    private void OnClickUpgradeClicked()
+    private void OnCursorBoardClicked()
     {
-        clickerManager?.TryBuyClickUpgrade();
+        FindAnyObjectByType<BookPanelController>()?.OpenToTab(5);
     }
 
-    private void OnGoldChangedForClickUpgrade(int _) => RefreshClickUpgradeButton();
-    private void OnClickUpgradePurchased(int _) => RefreshClickUpgradeButton();
+    private void OnGoldChangedForClickUpgrade(int _) => RefreshCursorBadge();
+    private void OnClickUpgradePurchased(int _) => RefreshCursorBadge();
 
-    /// <summary>Syncs the top-bar click upgrade button's cost label and affordability
-    /// (disabled styling comes from the Button component's :disabled rules).</summary>
-    private void RefreshClickUpgradeButton()
+    /// <summary>Shows the cursor board's badge while the next click upgrade is affordable.</summary>
+    private void RefreshCursorBadge()
     {
-        if (clickUpgradeButton == null || clickerManager == null)
+        if (cursorBadge == null || clickerManager == null)
             return;
 
-        int cost = clickerManager.ClickUpgradeCost;
-        if (clickUpgradeCostLabel != null)
-            clickUpgradeCostLabel.text = AnimatedNumberUITK.Abbrev(cost) + "g";
-
-        bool affordable = Inventory.Instance != null && Inventory.Instance.Gold >= cost;
-        clickUpgradeButton.SetEnabled(affordable);
-        clickUpgradeButton.EnableInClassList("btn-success", affordable);
-        clickUpgradeButton.EnableInClassList("btn-danger", !affordable);
+        bool affordable = Inventory.Instance != null && Inventory.Instance.Gold >= clickerManager.ClickUpgradeCost;
+        cursorBadge.EnableInClassList("hiring-badge--visible", affordable);
     }
 
     // ═════════════════════════════════════════════

@@ -99,6 +99,13 @@
     margin-left: var(--space-xl);
 }
 
+/* Cursor board lives in the right stats-section: hang from the bar top like the hiring sign */
+.cursor-menu-container {
+    align-self: flex-start;
+    margin-left: 0;
+    margin-right: var(--space-xl);
+}
+
 .pols {
     width: 100%;
     height: 24px;

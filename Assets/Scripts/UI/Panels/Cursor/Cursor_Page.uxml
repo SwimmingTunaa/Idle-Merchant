@@ -1,0 +1,44 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Panels/Cursor/CursorPageStyle.uss?fileID=7433441132597879392&amp;guid=3b1fdd20cf41448f9a1c2a62f0b4f7aa&amp;type=3#CursorPageStyle" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 24px 56px 24px 40px; margin-right: 4px;">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 12px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Cursor" class="cursor-page-title" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=2800000&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right&quot;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="cursor-art" class="cursor-art" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/cursor.png?fileID=21300000&amp;guid=8634fb03f7f74d04a879603e8a391180&amp;type=3#cursor&quot;); -unity-background-image-tint-color: rgb(113, 65, 59);" />
+            <ui:VisualElement name="cursor-stats" class="cursor-stats">
+                <ui:VisualElement class="cursor-stat-row">
+                    <ui:Label text="Click damage" class="cursor-stat-key" />
+                    <ui:Label name="stat-damage" text="1.0" class="cursor-stat-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="cursor-stat-row">
+                    <ui:Label text="Pickup radius" class="cursor-stat-key" />
+                    <ui:Label name="stat-radius" text="0.3" class="cursor-stat-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="cursor-stat-row">
+                    <ui:Label text="Damage AOE" class="cursor-stat-key" />
+                    <ui:Label name="stat-aoe" text="locked" class="cursor-stat-value cursor-stat-value--muted" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 24px 40px 24px 56px; margin-left: 4px;">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 12px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Upgrades" class="cursor-page-title" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=2800000&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right&quot;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
+            </ui:VisualElement>
+            <ui:ScrollView name="cursor-upgrade-scroll" class="cursor-upgrade-scroll" style="flex-grow: 1;">
+                <ui:VisualElement name="cursor-upgrade-list" class="cursor-upgrade-list" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
