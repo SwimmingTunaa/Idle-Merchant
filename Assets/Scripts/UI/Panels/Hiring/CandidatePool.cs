@@ -21,21 +21,25 @@ public class CandidatePool
     private float refreshTimer;
     private float refreshInterval = 300f;
     private float traitChance = 0.7f;
+    private readonly System.Func<int> ownedCount; // guild-wide units of this role, for cost scaling
 
     private const int BASE_POOL_SIZE = 5;
+    private const float COST_SCALE_PER_OWNED = 1.25f;
 
     public CandidatePool(
         HireRole role,
         int layerIndex,
         EntityDef entityDef,
         float refreshIntervalSeconds = 300f,
-        float traitChance = 0.7f)
+        float traitChance = 0.7f,
+        System.Func<int> ownedCount = null)
     {
         Role = role;
         LayerIndex = layerIndex;
         EntityDef = entityDef;
         refreshInterval = refreshIntervalSeconds;
         this.traitChance = traitChance;
+        this.ownedCount = ownedCount;
 
         RegeneratePool();
         refreshTimer = refreshInterval;
@@ -107,10 +111,14 @@ public class CandidatePool
             return;
         }
 
+        // Cost scales x1.25 per unit of this role already owned; baked at generation (pool keeps pre-hire prices until refresh)
+        int owned = ownedCount != null ? ownedCount() : 0;
+        int baseCost = Mathf.RoundToInt(EntityDef.hireCost * Mathf.Pow(COST_SCALE_PER_OWNED, owned));
+
         var newCandidates = HiringCandidateGenerator.GenerateCandidates(
             EntityDef,
             BASE_POOL_SIZE,
-            EntityDef.hireCost,
+            baseCost,
             traitChance
         );
 

@@ -438,7 +438,12 @@ public class HireController : BasePanelController
                 var key = (role, m.LayerIndex, def);
                 if (candidatePools.ContainsKey(key)) continue;
 
-                var pool = new CandidatePool(role, m.LayerIndex, def, refreshIntervalSeconds, traitChance);
+                var pool = new CandidatePool(role, m.LayerIndex, def, refreshIntervalSeconds, traitChance, () =>
+                {
+                    int owned = 0;
+                    foreach (var mgr in managers) owned += mgr.GetTotalCount();
+                    return owned;
+                });
                 candidatePools[key] = pool;
                 outList.Add(pool);
             }
