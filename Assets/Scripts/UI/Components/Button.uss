@@ -11,11 +11,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md) var(--space-md);
+    padding: 13px var(--space-md) 19px var(--space-md);
     font-size: 36px;
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: -unity-background-image-tint-color, scale;
     transition-duration: var(--transition-fast);
 }
@@ -33,11 +33,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md) var(--space-md);
+    padding: 13px var(--space-md) 19px var(--space-md);
     font-size: 36px;
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: -unity-background-image-tint-color, scale;
     transition-duration: var(--transition-fast);
 }
@@ -55,11 +55,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md) var(--space-md);
+    padding: 13px var(--space-md) 19px var(--space-md);
     font-size: 36px;
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: -unity-background-image-tint-color, scale;
     transition-duration: var(--transition-fast);
 }
@@ -77,11 +77,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md) var(--space-md);
+    padding: 13px var(--space-md) 19px var(--space-md);
     font-size: 36px;
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: -unity-background-image-tint-color, scale;
     transition-duration: var(--transition-fast);
 }
@@ -99,11 +99,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md) var(--space-md);
+    padding: 13px var(--space-md) 19px var(--space-md);
     font-size: 36px;
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: -unity-background-image-tint-color, scale;
     transition-duration: var(--transition-fast);
 }
@@ -121,11 +121,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md) var(--space-md);
+    padding: 13px var(--space-md) 19px var(--space-md);
     font-size: 36px;
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: -unity-background-image-tint-color, scale;
     transition-duration: var(--transition-fast);
 }
@@ -274,7 +274,8 @@
     width: 28px;
     height: 28px;
     flex-shrink: 0;
-    margin-left: var(--space-sm);
+    margin-left: 4px;
+    margin-bottom: 6px;
     -unity-background-scale-mode: scale-to-fit;
     background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&guid=16798bfa02f8d44348f9fffdaf153786&type=3#Copper Coin_0");
 }
@@ -293,7 +294,7 @@
     background-color: rgba(0, 0, 0, 0);
     color: var(--color-text-secondary);
     border-width: 0;
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");
+    -unity-font-definition: var(--font-body);
     transition-property: background-color, color;
     transition-duration: var(--transition-fast);
 }

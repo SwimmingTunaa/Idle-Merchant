@@ -18,6 +18,9 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     [SerializeField] private Sprite iconPickupRadius;
     [SerializeField] private Sprite iconDamageAOE;
 
+    [Tooltip("Guild star (Star_active) shown in star-gated lock pills.")]
+    [SerializeField] private Sprite starIcon;
+
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
 
@@ -106,7 +109,7 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         // Damage AOE — locked preview, star gated per GDD mouse upgrades
         var aoeCard = NewCard("Damage AOE", locked: true, icon: iconDamageAOE);
         AddLabel(aoeCard.Q<VisualElement>("card-info"), "cursor-card-substat").text = "clicks damage nearby mobs";
-        aoeCard.Add(LockPill("Unlocks at 2★"));
+        aoeCard.Add(LockPill("Unlocks at 2", withStar: true));
         list.Add(aoeCard);
     }
 
@@ -163,11 +166,23 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         return label;
     }
 
-    private static Label LockPill(string text)
+    private VisualElement LockPill(string text, bool withStar = false)
     {
-        var pill = new Label(text);
+        var pill = new VisualElement();
         pill.AddToClassList("btn-disabled");
         pill.AddToClassList("cursor-card-lockpill");
+
+        var label = new Label(text);
+        label.AddToClassList("btn-label");
+        pill.Add(label);
+
+        if (withStar && starIcon != null)
+        {
+            var star = new VisualElement();
+            star.AddToClassList("lockpill-star");
+            star.style.backgroundImage = new StyleBackground(starIcon);
+            pill.Add(star);
+        }
         return pill;
     }
 

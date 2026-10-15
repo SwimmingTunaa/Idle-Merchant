@@ -1,4 +1,5 @@
 :root {
+    --font-body: url("project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&guid=01964068568548bfbb7b65d7756844fc&type=3#Ithaca");   /* body text everywhere; headers use NotJam, bulletin uses Salmon Typewriter */
     /* ═════════ Primitives — mirrors Figma Primary/* and Blue/* ═════════
        These are the canonical colour swatches. Semantic tokens below
        should alias to these where possible. Update both Figma and this
@@ -156,31 +157,31 @@
 .label {
     font-size: var(--font-size-h2);
     color: var(--color-text-primary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: var(--font-body);
 }
 
 .text-body {
     font-size: var(--font-size-body);
     color: var(--color-text-secondary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: var(--font-body);
 }
 
 .text-small {
     font-size: var(--font-size-small);
     color: var(--color-text-secondary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: var(--font-body);
 }
 
 .text-caption {
     font-size: var(--font-size-caption);
     color: var(--color-text-muted);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: var(--font-body);
 }
 
 .text-lg {
     font-size: var(--font-size-h2);
     color: var(--color-text-secondary);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    -unity-font-definition: var(--font-body);
     -unity-font-style: normal;
 }
 

@@ -147,3 +147,44 @@
 .tab-badge--visible {
     display: flex;
 }
+
+/* ── Scrollbars: parchment groove + wooden plank thumb (applies to every book page) ── */
+.unity-scroller--vertical {
+    width: 16px;
+    margin-left: 6px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-scroller--vertical .unity-scroller__low-button,
+.unity-scroller--vertical .unity-scroller__high-button {
+    display: none;
+}
+
+.unity-scroller--vertical .unity-scroller__slider {
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 16px;
+    min-width: 16px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-scroller--vertical .unity-base-slider__tracker {
+    background-color: rgba(101, 67, 33, 0.14);
+    border-width: 0;
+    border-radius: 0;
+}
+
+.unity-scroller--vertical .unity-base-slider__dragger {
+    width: 12px;
+    left: 2px;
+    background-color: rgb(139, 90, 60);
+    border-color: rgb(101, 67, 33);
+    border-width: 2px;
+    border-radius: 0;
+}
+
+.unity-scroller--vertical .unity-base-slider__dragger:hover {
+    background-color: rgb(155, 112, 72);
+}
