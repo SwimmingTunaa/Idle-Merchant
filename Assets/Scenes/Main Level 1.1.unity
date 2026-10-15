@@ -32077,11 +32077,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20e7700408f54ba9a13ba4de6c057974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CursorUpgradePage
-  cardFrame: {fileID: 21300000, guid: e202a8ab367e41aead07308c65d8c8a8, type: 3}
+  cardTemplate: {fileID: 9197481963319205126, guid: 8becce16ec78438bbde77cc8fcd34159, type: 3}
   iconClickDamage: {fileID: 21300000, guid: 940bc9760f364ee89ed87856cff611c7, type: 3}
   iconPickupRadius: {fileID: 21300000, guid: 00d468b75f524988a8eb0aac34ebe881, type: 3}
   iconDamageAOE: {fileID: 21300000, guid: 08563c6efd5e4654803a1d70cf766a83, type: 3}
-  starIcon: {fileID: -930353575, guid: 391cae39f2cc64ebca5e7d6893d13427, type: 3}
   showDebugLogs: 0
 --- !u!1 &1671205707
 GameObject:
@@ -44400,6 +44399,9 @@ MonoBehaviour:
   clicksPerSecondCap: 10
   goldPerDamage: 1
   clickDamageLevel: 0
+  pickupRadiusLevel: 0
+  radiusPerLevel: 0.2
+  maxPickupRadiusLevel: 5
   damageRadius: 0
   shockwaveDuration: 0.2
   lootPickupRadius: 0.3

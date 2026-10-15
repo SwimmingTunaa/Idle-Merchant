@@ -16,6 +16,15 @@ public class ClickerManager : MonoBehaviour
     [Tooltip("Click damage upgrade level. Effective click damage = clickDamage * (1 + 0.1 * level).")]
     [SerializeField] private int clickDamageLevel = 0;
 
+    [Tooltip("Pickup radius upgrade level. Effective radius = lootPickupRadius + radiusPerLevel * level.")]
+    [SerializeField] private int pickupRadiusLevel = 0;
+
+    [Tooltip("World units of loot-vacuum radius added per upgrade level.")]
+    [SerializeField] private float radiusPerLevel = 0.2f;
+
+    [Tooltip("Max pickup radius upgrade levels (spatial upgrades need a ceiling).")]
+    [SerializeField] private int maxPickupRadiusLevel = 5;
+
     [Header("AOE Settings")]
     [Tooltip("Radius for damage AOE (0 = single target only)")]
     [SerializeField] private float damageRadius = 0f;
@@ -47,7 +56,30 @@ public class ClickerManager : MonoBehaviour
 
     public int ClickDamageLevel => clickDamageLevel;
     public float NextClickDamage => clickDamage * (1f + 0.1f * (clickDamageLevel + 1));
-    public float LootPickupRadius => lootPickupRadius;
+
+    // ── Pickup radius upgrade ──
+    public int PickupRadiusLevel => pickupRadiusLevel;
+    public bool PickupRadiusMaxed => pickupRadiusLevel >= maxPickupRadiusLevel;
+    public float LootPickupRadius => lootPickupRadius + radiusPerLevel * pickupRadiusLevel;
+    public float NextLootPickupRadius => lootPickupRadius + radiusPerLevel * (pickupRadiusLevel + 1);
+
+    /// <summary>Gold cost of the next pickup radius upgrade: round(250 * 1.5^level).</summary>
+    public int RadiusUpgradeCost => Mathf.RoundToInt(250f * Mathf.Pow(1.5f, pickupRadiusLevel));
+
+    /// <summary>Spends gold on the next pickup radius upgrade. Returns false if maxed or unaffordable.</summary>
+    public bool TryBuyRadiusUpgrade()
+    {
+        if (PickupRadiusMaxed) return false;
+        if (!Inventory.Instance.TrySpendGold(RadiusUpgradeCost)) return false;
+
+        pickupRadiusLevel++;
+        GameSignals.RaiseClickUpgradePurchased(pickupRadiusLevel);
+        return true;
+    }
+
+    /// <summary>True while any cursor upgrade is purchasable with the given gold (drives the board badge).</summary>
+    public bool AnyCursorUpgradeAffordable(int gold) =>
+        gold >= ClickUpgradeCost || (!PickupRadiusMaxed && gold >= RadiusUpgradeCost);
 
     /// <summary>Gold cost of the next click damage upgrade: round(100 * 1.15^level).</summary>
     public int ClickUpgradeCost => Mathf.RoundToInt(100f * Mathf.Pow(1.15f, clickDamageLevel));
@@ -142,8 +174,8 @@ public class ClickerManager : MonoBehaviour
         {
             if (hit.TryGetComponent(out IClickableLoot _))
             {
-                if (lootPickupRadius > 0f)
-                    VacuumLootToMouse(world, lootPickupRadius);
+                if (LootPickupRadius > 0f)
+                    VacuumLootToMouse(world, LootPickupRadius);
                 else
                     StartCoroutine(MoveLootToMouse(hit.gameObject));
                 return;
@@ -307,10 +339,10 @@ public class ClickerManager : MonoBehaviour
             Gizmos.DrawWireSphere(lastClickPosition, damageRadius);
         }
 
-        if (lootPickupRadius > 0f)
+        if (LootPickupRadius > 0f)
         {
             Gizmos.color = new Color(0f, 1f, 0f, 0.2f);
-            Gizmos.DrawWireSphere(lastClickPosition, lootPickupRadius);
+            Gizmos.DrawWireSphere(lastClickPosition, LootPickupRadius);
         }
     }
 #endif

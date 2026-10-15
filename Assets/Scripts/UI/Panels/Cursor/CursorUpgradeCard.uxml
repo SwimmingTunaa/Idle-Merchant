@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Cursor/CursorPageStyle.uss?fileID=7433441132597879392&amp;guid=3b1fdd20cf41448f9a1c2a62f0b4f7aa&amp;type=3#CursorPageStyle" />
+    <ui:VisualElement name="card-root" class="cursor-card" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&amp;guid=e202a8ab367e41aead07308c65d8c8a8&amp;type=3#card-torn&quot;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 3px;">
+        <ui:VisualElement name="card-header" class="cursor-card-header">
+            <ui:VisualElement name="card-icon" class="cursor-card-icon" />
+            <ui:VisualElement name="card-info" class="cursor-card-info">
+                <ui:Label name="card-name" text="Upgrade" class="cursor-card-name" />
+                <ui:Label name="card-stat" text="" class="cursor-card-stat" />
+                <ui:Label name="card-substat" text="" class="cursor-card-substat" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="card-buy" class="btn-success cursor-card-buy">
+            <ui:Label name="card-buy-label" text="100" class="btn-label" />
+            <ui:VisualElement name="card-buy-coin" class="btn-coin" />
+        </ui:Button>
+        <ui:VisualElement name="card-lockpill" class="btn-disabled cursor-card-lockpill">
+            <ui:Label name="card-lock-label" text="Coming soon" class="btn-label" />
+            <ui:VisualElement name="card-lock-star" class="lockpill-star" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/Star.png?fileID=-930353575&amp;guid=391cae39f2cc64ebca5e7d6893d13427&amp;type=3#Star_active&quot;);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

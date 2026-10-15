@@ -283,7 +283,7 @@ public class UIManager : PersistentSingleton<UIManager>
         if (cursorBadge == null || clickerManager == null)
             return;
 
-        bool affordable = Inventory.Instance != null && Inventory.Instance.Gold >= clickerManager.ClickUpgradeCost;
+        bool affordable = Inventory.Instance != null && clickerManager.AnyCursorUpgradeAffordable(Inventory.Instance.Gold);
         cursorBadge.EnableInClassList("hiring-badge--visible", affordable);
     }
 
