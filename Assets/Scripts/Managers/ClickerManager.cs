@@ -231,6 +231,8 @@ public class ClickerManager : MonoBehaviour
             {
                 // AOE shockwave centered on the mob you clicked
                 if (activeShockwave != null) StopCoroutine(activeShockwave);
+                if (ClickHitVFX.Instance != null)
+                    ClickHitVFX.Instance.PlayShockRing(hit.transform.position, EffectiveDamageRadius, shockwaveDuration);
                 activeShockwave = StartCoroutine(DamageShockwave(hit.transform.position, EffectiveDamageRadius, shockwaveDuration));
             }
             else

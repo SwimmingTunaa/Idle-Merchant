@@ -27,7 +27,8 @@ public class ClickHitVFX : MonoBehaviour
 
     private ParticleSystem sparks;   // no gravity: hit sparks + crack star + absorb pops
     private ParticleSystem debris;   // gravity: kill chunks
-    private ParticleSystem ring;     // no gravity, own system so a new click can Clear() just the ring
+    private ParticleSystem ring;      // no gravity, own system so a new click can Clear() just the ring
+    private ParticleSystem shockRing; // expanding damage-AOE ring, white -> red fade over its own lifetime
     private bool stopping;
 
     void Awake()
@@ -38,6 +39,15 @@ public class ClickHitVFX : MonoBehaviour
         sparks = CreateSystem("Sparks", gravity: 0f);
         debris = CreateSystem("Debris", gravity: 1.6f);
         ring = CreateSystem("VacuumRing", gravity: 0f);
+
+        shockRing = CreateSystem("ShockRing", gravity: 0f);
+        var col = shockRing.colorOverLifetime;
+        col.enabled = true;
+        var grad = new Gradient();
+        grad.SetKeys(
+            new[] { new GradientColorKey(sparkWhite, 0f), new GradientColorKey(starRed, 0.45f), new GradientColorKey(starRed, 1f) },
+            new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 0.7f), new GradientAlphaKey(0f, 1f) });
+        col.color = new ParticleSystem.MinMaxGradient(grad);
     }
 
     void OnDestroy()
@@ -147,6 +157,25 @@ public class ClickHitVFX : MonoBehaviour
             float a = Mathf.PI * 2f * i / count;
             var dir = new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0f);
             Emit(ring, center + dir * radius, -dir * (travel / duration), sparkWhite, duration, 0.18f);
+        }
+    }
+
+    /// <summary>Expanding ring matching the damage-AOE shockwave: grows from the click point
+    /// to the full radius over the shockwave's own duration, white fading to red. One ring at
+    /// a time — a new shockwave replaces any ring still expanding.</summary>
+    public void PlayShockRing(Vector3 center, float radius, float duration)
+    {
+        center.z = 0f;
+        shockRing.Clear();
+
+        int count = Mathf.Clamp(Mathf.RoundToInt(radius * 40f), 24, 72);
+        const float startR = 0.15f;
+        float speed = (radius - startR) / Mathf.Max(duration, 0.05f);
+        for (int i = 0; i < count; i++)
+        {
+            float a = Mathf.PI * 2f * i / count;
+            var dir = new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0f);
+            Emit(shockRing, center + dir * startR, dir * speed, sparkWhite, duration * 1.15f, 0.2f);
         }
     }
 
