@@ -156,6 +156,49 @@ public class GameDebugger : EditorWindow
             }
         }
         GUI.enabled = true;
+
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Clicker Upgrades", EditorStyles.boldLabel);
+
+        var clicker = FindAnyObjectByType<ClickerManager>();
+        if (clicker == null)
+        {
+            EditorGUILayout.HelpBox("No ClickerManager in scene.", MessageType.Info);
+        }
+        else
+        {
+            EditorGUILayout.LabelField("Click Damage:",
+                $"lvl {clicker.ClickDamageLevel} — {clicker.EffectiveClickDamage:0.#} dmg (next cost {clicker.ClickUpgradeCost}g)");
+            EditorGUILayout.LabelField("Pickup Radius:",
+                $"lvl {clicker.PickupRadiusLevel}{(clicker.PickupRadiusMaxed ? " (max)" : "")} — {clicker.LootPickupRadius:0.0} wu (next cost {clicker.RadiusUpgradeCost}g)");
+
+            GUI.enabled = Application.isPlaying;
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("+1 Dmg Lvl (free)"))
+                BumpClickerLevel(clicker, "clickDamageLevel", +1);
+            if (GUILayout.Button("+1 Radius Lvl (free)") && !clicker.PickupRadiusMaxed)
+                BumpClickerLevel(clicker, "pickupRadiusLevel", +1);
+            if (GUILayout.Button("Reset Levels"))
+            {
+                BumpClickerLevel(clicker, "clickDamageLevel", 0, reset: true);
+                BumpClickerLevel(clicker, "pickupRadiusLevel", 0, reset: true);
+            }
+            EditorGUILayout.EndHorizontal();
+            GUI.enabled = true;
+        }
+    }
+
+    // Debug-only: bump the clicker's serialized upgrade levels without spending gold,
+    // then raise the purchase signal so the Cursor page and board badge refresh.
+    void BumpClickerLevel(ClickerManager clicker, string field, int delta, bool reset = false)
+    {
+        var so = new SerializedObject(clicker);
+        var prop = so.FindProperty(field);
+        if (prop == null) { Debug.LogError($"[GameDebugger] Field '{field}' not found on ClickerManager"); return; }
+        prop.intValue = reset ? 0 : Mathf.Max(0, prop.intValue + delta);
+        so.ApplyModifiedPropertiesWithoutUndo();
+        GameSignals.RaiseClickUpgradePurchased(prop.intValue);
+        Debug.Log($"[GameDebugger] {field} -> {prop.intValue}");
     }
 
     // ===== INVENTORY TAB =====
