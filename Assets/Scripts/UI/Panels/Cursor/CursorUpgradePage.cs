@@ -28,6 +28,7 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     // Left page
     private Label statDamage;
     private Label statRadius;
+    private Label statAOE;
 
     // Per-card bindings, re-run on every refresh
     private readonly List<System.Action> cardRefreshers = new List<System.Action>();
@@ -44,11 +45,13 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         statDamage = leftPage.Q<Label>("stat-damage");
         statRadius = leftPage.Q<Label>("stat-radius");
+        statAOE = leftPage.Q<Label>("stat-aoe");
 
         BuildCards(rightPage.Q<VisualElement>("cursor-upgrade-list"));
 
         GameSignals.GoldChanged += OnGoldChanged;
         GameSignals.OnClickUpgradePurchased += OnUpgradePurchased;
+        ProgressionManager.OnStarEarned += OnStarEarned;
 
         Refresh();
 
@@ -59,14 +62,17 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
     {
         GameSignals.GoldChanged -= OnGoldChanged;
         GameSignals.OnClickUpgradePurchased -= OnUpgradePurchased;
+        ProgressionManager.OnStarEarned -= OnStarEarned;
 
         statDamage = null;
         statRadius = null;
+        statAOE = null;
         cardRefreshers.Clear();
     }
 
     private void OnGoldChanged(int _) => Refresh();
     private void OnUpgradePurchased(int _) => Refresh();
+    private void OnStarEarned(int _) => Refresh();
 
     // ═════════════════════════════════════════════
     // CARDS
@@ -94,13 +100,43 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
             maxed: () => clicker.PickupRadiusMaxed,
             buy: () => clicker.TryBuyRadiusUpgrade());
 
-        // Damage AOE — locked preview, star gated per GDD mouse upgrades
+        // Damage AOE — star gated: lock pill until unlocked, then a live buy card
         var aoe = NewCard(list, "Damage AOE", iconDamageAOE);
         aoe.Q<Label>("card-substat").text = "clicks damage nearby mobs";
-        aoe.Q<Label>("card-stat").style.display = DisplayStyle.None;
-        aoe.Q<Button>("card-buy").style.display = DisplayStyle.None;
-        aoe.Q<Label>("card-lock-label").text = "Unlocks at 2";
-        aoe.Q<VisualElement>("card-root").AddToClassList("cursor-card--locked");
+        aoe.Q<Label>("card-lock-label").text = $"Unlocks at {clicker.AOEStarRequirement}";
+        var aoeRoot = aoe.Q<VisualElement>("card-root");
+        var aoeStat = aoe.Q<Label>("card-stat");
+        var aoePill = aoe.Q<VisualElement>("card-lockpill");
+        var aoeBuy = aoe.Q<Button>("card-buy");
+        var aoeBuyLabel = aoe.Q<Label>("card-buy-label");
+        var aoeCoin = aoe.Q<VisualElement>("card-buy-coin");
+        aoeBuy.clicked += () => clicker.TryBuyAOEUpgrade();
+
+        cardRefreshers.Add(() =>
+        {
+            bool unlocked = clicker.AOEUnlocked;
+            aoeRoot.EnableInClassList("cursor-card--locked", !unlocked);
+            aoePill.style.display = unlocked ? DisplayStyle.None : DisplayStyle.Flex;
+            aoeBuy.style.display = unlocked ? DisplayStyle.Flex : DisplayStyle.None;
+            aoeStat.style.display = unlocked ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!unlocked) return;
+
+            if (clicker.AOEMaxed)
+            {
+                aoeStat.text = $"{clicker.EffectiveDamageRadius:0.0} radius (max)";
+                aoeBuyLabel.text = "Maxed";
+                aoeCoin.style.display = DisplayStyle.None;
+                aoeBuy.SetEnabled(false);
+                return;
+            }
+            aoeStat.text = clicker.AOELevel == 0
+                ? $"single ➜ <color=#376C2D>{clicker.NextDamageRadius:0.0} radius</color>"
+                : $"{clicker.EffectiveDamageRadius:0.0} ➜ <color=#376C2D>{clicker.NextDamageRadius:0.0} radius</color>";
+            aoeCoin.style.display = DisplayStyle.Flex;
+            int c = clicker.AOEUpgradeCost;
+            aoeBuyLabel.text = AnimatedNumberUITK.Abbrev(c);
+            aoeBuy.SetEnabled(Inventory.Instance != null && Inventory.Instance.Gold >= c);
+        });
     }
 
     /// <summary>Clone the template into the list and bind the shared bits (icon, name).</summary>
@@ -165,6 +201,13 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
 
         if (statDamage != null) statDamage.text = clicker.EffectiveClickDamage.ToString("0.#");
         if (statRadius != null) statRadius.text = clicker.LootPickupRadius.ToString("0.0");
+        if (statAOE != null)
+        {
+            statAOE.text = !clicker.AOEUnlocked ? "locked"
+                : clicker.AOELevel == 0 ? "off"
+                : clicker.EffectiveDamageRadius.ToString("0.0");
+            statAOE.EnableInClassList("cursor-stat-value--muted", !clicker.AOEUnlocked || clicker.AOELevel == 0);
+        }
 
         foreach (var refresh in cardRefreshers) refresh();
     }

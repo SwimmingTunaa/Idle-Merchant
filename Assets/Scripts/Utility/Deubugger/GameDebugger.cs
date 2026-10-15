@@ -15,6 +15,7 @@ public class GameDebugger : EditorWindow
 
     // Economy
     private int goldAmount = 1000;
+    private int dbgDmgLevel, dbgRadiusLevel, dbgAOELevel;
 
     // Inventory
     private ItemDef selectedItem;
@@ -167,35 +168,47 @@ public class GameDebugger : EditorWindow
         }
         else
         {
-            EditorGUILayout.LabelField("Click Damage:",
-                $"lvl {clicker.ClickDamageLevel} — {clicker.EffectiveClickDamage:0.#} dmg (next cost {clicker.ClickUpgradeCost}g)");
-            EditorGUILayout.LabelField("Pickup Radius:",
-                $"lvl {clicker.PickupRadiusLevel}{(clicker.PickupRadiusMaxed ? " (max)" : "")} — {clicker.LootPickupRadius:0.0} wu (next cost {clicker.RadiusUpgradeCost}g)");
-
             GUI.enabled = Application.isPlaying;
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("+1 Dmg Lvl (free)"))
-                BumpClickerLevel(clicker, "clickDamageLevel", +1);
-            if (GUILayout.Button("+1 Radius Lvl (free)") && !clicker.PickupRadiusMaxed)
-                BumpClickerLevel(clicker, "pickupRadiusLevel", +1);
-            if (GUILayout.Button("Reset Levels"))
+
+            DrawClickerLadder(clicker, "Click Damage", "clickDamageLevel", ref dbgDmgLevel,
+                $"lvl {clicker.ClickDamageLevel} — {clicker.EffectiveClickDamage:0.#} dmg (next {clicker.ClickUpgradeCost}g)");
+            DrawClickerLadder(clicker, "Pickup Radius", "pickupRadiusLevel", ref dbgRadiusLevel,
+                $"lvl {clicker.PickupRadiusLevel}{(clicker.PickupRadiusMaxed ? " (max)" : "")} — {clicker.LootPickupRadius:0.0} wu (next {clicker.RadiusUpgradeCost}g)");
+            DrawClickerLadder(clicker, "Damage AOE", "damageAOELevel", ref dbgAOELevel,
+                $"lvl {clicker.AOELevel}{(clicker.AOEMaxed ? " (max)" : clicker.AOEUnlocked ? "" : " (locked)")} — {clicker.EffectiveDamageRadius:0.0} wu (next {clicker.AOEUpgradeCost}g)");
+
+            if (GUILayout.Button("Reset All Levels"))
             {
                 BumpClickerLevel(clicker, "clickDamageLevel", 0, reset: true);
                 BumpClickerLevel(clicker, "pickupRadiusLevel", 0, reset: true);
+                BumpClickerLevel(clicker, "damageAOELevel", 0, reset: true);
             }
-            EditorGUILayout.EndHorizontal();
             GUI.enabled = true;
         }
     }
 
-    // Debug-only: bump the clicker's serialized upgrade levels without spending gold,
-    // then raise the purchase signal so the Cursor page and board badge refresh.
-    void BumpClickerLevel(ClickerManager clicker, string field, int delta, bool reset = false)
+    // One ladder row: readout, +1, and a typed level with Set.
+    void DrawClickerLadder(ClickerManager clicker, string label, string field, ref int typedLevel, string info)
+    {
+        EditorGUILayout.LabelField(label + ":", info);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("+1", GUILayout.Width(36)))
+            BumpClickerLevel(clicker, field, +1);
+        typedLevel = EditorGUILayout.IntField(typedLevel, GUILayout.Width(50));
+        if (GUILayout.Button("Set", GUILayout.Width(44)))
+            BumpClickerLevel(clicker, field, typedLevel, set: true);
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.Space(2);
+    }
+
+    // Debug-only: bump or set the clicker's serialized upgrade levels without spending
+    // gold, then raise the purchase signal so the Cursor page and board badge refresh.
+    void BumpClickerLevel(ClickerManager clicker, string field, int value, bool reset = false, bool set = false)
     {
         var so = new SerializedObject(clicker);
         var prop = so.FindProperty(field);
         if (prop == null) { Debug.LogError($"[GameDebugger] Field '{field}' not found on ClickerManager"); return; }
-        prop.intValue = reset ? 0 : Mathf.Max(0, prop.intValue + delta);
+        prop.intValue = reset ? 0 : set ? Mathf.Max(0, value) : Mathf.Max(0, prop.intValue + value);
         so.ApplyModifiedPropertiesWithoutUndo();
         GameSignals.RaiseClickUpgradePurchased(prop.intValue);
         Debug.Log($"[GameDebugger] {field} -> {prop.intValue}");

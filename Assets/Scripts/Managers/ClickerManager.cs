@@ -26,8 +26,16 @@ public class ClickerManager : MonoBehaviour
     [SerializeField] private int maxPickupRadiusLevel = 5;
 
     [Header("AOE Settings")]
-    [Tooltip("Radius for damage AOE (0 = single target only)")]
-    [SerializeField] private float damageRadius = 0f;
+    [Tooltip("Damage AOE upgrade level (0 = single target). Purchases gated by star requirement.")]
+    [SerializeField] private int damageAOELevel = 0;
+
+    [Tooltip("Shockwave radius at AOE level 1; each further level adds aoeRadiusPerLevel.")]
+    [SerializeField] private float aoeBaseRadius = 0.8f;
+    [SerializeField] private float aoeRadiusPerLevel = 0.3f;
+    [SerializeField] private int maxDamageAOELevel = 3;
+
+    [Tooltip("Guild stars required before Damage AOE can be bought.")]
+    [SerializeField] private int aoeStarRequirement = 2;
     
     [Tooltip("Duration of shockwave expansion for damage AOE (seconds)")]
     [SerializeField] private float shockwaveDuration = 0.2f;
@@ -77,9 +85,37 @@ public class ClickerManager : MonoBehaviour
         return true;
     }
 
+    // ── Damage AOE upgrade (star gated) ──
+    public int AOELevel => damageAOELevel;
+    public bool AOEMaxed => damageAOELevel >= maxDamageAOELevel;
+    public int AOEStarRequirement => aoeStarRequirement;
+    public bool AOEUnlocked =>
+        ProgressionManager.Instance != null && ProgressionManager.Instance.GetCurrentStars() >= aoeStarRequirement;
+
+    /// <summary>Shockwave radius at the current AOE level; 0 = single target.</summary>
+    public float EffectiveDamageRadius =>
+        damageAOELevel <= 0 ? 0f : aoeBaseRadius + aoeRadiusPerLevel * (damageAOELevel - 1);
+    public float NextDamageRadius => aoeBaseRadius + aoeRadiusPerLevel * damageAOELevel;
+
+    /// <summary>Gold cost of the next Damage AOE level: 1000 * 2^level.</summary>
+    public int AOEUpgradeCost => Mathf.RoundToInt(1000f * Mathf.Pow(2f, damageAOELevel));
+
+    /// <summary>Spends gold on the next Damage AOE level. Requires the star gate; returns false if locked, maxed or unaffordable.</summary>
+    public bool TryBuyAOEUpgrade()
+    {
+        if (!AOEUnlocked || AOEMaxed) return false;
+        if (!Inventory.Instance.TrySpendGold(AOEUpgradeCost)) return false;
+
+        damageAOELevel++;
+        GameSignals.RaiseClickUpgradePurchased(damageAOELevel);
+        return true;
+    }
+
     /// <summary>True while any cursor upgrade is purchasable with the given gold (drives the board badge).</summary>
     public bool AnyCursorUpgradeAffordable(int gold) =>
-        gold >= ClickUpgradeCost || (!PickupRadiusMaxed && gold >= RadiusUpgradeCost);
+        gold >= ClickUpgradeCost
+        || (!PickupRadiusMaxed && gold >= RadiusUpgradeCost)
+        || (AOEUnlocked && !AOEMaxed && gold >= AOEUpgradeCost);
 
     /// <summary>Gold cost of the next click damage upgrade: round(100 * 1.15^level).</summary>
     public int ClickUpgradeCost => Mathf.RoundToInt(100f * Mathf.Pow(1.15f, clickDamageLevel));
@@ -191,11 +227,11 @@ public class ClickerManager : MonoBehaviour
             if (!hit.TryGetComponent(out IDamageable enemy)) continue;
             if (hit.TryGetComponent(out EntityBase entity) && entity.IsDying) continue;
 
-            if (damageRadius > 0f)
+            if (EffectiveDamageRadius > 0f)
             {
                 // AOE shockwave centered on the mob you clicked
                 if (activeShockwave != null) StopCoroutine(activeShockwave);
-                activeShockwave = StartCoroutine(DamageShockwave(hit.transform.position, damageRadius, shockwaveDuration));
+                activeShockwave = StartCoroutine(DamageShockwave(hit.transform.position, EffectiveDamageRadius, shockwaveDuration));
             }
             else
             {
@@ -356,10 +392,10 @@ public class ClickerManager : MonoBehaviour
             Gizmos.DrawWireSphere(lastClickPosition, currentShockwaveRadius);
         }
 
-        if (damageRadius > 0f)
+        if (EffectiveDamageRadius > 0f)
         {
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.2f);
-            Gizmos.DrawWireSphere(lastClickPosition, damageRadius);
+            Gizmos.DrawWireSphere(lastClickPosition, EffectiveDamageRadius);
         }
 
         if (LootPickupRadius > 0f)
