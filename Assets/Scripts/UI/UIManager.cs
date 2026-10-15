@@ -79,6 +79,8 @@ public class UIManager : PersistentSingleton<UIManager>
         // (clears the placeholder markup) and keep them in sync as stars are earned.
         ProgressionManager.OnStarEarned += OnStarEarned;
         RefreshGuildStars();
+
+        SetUpClickUpgradeButton();
     }
 
     private void OnDisable() => CleanupInputActions();
@@ -87,6 +89,11 @@ public class UIManager : PersistentSingleton<UIManager>
     {
         CleanupInputActions();
         ProgressionManager.OnStarEarned -= OnStarEarned;
+
+        if (clickUpgradeButton != null)
+            clickUpgradeButton.clicked -= OnClickUpgradeClicked;
+        GameSignals.GoldChanged -= OnGoldChangedForClickUpgrade;
+        GameSignals.OnClickUpgradePurchased -= OnClickUpgradePurchased;
     }
 
     void Update()
@@ -230,6 +237,61 @@ public class UIManager : PersistentSingleton<UIManager>
             star.EnableInClassList("star-filled", i <= currentStars);
             star.EnableInClassList("star-empty", i > currentStars);
         }
+    }
+
+    // ═════════════════════════════════════════════
+    // CLICK UPGRADE BUTTON (top bar)
+    // ═════════════════════════════════════════════
+
+    private Button clickUpgradeButton;
+    private Label clickUpgradeCostLabel;
+    private ClickerManager clickerManager;
+
+    private void SetUpClickUpgradeButton()
+    {
+        if (uiDocument == null || uiDocument.rootVisualElement == null)
+            return;
+
+        clickUpgradeButton = uiDocument.rootVisualElement.Q<Button>("click-upgrade-button");
+        if (clickUpgradeButton == null)
+        {
+            Debug.LogWarning("[UIManager] 'click-upgrade-button' not found in UXML");
+            return;
+        }
+
+        clickUpgradeCostLabel = clickUpgradeButton.Q<Label>("click-upgrade-cost");
+        clickerManager = FindFirstObjectByType<ClickerManager>();
+
+        clickUpgradeButton.clicked += OnClickUpgradeClicked;
+        GameSignals.GoldChanged += OnGoldChangedForClickUpgrade;
+        GameSignals.OnClickUpgradePurchased += OnClickUpgradePurchased;
+
+        RefreshClickUpgradeButton();
+    }
+
+    private void OnClickUpgradeClicked()
+    {
+        clickerManager?.TryBuyClickUpgrade();
+    }
+
+    private void OnGoldChangedForClickUpgrade(int _) => RefreshClickUpgradeButton();
+    private void OnClickUpgradePurchased(int _) => RefreshClickUpgradeButton();
+
+    /// <summary>Syncs the top-bar click upgrade button's cost label and affordability
+    /// (disabled styling comes from the Button component's :disabled rules).</summary>
+    private void RefreshClickUpgradeButton()
+    {
+        if (clickUpgradeButton == null || clickerManager == null)
+            return;
+
+        int cost = clickerManager.ClickUpgradeCost;
+        if (clickUpgradeCostLabel != null)
+            clickUpgradeCostLabel.text = AnimatedNumberUITK.Abbrev(cost) + "g";
+
+        bool affordable = Inventory.Instance != null && Inventory.Instance.Gold >= cost;
+        clickUpgradeButton.SetEnabled(affordable);
+        clickUpgradeButton.EnableInClassList("btn-success", affordable);
+        clickUpgradeButton.EnableInClassList("btn-danger", !affordable);
     }
 
     // ═════════════════════════════════════════════

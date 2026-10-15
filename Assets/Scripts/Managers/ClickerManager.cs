@@ -9,6 +9,13 @@ public class ClickerManager : MonoBehaviour
     [SerializeField] private float clickDamage = 1f;
     [SerializeField] private int clicksPerSecondCap = 10;
 
+    [Header("Click Economy")]
+    [Tooltip("Multiplier applied to the gold shown/banked per point of click damage. Scales the displayed and banked gold without touching damage balance.")]
+    [SerializeField] private float goldPerDamage = 10f;
+
+    [Tooltip("Click damage upgrade level. Effective click damage = clickDamage * (1 + 0.1 * level).")]
+    [SerializeField] private int clickDamageLevel = 0;
+
     [Header("AOE Settings")]
     [Tooltip("Radius for damage AOE (0 = single target only)")]
     [SerializeField] private float damageRadius = 0f;
@@ -34,6 +41,22 @@ public class ClickerManager : MonoBehaviour
     private bool isShockwaveActive = false;
 
     private AdventurerAgent hoveredAdv;
+
+    /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
+    private float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
+
+    /// <summary>Gold cost of the next click damage upgrade: round(100 * 1.15^level).</summary>
+    public int ClickUpgradeCost => Mathf.RoundToInt(100f * Mathf.Pow(1.15f, clickDamageLevel));
+
+    /// <summary>Spends gold on the next click damage upgrade. Returns false if unaffordable.</summary>
+    public bool TryBuyClickUpgrade()
+    {
+        if (!Inventory.Instance.TrySpendGold(ClickUpgradeCost)) return false;
+
+        clickDamageLevel++;
+        GameSignals.RaiseClickUpgradePurchased(clickDamageLevel);
+        return true;
+    }
 
     void Update()
     {
@@ -141,14 +164,15 @@ public class ClickerManager : MonoBehaviour
             else
             {
                 // Single target damage
-                float applied = enemy.OnDamage(clickDamage);
+                float applied = enemy.OnDamage(EffectiveClickDamage);
                 if (applied > 0f)
                 {
+                    float gold = applied * goldPerDamage;
                     // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
                     if (DamageNumberManager.Instance != null)
-                        DamageNumberManager.Instance.ShowGoldGain(applied, hit.transform);
+                        DamageNumberManager.Instance.ShowGoldGain(gold, hit.transform);
                     else
-                        Inventory.Instance.AddGoldFloat(applied);
+                        Inventory.Instance.AddGoldFloat(gold);
                 }
             }
             return;
@@ -188,14 +212,15 @@ public class ClickerManager : MonoBehaviour
                     if (!hit.TryGetComponent(out MobAgent _))
                         continue;
 
-                    float applied = enemy.OnDamage(clickDamage);
+                    float applied = enemy.OnDamage(EffectiveClickDamage);
                     if (applied > 0f)
                     {
+                        float gold = applied * goldPerDamage;
                         // ShowGoldGain owns the gold: it's banked when the coin lands on the counter
                         if (DamageNumberManager.Instance != null)
-                            DamageNumberManager.Instance.ShowGoldGain(applied, hit.transform);
+                            DamageNumberManager.Instance.ShowGoldGain(gold, hit.transform);
                         else
-                            Inventory.Instance.AddGoldFloat(applied);
+                            Inventory.Instance.AddGoldFloat(gold);
 
                         alreadyDamaged.Add(enemy);
                     }

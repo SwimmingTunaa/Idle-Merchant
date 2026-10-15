@@ -80,7 +80,8 @@ public class AnimatedNumberUITK : MonoBehaviour
         label.schedule.Execute(() => label.style.scale = new Scale(Vector3.one)).StartingIn(180);
     }
 
-    private static string Abbrev(int n)
+    // Public so other HUD code (e.g. the click upgrade cost label) abbreviates identically.
+    public static string Abbrev(int n)
     {
         if (n >= 1_000_000_000) return (n / 1_000_000_000f).ToString("0.#") + "B";
         if (n >= 1_000_000)     return (n / 1_000_000f).ToString("0.#") + "M";

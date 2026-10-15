@@ -55,6 +55,10 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="right" class="stats-section">
+            <ui:Button name="click-upgrade-button" class="btn-success btn-sm click-upgrade-button">
+                <ui:Label name="click-upgrade-label" text="DMG +10%" class="btn-label"/>
+                <ui:Label name="click-upgrade-cost" text="100g" class="btn-label click-upgrade-cost"/>
+            </ui:Button>
             <ui:VisualElement name="coin-container" class="coin-plate">
                 <ui:VisualElement name="coin" class="coin">
                     <ui:Label name="coin-label" text="100k" class="coin-label"/>

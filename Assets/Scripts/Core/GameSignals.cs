@@ -41,6 +41,9 @@ public static class GameSignals
     //Hiring
     public static event Action<EntityDef, HireRole> OnUnitHired;
 
+    // Clicker
+    public static event Action<int> OnClickUpgradePurchased;   // click damage upgrade bought → new level
+
     // Public invoke methods
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
     public static void RaiseGoldSpent(int amount) => OnGoldSpent?.Invoke(amount);
@@ -62,6 +65,7 @@ public static class GameSignals
     public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
     public static void RaiseCustomerServed() => OnCustomerServed?.Invoke();
     public static void RaiseUnitHired(EntityDef unitDef, HireRole role) => OnUnitHired?.Invoke(unitDef, role);
+    public static void RaiseClickUpgradePurchased(int newLevel) => OnClickUpgradePurchased?.Invoke(newLevel);
 
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]
@@ -86,6 +90,7 @@ public static class GameSignals
         OnStarEarned = null;
         OnMarkedForSaleChanged = null;
         OnCustomerServed = null;
+        OnClickUpgradePurchased = null;
 
         Debug.Log("[GameSignals] All listeners cleared");
     }
@@ -112,6 +117,7 @@ public static class GameSignals
         Debug.Log($"OnMarkedForSaleChanged: {OnMarkedForSaleChanged?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnCustomerServed: {OnCustomerServed?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnUnitHired: {OnUnitHired?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnClickUpgradePurchased: {OnClickUpgradePurchased?.GetInvocationList().Length ?? 0}");
     }
 #endif
 }

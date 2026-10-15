@@ -289,6 +289,17 @@
     -unity-background-scale-mode: scale-to-fit;
 }
 
+/* Click damage upgrade buy button (top bar, left of the coin plate).
+   No gap in UI Toolkit — margin-right separates it from the coin plate. */
+.click-upgrade-button {
+    margin-right: var(--space-md);
+}
+
+.click-upgrade-cost {
+    margin-left: var(--space-sm);
+    font-size: var(--font-size-body-sm);
+}
+
 .pulse-target {
     transition-property: scale;
     transition-duration: 0.18s;
