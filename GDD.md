@@ -103,7 +103,7 @@ Click mobs/loot → Earn Gold → Hire Units / Buy Upgrades → Unlock Stars →
 ```
 [Player Input]
   Mouse click → damage mobs / collect loot (early game; bonus later)
-  Mouse upgrades → click damage, AOE damage, loot AOE
+  Mouse upgrades → click damage, AOE damage, loot AOE, auto click/collect
 
 [Dungeon Layer]
   Adventurers ←fight→ Mobs
@@ -367,6 +367,8 @@ Bought from the **Cursor page** of the Book (top-nav cursor board opens it; the 
 | **Click Damage** | +10% of base per level, uncapped | 100 × 1.15ⁿ | — |
 | **Pickup Radius** | 0.3 wu base, +0.2 wu/level, max 5 | 250 × 1.5ⁿ | — |
 | **Damage AOE** | 0.8 wu at lvl 1, +0.3 wu/level, max 3 (lvl 0 = single target) | 1000 × 2ⁿ | 2★ |
+| **Auto Click** | clicks a random mob every 3.0s at lvl 1, −0.1s/level, max 21 (1.0s floor); full click pipeline incl. AOE | 10000 × 1.35ⁿ | 3★ |
+| **Auto Collect** | vacuums a random loot drop (with pickup radius) every 3.0s at lvl 1, −0.1s/level, max 21 (1.0s floor) | 20000 × 1.35ⁿ | 4★ |
 
 **Click feedback (implemented):** every damaging click fires a pixel spark burst at the cursor plus a squash-and-stretch on the mob; the **kill blow** adds a crack-star flash, mob-coloured debris, and a 45 ms hit-stop (kills only, respects pause and the speed keys). Loot clicks show a **white ring collapsing from the effective pickup radius** to the click point (radius upgrades are visible on every click) with a spark pop per absorbed piece; AOE clicks show a **white-to-red ring expanding to the damage radius in sync with the shockwave**, so the visual edge is the damage edge. All effects are code-driven ParticleSystems (`ClickHitVFX`) — no spawned objects.
 
@@ -374,7 +376,7 @@ Bought from the **Cursor page** of the Book (top-nav cursor board opens it; the 
 - At game start the player *must* click to make progress — no adventurers, no porter, clicking is the only tool. This creates an active, hands-on opening that teaches the pipeline before automation takes over.
 - As adventurers are hired and porters are added, clicking transitions from mandatory to optional-but-satisfying
 - Pickup radius is particularly impactful on layers where mobs die in clusters and loot piles up
-- `ClickerManager` in code handles input, damage delivery, loot collection, and all three upgrade ladders; gold income from clicks is fractional (AddGoldFloat) and banks when the coin reaches the counter
+- `ClickerManager` in code handles input, damage delivery, loot collection, the auto click/collect ticks, and all five upgrade ladders; gold income from clicks is fractional (AddGoldFloat) and banks when the coin reaches the counter
 
 ---
 
@@ -578,13 +580,14 @@ Players spend gold to hire adventurers, porters, and customers from a rotating c
 - **Identity**: procedurally generated name + epithet (e.g. "Gorn the Relentless") via `IdentityGenerator`
 - **Rank**: 1–5 (affects base stats and hire cost)
 - **Traits**: 0–3 randomly selected traits from the available pool (tier-based)
-- **Hire cost**: base cost from `EntityDef.hireCost` × rank modifier × trait cost multipliers
+- **Hire cost**: base cost from `EntityDef.hireCost` × 1.25^(units of that role already owned, guild-wide across all layers) × rank modifier × trait cost multipliers
 - **Newspaper name**: the candidate's display name in the hiring panel, generated once and stable across re-populates
 
 ### 7.3 Candidate Pool
 
 `CandidatePool` manages a timed pool per unit type (adventurers, porters):
 - Pool refreshes on a timer, replacing candidates that aren't hired
+- Prices are baked at generation — after a hire, the remaining candidates keep their pre-hire prices until the next refresh (intended)
 - `CandidateCount` property for no-alloc count checks
 - `GetCandidates()` returns an allocating copy only when the UI needs to display the list
 
@@ -718,7 +721,7 @@ Gold is the sole currency. All operations flow through `Inventory.Instance`.
 - Clicker income — manual tapping for small fractional gold amounts
 
 **Spending:**
-- Hiring units (cost varies by rank + traits)
+- Hiring units (cost varies by rank + traits, ×1.25 per unit of that role already owned)
 - Purchasing upgrades (fixed cost from `GuildUpgradeDef`)
 
 ### 10.2 Item Pricing

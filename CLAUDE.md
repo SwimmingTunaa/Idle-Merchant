@@ -72,7 +72,7 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 
 ### Hiring Pipeline
 `CharacterGeneration/HiringCandidateGenerator.cs` → generates `HiringCandidate` structs (identity, traits, cost, `newspaperName`)
-`UI/Panels/Hiring/CandidatePool.cs` → timed pool per unit type; exposes `CandidateCount` (no-alloc) and `GetCandidates()` (allocating copy)
+`UI/Panels/Hiring/CandidatePool.cs` → timed pool per unit type; exposes `CandidateCount` (no-alloc) and `GetCandidates()` (allocating copy); base cost = `hireCost × 1.25^owned`, baked at generation (owned-count func injected by `HireController`, summed across layer managers)
 `UI/Panels/Hiring/HireController.cs` → stack UI, tab navigation, layer selector, hire animation
 `UI/Panels/Hiring/HireRoster.cs` → weighted rank selection from pools
 `UI/Panels/Hiring/CandidateUIMapper.cs` → populates Candidate.uxml from `HiringCandidate` data
