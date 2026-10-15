@@ -128,6 +128,8 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/Entities/Adventuers/PromoteIndicator.cs` | Persistent badge+arrow above promote-ready adventurers |
 | `Scripts/Rendering/HoverOutlineFeature.cs` | URP outline render feature — two instances on `Renderer2D`: hover/selection (layer bit 2, yellow) and permanent friendly outline (bit 4, near-black via `PermanentOutline`) |
 | `Scripts/UI/AnimatedNumberUITK.cs` | Lerped count-up for the gold label |
+| `Scripts/Effects/ClickHitVFX.cs` | Click juice: hit sparks, kill blow + hit-stop, squash, vacuum/shock rings (code-driven ParticleSystems, Emit-only) |
+| `Scripts/UI/Panels/Cursor/CursorUpgradePage.cs` | Book Cursor page — clones `CursorUpgradeCard.uxml` per upgrade, binds via closures |
 
 ---
 
@@ -151,6 +153,9 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **Click gold banks on coin arrival** — `ShowGoldGain` owns the gold; it's added via the fly-to-counter arrival callback. Any new failure path in that chain (DamageNumber, ItemExplosionVFX, ItemFlyAnimation) must bank the gold directly — VFX may be skipped, gold is never dropped
 - **Pooled visual toggles must be symmetric** — anything a `Show*`/spawn path disables (e.g. `textMesh.enabled`) must be re-enabled by every sibling path; pooled reuse otherwise leaks the off state into unrelated displays
 - **Outline rendering-layer bits** — bit 2 = hover/selection (yellow), bit 4 = permanent friendly outline (near-black); world-space markers that shouldn't be stroked must clear these bits on their renderers
+- **Overlay VFX sorting** — `EntitySortingManager` assigns entities orders 2000–8000; screen-feedback particles/markers that must draw over them use order 10000+
+- **Body font via token** — `--font-body` in `GlobalVariables.uss` (currently Ithaca); never hardcode a body-font url in USS. Inline UXML styles can't use `var()`, so the few inline font urls (Inventory, Candidate) need manual updates on a font change
+- **Clicker upgrade ladders live on `ClickerManager`** — cost/level formulas in code, levels serialized; all purchases raise `OnClickUpgradePurchased` (UI + board badge refresh off it). Game Debugger → Economy has free level set/bump controls
 
 ---
 

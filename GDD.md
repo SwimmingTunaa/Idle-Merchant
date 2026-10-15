@@ -359,21 +359,22 @@ Parties are punctuation marks in the shop loop. Regular customers are the steady
 - Early game this bypasses the porter entirely, enabling the shop to function before a porter is hired
 - Late game it can clear a backlogged dungeon floor faster than waiting for the porter
 
-**Mouse Upgrades:**
-Mouse upgrades are purchased like guild upgrades (gold + star gate). They make clicking progressively more powerful.
+**Mouse Upgrades (implemented):**
+Bought from the **Cursor page** of the Book (top-nav cursor board opens it; the board shows a badge while any upgrade is affordable). All ladders are repeatable with exponential costs, tunable on `ClickerManager`. ✅ *Reconciled: replaces the old guild-upgrade-style I/II/III one-shots.*
 
-| Upgrade | Effect |
-|---|---|
-| **Click Damage I / II / III** | Increases damage dealt per mob click |
-| **Damage AOE I / II** | Clicking a mob also damages nearby mobs within a radius |
-| **Loot AOE I / II** | Clicking a loot drop also collects nearby loot within a radius |
+| Upgrade | Ladder | Cost | Gate |
+|---|---|---|---|
+| **Click Damage** | +10% of base per level, uncapped | 100 × 1.15ⁿ | — |
+| **Pickup Radius** | 0.3 wu base, +0.2 wu/level, max 5 | 250 × 1.5ⁿ | — |
+| **Damage AOE** | 0.8 wu at lvl 1, +0.3 wu/level, max 3 (lvl 0 = single target) | 1000 × 2ⁿ | 2★ |
+
+**Click feedback (implemented):** every damaging click fires a pixel spark burst at the cursor plus a squash-and-stretch on the mob; the **kill blow** adds a crack-star flash, mob-coloured debris, and a 45 ms hit-stop (kills only, respects pause and the speed keys). Loot clicks show a **white ring collapsing from the effective pickup radius** to the click point (radius upgrades are visible on every click) with a spark pop per absorbed piece; AOE clicks show a **white-to-red ring expanding to the damage radius in sync with the shockwave**, so the visual edge is the damage edge. All effects are code-driven ParticleSystems (`ClickHitVFX`) — no spawned objects.
 
 **Design Notes:**
 - At game start the player *must* click to make progress — no adventurers, no porter, clicking is the only tool. This creates an active, hands-on opening that teaches the pipeline before automation takes over.
 - As adventurers are hired and porters are added, clicking transitions from mandatory to optional-but-satisfying
-- Loot AOE is particularly impactful on layers where mobs die in clusters and loot piles up
-- Mouse upgrades should be clearly visible milestones — the player should *feel* the power jump after each one
-- `ClickerManager` in code handles input, damage delivery, and loot collection; gold income from clicks is fractional (AddGoldFloat)
+- Pickup radius is particularly impactful on layers where mobs die in clusters and loot piles up
+- `ClickerManager` in code handles input, damage delivery, loot collection, and all three upgrade ladders; gold income from clicks is fractional (AddGoldFloat) and banks when the coin reaches the counter
 
 ---
 
@@ -689,13 +690,7 @@ Upgrades are one-time purchases from `GuildUpgradeDef` ScriptableObjects. They a
 | **Guild Hall** | Visual upgrade, possible passive bonuses |
 | **Price Mark-Up** | Applies a sell price multiplier to all items (future — not yet designed) |
 
-**Mouse Upgrades** — improve player click power:
-
-| Upgrade | Effect |
-|---|---|
-| **Click Damage I / II / III** | +damage per mob click |
-| **Damage AOE I / II** | Clicking a mob damages nearby mobs in a radius |
-| **Loot AOE I / II** | Clicking loot collects nearby loot in a radius |
+**Mouse Upgrades** — improve player click power. ✅ *Implemented as repeatable ladders on the Book's Cursor page rather than guild-upgrade one-shots — see §4.7 for the live numbers.*
 
 ### 9.3 Purchase Flow
 
@@ -936,13 +931,16 @@ Crafting adds a secondary economy loop: instead of selling raw loot directly, th
 All panels use **Unity UI Toolkit** (UXML/USS). Panels are orchestrated by `UIManager`. Each panel has a controller inheriting `BasePanelController`.
 
 **Key Panels:**
-- **Main HUD / Top Navigation** — gold display (animated count-up), star indicator, bookmark tabs, hiring sign with candidate badge; the bookmarks hide while the Book UI is open (its own edge tabs take over)
+- **Main HUD / Top Navigation** — gold display (animated count-up), star indicator, bookmark tabs, hiring sign with candidate badge, cursor board (opens the Cursor page; badge while any click upgrade is affordable); the bookmarks hide while the Book UI is open (its own edge tabs take over)
+- **Cursor Page (Book tab 6)** — cursor stats on the left page, upgrade cards on the right: template-cloned torn-paper cards (icon, name, current ➜ next in green, full-width price button with trailing coin), star-gated cards swap a lock pill for the buy button when unlocked
 - **Hiring Panel** — tabs per unit type, candidate cards, layer selector; hiring badge refreshes with the candidate pool
 - **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met); right-page detail panel aligned to Figma, selecting a unit outlines them in-world and locks the camera to them
 - **Progression Panel** — milestone tracker, star progress
 - **Upgrade Panel** — available upgrades, cost display
 - **Crafting Panel** — recipe list, input/output display, reserve settings
 - **Inventory Panel** — item counts by category
+
+**UI look (implemented):** body text is **Ithaca** via the `--font-body` token (headers stay NotJam blackletter, the Guild Bulletin keeps Salmon Typewriter); buttons share one raised-key pixel sprite with a pressed-state swap on click and tint-driven variants; costs show the Copper Coin icon trailing the number everywhere; Book scroll views use a wooden-plank scrollbar on a parchment groove.
 
 ### 14.2 Camera & Layer Navigation
 
