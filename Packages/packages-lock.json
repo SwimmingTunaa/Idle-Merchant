@@ -308,6 +308,15 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.visualeffectgraph": {
+      "version": "17.6.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.shadergraph": "17.6.0",
+        "com.unity.render-pipelines.core": "17.6.0"
+      }
+    },
     "com.unity.visualscripting": {
       "version": "1.9.12",
       "depth": 0,
