@@ -91,6 +91,13 @@ public class CounterService : MonoBehaviour
 
     void LeaveNow(CustomerAgent c)
     {
+        // Turned away: stamp reason + drop the want BEFORE Leaving so carry display / anim / bubble see a walkout.
+        // IsPurchasableNow fails on stock first; with stock left, only the budget can have failed.
+        c.walkoutReason = SalesManager.Instance.GetAvailableForSale(c.desiredItem) > 0
+            ? WalkoutReason.TooExpensive
+            : WalkoutReason.NoStock;
+        c.desiredItem = null;
+        c.desiredQty = 0;
         c.ChangeState(CustomerState.Leaving);
     }
 

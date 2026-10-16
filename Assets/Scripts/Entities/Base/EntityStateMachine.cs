@@ -48,8 +48,10 @@ public abstract class EntityStateMachine<TState> : EntityBase where TState : Enu
         {
             // Store how much real time has passed since last logic tick
             TickDelta = updateTimer;
-            
-            updateTimer -= UPDATE_INTERVAL; // Preserve fractional time
+
+            // Zero, not -= UPDATE_INTERVAL: with frames > 0.1s (timeScale boost, low fps) that drifted upward
+            // unbounded, inflating TickDelta until every AI timer finished on its first tick.
+            updateTimer = 0f;
             OnUpdateState(State);
         }
     }
