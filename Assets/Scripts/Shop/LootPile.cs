@@ -18,7 +18,6 @@ public class LootPile : PersistentSingleton<LootPile>
     [SerializeField] private float heapHeight = 0.9f;
     [Tooltip("Local Y of the bottom item row — just under the bin rim so it reads as contained.")]
     [SerializeField] private float baseY = 0.5f;
-    [SerializeField] private float itemScale = 0.6f;
     [Tooltip("Order of the bottom item; items stack upward and the bin front draws over them all. " +
              "Scenery band: above shop walls/counter (≤2), below entities (2000+).")]
     [SerializeField] private int baseSortingOrder = 3;
@@ -26,7 +25,6 @@ public class LootPile : PersistentSingleton<LootPile>
     [SerializeField] private SpriteRenderer binFront;
 
     [Header("Fly")]
-    [SerializeField] private float flyScale = 0.5f;
     [Tooltip("Where sold items hop to. Empty = the queue's counter point, lifted onto the counter top.")]
     [SerializeField] private Transform saleTarget;
 
@@ -50,7 +48,6 @@ public class LootPile : PersistentSingleton<LootPile>
             go.transform.SetParent(transform, false);
             go.transform.localPosition = new Vector3((Hash(i) * 2f - 1f) * halfSpread, baseY + t * heapHeight + Hash(i + 101) * 0.08f, 0f);
             go.transform.localRotation = Quaternion.Euler(0f, 0f, (Hash(i + 211) - 0.5f) * 50f);
-            go.transform.localScale = Vector3.one * itemScale;
 
             var sr = go.AddComponent<SpriteRenderer>();
             if (binFront != null) sr.sharedMaterial = binFront.sharedMaterial;
@@ -88,14 +85,14 @@ public class LootPile : PersistentSingleton<LootPile>
         Vector3 to = saleTarget != null ? saleTarget.position
             : QueueController.Instance != null ? QueueController.Instance.counterPoint.position + Vector3.up * 0.8f
             : transform.position;
-        ItemExplosionVFX.Instance.FlyToWorld(Icon(stack.itemDef), TopOfHeap, to, flyScale);
+        ItemExplosionVFX.Instance.FlyToWorld(Icon(stack.itemDef), TopOfHeap, to);
     }
 
     /// <summary>Fly one item icon from a world point into the pile (VFX only — the item is already banked).</summary>
     public void FlyIn(ItemDef item, Vector3 from)
     {
         if (item == null || ItemExplosionVFX.Instance == null) return;
-        ItemExplosionVFX.Instance.FlyToWorld(Icon(item), from, TopOfHeap, flyScale);
+        ItemExplosionVFX.Instance.FlyToWorld(Icon(item), from, TopOfHeap);
     }
 
     private void Rebuild()

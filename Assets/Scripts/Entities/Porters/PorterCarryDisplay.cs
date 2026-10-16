@@ -2,17 +2,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Stacks one item icon per carried loot stack above the porter. Driven by
+/// Stacks one item icon per carried loot stack above the porter, at native scale (same size as a dropped item). Driven by
 /// PorterAgent.Refresh calls at the points carriedLoot changes — no polling.
 /// Pool-safe: hides all icons in OnDisable.
 /// </summary>
 public class PorterCarryDisplay : MonoBehaviour
 {
     [SerializeField] private int maxIcons = 5;
-    [SerializeField] private Vector3 baseOffset = new Vector3(0f, 2.1f, 0f);
-    [SerializeField] private float spacing = 0.35f;
+    [SerializeField] private Vector3 baseOffset = new Vector3(0f, 2.25f, 0f);
+    [SerializeField] private float spacing = 0.5f;
     [SerializeField] private float jitterX = 0.12f;
-    [SerializeField] private float iconScale = 0.7f;
 
     private SpriteRenderer body;
     private SpriteRenderer[] icons;
@@ -26,7 +25,6 @@ public class PorterCarryDisplay : MonoBehaviour
             var go = new GameObject($"CarryIcon{i}");
             go.transform.SetParent(transform, false);
             go.transform.localPosition = baseOffset + new Vector3(i % 2 == 0 ? -jitterX : jitterX, i * spacing, 0f);
-            go.transform.localScale = Vector3.one * iconScale;
             icons[i] = go.AddComponent<SpriteRenderer>();
             icons[i].enabled = false;
         }

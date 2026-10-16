@@ -65,8 +65,9 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
         }
     }
 
-    /// <summary>One item icon arcing world→world (e.g. loot → shop pile, pile → counter). Pure VFX, no callback.</summary>
-    public void FlyToWorld(Sprite sprite, Vector3 from, Vector3 to, float scale = 0.5f)
+    /// <summary>One item icon arcing world→world (e.g. loot → shop pile, pile → counter). Pure VFX, no callback.
+    /// Default scale 1 = a dropped item's size, so items keep their size mid-journey.</summary>
+    public void FlyToWorld(Sprite sprite, Vector3 from, Vector3 to, float scale = 1f)
     {
         if (itemPrefab == null || sprite == null) return;
         ItemFlyAnimation animation = SpawnFlyer(sprite, from, scale);
