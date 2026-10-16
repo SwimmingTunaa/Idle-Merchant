@@ -1,66 +1,25 @@
-.milestone-card {
-    flex-direction: column;
-    margin-bottom: var(--space-md);
-    padding: var(--space-md);
-    background-color: var(--color-bg-surface);
-    border-width: var(--border-thin);
-    border-color: var(--color-border-light);
-    border-radius: var(--radius-md);
+/* Book (Guild page) milestone card = the HUD tracker card (MilestoneTracker.uss .mt-*) on the book's
+   card-torn.png at 3px. Two-class selectors so these win regardless of sheet import order. */
+
+.mt-card.guild-ms {
+    /* card-torn at 3px has a thinner chip band/shadow than the HUD sprite at 5px */
+    padding: 14px 14px 18px 14px;
+    margin-bottom: 12px;
 }
 
-.milestone-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-xs);
+.guild-ms .mt-card-name {
+    font-size: 26px;
 }
 
-.milestone-name {
-    flex-grow: 1;
-    color: var(--color-text-primary);
+.guild-ms .mt-card-desc {
+    font-size: 18px;
 }
 
-.milestone-checkmark {
-    display: flex;
-    color: var(--color-success);
-    font-size: 32px;
-    -unity-font-style: bold;
-    margin-left: 0;
-    margin-top: 0;
-    margin-right: 0;
-    margin-bottom: 0;
-    padding-top: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    padding-left: 0;
-    position: absolute;
-    right: 0;
-    align-content: auto;
-    align-self: auto;
-    justify-content: center;
-    align-items: center;
-}
-
-.milestone-checkmark--visible {
-    display: flex;
-}
-
-.milestone-flavour {
+.guild-ms-flavour {
+    font-size: 16px;
+    white-space: normal;
     color: var(--color-text-muted);
-    -unity-font-style: italic;
-    margin-bottom: var(--space-sm);
-    white-space: normal;
-}
-
-.milestone-description {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-sm);
-    white-space: normal;
-}
-
-/* Progress bar → uses ProgressBar component (Components/ProgressBar.uss) */
-
-.milestone-card--complete {
-    background-color: var(--color-bg-light);
-    border-color: var(--color-success);
+    -unity-font-definition: var(--font-body);
+    margin: 2px 0 0 0;
+    padding: 0;
 }

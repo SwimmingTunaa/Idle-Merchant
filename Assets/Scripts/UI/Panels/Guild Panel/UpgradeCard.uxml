@@ -1,25 +1,24 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/UpgradeCard.uss?fileID=7433441132597879392&amp;guid=98e2355806c7c4ccbb3254731cc87521&amp;type=3#UpgradeCard" />
-    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
-    <ui:VisualElement name="upgrade-card" class="upgrade-card">
-        <Style src="project://database/Assets/Scripts/UI/Panels/Guild%20Panel/UpgradeCard.uss?fileID=7433441132597879392&amp;guid=98e2355806c7c4ccbb3254731cc87521&amp;type=3#UpgradeCard" />
-        <ui:VisualElement name="upgrade-icon" class="upgrade-icon" />
-        <ui:Label name="upgrade-name" text="Forging Station" class="upgrade-name" />
-        <ui:Label name="upgrade-description" text="Unlock the crafting system to create valuable goods from raw materials." class="upgrade-description" />
-        <ui:VisualElement name="cost-container" class="cost-container">
-            <ui:VisualElement name="coin-icon" class="card-coin-icon" />
-            <ui:Label name="cost-label" text="500" class="cost-label" />
+    <ui:VisualElement name="card-root" class="guild-card" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&amp;guid=e202a8ab367e41aead07308c65d8c8a8&amp;type=3#card-torn&quot;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 3px;">
+        <ui:VisualElement class="guild-card-header">
+            <ui:VisualElement class="guild-card-icon-frame">
+                <ui:VisualElement name="upgrade-icon" class="guild-card-icon" />
+            </ui:VisualElement>
+            <ui:Label name="upgrade-name" text="Upgrade" class="guild-card-name" />
         </ui:VisualElement>
-        <ui:VisualElement name="star-requirement" class="star-requirement">
-            <ui:Label name="star-requirement-label" text="Requires 2★" class="star-requirement-label" />
+        <ui:Label name="upgrade-description" text="" class="guild-card-desc" />
+        <ui:Button name="purchase-button" class="btn-success guild-card-slot">
+            <ui:Label name="purchase-label" text="0" class="btn-label" />
+            <ui:VisualElement class="btn-coin" />
+        </ui:Button>
+        <ui:VisualElement name="lock-pill" class="btn-disabled guild-card-slot">
+            <ui:Label name="lock-label" text="Requires 1" class="btn-label" />
+            <ui:VisualElement class="guild-card-lock-star" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/Star.png?fileID=-930353575&amp;guid=391cae39f2cc64ebca5e7d6893d13427&amp;type=3#Star_active&quot;);" />
         </ui:VisualElement>
-        <ui:Button name="purchase-button" text="Purchase" class="btn-primary" />
-        <ui:VisualElement name="lock-overlay" class="lock-overlay" style="top: 0; display: flex;">
-            <ui:VisualElement name="lock-icon" class="lock-icon" />
+        <ui:VisualElement name="owned-pill" class="btn-disabled guild-card-slot guild-card-owned">
+            <ui:Label text="Owned" class="btn-label" />
         </ui:VisualElement>
-        <ui:VisualElement name="owned-badge" class="owned-badge">
-            <ui:Label text="✓ Owned" class="owned-label" />
-        </ui:VisualElement>
-        <ui:Label name="insufficient-gold-label" text="Need 200g" class="insufficient-gold-label" />
     </ui:VisualElement>
 </ui:UXML>

@@ -27,6 +27,7 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
     private List<GuildUpgradeDef> allUpgrades = new List<GuildUpgradeDef>();
     private Dictionary<GuildUpgradeDef, VisualElement> upgradeCards = new Dictionary<GuildUpgradeDef, VisualElement>();
     private MilestoneProgressEvents progressEvents;
+    private MilestoneTracker coinShower;   // HUD tracker owns the UI coin flight to the gold counter
 
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
@@ -52,9 +53,10 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         upgradeGrid = rightPage.Q<VisualElement>("upgrade-grid");
 
         // Subscribe signals
+        coinShower = FindAnyObjectByType<MilestoneTracker>();
         progressEvents = new MilestoneProgressEvents(
             onProgressChanged: RefreshMilestoneProgress,
-            onFullRebuild: UpdateLeftPage
+            onFullRebuild: OnProgressionChanged
         );
         progressEvents.Subscribe();
         GameSignals.GoldChanged += OnGoldChanged;
@@ -80,6 +82,14 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         upgradeScrollView = null;
         upgradeGrid = null;
         upgradeCards.Clear();
+        coinShower = null;
+    }
+
+    // Star earned / upgrade bought: rebuild the milestone tier and re-gate every upgrade card.
+    private void OnProgressionChanged()
+    {
+        UpdateLeftPage();
+        OnGoldChanged(0);
     }
 
     // ═════════════════════════════════════════════
@@ -144,51 +154,26 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         }
 
         int nextStar = currentStars + 1;
-        var milestones = ProgressionManager.Instance.GetMilestonesForStar(nextStar);
-        foreach (var milestone in milestones)
+        foreach (var milestone in ProgressionManager.Instance.GetMilestonesForStar(nextStar))
             milestonesContainer.Add(CreateMilestoneRow(milestone));
+        RefreshMilestoneProgress();
     }
 
+    // Same card + claim flow as the HUD tracker (MilestoneTracker.BindCard/RefreshCard); claims fly coins
+    // through the tracker's UI shower, else ProgressionManager's world-burst/direct fallback banks the gold.
     private VisualElement CreateMilestoneRow(StarMilestoneDef milestone)
     {
         var card = milestoneCardTemplate.CloneTree();
         card.userData = milestone;
+        var row = card.Q<VisualElement>("card-root");
 
-        var nameLabel = card.Q<Label>("milestone-name");
-        if (nameLabel != null)
-            nameLabel.text = !string.IsNullOrEmpty(milestone.displayName) ? milestone.displayName : milestone.description;
+        MilestoneTracker.BindCard(row, milestone,
+            (source, count, land) => coinShower != null && coinShower.LaunchCoins(source, count, land));
 
-        var flavourLabel = card.Q<Label>("milestone-flavour");
-        if (flavourLabel != null)
-        {
-            bool hasFlavour = !string.IsNullOrEmpty(milestone.flavorText);
-            flavourLabel.style.display = hasFlavour ? DisplayStyle.Flex : DisplayStyle.None;
-            if (hasFlavour) flavourLabel.text = milestone.flavorText;
-        }
-
-        var descLabel = card.Q<Label>("milestone-description");
-        if (descLabel != null) descLabel.text = milestone.description;
-
-        int current = ProgressionManager.Instance.GetMilestoneCurrentValue(milestone);
-        int target = milestone.targetValue;
-        float progress = ProgressionManager.Instance.GetMilestoneProgress(milestone);
-        bool complete = ProgressionManager.Instance.IsMilestoneComplete(milestone);
-
-        var fill = card.Q<VisualElement>("progress-fill");
-        if (fill != null)
-        {
-            fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
-            fill.EnableInClassList("progress-fill--success", complete);
-        }
-
-        var progressText = card.Q<Label>("progress-label");
-        if (progressText != null) progressText.text = $"{current}/{target}";
-
-        if (complete)
-        {
-            card.AddToClassList("milestone-card--complete");
-            card.Q<Label>("milestone-checkmark")?.AddToClassList("milestone-checkmark--visible");
-        }
+        var flavour = row.Q<Label>("card-flavour");
+        bool hasFlavour = !string.IsNullOrEmpty(milestone.flavorText);
+        flavour.style.display = hasFlavour ? DisplayStyle.Flex : DisplayStyle.None;
+        if (hasFlavour) flavour.text = milestone.flavorText;
 
         return card;
     }
@@ -196,27 +181,19 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
     private void RefreshMilestoneProgress()
     {
         if (milestonesContainer == null) return;
+        var pm = ProgressionManager.Instance;
+        int claimed = 0, total = 0;
         foreach (var card in milestonesContainer.Children())
         {
-            var def = card.userData as StarMilestoneDef;
-            if (def == null) continue;
-
-            bool complete = ProgressionManager.Instance.IsMilestoneComplete(def);
-            int current = ProgressionManager.Instance.GetMilestoneCurrentValue(def);
-            float progress = ProgressionManager.Instance.GetMilestoneProgress(def);
-
-            var fill = card.Q<VisualElement>("progress-fill");
-            if (fill != null)
-            {
-                fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
-                fill.EnableInClassList("progress-fill--success", complete);
-            }
-
-            var progressLabel = card.Q<Label>("progress-label");
-            if (progressLabel != null) progressLabel.text = $"{current}/{def.targetValue}";
-            card.Q<Label>("milestone-checkmark")?.EnableInClassList("milestone-checkmark--visible", complete);
-            card.EnableInClassList("milestone-card--complete", complete);
+            if (card.userData is not StarMilestoneDef def) continue;
+            MilestoneTracker.RefreshCard(card.Q<VisualElement>("card-root"), def);
+            total++;
+            if (pm.IsMilestoneClaimed(def)) claimed++;
         }
+
+        int stars = pm.GetCurrentStars();
+        if (nextStarLabel != null && stars < 5)
+            nextStarLabel.text = $"Progress to {stars + 1}★ - {claimed}/{total} claimed";
     }
 
     // ═════════════════════════════════════════════
@@ -240,65 +217,34 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
     private VisualElement CreateUpgradeCard(GuildUpgradeDef upgrade)
     {
         var card = upgradeCardTemplate.CloneTree();
+        card.style.width = Length.Percent(48.5f);   // the grid sizes the TemplateContainer, not card-root
 
-        var icon = card.Q<VisualElement>("upgrade-icon");
-        if (icon != null && upgrade.icon != null)
-            icon.style.backgroundImage = new StyleBackground(upgrade.icon);
+        if (upgrade.icon != null)
+            card.Q<VisualElement>("upgrade-icon").style.backgroundImage = new StyleBackground(upgrade.icon);
 
         card.Q<Label>("upgrade-name").text = upgrade.upgradeName;
         card.Q<Label>("upgrade-description").text = upgrade.description;
-        card.Q<Label>("cost-label").text = upgrade.goldCost.ToString();
-
-        if (upgrade.starRequirement > 0)
-        {
-            var starReq = card.Q<VisualElement>("star-requirement");
-            if (starReq != null)
-            {
-                starReq.style.display = DisplayStyle.Flex;
-                card.Q<Label>("star-requirement-label").text = $"Requires {upgrade.starRequirement}★";
-            }
-        }
-
-        var button = card.Q<Button>("purchase-button");
-        if (button != null)
-            button.clicked += () => OnPurchaseClicked(upgrade);
+        card.Q<Label>("purchase-label").text = AnimatedNumberUITK.Abbrev(upgrade.goldCost);
+        card.Q<Label>("lock-label").text = $"Requires {upgrade.starRequirement}";
+        card.Q<Button>("purchase-button").clicked += () => OnPurchaseClicked(upgrade);
 
         UpdateCardState(card, upgrade);
         return card;
     }
 
+    // Exactly one bottom slot: Owned pill / "Requires N★" lock pill / buy button (disabled while unaffordable).
     private void UpdateCardState(VisualElement card, GuildUpgradeDef upgrade)
     {
-        card.RemoveFromClassList("upgrade-card--locked");
-        card.RemoveFromClassList("upgrade-card--unavailable");
-        card.RemoveFromClassList("upgrade-card--available");
-        card.RemoveFromClassList("upgrade-card--owned");
+        bool owned = ProgressionManager.Instance.IsUpgradeOwned(upgrade);
+        bool locked = !owned && ProgressionManager.Instance.GetCurrentStars() < upgrade.starRequirement;
+
+        card.Q<VisualElement>("card-root").EnableInClassList("guild-card--locked", locked);
+        card.Q<VisualElement>("owned-pill").style.display = owned ? DisplayStyle.Flex : DisplayStyle.None;
+        card.Q<VisualElement>("lock-pill").style.display = locked ? DisplayStyle.Flex : DisplayStyle.None;
 
         var button = card.Q<Button>("purchase-button");
-
-        if (ProgressionManager.Instance.IsUpgradeOwned(upgrade))
-        {
-            card.AddToClassList("upgrade-card--owned");
-            button?.SetEnabled(false);
-        }
-        else if (ProgressionManager.Instance.GetCurrentStars() < upgrade.starRequirement)
-        {
-            card.AddToClassList("upgrade-card--locked");
-            button?.SetEnabled(false);
-        }
-        else if (!Inventory.Instance.CanAfford(upgrade.goldCost))
-        {
-            card.AddToClassList("upgrade-card--unavailable");
-            int needed = upgrade.goldCost - Inventory.Instance.Gold;
-            var insufficientLabel = card.Q<Label>("insufficient-gold-label");
-            if (insufficientLabel != null) insufficientLabel.text = $"Need {needed}g";
-            button?.SetEnabled(false);
-        }
-        else
-        {
-            card.AddToClassList("upgrade-card--available");
-            button?.SetEnabled(true);
-        }
+        button.style.display = owned || locked ? DisplayStyle.None : DisplayStyle.Flex;
+        button.SetEnabled(Inventory.Instance != null && Inventory.Instance.CanAfford(upgrade.goldCost));
     }
 
     private void OnPurchaseClicked(GuildUpgradeDef upgrade)
