@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>Why a customer's want-pick failed (shown in their bubble as they walk out).</summary>
+public enum WalkoutReason { None, NoStock, TooExpensive }
+
 public class SalesManager : PersistentSingleton<SalesManager>
 {
     [Header("Debug")]
@@ -130,10 +133,12 @@ public class SalesManager : PersistentSingleton<SalesManager>
         int budget,
         Vector2Int batchRange,
         out ItemDef desiredItem,
-        out int desiredQty)
+        out int desiredQty,
+        out WalkoutReason reason)
     {
         desiredItem = null;
         desiredQty = 0;
+        reason = WalkoutReason.NoStock;
 
         if (inventory == null) return false;
 
@@ -154,6 +159,7 @@ public class SalesManager : PersistentSingleton<SalesManager>
             if (available <= 0) continue;
 
             if (item.sellPrice <= 0) continue;
+            reason = WalkoutReason.TooExpensive; // stock matched preference; only budget can fail now
             if (item.sellPrice > budget) continue;
 
             _sellableBuffer.Add(item);
@@ -192,6 +198,7 @@ public class SalesManager : PersistentSingleton<SalesManager>
 
         if (qty < min)
         {
+            reason = maxByBudget < min ? WalkoutReason.TooExpensive : WalkoutReason.NoStock;
             // If you want: allow "buy less than batchMin" as fallback, or fail.
             // I recommend failing, so customers don't constantly do tiny buys if your design expects batches.
             //may add an ability or stat in the future, to upsell cusomters
@@ -203,6 +210,7 @@ public class SalesManager : PersistentSingleton<SalesManager>
 
         desiredItem = best;
         desiredQty = qty;
+        reason = WalkoutReason.None;
         return true;
     }
 

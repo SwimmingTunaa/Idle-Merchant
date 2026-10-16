@@ -8,6 +8,7 @@ using TMPro;
 /// - Replaces the placeholder icon with the ItemDef's icon (taken from visualPrefab's SpriteRenderer).
 /// - Updates quantity text (optional).
 /// - Shows while SeekingQueue/Queueing/Buying, hides otherwise.
+/// - Intent beats: "?" while browsing (Wander/Idle), "!" flash on deciding, walkout reason icon when leaving empty-handed.
 /// Designed to be pool-friendly.
 /// </summary>
 [DefaultExecutionOrder(1000)] // after CustomerAgent Init/EnterState
@@ -27,9 +28,22 @@ public class CustomerWantBubble : MonoBehaviour
     public bool showInQueueing     = true;
     public bool showInBuying       = true;
 
+    [Header("Intent Icons")]
+    [Tooltip("Shown while browsing (Wander/Idle), before a want is picked.")]
+    [SerializeField] private Sprite thinkingSprite;
+    [Tooltip("Flashed the moment a want is picked, before the item icon.")]
+    [SerializeField] private Sprite decidedSprite;
+    [Tooltip("Walkout: nothing matching their preference was for sale.")]
+    [SerializeField] private Sprite noStockSprite;
+    [Tooltip("Walkout: matching stock existed but none fit their budget.")]
+    [SerializeField] private Sprite tooExpensiveSprite;
+    [SerializeField] private float decideFlashDuration = 0.6f;
+
     // Cache last values to avoid work every frame
     private ItemDef _lastItem;
     private int _lastQty = -1;
+    private Sprite _lastOverride;
+    private float _decideFlashUntil;
 
     void Awake()
     {
@@ -58,6 +72,8 @@ public class CustomerWantBubble : MonoBehaviour
         // On pooled respawn, force refresh
         _lastItem = null;
         _lastQty = -1;
+        _lastOverride = null;
+        _decideFlashUntil = 0f;
         // RefreshAll(force: true);
         SetVisible(false, force: true);
     }
@@ -73,7 +89,7 @@ public class CustomerWantBubble : MonoBehaviour
         if (!customer || !bubbleRoot) return;
 
         // Only refresh content when something changed
-        if (_lastItem != customer.desiredItem || _lastQty != customer.desiredQty)
+        if (_lastOverride != GetOverrideIcon() || _lastItem != customer.desiredItem || _lastQty != customer.desiredQty)
         {
             RefreshAll();
         }
@@ -81,12 +97,30 @@ public class CustomerWantBubble : MonoBehaviour
 
     private void OnCustomerStateChanged(CustomerState prev, CustomerState next)
     {
-        UpdateVisibilityForState(next);
+        if (next == CustomerState.SeekingQueue && (prev == CustomerState.Wander || prev == CustomerState.Idle))
+            _decideFlashUntil = Time.time + decideFlashDuration;
+
+        RefreshAll();
     }
+
+    // Intent icon that replaces the item icon for the current state, or null to show the desired item.
+    private Sprite GetOverrideIcon() => customer.State switch
+    {
+        CustomerState.Wander or CustomerState.Idle => thinkingSprite,
+        CustomerState.SeekingQueue when Time.time < _decideFlashUntil => decidedSprite,
+        // Leaving with a purchase keeps desiredItem (CustomerCarryDisplay owns that); only walkouts get a reason
+        CustomerState.Leaving when customer.desiredItem == null => customer.walkoutReason switch
+        {
+            WalkoutReason.NoStock      => noStockSprite,
+            WalkoutReason.TooExpensive => tooExpensiveSprite,
+            _                          => null
+        },
+        _ => null
+    };
 
     private void UpdateVisibilityForState(CustomerState state)
     {
-        bool show = state switch
+        bool show = _lastOverride != null || state switch
         {
             CustomerState.SeekingQueue => showInSeekingQueue,
             CustomerState.Queueing     => showInQueueing,
@@ -104,6 +138,17 @@ public class CustomerWantBubble : MonoBehaviour
         // Update icon + qty
         ApplyIconFromItem(customer.desiredItem, force);
         ApplyQty(customer.desiredQty, force);
+
+        _lastOverride = GetOverrideIcon();
+        if (_lastOverride && iconRenderer)
+        {
+            iconRenderer.sprite  = _lastOverride;
+            iconRenderer.color   = Color.white;
+            iconRenderer.enabled = true;
+#if TMP_PRESENT
+            if (qtyText) qtyText.text = string.Empty;
+#endif
+        }
 
         // Toggle visibility logically
         UpdateVisibilityForState(customer.State);

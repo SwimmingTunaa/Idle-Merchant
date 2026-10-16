@@ -29,6 +29,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     public ItemDef desiredItem;
     public int desiredQty;
     public float budget;
+    [Tooltip("Why the last want-pick failed; shown in the want bubble while walking out.")]
+    public WalkoutReason walkoutReason;
     
     [Header("Queue Seeking")]
     [Tooltip("How often to check if queue is full while seeking (seconds)")]
@@ -88,6 +90,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         // Clear previous state
         desiredItem = null;
         desiredQty = 0;
+        walkoutReason = WalkoutReason.None;
         targetPos = null;
         idleTimer = null; // Timers created in OnEnterState
         seekingTimeoutTimer = null;
@@ -146,27 +149,15 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
             return;
         }
         
-        SalesManager salesManager = SalesManager.Instance;
-        Inventory inventory = Inventory.Instance;
-        int budget = (int)Random.Range(customerDef.budget.x, customerDef.budget.y);
-
-        if (salesManager.TryPickDesiredForCustomer(
-        inventory,
-        customerDef.itemPreferance,
-        budget,
-        customerDef.batchRange,
-        out var item,
-        out var qty))
-        {
-            desiredItem = item;
-            desiredQty = Mathf.Max(1, qty);
-   
-        }
-        else
-        {
-            // No item found — caller handles state transition
-        }
-
+        // On failure desiredItem is cleared (no stale want from an earlier pick) — caller handles state transition
+        SalesManager.Instance.TryPickDesiredForCustomer(
+            Inventory.Instance,
+            customerDef.itemPreferance,
+            (int)budget,
+            customerDef.batchRange,
+            out desiredItem,
+            out desiredQty,
+            out walkoutReason);
     }
 
     /// <summary>
@@ -340,7 +331,6 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
 
             case CustomerState.Wander:
-                SalesManager salesManager = SalesManager.Instance;
                 wanderTimer.Tick(TickDelta);
 
                 // Handle pause at wander point
@@ -367,22 +357,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 // Browse timer expired — decide to buy
                 if (wanderTimer.IsFinished)
                 {
-                    if (salesManager.TryPickDesiredForCustomer(
-                        Inventory.Instance,
-                        customerDef.itemPreferance,
-                        (int)budget,
-                        customerDef.batchRange,
-                        out var item,
-                        out var qty))
-                    {
-                        desiredItem = item;
-                        desiredQty = Mathf.Max(1, qty);
-                        ChangeState(CustomerState.SeekingQueue);
-                    }
-                    else
-                    {
-                        ChangeState(CustomerState.Leaving);
-                    }
+                    PickWantFromInventory();
+                    ChangeState(desiredItem != null ? CustomerState.SeekingQueue : CustomerState.Leaving);
                 }
                 break;
 
@@ -413,6 +389,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         // Clear customer-specific data before returning to pool
         desiredItem = null;
         desiredQty = 0;
+        walkoutReason = WalkoutReason.None;
         budget = 0f;
         targetPos = null;
         customerDef = null; // Clear def so Start() doesn't use old data
