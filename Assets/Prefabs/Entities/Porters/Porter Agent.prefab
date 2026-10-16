@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -259556887160843058}
   - component: {fileID: -1464411269404421513}
   - component: {fileID: 3389874610754164736}
+  - component: {fileID: 8686768974733542848}
   m_Layer: 9
   m_Name: Porter Agent
   m_TagString: Untagged
@@ -131,6 +132,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PermanentOutline
   outlineRenderingLayer: 4
+--- !u!114 &8686768974733542848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440394158813992520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f78eff13f8604c9b9c804fc67350012, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PorterCarryDisplay
+  maxIcons: 5
+  baseOffset: {x: 0, y: 2.1, z: 0}
+  spacing: 0.35
+  jitterX: 0.12
+  iconScale: 0.7
 --- !u!1 &840724104000160350
 GameObject:
   m_ObjectHideFlags: 0

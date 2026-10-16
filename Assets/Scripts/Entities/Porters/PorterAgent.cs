@@ -51,6 +51,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
     
     // Pickup animation tracking
     private Coroutine pickupCoroutine;
+    private PorterCarryDisplay carryDisplay;
     
     // Transport
     private TransportPoint transport;
@@ -64,6 +65,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
     {
         col = GetComponent<Collider2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        carryDisplay = GetComponent<PorterCarryDisplay>();
     }
 
     public override void Init(EntityDef entityDef, int layer, Spawner spawner, Collider2D playArea)
@@ -446,13 +448,15 @@ public class PorterAgent : EntityStateMachine<PorterState>
             {
                 var inventory = Inventory.Instance.GetInventoryType(stack.itemDef.itemCategory);
                 Inventory.Instance.Add(inventory, stack);
-                
+                if (LootPile.Instance != null) LootPile.Instance.FlyIn(stack.itemDef, transform.position + Vector3.up * 0.5f);
+
                 if (showDebugLogs)
                     Debug.Log($"[{name}] Deposited {stack.qty}x {stack.itemDef.displayName}");
             }
 
             // Clear carried loot
             carriedLoot.Clear();
+            if (carryDisplay) carryDisplay.Refresh(carriedLoot);
 
             // Now walk back down the ladder
             ChangeState(PorterState.ReturnToLayer);
@@ -637,6 +641,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
         if (stack.itemDef != null)
         {
             carriedLoot.Add(stack);
+            if (carryDisplay) carryDisplay.Refresh(carriedLoot);
             
             if (showDebugLogs)
                 Debug.Log($"[{name}] Picked up {stack.qty}x {stack.itemDef.displayName} (carrying {carriedLoot.Count}/{(int)Stats.CarryCapacity})");
