@@ -57,12 +57,13 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 - `GameSignals` drives reactive UI updates (gold display, unit counts, etc.)
 - Design tokens: `Scripts/UI/GlobalVariables.uss` — colour / text / spacing / font-size `--vars` mirrored from Figma; consume via `var()` in `.class`/`#id` rules
 - Reusable Button: `Scripts/UI/Components/Button.uss` + `Button.uxml` — tint-driven 9-slice variants (`btn-primary` / `-secondary` / `-success` / `-danger` / `-disabled`)
+- Top-nav board badges: `UIManager.SetBoardBadge(badge, visible, wiggle)` — shared badge toggle + ~5s button tilt-wiggle (scheduled item kept in the badge's `userData`); used by the cursor and hiring boards
 - **UI Toolkit gotchas:** no `gap` (use margins) · no `box-shadow` / `text-shadow` · `var()` resolves only in USS rules, never inline `style=""` (inline `var()` throws an NRE that aborts the whole `CloneTree` → blank panel) · a margin reset must be a bare `*`, not `#scope *` (id specificity wipes class margins)
 
 ### Shop Pipeline
 `Shop/Inventory.cs` → gold source of truth (use `Inventory.Instance` for gold ops)
 `Shop/ShopManager.cs` → orchestrates shelf, counter, sales
-`Shop/SalesManager.cs` → sells items to customers
+`Shop/SalesManager.cs` → sells items to customers; `TryPickDesiredForCustomer` resolves a want and reports a `WalkoutReason` (`NoStock` / `TooExpensive`) on failure
 `Shop/Shelf.cs` → holds items for sale
 `Shop/QueueController.cs` → customer queue
 
@@ -72,8 +73,8 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 
 ### Hiring Pipeline
 `CharacterGeneration/HiringCandidateGenerator.cs` → generates `HiringCandidate` structs (identity, traits, cost, `newspaperName`)
-`UI/Panels/Hiring/CandidatePool.cs` → timed pool per unit type; exposes `CandidateCount` (no-alloc) and `GetCandidates()` (allocating copy); base cost = `hireCost × 1.25^owned`, baked at generation (owned-count func injected by `HireController`, summed across layer managers)
-`UI/Panels/Hiring/HireController.cs` → stack UI, tab navigation, layer selector, hire animation
+`UI/Panels/Hiring/CandidatePool.cs` → timed pool per unit type; exposes `CandidateCount` / `MinHireCost` (no-alloc, pure) and `GetCandidates()` (allocating copy); base cost = `hireCost × 1.25^owned`, baked at generation (owned-count func injected by `HireController`, summed across layer managers)
+`UI/Panels/Hiring/HireController.cs` → stack UI, tab navigation, layer selector, hire animation; top-bar hiring sign (coin badge = cheapest candidate affordable + wiggle, "!" = restocked while closed; pocket-watch refresh countdown within `stopwatchShowSeconds`)
 `UI/Panels/Hiring/HireRoster.cs` → weighted rank selection from pools
 `UI/Panels/Hiring/CandidateUIMapper.cs` → populates Candidate.uxml from `HiringCandidate` data
 `HiringCandidate` struct holds all per-candidate state; `newspaperName` is assigned once at generation, stable across re-populates
@@ -136,6 +137,8 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 ## Conventions
 
 - **No `Update()` in entity AI** — use `EntityStateMachine` staggered tick (`OnUpdateState`)
+- **`TickDelta` must stay bounded** — the staggered tick resets its accumulator to 0 each tick; never go back to `-= UPDATE_INTERVAL` (long frames / high timeScale drift it upward and every AI timer expires on its first tick)
+- **Customer walkouts clear the want** — any path that sends a customer to `Leaving` without a purchase nulls `desiredItem`/`desiredQty` and stamps `walkoutReason` first; carry display, the `Upset` anim bool and the reason bubble all key off it (see `CounterService.LeaveNow`)
 - **Gold ops** — always go through `Inventory.Instance`, not direct field manipulation
 - **Events** — raise via `GameSignals.Raise*()`, never invoke static events directly
 - **Stat modifiers** — add via `Stats.Mediator.AddModifier()`, never modify `BaseStats` at runtime

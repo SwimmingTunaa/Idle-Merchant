@@ -304,6 +304,8 @@ Idle → Wander → SeekingQueue → Queueing → Buying → Leaving → Exited
 - On reaching the counter: resolves a **want** against current stock within budget (`SalesManager.TryPickDesiredForCustomer`), favouring higher-value affordable items biased by archetype preference; the desired item is shown via a want-bubble above the customer
 - Buys a quantity within the batch range that budget and stock allow
 - Leaves after purchase, despawns on exit
+- **Intent bubbles (implemented):** "?" while browsing, a 0.6s "!" flash on picking a want, then the item + qty while queueing; an empty-handed walkout shows **why** — crossed crate (nothing matching in stock) or crossed coin (over budget) — including counter rejections
+- **Animation (implemented):** Browse at wander pauses, Pay at the counter, Carry Walk when leaving with a purchase, Upset Walk on empty-handed walkouts
 
 **Design Intent:**
 Customers are the gold spigot. Their throughput is limited by queue capacity, item availability, and their budget. Expensive items = more gold per transaction. Queue length is a visible signal of shop health.
@@ -485,6 +487,8 @@ HP values shown are base (Layer 1/3/5/7/9 of each zone). Layer 2/4/6/8/10 varian
 | Infernal Depths | Infernal Core | Premium | 80g | Demon Lord |
 | Infernal Depths | Brimstone Ash | Premium | 20g | All Zone 5 mobs (bonus) |
 
+**Icons (implemented):** all 35 items (raw + crafted) carry real `icon` + `spriteDrop` art from licensed 32px pixel packs — Monster Loot for raw drops, weapon/armor/jewelry/materials packs for crafted gear — under `Assets/Sprites/Loot/<pack>/`.
+
 ---
 
 ## 6. Shop System
@@ -526,7 +530,7 @@ Having dungeon layers running (adventurers fighting, loot being generated) contr
 The combined rate is capped by `maxAlive` customer limits, which scale upward with Guild Stars. You can't flood the shop with infinite customers — there's a meaningful ceiling that grows with progression.
 
 **Empty shelf behaviour:**
-Customers spawn regardless of whether items are actually in stock. A customer who arrives to nothing will attempt to buy, fail, and visibly leave empty-handed. This is intentional — it gives the player clear feedback that they're missing sales, without punishing them with a permanent traffic penalty.
+Customers spawn regardless of whether items are actually in stock. A customer who arrives to nothing will attempt to buy, fail, and visibly leave empty-handed (upset walk + a reason bubble: out of stock vs. too expensive). This is intentional — it gives the player clear feedback that they're missing sales, without punishing them with a permanent traffic penalty.
 
 **Party Customer spawning:**
 Parties use a completely separate cooldown. Their weighted spawn chance is influenced by inventory quality and active layers, but they will **not** appear if the shop has nothing of value. See Section 4.6 for party behaviour details.
@@ -598,6 +602,7 @@ Players spend gold to hire adventurers, porters, and customers from a rotating c
 - **Layer selector** — player chooses which layer the hired unit will be assigned to at hire time
 - Hire animation plays on successful hire
 - Gold is deducted from `Inventory`; `GameSignals.OnUnitHired` fires
+- **Top-bar hiring sign (implemented):** copper-coin badge + periodic button wiggle when gold covers the cheapest candidate in any pool (`CandidatePool.MinHireCost`); otherwise a paper "!" badge when pools restocked while the board was closed (cleared on open, no wiggle). A pixel pocket-watch on the sign's left edge drains toward the next pool refresh, shown only within the last `stopwatchShowSeconds` (120s default)
 
 **Unit reassignment (future):** Drag-and-drop reassignment between layers is planned but not yet implemented. For now, layer assignment is set on hire and units stay on their assigned layer. Firing and re-hiring is the workaround for reassignment.
 
@@ -934,7 +939,7 @@ Crafting adds a secondary economy loop: instead of selling raw loot directly, th
 All panels use **Unity UI Toolkit** (UXML/USS). Panels are orchestrated by `UIManager`. Each panel has a controller inheriting `BasePanelController`.
 
 **Key Panels:**
-- **Main HUD / Top Navigation** — gold display (animated count-up), star indicator, bookmark tabs, hiring sign with candidate badge, cursor board (opens the Cursor page; badge while any click upgrade is affordable); the bookmarks hide while the Book UI is open (its own edge tabs take over)
+- **Main HUD / Top Navigation** — gold display (animated count-up), star indicator, bookmark tabs, hiring sign (affordable-hire coin / new-stock "!" badge, refresh pocket-watch — see 7.4), cursor board (opens the Cursor page; badge while any click upgrade is affordable); boards tilt-wiggle every ~5s while actionable; the bookmarks hide while the Book UI is open (its own edge tabs take over)
 - **Cursor Page (Book tab 6)** — cursor stats on the left page, upgrade cards on the right: template-cloned torn-paper cards (icon, name, current ➜ next in green, full-width price button with trailing coin), star-gated cards swap a lock pill for the buy button when unlocked
 - **Hiring Panel** — tabs per unit type, candidate cards, layer selector; hiring badge refreshes with the candidate pool
 - **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met); right-page detail panel aligned to Figma, selecting a unit outlines them in-world and locks the camera to them
@@ -981,7 +986,7 @@ Characters are assembled from modular sprite parts:
 Key animation states (via `AnimatorOverrideController`):
 - `Idle`, `Walk`, `Attack`, `Hit`, `Dead`
 - Porter-specific: `PickUp`, `Climb`, `Deposit`
-- Customer-specific: `Buy`
+- Customer-specific: `Browse`, `Pay` (counter; reuses each character's jump clip), `Carry Walk`, `Upset Walk` — no combat states
 
 `AnimatorOverrideController` is randomised per entity at spawn, providing visual variety within the same animation set.
 
@@ -1085,9 +1090,7 @@ See Section 13.3 for full recipe table.
 | Storage Expansion | 2★+ | More inventory capacity |
 | Price Mark-Up | Future | Sell price multiplier |
 | Guild Hall | Cosmetic | Visual upgrade |
-| Click Damage I/II/III | Early-mid game | +click damage |
-| Damage AOE I/II | Mid game | Click splash damage |
-| Loot AOE I/II | Mid game | Click loot vacuum |
+| Mouse upgrades | Cursor page | Repeatable ladders — see Section 4.7 table |
 
 ### 16.6 Milestones (Per Star Tier)
 
@@ -1143,7 +1146,7 @@ At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be e
 
 ### 18.1 Entity Architecture
 - All entities inherit from `EntityBase (MonoBehaviour)`
-- AI uses `EntityStateMachine<TState>` at 10Hz — never `Update()` in AI
+- AI uses `EntityStateMachine<TState>` at 10Hz — never `Update()` in AI; the tick accumulator resets each tick so `TickDelta` stays bounded at any frame rate / time scale
 - Pooled entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - Rank-up applies a permanent stat modifier set via `StatsMediator`; it does not swap the `EntityDef`
 - Each rank tier's modifier values should be defined in `AdventurerDef` as an array (indexed by rank)
