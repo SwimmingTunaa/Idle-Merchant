@@ -34,6 +34,10 @@ public class StarMilestoneDef : ScriptableObject
     [Header("Reward (Optional)")]
     [Tooltip("Reward granted when this milestone is completed")]
     public MilestoneRewardDef reward;
+
+    [Header("Reward")]
+    [Tooltip("Gold paid (as a coin burst to the counter) when the player claims this milestone")]
+    public int goldReward;
 }
 
 /// <summary>

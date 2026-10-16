@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
   m_Name: Milestone_5Star_TopToBottom
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
-  displayName: Juggling Act
+  displayName: Top to Bottom
   description: Operate on 5 dungeon layers simultaneously
   flavorText: From the entrance to the depths, it's all your territory now.
   icon: {fileID: 0}
@@ -21,3 +21,4 @@ MonoBehaviour:
   targetValue: 5
   requiredUpgrade: {fileID: 0}
   reward: {fileID: 0}
+  goldReward: 400000

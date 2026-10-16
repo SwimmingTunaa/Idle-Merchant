@@ -5994,7 +5994,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
   showDebugLogs: 0
   transport: {fileID: 1642071349}
-  depositPoint: {fileID: 1426513257}
+  depositPoint: {fileID: 1446923805}
 --- !u!4 &311339225
 Transform:
   m_ObjectHideFlags: 0
@@ -28733,6 +28733,7 @@ GameObject:
   - component: {fileID: 1433364566}
   - component: {fileID: 1433364567}
   - component: {fileID: 1433364568}
+  - component: {fileID: 1433364571}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -28978,6 +28979,23 @@ MonoBehaviour:
           m_CallState: 2
     buttonName: guild-button
     allowToggle: 1
+--- !u!114 &1433364571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433364561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8a420253bc1743069da01835cb87923, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilestoneTracker
+  uiDocument: {fileID: 1433364562}
+  cardTemplate: {fileID: 9197481963319205126, guid: b0c987ef044b5401b9925f2c249d41b0, type: 3}
+  refreshInterval: 1
+  startExpanded: 1
+  showDebugLogs: 0
 --- !u!1 &1446923804
 GameObject:
   m_ObjectHideFlags: 0
@@ -29004,7 +29022,7 @@ Transform:
   m_GameObject: {fileID: 1446923804}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 22.75, y: 0, z: 0}
+  m_LocalPosition: {x: 24.5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -29027,10 +29045,8 @@ MonoBehaviour:
   heapWidth: 1.4
   heapHeight: 0.9
   baseY: 0.5
-  itemScale: 0.6
   baseSortingOrder: 3
   binFront: {fileID: 215874370}
-  flyScale: 0.5
   saleTarget: {fileID: 0}
 --- !u!1 &1449877901
 GameObject:

@@ -52,6 +52,16 @@ public class Inventory : PersistentSingleton<Inventory>
     public int Get(ItemCategory cat, ItemDef item) =>
         Get(GetInventoryType(cat), item);
 
+    /// <summary>Number of different item types currently in stock (no-alloc).</summary>
+    public int DistinctItemCount => CountInStock(commonInventory) + CountInStock(craftedInventory) + CountInStock(luxuryInventory);
+
+    private static int CountInStock(Dictionary<ItemDef,int> inv)
+    {
+        int n = 0;
+        foreach (var kv in inv) if (kv.Key != null && kv.Value > 0) n++;
+        return n;
+    }
+
     public void Add(Dictionary<ItemDef,int> inventory, ResourceStack stack) 
     {
         inventory.TryGetValue(stack.itemDef, out var q);

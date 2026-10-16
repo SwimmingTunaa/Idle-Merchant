@@ -33,6 +33,8 @@ public static class GameSignals
     public static event Action<AdventurerAgent> OnAdventurerFocusRequested;  // world right-click → open Roster to this hero
     public static event Action<int> OnLayerUnlocked;
     public static event Action<int> OnStarEarned;
+    public static event Action<StarMilestoneDef> OnMilestoneReached;   // target hit → claimable
+    public static event Action<StarMilestoneDef> OnMilestoneClaimed;   // player claimed → gold + reward paid
     public static event Action    OnMarkedForSaleChanged;
 
     // Customers
@@ -62,6 +64,8 @@ public static class GameSignals
     public static void RaiseAdventurerFocusRequested(AdventurerAgent agent) => OnAdventurerFocusRequested?.Invoke(agent);
     public static void RaiseLayerUnlocked(int layer) => OnLayerUnlocked?.Invoke(layer);
     public static void RaiseStarEarned(int star) => OnStarEarned?.Invoke(star);
+    public static void RaiseMilestoneReached(StarMilestoneDef milestone) => OnMilestoneReached?.Invoke(milestone);
+    public static void RaiseMilestoneClaimed(StarMilestoneDef milestone) => OnMilestoneClaimed?.Invoke(milestone);
     public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
     public static void RaiseCustomerServed() => OnCustomerServed?.Invoke();
     public static void RaiseUnitHired(EntityDef unitDef, HireRole role) => OnUnitHired?.Invoke(unitDef, role);
@@ -88,6 +92,8 @@ public static class GameSignals
         OnAdventurerFocusRequested = null;
         OnLayerUnlocked = null;
         OnStarEarned = null;
+        OnMilestoneReached = null;
+        OnMilestoneClaimed = null;
         OnMarkedForSaleChanged = null;
         OnCustomerServed = null;
         OnClickUpgradePurchased = null;
@@ -114,6 +120,8 @@ public static class GameSignals
         Debug.Log($"OnAdventurerXPChanged: {OnAdventurerXPChanged?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnLayerUnlocked: {OnLayerUnlocked?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnStarEarned: {OnStarEarned?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnMilestoneReached: {OnMilestoneReached?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnMilestoneClaimed: {OnMilestoneClaimed?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnMarkedForSaleChanged: {OnMarkedForSaleChanged?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnCustomerServed: {OnCustomerServed?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnUnitHired: {OnUnitHired?.GetInvocationList().Length ?? 0}");

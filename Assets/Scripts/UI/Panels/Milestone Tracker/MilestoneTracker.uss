@@ -4,27 +4,26 @@
     right: 0;
     width: 320px;
     background-color: rgba(255, 255, 255, 0);
-    border-top-left-radius: var(--radius-md);
-    border-bottom-left-radius: var(--radius-md);
-    border-width: var(--border-medium);
-    border-color: var(--color-border-medium);
-    border-right-width: 0;
-    overflow: hidden;
 }
 
+/* Wood-framed plank. rotate = attention wiggle driven by UIManager.SetBoardBadge. */
 .mt-header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-sm) var(--space-md);
-    background-color: var(--color-bg-medium);
-    border-bottom-width: var(--border-thin);
+    padding: var(--space-xs) var(--space-md);
+    background-color: var(--color-box-bg);
+    border-width: 3px;
     border-color: var(--color-border-dark);
+    border-radius: var(--radius-sm);
     cursor: link;
+    transition-property: rotate;
+    transition-duration: 0.08s;
+    transition-timing-function: ease-in-out;
 }
 
 .mt-header:hover {
-    background-color: var(--color-bg-dark);
+    background-color: var(--primary-400);
 }
 
 .mt-header-left {
@@ -33,17 +32,17 @@
 }
 
 .mt-star-label {
-    color: var(--color-text-inverse);
+    color: var(--color-text-strong);
     margin-right: var(--space-sm);
 }
 
 .mt-count-label {
-    color: var(--color-accent);
+    color: var(--color-text-primary);
     -unity-font-style: bold;
 }
 
 .mt-chevron {
-    color: var(--color-text-inverse);
+    color: var(--color-text-strong);
     font-size: 12px;
     transition-property: rotate;
     transition-duration: var(--transition-normal);
@@ -53,56 +52,171 @@
     rotate: 180deg;
 }
 
+/* Claimable count: gold slip on the plank's top-left (tracker hugs the right screen edge).
+   Base position/visibility from .hiring-badge (MainUI.uss). */
+.mt-claim-badge {
+    top: -12px;
+    left: -12px;
+    right: auto;
+    width: 30px;
+    height: 30px;
+    border-width: 3px;
+    border-color: rgb(20, 14, 10);
+    background-color: var(--color-warning);
+    color: var(--color-text-strong);
+    font-size: 26px;
+    padding: 0;
+    -unity-text-align: middle-center;
+    -unity-font-definition: var(--font-body);
+}
+
 .mt-body {
     overflow: hidden;
 }
 
-.mt-body--collapsed {
-}
-
 .mt-list {
     flex-direction: column;
-    padding: var(--space-sm);
-    background-color: rgba(250, 240, 220, 0.55);
+    padding-top: var(--space-sm);
 }
 
-.mt-row {
+/* ── Torn-paper milestone card (card-torn.png 9-slice is inline in MilestoneCard.uxml) ── */
+
+.mt-card {
     flex-direction: column;
-    padding: var(--space-sm) var(--space-sm);
-    margin-bottom: var(--space-xs);
-    border-bottom-width: var(--border-thin);
-    border-color: var(--color-border-light);
+    align-items: stretch;
+    margin-bottom: var(--space-sm);
+    padding: 14px;
 }
 
-.mt-row-top {
+.mt-card--claimable {
+    -unity-background-image-tint-color: rgb(255, 222, 140);
+}
+
+.mt-card--claimed {
+    opacity: 0.62;
+}
+
+.mt-card-row {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.mt-card-icon-frame {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    padding: 4px;
+    background-color: var(--color-box-bg);
+    border-width: 3px;
+    border-color: var(--color-border-dark);
+    border-radius: var(--radius-sm);
+}
+
+.mt-card-icon {
+    flex-grow: 1;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.mt-card-info {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.mt-card-name {
+    font-size: 24px;
+    white-space: normal;
+    color: var(--color-text-strong);
+    -unity-font-definition: var(--font-body);
+}
+
+.mt-card-desc {
+    font-size: 16px;
+    white-space: normal;
+    color: var(--color-text-primary);
+    -unity-font-definition: var(--font-body);
+}
+
+.mt-card-bar.progress-track {
+    margin-top: 6px;
+    height: 20px;
+    background-color: var(--primary-200);
+    border-width: 2px;
+    border-color: var(--color-box-border);
+    border-radius: 3px;
+}
+
+.mt-card .progress-fill {
+    border-radius: 0;
+}
+
+.mt-card .progress-label {
+    color: var(--color-text-strong);
+    -unity-font-definition: var(--font-body);
+}
+
+.mt-card--claimed .progress-fill {
+    background-color: var(--color-text-muted);
+}
+
+.mt-card-reward {
     flex-direction: row;
     align-items: center;
-    margin-bottom: var(--space-xs);
+    margin-top: 6px;
 }
 
-.mt-row-description {
-    flex-grow: 1;
-    color: var(--color-text-secondary);
-    font-size: var(--text-lg);
-    white-space: normal;
+.mt-card-reward-coin {
+    width: 18px;
+    height: 18px;
+    margin-left: 0;
+    margin-right: 6px;
 }
 
-.mt-row-description--complete {
-    color: var(--color-success);
+.mt-card-reward-label {
+    font-size: 16px;
+    color: var(--color-text-primary);
+    -unity-font-definition: var(--font-body);
 }
 
-.mt-row-check {
-    color: var(--color-success);
-    font-size: 14px;
-    -unity-font-style: bold;
-    margin-left: var(--space-xs);
+.mt-card--claimable .mt-card-reward {
     display: none;
 }
 
-.mt-row-check--visible {
+/* Gold claim button (Button.uss .btn-gold) — only while claimable */
+.mt-card-claim {
+    display: none;
+    width: 100%;
+    height: 48px;
+    margin: 10px 0 0 0;
+    padding: 3px 10px 9px 10px;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.mt-card--claimable .mt-card-claim {
     display: flex;
 }
 
-.mt-progress-row {
-    margin-top: var(--space-xs);
+.mt-card-claim-coin {
+    margin-left: 8px;
+    margin-right: 4px;
+}
+
+.mt-card-stamp {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    padding: 0 6px;
+    rotate: -7deg;
+    font-size: 20px;
+    color: var(--color-success-active);
+    border-width: 2px;
+    border-color: var(--color-success-active);
+    background-color: rgba(250, 240, 220, 0.75);
+    -unity-font-definition: var(--font-body);
+}
+
+.mt-card--claimed .mt-card-stamp {
+    display: flex;
 }

@@ -40,7 +40,9 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private HashSet<GuildUpgradeDef> ownedUpgrades = new HashSet<GuildUpgradeDef>();
     // Track which upgrades are available for purchase (not yet owned)
     private HashSet<GuildUpgradeDef> availableUpgrades = new HashSet<GuildUpgradeDef>();
-    private HashSet<StarMilestoneDef> completedMilestones = new HashSet<StarMilestoneDef>();
+    // Reached = target hit (claimable); claimed ⊆ reached. Runtime only — no save system yet.
+    private HashSet<StarMilestoneDef> reachedMilestones = new HashSet<StarMilestoneDef>();
+    private HashSet<StarMilestoneDef> claimedMilestones = new HashSet<StarMilestoneDef>();
 
 
     // Milestone counters (accumulative from game start)
@@ -54,6 +56,8 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private int totalCraftedItemsSold = 0;
     private int totalCustomersServed = 0;
     private int totalAdventurersRankedUp = 0;
+    // Item types the player has crafted — a sale of one counts toward CraftedItemsSold
+    private readonly HashSet<ItemDef> craftedItemDefs = new HashSet<ItemDef>();
 
     // Dirty flag — set when any counter changes, checked once per frame
     private bool milestoneCheckPending = false;
@@ -97,6 +101,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnUnitHired += HandleUnitHired;
         GameSignals.OnCustomerServed += HandleCustomerServed;
         GameSignals.OnAdventurerPromoted += HandleAdventurerPromoted;
+        GameSignals.OnItemSold += HandleItemSold;
     }
 
     void OnDisable()
@@ -109,6 +114,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnUnitHired -= HandleUnitHired;
         GameSignals.OnCustomerServed -= HandleCustomerServed;
         GameSignals.OnAdventurerPromoted -= HandleAdventurerPromoted;
+        GameSignals.OnItemSold -= HandleItemSold;
     }
 
     // Signal handlers
@@ -129,7 +135,13 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
 
     private void HandleProductCrafted(ResourceStack stack)
     {
+        craftedItemDefs.Add(stack.itemDef);
         IncrementItemsCrafted(stack.qty);
+    }
+
+    private void HandleItemSold(ResourceStack stack)
+    {
+        if (craftedItemDefs.Contains(stack.itemDef)) IncrementCraftedItemsSold(stack.qty);
     }
 
     private void HandleUnitHired(EntityDef def, HireRole role)
@@ -183,8 +195,8 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     }
 
     /// <summary>
-    /// Check if all milestones for next star are complete.
-    /// If complete, award star. If individual milestone just completed, grant reward.
+    /// Flag next-star milestones that just hit their target as reached (claimable).
+    /// Rewards and the star itself are granted by TryClaimMilestone.
     /// </summary>
     private void CheckMilestones()
     {
@@ -200,24 +212,70 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
             return;
         }
 
-        // Check each milestone for completion and grant rewards
         foreach (var milestone in milestones)
         {
-            if (IsMilestoneComplete(milestone) && !completedMilestones.Contains(milestone))
-            {
-                // Milestone just completed - grant reward
-                GrantMilestoneReward(milestone);
-                completedMilestones.Add(milestone);
-            }
+            if (!reachedMilestones.Contains(milestone) && IsMilestoneComplete(milestone))
+                MarkReached(milestone);
         }
+    }
 
-        // Check if all milestones complete to award star
-        bool allComplete = milestones.All(m => IsMilestoneComplete(m));
+    private void MarkReached(StarMilestoneDef milestone)
+    {
+        if (!reachedMilestones.Add(milestone)) return;
+        GameSignals.RaiseMilestoneReached(milestone);
+    }
 
-        if (allComplete)
+    public bool IsMilestoneReached(StarMilestoneDef milestone) => milestone != null && reachedMilestones.Contains(milestone);
+    public bool IsMilestoneClaimed(StarMilestoneDef milestone) => milestone != null && claimedMilestones.Contains(milestone);
+
+    /// <summary>Reached but not yet claimed (claimed ⊆ reached, so a count difference).</summary>
+    public int ClaimableCount => reachedMilestones.Count - claimedMilestones.Count;
+
+    /// <summary>
+    /// Claim a reached milestone: pays goldReward as a coin burst from coinOrigin (world) to the gold
+    /// counter, grants its unlock reward, then awards the star once every milestone of the tier is claimed.
+    /// </summary>
+    public bool TryClaimMilestone(StarMilestoneDef milestone, Vector3 coinOrigin)
+    {
+        if (!IsMilestoneReached(milestone) || !claimedMilestones.Add(milestone))
+            return false;
+
+        PayMilestoneGold(milestone.goldReward, coinOrigin);
+        GrantMilestoneReward(milestone);
+        GameSignals.RaiseMilestoneClaimed(milestone);
+
+        int targetStar = currentStars + 1;
+        var tier = GetMilestonesForStar(targetStar);
+        if (tier.Count > 0 && tier.All(claimedMilestones.Contains))
         {
             AwardStar(targetStar);
+            milestoneCheckPending = true; // next tier may already be met
         }
+        return true;
+    }
+
+    // Gold banks as the coins land (house rule); every no-VFX path banks directly.
+    private static void PayMilestoneGold(int amount, Vector3 from)
+    {
+        if (amount <= 0) return;
+        if (ItemExplosionVFX.Instance == null)
+        {
+            Inventory.Instance.AddGold(amount);
+            return;
+        }
+
+        int coins = Mathf.Clamp(amount / 100, 5, 15);
+        int share = amount / coins;
+        int left = coins;
+        // Last coin to land carries the remainder, so the total is exact whatever the arrival order
+        ItemExplosionVFX.Instance.SpawnExplosion(null, from, coins, coins,
+            onEachArrival: () => Inventory.Instance.AddGold(--left == 0 ? amount - share * (coins - 1) : share));
+    }
+
+    /// <summary>Debug: flag a milestone reached without grinding its counter.</summary>
+    public void ForceReachMilestone(StarMilestoneDef milestone)
+    {
+        if (milestone != null) MarkReached(milestone);
     }
 
 /// <summary>
@@ -447,22 +505,9 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public bool IsMilestoneComplete(StarMilestoneDef milestone)
     {
         if (milestone == null) return false;
-
-        return milestone.milestoneType switch
-        {
-            MilestoneType.GoldEarned => totalGoldEarned >= milestone.targetValue,
-            MilestoneType.MobsKilled => totalMobsKilled >= milestone.targetValue,
-            MilestoneType.UnitsHired => totalUnitsHired >= milestone.targetValue,
-            MilestoneType.AdventurersHired => totalAdventurersHired >= milestone.targetValue,
-            MilestoneType.PortersHired => totalPortersHired >= milestone.targetValue,
-            MilestoneType.LootCollected => totalLootCollected >= milestone.targetValue,
-            MilestoneType.ItemsCrafted => totalItemsCrafted >= milestone.targetValue,
-            MilestoneType.CraftedItemsSold => totalCraftedItemsSold >= milestone.targetValue,
-            MilestoneType.CustomersServed => totalCustomersServed >= milestone.targetValue,
-            MilestoneType.UpgradePurchased => milestone.requiredUpgrade != null && ownedUpgrades.Contains(milestone.requiredUpgrade),
-            MilestoneType.AdventurerRankedUp => totalAdventurersRankedUp >= milestone.targetValue,
-            _ => false
-        };
+        if (milestone.milestoneType == MilestoneType.UpgradePurchased)
+            return milestone.requiredUpgrade != null && ownedUpgrades.Contains(milestone.requiredUpgrade);
+        return GetMilestoneCurrentValue(milestone) >= Mathf.Max(1, milestone.targetValue);
     }
 
     /// <summary>
@@ -471,27 +516,9 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     public float GetMilestoneProgress(StarMilestoneDef milestone)
     {
         if (milestone == null) return 0f;
-
-        int current = milestone.milestoneType switch
-        {
-            MilestoneType.GoldEarned => totalGoldEarned,
-            MilestoneType.MobsKilled => totalMobsKilled,
-            MilestoneType.UnitsHired => totalUnitsHired,
-            MilestoneType.AdventurersHired => totalAdventurersHired,
-            MilestoneType.PortersHired => totalPortersHired,
-            MilestoneType.LootCollected => totalLootCollected,
-            MilestoneType.ItemsCrafted => totalItemsCrafted,
-            MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
-            MilestoneType.CustomersServed => totalCustomersServed,
-            MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
-            MilestoneType.AdventurerRankedUp => totalAdventurersRankedUp,
-            _ => 0
-        };
-
         if (milestone.milestoneType == MilestoneType.UpgradePurchased)
-            return ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1f : 0f;
-
-        return Mathf.Clamp01((float)current / milestone.targetValue);
+            return IsMilestoneComplete(milestone) ? 1f : 0f;
+        return Mathf.Clamp01((float)GetMilestoneCurrentValue(milestone) / Mathf.Max(1, milestone.targetValue));
     }
 
     /// <summary>
@@ -513,9 +540,31 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
             MilestoneType.CustomersServed => totalCustomersServed,
             MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
-            MilestoneType.AdventurerRankedUp => totalAdventurersRankedUp,
+            // Only adventurers promote (rank up), so "units promoted" is the same counter
+            MilestoneType.AdventurerRankedUp or MilestoneType.UnitsPromoted => totalAdventurersRankedUp,
+            MilestoneType.AllLayersActive => CountStaffedLayers(),
+            MilestoneType.UniqueItemsOwned => Inventory.Instance != null ? Inventory.Instance.DistinctItemCount : 0,
             _ => 0
         };
+    }
+
+    // Per-layer unit managers (deeper layers start inactive, hence Include); re-found after a scene reload destroys them.
+    private MonoBehaviour[] layerManagers;
+
+    /// <summary>Pure query: distinct layers with at least one adventurer or porter on them right now.</summary>
+    private int CountStaffedLayers()
+    {
+        if (layerManagers == null || layerManagers.Length == 0 || layerManagers[0] == null)
+            layerManagers = FindObjectsByType<AdventurerManager>(FindObjectsInactive.Include)
+                .Concat<MonoBehaviour>(FindObjectsByType<PorterManager>(FindObjectsInactive.Include)).ToArray();
+
+        int mask = 0;
+        foreach (var m in layerManagers)
+            if (m is IUnitManager um && um.GetTotalCount() > 0) mask |= 1 << um.LayerIndex;
+
+        int layers = 0;
+        for (; mask != 0; mask &= mask - 1) layers++;
+        return layers;
     }
 
     // ===== MILESTONE INCREMENT METHODS =====
@@ -907,6 +956,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         maxUnlockedLayer = 1;
         currentStars = 1;
         ownedUpgrades.Clear();
+        reachedMilestones.Clear();
+        claimedMilestones.Clear();
         totalGoldEarned = 0;
         totalMobsKilled = 0;
         totalUnitsHired = 0;

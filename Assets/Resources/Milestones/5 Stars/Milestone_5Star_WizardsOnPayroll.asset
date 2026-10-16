@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: Milestone_5Star_WizardsOnPayroll
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
   displayName: Wizards on Payroll
-  description: Purchase 3 Teleporter for Layer 3
+  description: Hire 15 porters
   flavorText: 'WIP: The wizard installing it keeps muttering about ''conservation
     of mass.'' You nod and smile.'
   icon: {fileID: 0}
   starLevel: 5
-  milestoneType: 14
-  targetValue: 3
+  milestoneType: 7
+  targetValue: 15
   requiredUpgrade: {fileID: 0}
   reward: {fileID: 0}
+  goldReward: 350000

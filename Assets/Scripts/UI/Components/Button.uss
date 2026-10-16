@@ -42,7 +42,7 @@
     transition-duration: var(--transition-fast);
 }
 
-.btn-success {
+.btn-success, .btn-gold {
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/button-raised.png?fileID=21300000&guid=35bc8f28e7a14dbe8d2152d953cc0fc7&type=3#button-raised");
     -unity-slice-left: 5;
     -unity-slice-top: 5;
@@ -176,6 +176,23 @@
     scale: 0.97 0.97;
 }
 
+/* Gold: claim/reward payouts. Dark ink label reads on the bright tint. */
+.btn-gold {
+    -unity-background-image-tint-color: var(--color-warning);
+    color: var(--color-text-strong);
+}
+
+.btn-gold:hover {
+    -unity-background-image-tint-color: var(--color-warning-hover);
+    scale: 1.02 1.02;
+}
+
+.btn-gold:active {
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/button-pressed.png?fileID=21300000&guid=0444a046c4fd441485acbb48ef4dacd8&type=3#button-pressed");
+    -unity-background-image-tint-color: var(--color-accent-active);
+    scale: 0.97 0.97;
+}
+
 .btn-danger {
     -unity-background-image-tint-color: var(--color-destructive);
 }
@@ -226,7 +243,7 @@
     scale: 1 1;
 }
 
-.btn-success:disabled {
+.btn-success:disabled, .btn-gold:disabled {
     -unity-background-image-tint-color: var(--color-disabled-bg);
     color: var(--color-disabled-text);
     opacity: 1;

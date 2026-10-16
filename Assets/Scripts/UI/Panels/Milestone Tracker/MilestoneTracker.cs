@@ -10,6 +10,8 @@ public class MilestoneTracker : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIDocument uiDocument;
+    [Tooltip("Row template (MilestoneCard.uxml): torn-paper card with progress, reward and claim button.")]
+    [SerializeField] private VisualTreeAsset cardTemplate;
 
     [Header("Settings")]
     [Tooltip("Seconds between live progress refreshes")]
@@ -23,6 +25,7 @@ public class MilestoneTracker : MonoBehaviour
     private Label starLabel;
     private Label countLabel;
     private Label chevron;
+    private Label claimBadge;
     private VisualElement body;
     private VisualElement list;
 
@@ -99,10 +102,11 @@ public class MilestoneTracker : MonoBehaviour
         starLabel  = root.Q<Label>("mt-star-label");
         countLabel = root.Q<Label>("mt-count-label");
         chevron    = root.Q<Label>("mt-chevron");
+        claimBadge = root.Q<Label>("mt-claim-badge");
         body       = root.Q<VisualElement>("mt-body");
         list       = root.Q<VisualElement>("mt-list");
 
-        if (body == null || list == null)
+        if (body == null || list == null || cardTemplate == null)
         {
             Debug.LogError("[MilestoneTracker] Required elements not found.");
             return false;
@@ -133,47 +137,46 @@ public class MilestoneTracker : MonoBehaviour
             ? new List<StarMilestoneDef>()
             : ProgressionManager.Instance.GetMilestonesForStar(nextStar);
 
-        int completed = 0;
         foreach (var m in milestones)
         {
             var row = CreateRow(m);
             list.Add(row);
             rows.Add((m, row));
-            if (ProgressionManager.Instance.IsMilestoneComplete(m)) completed++;
         }
 
-        UpdateCountLabel(completed, milestones.Count);
+        RefreshProgress();
     }
 
-    // Lightweight: updates bar values on existing rows without rebuilding DOM.
+    // Lightweight: updates bar values + claim state on existing rows without rebuilding DOM.
     private void RefreshProgress()
     {
-        if (ProgressionManager.Instance == null) return;
+        var pm = ProgressionManager.Instance;
+        if (pm == null) return;
 
-        int completed = 0;
+        int claimed = 0;
         foreach (var (def, row) in rows)
         {
-            bool  complete = ProgressionManager.Instance.IsMilestoneComplete(def);
-            int   current  = ProgressionManager.Instance.GetMilestoneCurrentValue(def);
-            float progress = ProgressionManager.Instance.GetMilestoneProgress(def);
+            bool isClaimed = pm.IsMilestoneClaimed(def);
+            bool reached   = pm.IsMilestoneReached(def);
+            int  current   = reached ? def.targetValue : pm.GetMilestoneCurrentValue(def);
+            float progress = reached ? 1f : pm.GetMilestoneProgress(def);
 
-            var fill = row.Q<VisualElement>("progress-fill");
-            if (fill != null)
-            {
-                fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
-                fill.EnableInClassList("progress-fill--success", complete);
-            }
+            row.EnableInClassList("mt-card--claimable", reached && !isClaimed);
+            row.EnableInClassList("mt-card--claimed", isClaimed);
+            row.Q<VisualElement>("progress-fill").style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
+            row.Q<Label>("progress-label").text =
+                $"{AnimatedNumberUITK.Abbrev(current)} / {AnimatedNumberUITK.Abbrev(def.targetValue)}";
+            if (isClaimed && def.goldReward > 0)
+                row.Q<Label>("card-reward-label").text = $"Reward: {AnimatedNumberUITK.Abbrev(def.goldReward)} - collected";
 
-            var text = row.Q<Label>("progress-label");
-            if (text != null) text.text = $"{current}/{def.targetValue}";
-
-            row.Q<Label>("mt-row-description")?.EnableInClassList("mt-row-description--complete", complete);
-            row.Q<Label>("mt-row-check")?.EnableInClassList("mt-row-check--visible", complete);
-
-            if (complete) completed++;
+            if (isClaimed) claimed++;
         }
 
-        UpdateCountLabel(completed, rows.Count);
+        UpdateCountLabel(claimed, rows.Count);
+
+        int claimable = pm.ClaimableCount;
+        if (claimBadge != null) claimBadge.text = claimable.ToString();
+        UIManager.SetBoardBadge(claimBadge, claimable > 0, claimable > 0);
     }
 
     private void UpdateCountLabel(int completed, int total)
@@ -196,53 +199,46 @@ public class MilestoneTracker : MonoBehaviour
     // ROW CREATION
     // ═════════════════════════════════════════════
 
+    // Clones the card; state classes/values are applied by RefreshProgress.
     private VisualElement CreateRow(StarMilestoneDef def)
     {
-        bool  complete = ProgressionManager.Instance.IsMilestoneComplete(def);
-        int   current  = ProgressionManager.Instance.GetMilestoneCurrentValue(def);
-        float progress = ProgressionManager.Instance.GetMilestoneProgress(def);
+        var row = cardTemplate.CloneTree().Q<VisualElement>("card-root");
 
-        var row = new VisualElement();
-        row.AddToClassList("mt-row");
+        row.Q<Label>("card-name").text = def.displayName;
+        row.Q<Label>("card-desc").text = def.description;
+        if (def.icon != null)
+            row.Q<VisualElement>("card-icon").style.backgroundImage = new StyleBackground(def.icon);
 
-        // Description + checkmark
-        var top = new VisualElement();
-        top.AddToClassList("mt-row-top");
+        string reward = AnimatedNumberUITK.Abbrev(def.goldReward);
+        row.Q<Label>("card-reward-label").text = $"Reward: {reward}";
+        if (def.goldReward <= 0)   // inline only for "off" — USS hides it while claimable
+            row.Q<VisualElement>("card-reward").style.display = DisplayStyle.None;
 
-        var desc = new Label(def.description);
-        desc.name = "mt-row-description";
-        desc.AddToClassList("mt-row-description");
-        desc.EnableInClassList("mt-row-description--complete", complete);
-        top.Add(desc);
-
-        var check = new Label("✓");
-        check.name = "mt-row-check";
-        check.AddToClassList("mt-row-check");
-        check.EnableInClassList("mt-row-check--visible", complete);
-        top.Add(check);
-
-        row.Add(top);
-
-        // Progress bar — uses ProgressBar component classes
-        var track = new VisualElement();
-        track.AddToClassList("progress-track");
-        track.AddToClassList("mt-progress-row");
-
-        var fill = new VisualElement();
-        fill.name = "progress-fill";
-        fill.AddToClassList("progress-fill");
-        fill.EnableInClassList("progress-fill--success", complete);
-        fill.style.width = Length.Percent(Mathf.Clamp01(progress) * 100f);
-        track.Add(fill);
-
-        var progressText = new Label($"{current}/{def.targetValue}");
-        progressText.name = "progress-label";
-        progressText.AddToClassList("progress-label");
-        track.Add(progressText);
-
-        row.Add(track);
+        var claimButton = row.Q<Button>("card-claim");
+        row.Q<Label>("card-claim-amount").text = def.goldReward > 0 ? $"+{reward}" : "";
+        claimButton.clicked += () =>
+        {
+            claimButton.SetEnabled(false);   // no double-claims; the row flips to claimed on the signal
+            ProgressionManager.Instance?.TryClaimMilestone(def, BurstOrigin(row));
+        };
 
         return row;
+    }
+
+    // Panel point → world point (z=0) just LEFT of the card: world sprites draw under UI Toolkit,
+    // so a burst at the button itself would fly hidden behind the tracker column.
+    private static Vector3 BurstOrigin(VisualElement element)
+    {
+        Camera cam = Camera.main;
+        if (cam == null || element.panel == null) return Vector3.zero;
+
+        Vector2 center = new Vector2(element.worldBound.xMin - 80f, element.worldBound.center.y);
+        Vector2 panelSize = element.panel.visualTree.layout.size;
+        var screen = new Vector3(
+            center.x / panelSize.x * Screen.width,
+            (1f - center.y / panelSize.y) * Screen.height,
+            -cam.transform.position.z);
+        return cam.ScreenToWorldPoint(screen);
     }
 
     // ═════════════════════════════════════════════

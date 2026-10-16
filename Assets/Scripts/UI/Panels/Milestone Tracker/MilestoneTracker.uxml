@@ -3,12 +3,13 @@
     <Style src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uss?fileID=7433441132597879392&amp;guid=457eaf788e8904f54b06b019b6612282&amp;type=3#MilestoneTracker" />
     <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss?fileID=7433441132597879392&amp;guid=492d8502d093f41ecb20460e908cfc39&amp;type=3#ProgressBar" />
     <ui:VisualElement name="milestone-tracker" class="mt-root">
-        <ui:Button name="mt-toggle-button" class="mt-header" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+        <ui:Button name="mt-toggle-button" class="mt-header" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
             <ui:VisualElement name="VisualElement" class="mt-header-left">
                 <ui:Label name="mt-star-label" text="Progress" class="mt-star-label text-lg" />
                 <ui:Label name="mt-count-label" text="0/4" class="mt-count-label text-small" />
             </ui:VisualElement>
             <ui:Label name="mt-chevron" text="▲" class="mt-chevron" />
+            <ui:Label name="mt-claim-badge" text="0" picking-mode="Ignore" class="hiring-badge mt-claim-badge" />
         </ui:Button>
         <ui:VisualElement name="mt-body" class="mt-body">
             <ui:VisualElement name="mt-list" class="mt-list" />

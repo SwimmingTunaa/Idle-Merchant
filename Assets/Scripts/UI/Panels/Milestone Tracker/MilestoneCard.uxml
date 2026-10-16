@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss?fileID=7433441132597879392&amp;guid=492d8502d093f41ecb20460e908cfc39&amp;type=3#ProgressBar" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uss?fileID=7433441132597879392&amp;guid=457eaf788e8904f54b06b019b6612282&amp;type=3#MilestoneTracker" />
+    <ui:VisualElement name="card-root" class="mt-card" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&amp;guid=e202a8ab367e41aead07308c65d8c8a8&amp;type=3#card-torn&quot;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 3px;">
+        <ui:VisualElement class="mt-card-row">
+            <ui:VisualElement class="mt-card-icon-frame">
+                <ui:VisualElement name="card-icon" class="mt-card-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/Star.png?fileID=-930353575&amp;guid=391cae39f2cc64ebca5e7d6893d13427&amp;type=3#Star_active&quot;);" />
+            </ui:VisualElement>
+            <ui:VisualElement class="mt-card-info">
+                <ui:Label name="card-name" text="Milestone" class="mt-card-name" />
+                <ui:Label name="card-desc" text="" class="mt-card-desc" />
+                <ui:VisualElement class="progress-track mt-card-bar">
+                    <ui:VisualElement name="progress-fill" class="progress-fill progress-fill--warning" />
+                    <ui:Label name="progress-label" text="0 / 0" class="progress-label" />
+                </ui:VisualElement>
+                <ui:VisualElement name="card-reward" class="mt-card-reward">
+                    <ui:VisualElement class="btn-coin mt-card-reward-coin" />
+                    <ui:Label name="card-reward-label" text="Reward: 0" class="mt-card-reward-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="card-claim" class="btn-gold mt-card-claim">
+            <ui:Label text="Claim" class="btn-label" />
+            <ui:VisualElement class="btn-coin mt-card-claim-coin" />
+            <ui:Label name="card-claim-amount" text="0" class="btn-label" />
+        </ui:Button>
+        <ui:Label name="card-stamp" text="CLAIMED" picking-mode="Ignore" class="mt-card-stamp" />
+    </ui:VisualElement>
+</ui:UXML>

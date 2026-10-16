@@ -22,9 +22,12 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
     public void SpawnExplosion(Sprite sprite, Vector3 worldPosition, int count, int maxCount = 15, float scale = 1f,
         System.Action onEachArrival = null)
     {
+        int spawnCount = Mathf.Min(count, maxCount);
+
         if (itemPrefab == null)
         {
             Debug.LogError("[ItemExplosionVFX] No item prefab assigned!");
+            DeliverNow(onEachArrival, spawnCount);
             return;
         }
 
@@ -40,12 +43,17 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
         if (spriteToUse == null)
         {
             Debug.LogError("[ItemExplosionVFX] No sprite provided and no default sprite assigned!");
+            DeliverNow(onEachArrival, spawnCount);
             return;
         }
 
-        int spawnCount = Mathf.Min(count, maxCount);
-
         StartCoroutine(SpawnSequence(spriteToUse, worldPosition, screenTarget, spawnCount, scale, onEachArrival));
+    }
+
+    // VFX skipped — still fire every arrival callback, they may carry gold
+    private static void DeliverNow(System.Action onEachArrival, int count)
+    {
+        for (int i = 0; i < count; i++) onEachArrival?.Invoke();
     }
 
     private System.Collections.IEnumerator SpawnSequence(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, int count, float scale,

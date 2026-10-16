@@ -20,6 +20,7 @@ public class MilestoneProgressEvents
     private readonly Action<EntityDef, HireRole> _onHired;
     private readonly Action<int>           _onStar;
     private readonly Action<GuildUpgradeDef> _onUpgrade;
+    private readonly Action<StarMilestoneDef> _onMilestone;
 
     public MilestoneProgressEvents(Action onProgressChanged, Action onFullRebuild)
     {
@@ -31,6 +32,7 @@ public class MilestoneProgressEvents
         _onHired    = (_, __) => onProgressChanged();
         _onStar     = _ => onFullRebuild();
         _onUpgrade  = _ => onFullRebuild();
+        _onMilestone = _ => onProgressChanged();
     }
 
     public void Subscribe()
@@ -43,6 +45,8 @@ public class MilestoneProgressEvents
         GameSignals.OnUnitHired               += _onHired;
         ProgressionManager.OnStarEarned       += _onStar;
         ProgressionManager.OnUpgradePurchased += _onUpgrade;
+        GameSignals.OnMilestoneReached        += _onMilestone;
+        GameSignals.OnMilestoneClaimed        += _onMilestone;
     }
 
     public void Unsubscribe()
@@ -55,5 +59,7 @@ public class MilestoneProgressEvents
         GameSignals.OnUnitHired               -= _onHired;
         ProgressionManager.OnStarEarned       -= _onStar;
         ProgressionManager.OnUpgradePurchased -= _onUpgrade;
+        GameSignals.OnMilestoneReached        -= _onMilestone;
+        GameSignals.OnMilestoneClaimed        -= _onMilestone;
     }
 }

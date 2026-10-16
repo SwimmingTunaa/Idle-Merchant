@@ -477,10 +477,16 @@ public class GameDebugger : EditorWindow
                         bool complete = pm.IsMilestoneComplete(milestone);
                         float progress = pm.GetMilestoneProgress(milestone);
                         
-                        string status = complete ? "✓" : "✗";
+                        string status = pm.IsMilestoneClaimed(milestone) ? "✓✓" : pm.IsMilestoneReached(milestone) ? "$" : complete ? "✓" : "✗";
                         string progressText = $"{status} {milestone.description}: {current}/{milestone.targetValue} ({progress * 100:F0}%)";
-                        
+
+                        EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(progressText);
+                        GUI.enabled = !pm.IsMilestoneReached(milestone);
+                        if (GUILayout.Button("Reach", GUILayout.Width(55)))
+                            pm.ForceReachMilestone(milestone);   // → claimable in the tracker
+                        GUI.enabled = true;
+                        EditorGUILayout.EndHorizontal();
                     }
                 }
                 else
