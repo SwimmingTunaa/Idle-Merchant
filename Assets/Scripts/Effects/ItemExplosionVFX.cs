@@ -65,7 +65,32 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
         }
     }
 
+    /// <summary>One item icon arcing world→world (e.g. loot → shop pile, pile → counter). Pure VFX, no callback.</summary>
+    public void FlyToWorld(Sprite sprite, Vector3 from, Vector3 to, float scale = 0.5f)
+    {
+        if (itemPrefab == null || sprite == null) return;
+        ItemFlyAnimation animation = SpawnFlyer(sprite, from, scale);
+        if (animation != null)
+            animation.StartFlightToWorld(to, new Vector3(Random.Range(-0.2f, 0.2f), 0.2f, 0f));   // small pop, not a burst
+    }
+
     private void SpawnSingleItem(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, System.Action onComplete, float scale = 1f)
+    {
+        float angle = Random.Range(0f, 360f);
+        Vector3 direction = new Vector3(
+            Mathf.Cos(angle * Mathf.Deg2Rad),
+            Mathf.Sin(angle * Mathf.Deg2Rad),
+            0f
+        );
+
+        ItemFlyAnimation animation = SpawnFlyer(sprite, worldPos, scale);
+        if (animation != null)
+            animation.StartFlight(screenTarget, direction, onComplete);
+        else
+            onComplete?.Invoke();   // never swallow the callback — it may carry gold
+    }
+
+    private ItemFlyAnimation SpawnFlyer(Sprite sprite, Vector3 worldPos, float scale)
     {
         GameObject itemObj = ObjectPoolManager.Instance.SpawnObject(
             itemPrefab,
@@ -73,8 +98,7 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
             Quaternion.identity,
             ObjectPoolManager.PoolType.GameObject
         );
-
-        if (itemObj == null) { onComplete?.Invoke(); return; }   // never swallow the callback — it may carry gold
+        if (itemObj == null) return null;
 
         SpriteRenderer sr = itemObj.GetComponent<SpriteRenderer>();
         if (sr != null)
@@ -84,22 +108,6 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
         }
 
         itemObj.transform.localScale = Vector3.one * scale;
-
-        float angle = Random.Range(0f, 360f);
-        Vector3 direction = new Vector3(
-            Mathf.Cos(angle * Mathf.Deg2Rad),
-            Mathf.Sin(angle * Mathf.Deg2Rad),
-            0f
-        );
-
-        ItemFlyAnimation animation = itemObj.GetComponent<ItemFlyAnimation>();
-        if (animation != null)
-        {
-            animation.StartFlight(screenTarget, direction, onComplete);
-        }
-        else
-        {
-            onComplete?.Invoke();
-        }
+        return itemObj.GetComponent<ItemFlyAnimation>();
     }
 }

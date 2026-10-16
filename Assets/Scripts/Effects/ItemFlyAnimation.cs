@@ -29,6 +29,7 @@ public class ItemFlyAnimation : MonoBehaviour
     private Coroutine flyCoroutine;
     
     private Vector2 targetScreenPosition;
+    private Vector3? worldTarget;   // set → world→world flight, re-projected every frame (camera may pan)
     private Vector3 explosionVelocity;
     private System.Action onArrivalCallback;
     
@@ -51,8 +52,16 @@ public class ItemFlyAnimation : MonoBehaviour
     }
     
     public void StartFlight(Vector2 screenTarget, Vector3 randomExplosionDir, System.Action onComplete = null)
+        => Begin(screenTarget, null, randomExplosionDir, onComplete);
+
+    /// <summary>Fly to a world point (e.g. the shop loot pile) instead of a UI screen point.</summary>
+    public void StartFlightToWorld(Vector3 target, Vector3 explosionDir, System.Action onComplete = null)
+        => Begin(WorldToScreen(target), target, explosionDir, onComplete);
+
+    private void Begin(Vector2 screenTarget, Vector3? world, Vector3 randomExplosionDir, System.Action onComplete)
     {
         targetScreenPosition = screenTarget;
+        worldTarget = world;
         explosionVelocity = randomExplosionDir * explosionForce;
         onArrivalCallback = onComplete;
         
@@ -102,10 +111,15 @@ public class ItemFlyAnimation : MonoBehaviour
             float t = elapsed / flightDuration;
             
             float easedT = Mathf.SmoothStep(0f, 1f, t);
-            
+            if (worldTarget.HasValue) targetScreenPosition = WorldToScreen(worldTarget.Value);
+
             Vector2 currentScreenPos = Vector2.Lerp(startScreenPos, targetScreenPosition, easedT);
             
-            float arcOffset = Mathf.Sin(easedT * Mathf.PI) * arcHeight * Screen.height * 0.1f;
+            // UI flights arc by screen height; world→world hops arc by their own length so short hops stay low
+            float arcBase = worldTarget.HasValue
+                ? Vector2.Distance(startScreenPos, targetScreenPosition) * 0.25f
+                : Screen.height * 0.1f;
+            float arcOffset = Mathf.Sin(easedT * Mathf.PI) * arcHeight * arcBase;
             currentScreenPos.y += arcOffset;
             
             transform.position = ScreenToWorld(currentScreenPos);
@@ -141,8 +155,8 @@ public class ItemFlyAnimation : MonoBehaviour
             yield return null;
         }
         
-        // Spawn particle effect at arrival position
-        if (arrivalParticlePrefab != null)
+        // Spawn particle effect at arrival position (coin-gain FX belongs to the UI counter, not world targets)
+        if (arrivalParticlePrefab != null && !worldTarget.HasValue)
         {
             Vector3 worldPos = ScreenToWorld(targetScreenPosition);
             ObjectPoolManager.Instance.SpawnObject(

@@ -164,6 +164,7 @@ public class Loot : MonoBehaviour, IClickableLoot
 
         ResourceStack stack = new ResourceStack(def, qty, sellValue);
         Inventory.Instance.Add(Inventory.Instance.GetInventoryType(def.itemCategory), stack);
+        if (LootPile.Instance != null) LootPile.Instance.FlyIn(def, transform.position);   // banked; icon arcs to the shop pile
 
         // Track for milestone progress
         if (ProgressionManager.Instance != null)
