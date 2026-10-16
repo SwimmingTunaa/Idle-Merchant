@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
     <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss?fileID=7433441132597879392&amp;guid=492d8502d093f41ecb20460e908cfc39&amp;type=3#ProgressBar" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uss?fileID=7433441132597879392&amp;guid=457eaf788e8904f54b06b019b6612282&amp;type=3#MilestoneTracker" />
-    <ui:VisualElement name="card-root" class="mt-card" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&amp;guid=e202a8ab367e41aead07308c65d8c8a8&amp;type=3#card-torn&quot;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 3px;">
+    <ui:VisualElement name="card-root" class="mt-card" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn-hud.png?fileID=21300000&amp;guid=85319ae706c545578604b38917b936c6&amp;type=3#card-torn-hud&quot;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 5px;">
         <ui:VisualElement class="mt-card-row">
             <ui:VisualElement class="mt-card-icon-frame">
                 <ui:VisualElement name="card-icon" class="mt-card-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/Star.png?fileID=-930353575&amp;guid=391cae39f2cc64ebca5e7d6893d13427&amp;type=3#Star_active&quot;);" />
