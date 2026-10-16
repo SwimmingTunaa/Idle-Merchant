@@ -69,6 +69,20 @@ public class CandidatePool
     public int CandidateCount => candidates.Count;
 
     /// <summary>
+    /// Cheapest baked hire cost in the pool (int.MaxValue when empty). No allocation.
+    /// </summary>
+    public int MinHireCost
+    {
+        get
+        {
+            int min = int.MaxValue;
+            foreach (var c in candidates)
+                if (c.hireCost < min) min = c.hireCost;
+            return min;
+        }
+    }
+
+    /// <summary>
     /// Get all available candidates (copy).
     /// </summary>
     public List<HiringCandidate> GetCandidates()

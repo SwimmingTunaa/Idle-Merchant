@@ -34,6 +34,12 @@ public class HireController : BasePanelController
     [Header("Animation")]
     [SerializeField] private float hireAnimationDuration = 0.5f;
 
+    [Header("Top-Bar Sign")]
+    [Tooltip("Stopwatch frames shown on the hiring sign before pools refresh (full → empty).")]
+    [SerializeField] private Sprite[] stopwatchFrames;
+    [Tooltip("Stopwatch appears when the next pool refresh is within this many seconds")]
+    [SerializeField] private float stopwatchShowSeconds = 120f;
+
     // UI Elements
     private VisualElement stackContainer;
     private VisualElement emptyState;
@@ -82,6 +88,12 @@ public class HireController : BasePanelController
 
     private bool isHireAnimating;
 
+    // Top-bar sign: badge = coin (can afford a hire, wiggles) > "!" (new stock while closed); stopwatch = refresh countdown
+    private Label hiringBadge;
+    private VisualElement hiringStopwatch;
+    private bool hasNewStock;
+    private bool affordPending = true;
+
     private static readonly string[] ShadowClasses =
     {
         "card-shadow-0",
@@ -117,6 +129,7 @@ public class HireController : BasePanelController
 
     private void OnGoldChanged(int total)
     {
+        affordPending = true;
         UpdateHireButtonState();
     }
 
@@ -142,8 +155,18 @@ public class HireController : BasePanelController
         foreach (var pool in candidatePools.Values)
             poolRefreshed |= pool.Update(Time.deltaTime);
 
-        if (poolRefreshed && State != PanelState.Open)
-            SetHiringBadge(true);
+        if (poolRefreshed)
+        {
+            affordPending = true;
+            if (State != PanelState.Open)
+                SetHiringBadge(true);
+        }
+
+        if (affordPending)
+        {
+            affordPending = false;
+            RefreshHiringBadge();
+        }
 
         if (State == PanelState.Open)
             UpdateEmptyTimer();
@@ -206,13 +229,49 @@ public class HireController : BasePanelController
     }
 
     /// <summary>
-    /// Shows/hides the new-candidates badge on the top-bar hiring sign.
+    /// Shows/hides the new-candidates ("!") badge on the top-bar hiring sign.
     /// Cleared automatically when the panel opens.
     /// </summary>
     public void SetHiringBadge(bool visible)
     {
-        uiDocument?.rootVisualElement?.Q<VisualElement>("hiring-badge")
-            ?.EnableInClassList("hiring-badge--visible", visible);
+        hasNewStock = visible;
+        RefreshHiringBadge();
+        UpdateStopwatch();
+    }
+
+    // Coin look + wiggle when gold covers the cheapest candidate in any pool; else "!" while new stock is unseen.
+    private void RefreshHiringBadge()
+    {
+        if (hiringBadge == null)
+            return;
+
+        int minCost = int.MaxValue;
+        foreach (var pool in candidatePools.Values)
+            minCost = Mathf.Min(minCost, pool.MinHireCost);
+
+        bool affordable = minCost != int.MaxValue && Inventory.Instance != null && Inventory.Instance.CanAfford(minCost);
+        hiringBadge.EnableInClassList("hiring-badge--coin", affordable);
+        hiringBadge.text = affordable ? "" : "!";
+        UIManager.SetBoardBadge(hiringBadge, affordable || hasNewStock, affordable);
+    }
+
+    // Once per second: stopwatch drains over the final stopwatchShowSeconds of the (synced) pool refresh cycle.
+    private void UpdateStopwatch()
+    {
+        if (hiringStopwatch == null)
+            return;
+
+        float remaining = float.MaxValue;
+        foreach (var pool in candidatePools.Values)
+            remaining = Mathf.Min(remaining, pool.GetTimeUntilRefresh());
+
+        bool show = !hasNewStock && remaining <= stopwatchShowSeconds && stopwatchFrames != null && stopwatchFrames.Length > 0;
+        hiringStopwatch.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+        if (!show)
+            return;
+
+        int frame = Mathf.Clamp((int)(stopwatchFrames.Length * (stopwatchShowSeconds - remaining) / stopwatchShowSeconds), 0, stopwatchFrames.Length - 1);
+        hiringStopwatch.style.backgroundImage = new StyleBackground(stopwatchFrames[frame]);
     }
 
     // ═════════════════════════════════════════════
@@ -311,6 +370,10 @@ public class HireController : BasePanelController
     protected override void BuildUI()
     {
         if (uiDocument == null) return;
+
+        hiringBadge = uiDocument.rootVisualElement.Q<Label>("hiring-badge");
+        hiringStopwatch = uiDocument.rootVisualElement.Q<VisualElement>("hiring-stopwatch");
+        hiringStopwatch?.schedule.Execute(UpdateStopwatch).Every(1000);
         panel = uiDocument.rootVisualElement.Q<VisualElement>("hire-panel");
         if (panel == null)
         {
@@ -457,6 +520,7 @@ public class HireController : BasePanelController
         CreatePools(adventurerManagers, HireRole.Adventurer, adventurerPools);
         CreatePools(porterManagers, HireRole.Porter, porterPools);
         UpdateLayerSelector();
+        affordPending = true;
 
         if (showDebugLogs)
             Debug.Log($"[HirePanel] Layer {layer} unlocked — new rank {layer} candidate pools created");
@@ -677,6 +741,7 @@ public class HireController : BasePanelController
         {
             pool.ConsumeCandidate(c);
             candidateToPool.Remove(c);
+            affordPending = true;
         }
 
         CurrentRoster.RemoveAt(0);

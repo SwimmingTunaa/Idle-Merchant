@@ -284,7 +284,52 @@ public class UIManager : PersistentSingleton<UIManager>
             return;
 
         bool affordable = Inventory.Instance != null && clickerManager.AnyCursorUpgradeAffordable(Inventory.Instance.Gold);
-        cursorBadge.EnableInClassList("hiring-badge--visible", affordable);
+        SetBoardBadge(cursorBadge, affordable, affordable);
+    }
+
+    // Board-button attention wiggle: one scheduled item per button, stepped every WiggleStepMs;
+    // the first WiggleAngles.Length steps tilt (USS transitions the rotate), the rest of the cycle idles.
+    private static readonly float[] WiggleAngles = { 6f, -6f, 3f, 0f };
+    private const long WiggleStepMs = 80;
+    private const int WiggleCycleSteps = 62; // ~5s period
+
+    /// <summary>
+    /// Toggles a top-bar board badge (class "hiring-badge--visible") and, independently, the parent
+    /// button's periodic tilt wiggle. The wiggle's scheduled item lives in the badge's userData.
+    /// </summary>
+    public static void SetBoardBadge(VisualElement badge, bool visible, bool wiggle)
+    {
+        if (badge == null)
+            return;
+
+        badge.EnableInClassList("hiring-badge--visible", visible);
+        VisualElement button = badge.parent;
+
+        if (badge.userData is not IVisualElementScheduledItem wiggleItem)
+        {
+            if (!wiggle)
+                return;
+            int step = 0;
+            badge.userData = button.schedule.Execute(() =>
+            {
+                if (step < WiggleAngles.Length)
+                    button.style.rotate = new Rotate(Angle.Degrees(WiggleAngles[step]));
+                step = (step + 1) % WiggleCycleSteps;
+            }).Every(WiggleStepMs);
+            return;
+        }
+
+        if (wiggle == wiggleItem.isActive)
+            return;
+        if (wiggle)
+        {
+            wiggleItem.Resume();
+        }
+        else
+        {
+            wiggleItem.Pause();
+            button.style.rotate = StyleKeyword.Null;
+        }
     }
 
     // ═════════════════════════════════════════════
