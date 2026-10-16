@@ -29,6 +29,9 @@ public static class AnimHash
     
     // ===== CUSTOMER PARAMETERS =====
     public static readonly int Carry = Animator.StringToHash("Carry");
+    public static readonly int Browse = Animator.StringToHash("Browse");
+    public static readonly int Pay = Animator.StringToHash("Pay");
+    public static readonly int Upset = Animator.StringToHash("Upset");
 
     // ===== STATE BOOLS (Optional - if using bool parameters instead of state machine) =====
     public static readonly int IsIdle = Animator.StringToHash("IsIdle");

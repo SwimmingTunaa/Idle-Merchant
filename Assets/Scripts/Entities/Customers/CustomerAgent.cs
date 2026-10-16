@@ -172,8 +172,28 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         ChangeState(CustomerState.Leaving);
     }
 
+    // Drives the Browse / Pay / Upset animator bools; called with on=true on enter, false on exit.
+    private void SetStateAnimBool(CustomerState state, bool on)
+    {
+        if (animator == null) return;
+        switch (state)
+        {
+            case CustomerState.Wander:
+            case CustomerState.Idle:
+                animator.SetBool(AnimHash.Browse, on);
+                break;
+            case CustomerState.Buying:
+                animator.SetBool(AnimHash.Pay, on);
+                break;
+            case CustomerState.Leaving:
+                animator.SetBool(AnimHash.Upset, on && walkoutReason != WalkoutReason.None);
+                break;
+        }
+    }
+
     protected override void OnEnterState(CustomerState newState)
     {
+        SetStateAnimBool(newState, true);
         switch (newState)
         {
             case CustomerState.Idle:
@@ -378,6 +398,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
 
     protected override void OnExitState(CustomerState oldState)
     {
+        SetStateAnimBool(oldState, false);
         if (oldState == CustomerState.Wander)
             Stats.Mediator.RemoveModifier(WanderSpeedModifierId);
     }
