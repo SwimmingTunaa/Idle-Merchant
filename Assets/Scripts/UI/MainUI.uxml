@@ -10,11 +10,11 @@
     <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button"/>
     <ui:VisualElement name="main-root" class="main-ui-root">
         <ui:Instance template="TopNavigation" name="TopNavigation"/>
-        <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
         <ui:VisualElement name="body" class="game-view-area" style="flex-grow: 1;">
             <ui:Instance template="HirePanel" name="HirePanel" style="display: none;"/>
             <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1; display: none;"/>
             <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;"/>
         </ui:VisualElement>
+        <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
     </ui:VisualElement>
 </ui:UXML>

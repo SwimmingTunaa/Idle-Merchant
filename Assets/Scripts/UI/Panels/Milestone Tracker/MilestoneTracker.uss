@@ -12,6 +12,9 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--space-xs) var(--space-md);
+    /* kill the ui:Button default gray that shows through the sprite's transparent corners */
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
     background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Box.png?fileID=2800000&guid=b1a09ce780a154f14af9ecb3b7d86965&type=3#Box");
     -unity-slice-left: 5;
     -unity-slice-right: 5;
@@ -35,17 +38,24 @@
 
 .mt-star-label {
     color: var(--color-text-strong);
-    margin-right: var(--space-sm);
+    margin: 0 var(--space-sm) 0 0;
+    padding: 0;
 }
 
 .mt-count-label {
     color: var(--color-text-primary);
     -unity-font-style: bold;
+    margin: 0;
+    padding: 0;
 }
 
 .mt-chevron {
-    color: var(--color-text-strong);
-    font-size: 12px;
+    width: 33px;
+    height: 21px;
+    margin: 0;
+    padding: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/chevron-up.png?fileID=21300000&guid=b941cbb03276441e1875e0e9cf9b35bc&type=3#chevron-up");
+    -unity-background-scale-mode: scale-to-fit;
     transition-property: rotate;
     transition-duration: var(--transition-normal);
 }
@@ -72,8 +82,21 @@
     -unity-font-definition: var(--font-body);
 }
 
+/* Clip whose height MilestoneTracker animates (0 ↔ scroll height) — the "unroll". */
 .mt-body {
     overflow: hidden;
+}
+
+/* ~3.5 cards at the 1920×1200 reference; the half-card peek invites scrolling.
+   Absolute so it keeps its natural height while the clip is shorter (a flex child would be squashed to it). */
+.mt-scroll {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-height: 580px;
+    /* matches the vertical scroller's width so the cards centre under the header plank */
+    padding-left: 16px;
 }
 
 .mt-list {
@@ -81,13 +104,73 @@
     padding-top: var(--space-sm);
 }
 
+/* Rolled-up remainder of the parchment: rides the clip's bottom edge, overlapping the last visible card. */
+.mt-roll {
+    height: 40px;
+    margin: -10px -10px 0 -10px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/scroll-roll.png?fileID=21300000&guid=3096f7fa591547489b9720ec64371e03&type=3#scroll-roll");
+    -unity-slice-left: 6;
+    -unity-slice-right: 6;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
+    -unity-slice-scale: 5px;
+}
+
+/* collapsed: nothing to overlap, drop below the header instead of covering its text */
+.mt-roll--collapsed {
+    margin-top: -1px;
+}
+
+/* Scrollbar: wooden plank thumb, copied from BookPanel.uss (scoped to the tracker). */
+.mt-scroll .unity-scroller--vertical {
+    width: 16px;
+    margin-left: 4px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.mt-scroll .unity-scroller--vertical .unity-scroller__low-button,
+.mt-scroll .unity-scroller--vertical .unity-scroller__high-button {
+    display: none;
+}
+
+.mt-scroll .unity-scroller--vertical .unity-scroller__slider {
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 16px;
+    min-width: 16px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.mt-scroll .unity-scroller--vertical .unity-base-slider__tracker {
+    background-color: rgba(101, 67, 33, 0.14);
+    border-width: 0;
+    border-radius: 0;
+}
+
+.mt-scroll .unity-scroller--vertical .unity-base-slider__dragger {
+    width: 12px;
+    left: 2px;
+    background-color: rgb(139, 90, 60);
+    border-color: rgb(101, 67, 33);
+    border-width: 2px;
+    border-radius: 0;
+}
+
+.mt-scroll .unity-scroller--vertical .unity-base-slider__dragger:hover {
+    background-color: rgb(155, 112, 72);
+}
+
 /* ── Torn-paper milestone card (card-torn.png 9-slice is inline in MilestoneCard.uxml) ── */
 
 .mt-card {
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
     margin-bottom: var(--space-sm);
-    padding: 14px;
+    /* sprite is asymmetric (chip band top, shadow bottom) — padding centres the content between the visible paper edges */
+    padding: 17px 14px 24px;
 }
 
 .mt-card--claimable {
@@ -123,6 +206,8 @@
 .mt-card-info {
     flex-grow: 1;
     flex-shrink: 1;
+    /* breathing room so the bar doesn't touch the paper's right edge */
+    margin-right: 8px;
 }
 
 .mt-card-name {
@@ -130,6 +215,9 @@
     white-space: normal;
     color: var(--color-text-strong);
     -unity-font-definition: var(--font-body);
+    /* Unity labels ship default margins/padding — zero them, gaps are set explicitly below */
+    margin: 0;
+    padding: 0;
 }
 
 .mt-card-desc {
@@ -137,10 +225,12 @@
     white-space: normal;
     color: var(--color-text-primary);
     -unity-font-definition: var(--font-body);
+    margin: 2px 0 0 0;
+    padding: 0;
 }
 
 .mt-card-bar.progress-track {
-    margin-top: 6px;
+    margin-top: 8px;
     height: 20px;
     background-color: var(--primary-200);
     border-width: 2px;
@@ -164,7 +254,7 @@
 .mt-card-reward {
     flex-direction: row;
     align-items: center;
-    margin-top: 6px;
+    margin-top: 3px;
 }
 
 .mt-card-reward-coin {
@@ -178,18 +268,21 @@
     font-size: 16px;
     color: var(--color-text-primary);
     -unity-font-definition: var(--font-body);
+    margin: 0;
+    padding: 0;
 }
 
 .mt-card--claimable .mt-card-reward {
     display: none;
 }
 
-/* Gold claim button (Button.uss .btn-gold) — only while claimable */
+/* Green claim button (Button.uss .btn-success) — only while claimable */
 .mt-card-claim {
     display: none;
-    width: 100%;
     height: 48px;
-    margin: 10px 0 0 0;
+    /* width from auto stretch minus the same 8px right inset the bar keeps */
+    align-self: stretch;
+    margin: 10px 8px 0 0;
     padding: 3px 10px 9px 10px;
     font-size: 28px;
     flex-shrink: 0;

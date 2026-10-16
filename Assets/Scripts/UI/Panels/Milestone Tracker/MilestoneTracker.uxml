@@ -8,11 +8,14 @@
                 <ui:Label name="mt-star-label" text="Progress" class="mt-star-label text-lg" />
                 <ui:Label name="mt-count-label" text="0/4" class="mt-count-label text-small" />
             </ui:VisualElement>
-            <ui:Label name="mt-chevron" text="▲" class="mt-chevron" />
+            <ui:Label name="mt-chevron" text="" class="mt-chevron" />
             <ui:Label name="mt-claim-badge" text="0" picking-mode="Ignore" class="hiring-badge mt-claim-badge" />
         </ui:Button>
         <ui:VisualElement name="mt-body" class="mt-body">
-            <ui:VisualElement name="mt-list" class="mt-list" />
+            <ui:ScrollView name="mt-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden" class="mt-scroll">
+                <ui:VisualElement name="mt-list" class="mt-list" />
+            </ui:ScrollView>
         </ui:VisualElement>
+        <ui:VisualElement name="mt-roll" picking-mode="Ignore" class="mt-roll" />
     </ui:VisualElement>
 </ui:UXML>

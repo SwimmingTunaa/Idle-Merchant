@@ -232,15 +232,18 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     public int ClaimableCount => reachedMilestones.Count - claimedMilestones.Count;
 
     /// <summary>
-    /// Claim a reached milestone: pays goldReward as a coin burst from coinOrigin (world) to the gold
-    /// counter, grants its unlock reward, then awards the star once every milestone of the tier is claimed.
+    /// Claim a reached milestone: pays goldReward as a coin flight to the gold counter, grants its unlock
+    /// reward, then awards the star once every milestone of the tier is claimed.
+    /// uiCoinFlight(coins, onEachArrival) runs the UI-layer shower; it returns false (having called nothing)
+    /// when it can't, and the world burst from coinOrigin takes over.
     /// </summary>
-    public bool TryClaimMilestone(StarMilestoneDef milestone, Vector3 coinOrigin)
+    public bool TryClaimMilestone(StarMilestoneDef milestone, Vector3 coinOrigin,
+        System.Func<int, System.Action, bool> uiCoinFlight = null)
     {
         if (!IsMilestoneReached(milestone) || !claimedMilestones.Add(milestone))
             return false;
 
-        PayMilestoneGold(milestone.goldReward, coinOrigin);
+        PayMilestoneGold(milestone.goldReward, coinOrigin, uiCoinFlight);
         GrantMilestoneReward(milestone);
         GameSignals.RaiseMilestoneClaimed(milestone);
 
@@ -254,22 +257,22 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         return true;
     }
 
-    // Gold banks as the coins land (house rule); every no-VFX path banks directly.
-    private static void PayMilestoneGold(int amount, Vector3 from)
+    // Gold banks as the coins land (house rule): UI shower → world burst → direct, every path banks in full.
+    private static void PayMilestoneGold(int amount, Vector3 from, System.Func<int, System.Action, bool> uiCoinFlight)
     {
         if (amount <= 0) return;
-        if (ItemExplosionVFX.Instance == null)
-        {
-            Inventory.Instance.AddGold(amount);
-            return;
-        }
 
-        int coins = Mathf.Clamp(amount / 100, 5, 15);
+        int coins = Mathf.Clamp(amount / 25, 14, 36);
         int share = amount / coins;
         int left = coins;
         // Last coin to land carries the remainder, so the total is exact whatever the arrival order
-        ItemExplosionVFX.Instance.SpawnExplosion(null, from, coins, coins,
-            onEachArrival: () => Inventory.Instance.AddGold(--left == 0 ? amount - share * (coins - 1) : share));
+        System.Action land = () => Inventory.Instance.AddGold(--left == 0 ? amount - share * (coins - 1) : share);
+
+        if (uiCoinFlight != null && uiCoinFlight(coins, land)) return;
+        if (ItemExplosionVFX.Instance != null)
+            ItemExplosionVFX.Instance.SpawnExplosion(null, from, coins, coins, onEachArrival: land);
+        else
+            Inventory.Instance.AddGold(amount);
     }
 
     /// <summary>Debug: flag a milestone reached without grinding its counter.</summary>
