@@ -131,6 +131,8 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/UI/AnimatedNumberUITK.cs` | Lerped count-up for the gold label |
 | `Scripts/Effects/ClickHitVFX.cs` | Click juice: hit sparks, kill blow + hit-stop, squash, vacuum/shock rings (code-driven ParticleSystems, Emit-only) |
 | `Scripts/UI/Panels/Cursor/CursorUpgradePage.cs` | Book Cursor page — clones `CursorUpgradeCard.uxml` per upgrade, binds via closures |
+| `Scripts/Managers/SaveManager.cs` | Single-slot save (`SaveData` DTO, Newtonsoft JSON, atomic .tmp/.bak writes, 30 s autosave), cold-boot restore, offline rates + award; design in `SAVE_DESIGN.md` |
+| `Scripts/UI/Panels/Welcome Back/WelcomeBackPanel.cs` | "While you were away" panel — display only, `SaveManager` banks on Collect |
 
 ---
 
@@ -159,6 +161,11 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **Overlay VFX sorting** — `EntitySortingManager` assigns entities orders 2000–8000; screen-feedback particles/markers that must draw over them use order 10000+
 - **Body font via token** — `--font-body` in `GlobalVariables.uss` (currently Ithaca); never hardcode a body-font url in USS. Inline UXML styles can't use `var()`, so the few inline font urls (Inventory, Candidate) need manual updates on a font change
 - **Clicker upgrade ladders live on `ClickerManager`** — cost/level formulas in code, levels serialized; all purchases raise `OnClickUpgradePurchased` (UI + board badge refresh off it). Game Debugger → Economy has free level set/bump controls
+- **New persistent state goes in `SaveData`** — add a chunk to the DTO, fill it in `SaveManager.Collect`, restore it in `ApplyEarly`/`ApplyLate`, then re-raise the existing `GameSignals` so UI rebuilds (no new "loaded" events, no per-component ISaveable). Game Debugger → Save has Save Now / Load / Wipe / Simulate Away
+- **ScriptableObject asset names are save keys** — items, milestones, guild upgrades and unit `EntityDef`s are saved by `.name`; renaming one orphans it in existing saves (not restored; only items log an error)
+- **Offline rates count passive income only** — customer sales (`OnItemSold`) and porter deliveries (`RecordPorterDelivery`); clicks, milestone claims and debug gold never count. A new income source must decide explicitly whether it's passive
+- **Gold in flight rides the save** — gold that's committed but still animating (offline Collect shower) is tracked in `goldInFlight` and saved as banked, decremented per coin on arrival; follow that pattern for any new delayed-bank flow
+- **`lastPlayedUtc` means "collected up to", not "last seen"** — while a welcome-back award is unclaimed it's saved as `now − pendingAway` and rates freeze, so quitting on the panel re-offers the identical award; don't "fix" it to `UtcNow`
 
 ---
 

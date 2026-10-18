@@ -122,7 +122,7 @@ Click mobs/loot → Earn Gold → Hire Units / Buy Upgrades → Unlock Stars →
 ```
 
 ### 3.4 Idle Behaviour
-When the player is away, all loops continue:
+When the player is away but the game is running, all loops continue (a closed game earns offline instead — see 10.5):
 - Adventurers fight, die, revive, and accumulate XP automatically
 - Porters collect and deposit loot automatically
 - Customers arrive, buy, and leave automatically
@@ -270,6 +270,7 @@ Idle → Wander → Seek (loot) → PickUp → Return → Travel (climb) → Dep
 - Travels to `TransportPoint`, plays climb animation during vertical transit
 - Deposits carried loot to `Inventory`
 - Returns to layer and repeats
+- **Carry display (implemented):** up to 5 item icons stack above the porter's head, one per carried stack; on deposit they fly into the shop's loot pile (6.3)
 
 **Stats:**
 
@@ -512,6 +513,7 @@ The shop is the gold-generation endpoint of the pipeline. Loot flows in from por
 - **Counter**: Where sales happen. `SalesManager.TrySellItem()` validates stock, removes the item from inventory, and adds gold.
 - **SalesManager** tracks which items are "marked for sale" and calculates available quantity (total − reserved − allocated to waiting customers).
 - **Shopkeeper**: The counter is always staffed by the player's avatar. No staffing mechanic — the counter is never unstaffed.
+- **Loot pile (implemented)**: shop stock is shown as a physical heap in an open bin behind the shopkeeper (capped at 16 sprites, a mix of the stocked item types). Porter deposits and vacuumed loot fly into it; each sale hops an icon from the pile to the counter — stock level is readable at a glance.
 
 ### 6.4 Customer Spawn System
 
@@ -626,7 +628,7 @@ Progression is measured in **stars** (1★ to 5★). Stars gate layer unlocks an
 | 4★ | Layers 6–7 | Star rewards |
 | 5★ | Layers 8–10 | Star rewards (max progression) |
 
-To earn a star, the player must complete **all milestones** for the next star level.
+To earn a star, the player must complete **and claim** all milestones for the next star level (see 8.3).
 
 ### 8.2 Milestones
 
@@ -659,7 +661,11 @@ Milestones are tracked progress gates tied to in-game events. Each milestone has
 
 ### 8.3 Milestone Rewards
 
-Each milestone has an associated `MilestoneRewardDef`. Reward types include:
+**Claiming (implemented):** reaching a milestone's target makes it **claimable** rather than completing it. The player presses Claim (HUD tracker or the Guild page in the Book); only then does it pay out and count toward the next star. Every milestone pays a **gold reward** (`goldReward`, ~100–300g at 1★ scaling to 500K at 5★), flown as a coin shower from the Claim button to the gold counter — gold banks per coin on arrival and every failure path banks directly. Unlock rewards (below) also grant at claim time.
+
+**Milestone tracker (implemented):** a torn-paper card list on the HUD, under the gold counter, sorted claimable > in progress > claimed, each card showing progress / gold Claim button / claimed state. The header badges and wiggles while anything is claimable. The Book's Guild page lists the same milestones with the same three states (and claims from there too), beside the guild upgrade cards (buy button, "Requires N-star" lock, or Owned).
+
+Each milestone also has an associated `MilestoneRewardDef`. Reward types include:
 - **Unlock upgrade** — make a `GuildUpgradeDef` available for purchase
 - **Grant upgrade** — apply a `GuildUpgradeDef` for free
 - **Unlock feature** — enable a game system (crafting station, etc.)
@@ -724,6 +730,8 @@ Gold is the sole currency. All operations flow through `Inventory.Instance`.
 **Income sources:**
 - Counter sales (primary) — customer buys item, gold added
 - Clicker income — manual tapping for small fractional gold amounts
+- Milestone claims — one-off gold rewards (8.3)
+- Offline earnings — collected on return (10.5)
 
 **Spending:**
 - Hiring units (cost varies by rank + traits, ×1.25 per unit of that role already owned)
@@ -759,7 +767,13 @@ Each customer has a randomly determined budget (`CustomerDef.budgetRange`, e.g. 
 
 ### 10.5 Idle Accumulation
 
-While offline, the loop continues at normal speed (no catch-up multiplier in current design). Gold accumulates, milestones tick, loot builds up in inventory, adventurers accumulate XP. The player returns to see meaningful progress — and possibly a promotion waiting.
+While the game is running, the loop continues on its own (3.4). While it's **closed**, nothing is simulated — the guild is paid from rates measured during play (implemented; full design in `SAVE_DESIGN.md`):
+
+- **Autosave:** every 30s, on pause/focus loss and on quit — no Save button. One local slot. What persists: gold, shop stock, stars, milestone reached/claimed state, lifetime counters, clicker ladder levels, owned guild upgrades, game speed, and the full roster (identity, appearance, traits, rank, level/XP, assigned layer). Loot on the floor or in porters' arms banks into stock on save. Not persisted: hire pools (fresh candidates on return), customers, mobs, VFX.
+- **Passive rates:** while playing, the game keeps rolling ~10-minute averages of gold/min and loot/min — **customer sales and porter deliveries only**. Clicks, milestone claims and debug gold never count, and the rate reads zero unless at least one adventurer and one porter are employed: clicking isn't passive income. Measured on game time, so a 3× session doesn't earn 3× offline.
+- **Offline award:** away time (capped at **8 hours**) × rate × **50%** efficiency, for both gold and items. Items split across what the unlocked layers' mobs drop, weighted by drop rates. Crafting does not run offline (v1).
+- **Welcome back:** if away more than 2 minutes, a parchment panel shows time away, gold earned and the top 3 items ("+ N more"). Nothing banks until the big **Collect** button: gold flies as a coin shower to the counter, items fly into the loot pile. Quitting on the panel — or mid-shower — re-offers the same award next launch; nothing is lost or doubled.
+- **Future knobs:** upgradeable cap ("Night Shift") and efficiency, offline events.
 
 ---
 
@@ -943,8 +957,9 @@ All panels use **Unity UI Toolkit** (UXML/USS). Panels are orchestrated by `UIMa
 - **Cursor Page (Book tab 6)** — cursor stats on the left page, upgrade cards on the right: template-cloned torn-paper cards (icon, name, current ➜ next in green, full-width price button with trailing coin), star-gated cards swap a lock pill for the buy button when unlocked
 - **Hiring Panel** — tabs per unit type, candidate cards, layer selector; hiring badge refreshes with the candidate pool
 - **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met); right-page detail panel aligned to Figma, selecting a unit outlines them in-world and locks the camera to them
-- **Progression Panel** — milestone tracker, star progress
-- **Upgrade Panel** — available upgrades, cost display
+- **Milestone Tracker (HUD)** — torn-paper milestone cards under the gold counter with Claim buttons (see 8.3)
+- **Guild Page (Book)** — star progress, claimable milestone list, guild upgrade cards
+- **Welcome Back** — offline earnings summary + Collect, shown on launch after >2 min away (see 10.5)
 - **Crafting Panel** — recipe list, input/output display, reserve settings
 - **Inventory Panel** — item counts by category
 
@@ -1186,6 +1201,11 @@ At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be e
 ### 18.9 Singleton Pattern
 - Persistent cross-scene managers use `PersistentSingleton<T>`
 - Access: `GameManager.Instance`, `UnitManager.Instance`, `Inventory.Instance`, etc.
+
+### 18.10 Save System
+- `SaveManager` collects one `SaveData` DTO from each manager; new persistent state adds its chunk there and restores by re-raising the existing `GameSignals`
+- ScriptableObject asset names are save keys — renaming a milestone, item, upgrade or unit def orphans it in existing saves
+- New income sources must decide whether they count toward the offline rate (only sales + porter deliveries do today)
 
 ---
 
