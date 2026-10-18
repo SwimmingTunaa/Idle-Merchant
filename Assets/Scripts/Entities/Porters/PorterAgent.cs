@@ -554,6 +554,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
     // ===== QUERIES =====
 
     public int GetCarriedCount() => carriedLoot.Count;
+    public IReadOnlyList<ResourceStack> CarriedLoot => carriedLoot;
     public int GetCarryCapacity() => (int)Stats.CarryCapacity;
     public bool IsFull() => carriedLoot.Count >= (int)Stats.CarryCapacity;
     public bool IsCarryingLoot() => carriedLoot.Count > 0;

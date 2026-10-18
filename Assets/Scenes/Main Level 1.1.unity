@@ -26766,6 +26766,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2cd89fb9cf7e74c8caf040491331ca54, type: 3}
+--- !u!1 &1293385178
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1293385180}
+  - component: {fileID: 1293385179}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1293385179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293385178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 130af07c364984dc0bbe6674f429a890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SaveManager
+  showDebugLogs: 0
+--- !u!4 &1293385180
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293385178}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1293809159
 GameObject:
   m_ObjectHideFlags: 0
@@ -28995,6 +29040,8 @@ MonoBehaviour:
   cardTemplate: {fileID: 9197481963319205126, guid: b0c987ef044b5401b9925f2c249d41b0, type: 3}
   refreshInterval: 1
   startExpanded: 1
+  coinFlightTime: 0.65
+  coinStagger: 0.04
   showDebugLogs: 0
 --- !u!1 &1446923804
 GameObject:
@@ -48317,3 +48364,4 @@ SceneRoots:
   - {fileID: 1933190338}
   - {fileID: 1433364563}
   - {fileID: 1685740137}
+  - {fileID: 1293385180}

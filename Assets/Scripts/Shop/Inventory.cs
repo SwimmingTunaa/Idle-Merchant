@@ -126,6 +126,13 @@ public class Inventory : PersistentSingleton<Inventory>
     /// </summary>
     public int Gold => gold.Int;
 
+    /// <summary>Load path only: sets the balance without OnGoldEarned (lifetime counters are restored, not re-earned).</summary>
+    public void SetGoldFromSave(int amount)
+    {
+        gold.Set(amount);
+        GameSignals.RaiseGoldChanged(gold.Int);
+    }
+
     /// <summary>
     /// NEW: Check if player can afford a specific cost.
     /// Read-only check with no side effects.

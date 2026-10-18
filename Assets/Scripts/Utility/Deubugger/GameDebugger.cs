@@ -10,7 +10,7 @@ using System.Linq;
 /// </summary>
 public class GameDebugger : EditorWindow
 {
-    private enum DebugTab { Economy, Inventory, Spawning, Crafting, Progression, TimeControl, Settings }
+    private enum DebugTab { Economy, Inventory, Spawning, Crafting, Progression, TimeControl, Settings, Save }
     private DebugTab currentTab = DebugTab.Economy;
 
     // Economy
@@ -93,6 +93,9 @@ public class GameDebugger : EditorWindow
                 break;
             case DebugTab.Settings:
                 DrawSettingsTab();
+                break;
+            case DebugTab.Save:
+                DrawSaveTab();
                 break;
         }
         
@@ -776,6 +779,45 @@ public class GameDebugger : EditorWindow
         GUI.enabled = true;
     }
 
+    // ===== SAVE TAB =====
+
+    const string ReenterPlayKey = "GameDebugger.ReenterPlay";
+
+    void DrawSaveTab()
+    {
+        GUILayout.Label("Save System", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("File:", SaveManager.SavePath);
+        EditorGUILayout.LabelField("Exists:", System.IO.File.Exists(SaveManager.SavePath)
+            ? $"yes ({System.IO.File.GetLastWriteTime(SaveManager.SavePath):HH:mm:ss}), bak: {System.IO.File.Exists(SaveManager.SavePath + ".bak")}"
+            : "no");
+        EditorGUILayout.Space(5);
+
+        GUI.enabled = Application.isPlaying && SaveManager.Instance != null;
+        if (GUILayout.Button("Save Now", GUILayout.Height(30)))
+            SaveManager.Instance.Save();
+
+        // Load is a cold boot by design: restart play mode without the quit-save so the file on disk loads.
+        if (GUILayout.Button("Load (restart play mode from file)", GUILayout.Height(30)))
+        {
+            SaveManager.Instance.SuspendSaving();
+            RestartPlayMode();
+        }
+        GUI.enabled = true;
+
+        if (GUILayout.Button("Wipe Save", GUILayout.Height(30)) &&
+            EditorUtility.DisplayDialog("Wipe Save", "Delete save.json and save.json.bak? This cannot be undone.", "Wipe", "Cancel"))
+        {
+            SaveManager.WipeSaveFiles();
+            if (Application.isPlaying) RestartPlayMode();
+        }
+    }
+
+    static void RestartPlayMode()
+    {
+        SessionState.SetBool(ReenterPlayKey, true);
+        EditorApplication.ExitPlaymode();
+    }
+
     // ===== UTILITY METHODS =====
 
     void LoadSettings()
@@ -928,6 +970,12 @@ public class GameDebugger : EditorWindow
 
     static void OnPlayModeStateChanged(PlayModeStateChange state)
     {
+        if (state == PlayModeStateChange.EnteredEditMode && SessionState.GetBool(ReenterPlayKey, false))
+        {
+            SessionState.EraseBool(ReenterPlayKey);
+            EditorApplication.EnterPlaymode();
+        }
+
         if (state == PlayModeStateChange.EnteredPlayMode)
         {
             var guids = AssetDatabase.FindAssets("t:GameDebugSettings");

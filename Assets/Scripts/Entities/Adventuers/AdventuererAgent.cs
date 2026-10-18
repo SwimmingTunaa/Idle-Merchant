@@ -584,6 +584,34 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         int cost = adventurerDef.PromoteCost(currentRank);
         if (Inventory.Instance == null || !Inventory.Instance.TrySpendGold(cost)) return false;
 
+        int prevRank = currentRank;
+        AdvanceRank();
+        GameSignals.RaiseAdventurerPromoted(this, AdventurerRank.Name(prevRank), AdventurerRank.Name(currentRank));
+        return true;
+    }
+
+    /// <summary>
+    /// Load path: replays level-ups and promotions up to the saved rank/level so every stat bonus is
+    /// re-applied exactly as earned — no gold, no signals. Call right after spawn (Init resets to Wood I).
+    /// </summary>
+    public void RestoreProgress(int rank, int level, float xp)
+    {
+        if (adventurerDef == null) return;
+        rank = Mathf.Clamp(rank, 1, adventurerDef.maxRank);
+        level = Mathf.Clamp(level, 1, adventurerDef.levelsPerRank);
+
+        while (currentRank < rank)
+        {
+            while (currentLevel < adventurerDef.levelsPerRank) { currentLevel++; ApplyLevelBonus(); }
+            AdvanceRank();
+        }
+        while (currentLevel < level) { currentLevel++; ApplyLevelBonus(); }
+        currentXP = xp;
+    }
+
+    // Rank transition bonuses + reset to level 1 (shared by Promote and RestoreProgress).
+    private void AdvanceRank()
+    {
         // Permanent damage bonus — ID range 1001–1004 (one per rank transition)
         Stats.Mediator.AddModifier(new BasicStatModifier(
             StatType.AttackDamage,
@@ -601,18 +629,17 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         ));
 
         // Max HP bonus applied directly to Health (Health is decoupled from Stats)
-        float hpRatio = health.HealthPercent;
-        float newMaxHP = health.MaxHP * (1f + adventurerDef.rankHPMultiplier);
-        health.Init(newMaxHP, fullHP: false);
-        health.SetHP(newMaxHP * hpRatio);
+        if (health != null)
+        {
+            float hpRatio = health.HealthPercent;
+            float newMaxHP = health.MaxHP * (1f + adventurerDef.rankHPMultiplier);
+            health.Init(newMaxHP, fullHP: false);
+            health.SetHP(newMaxHP * hpRatio);
+        }
 
-        int prevRank = currentRank;
         currentRank++;
         currentLevel = 1;
         currentXP = 0f;
-
-        GameSignals.RaiseAdventurerPromoted(this, AdventurerRank.Name(prevRank), AdventurerRank.Name(currentRank));
-        return true;
     }
 
     /// <summary>Subscribed to combat.OnDamageDealt — awards XP on kill.</summary>

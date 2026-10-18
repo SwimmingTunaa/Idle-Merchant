@@ -17,6 +17,8 @@ public class GameManager : PersistentSingleton<GameManager>
     private float previousTimeScale = 1f;
     private bool IsPaused {get; set;}
     public float CurrentTimeScale => Time.timeScale;
+    /// <summary>Player's chosen speed (1x/2x/3x), unaffected by pause or hit-stop. Saved as a setting.</summary>
+    public float GameSpeed => previousTimeScale;
 
     private void OnDestroy()
     {

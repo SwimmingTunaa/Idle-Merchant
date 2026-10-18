@@ -239,22 +239,29 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         }
 
         var candidate = candidates[0];
-        T unit = SpawnUnitWithCandidate(candidate);
-
-        if (unit == null)
+        if (SpawnFromData(candidate) == null)
         {
             Debug.LogError($"[{GetType().Name}] DebugHireUnit: SpawnUnitWithCandidate failed for {def.displayName}");
             return false;
         }
 
-        if (!spawnedByType.ContainsKey(def))
-            spawnedByType[def] = new List<T>();
-        spawnedByType[def].Add(unit);
-
         Debug.Log($"[{GetType().Name}] DebugHireUnit: Spawned {candidate.DisplayName} on layer {LayerIndex}");
         return true;
     }
 #endif
+
+    // Spawn + track from existing data (save load, debug): no gold, no capacity check, no OnUnitHired
+    // (lifetime hire counters are restored by the save, not re-earned). Identity/traits applied as given.
+    public T SpawnFromData(HiringCandidate candidate)
+    {
+        T unit = SpawnUnitWithCandidate(candidate);
+        if (unit == null) return null;
+
+        if (!spawnedByType.TryGetValue(candidate.entityDef, out var list))
+            spawnedByType[candidate.entityDef] = list = new List<T>();
+        list.Add(unit);
+        return unit;
+    }
 
     // Remove a specific unit.
     public virtual void RemoveUnit(T unit)

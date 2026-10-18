@@ -40,7 +40,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private HashSet<GuildUpgradeDef> ownedUpgrades = new HashSet<GuildUpgradeDef>();
     // Track which upgrades are available for purchase (not yet owned)
     private HashSet<GuildUpgradeDef> availableUpgrades = new HashSet<GuildUpgradeDef>();
-    // Reached = target hit (claimable); claimed ⊆ reached. Runtime only — no save system yet.
+    // Reached = target hit (claimable); claimed ⊆ reached. Persisted by SaveManager (ToSave/LoadFrom).
     private HashSet<StarMilestoneDef> reachedMilestones = new HashSet<StarMilestoneDef>();
     private HashSet<StarMilestoneDef> claimedMilestones = new HashSet<StarMilestoneDef>();
 
@@ -853,6 +853,82 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
                 Debug.Log($"  {kvp.Key}: {kvp.Value.Count} items");
             }
         }
+    }
+
+    // ===== SAVE / LOAD =====
+    // SO references persist as asset names (renaming an asset orphans it in old saves).
+
+    public ProgressionSave ToSave() => new ProgressionSave
+    {
+        stars = currentStars,
+        maxUnlockedLayer = maxUnlockedLayer,
+        goldEarned = totalGoldEarned,
+        mobsKilled = totalMobsKilled,
+        unitsHired = totalUnitsHired,
+        adventurersHired = totalAdventurersHired,
+        portersHired = totalPortersHired,
+        lootCollected = totalLootCollected,
+        itemsCrafted = totalItemsCrafted,
+        craftedItemsSold = totalCraftedItemsSold,
+        customersServed = totalCustomersServed,
+        adventurersRankedUp = totalAdventurersRankedUp,
+        craftedItemTypes = craftedItemDefs.Where(d => d != null).Select(d => d.name).ToList(),
+        reachedMilestones = reachedMilestones.Where(m => m != null).Select(m => m.name).ToList(),
+        claimedMilestones = claimedMilestones.Where(m => m != null).Select(m => m.name).ToList(),
+    };
+
+    public List<string> OwnedUpgradeNames() => ownedUpgrades.Where(u => u != null).Select(u => u.name).ToList();
+
+    /// <summary>
+    /// Cold-boot restore (SaveManager, before other Starts so activators and UI build from it).
+    /// Purchasable upgrades are re-derived from the star rewards already earned; no events fire here.
+    /// </summary>
+    public void LoadFrom(ProgressionSave p, List<string> ownedUpgradeNames)
+    {
+        currentStars = p.stars;
+        maxUnlockedLayer = p.maxUnlockedLayer;
+        totalGoldEarned = p.goldEarned;
+        totalMobsKilled = p.mobsKilled;
+        totalUnitsHired = p.unitsHired;
+        totalAdventurersHired = p.adventurersHired;
+        totalPortersHired = p.portersHired;
+        totalLootCollected = p.lootCollected;
+        totalItemsCrafted = p.itemsCrafted;
+        totalCraftedItemsSold = p.craftedItemsSold;
+        totalCustomersServed = p.customersServed;
+        totalAdventurersRankedUp = p.adventurersRankedUp;
+
+        craftedItemDefs.Clear();
+        var items = SaveManager.ItemsByName();
+        foreach (var name in p.craftedItemTypes)
+            if (items.TryGetValue(name, out var item)) craftedItemDefs.Add(item);
+        reachedMilestones = new HashSet<StarMilestoneDef>(allMilestones.Where(m => p.reachedMilestones.Contains(m.name)));
+        claimedMilestones = new HashSet<StarMilestoneDef>(allMilestones.Where(m => p.claimedMilestones.Contains(m.name)));
+        ownedUpgrades = new HashSet<GuildUpgradeDef>(
+            Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades").Where(u => ownedUpgradeNames.Contains(u.name)));
+
+        availableUpgrades.Clear();
+        foreach (var reward in starRewards)
+            if (reward != null && reward.starLevel <= currentStars && reward.upgradesAvailableForPurchase != null)
+                availableUpgrades.UnionWith(reward.upgradesAvailableForPurchase.Where(u => u != null));
+
+        RebuildAvailableItemsCache();
+        milestoneCheckPending = true;
+    }
+
+    /// <summary>Re-enables recipes unlocked by earned stars and claimed milestones.
+    /// Runs after CraftingManager.Start (EnableRecipe needs its inventory ref).</summary>
+    public void EnableUnlockedRecipes()
+    {
+        if (CraftingManager.Instance == null) return;
+        foreach (var reward in starRewards)
+            if (reward != null && reward.starLevel <= currentStars && reward.recipesUnlocked != null)
+                foreach (var recipe in reward.recipesUnlocked)
+                    if (recipe != null) CraftingManager.Instance.EnableRecipe(recipe);
+
+        foreach (var m in claimedMilestones)
+            if (m.reward != null && m.reward.rewardType == RewardType.UnlockRecipe && m.reward.recipeToUnlock != null)
+                CraftingManager.Instance.EnableRecipe(m.reward.recipeToUnlock);
     }
 
     // ===== DEBUG CONTEXT MENU =====

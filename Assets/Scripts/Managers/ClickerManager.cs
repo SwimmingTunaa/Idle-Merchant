@@ -182,6 +182,16 @@ public class ClickerManager : MonoBehaviour
         return true;
     }
 
+    /// <summary>Load path only: restores all five ladder levels (SaveManager raises the refresh signal).</summary>
+    public void RestoreLevels(int damage, int radius, int aoe, int autoClick, int autoCollect)
+    {
+        clickDamageLevel = damage;
+        pickupRadiusLevel = radius;
+        damageAOELevel = aoe;
+        autoClickLevel = autoClick;
+        autoCollectLevel = autoCollect;
+    }
+
     /// <summary>True while any cursor upgrade is purchasable with the given gold (drives the board badge).</summary>
     public bool AnyCursorUpgradeAffordable(int gold) =>
         gold >= ClickUpgradeCost
