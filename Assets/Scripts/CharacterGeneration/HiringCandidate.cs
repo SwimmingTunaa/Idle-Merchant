@@ -15,6 +15,7 @@ public struct HiringCandidate
     public int hireCost;
     public CharacterAppearanceIndices appearanceIndices;
     public string newspaperName;
+    public int startRank;          // >1: joins already promoted (Recruitment Favor); 0/1 = fresh recruit
     
     // Cached generated sprite (lazy-loaded)
     private Sprite _cachedShopSprite;

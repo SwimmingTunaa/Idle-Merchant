@@ -527,6 +527,89 @@ public class HireController : BasePanelController
     }
 
     // ═════════════════════════════════════════════
+    // SEAL SHOP (ContractManager)
+    // ═════════════════════════════════════════════
+
+    public bool CanGrantFavor => adventurerPools.Count > 0;
+
+    /// <summary>Recruitment Favor: a candidate of the highest unlocked def rank that joins promoted
+    /// (rank = guild stars + 1, min Bronze) and survives pool refreshes until hired.</summary>
+    // Regular pools regenerate on load; only unhired favors persist (SaveManager → ContractSave.favors).
+    public void GrantRecruitmentFavor()
+    {
+        CandidatePool best = null;
+        foreach (var p in adventurerPools)
+            if (best == null || p.EntityDef.rank > best.EntityDef.rank
+                || (p.EntityDef.rank == best.EntityDef.rank && p.LayerIndex > best.LayerIndex))
+                best = p;
+        if (best == null) return;
+
+        int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
+        int maxRank = best.EntityDef is AdventurerDef ad ? ad.maxRank : 5;
+        var c = best.AddFavored(Mathf.Clamp(stars + 1, 2, maxRank));
+        OnPoolsChanged();
+        if (showDebugLogs) Debug.Log($"[HirePanel] Recruitment Favor: {c.DisplayName} joins at rank {c.startRank}");
+    }
+
+    /// <summary>Unhired favors, one entry each. Hiring consumes them from the pool, so they drop out of the next save.</summary>
+    public List<FavorSave> FavorsToSave()
+    {
+        var list = new List<FavorSave>();
+        foreach (var p in adventurerPools)
+            foreach (var c in p.Favored)
+                list.Add(new FavorSave
+                {
+                    def = p.EntityDef.name, layer = p.LayerIndex, identity = c.identity, traits = c.traits,
+                    appearance = c.appearanceIndices, startRank = c.startRank, hireCost = c.hireCost,
+                    cursedCombo = c.cursedCombo != null ? c.cursedCombo.name : null,
+                });
+        return list;
+    }
+
+    /// <summary>Cold-boot restore (SaveManager.ApplyLate, after the layer signals so every saved pool exists).</summary>
+    public void RestoreFavors(List<FavorSave> favors)
+    {
+        foreach (var f in favors)
+        {
+            var pool = adventurerPools.Find(p => p.LayerIndex == f.layer && p.EntityDef.name == f.def);
+            if (pool == null)
+            {
+                Debug.LogError($"[HirePanel] No pool for saved favor '{f.identity?.DisplayName}' ({f.def}, layer {f.layer}) — dropped");
+                continue;
+            }
+            pool.AddFavored(new HiringCandidate
+            {
+                entityDef = pool.EntityDef, identity = f.identity, traits = f.traits,
+                appearanceIndices = f.appearance, startRank = f.startRank, hireCost = f.hireCost,
+                cursedCombo = f.cursedCombo != null ? CursedComboDatabase.GetAllCombos().Find(x => x.name == f.cursedCombo) : null,
+            });
+        }
+        if (favors.Count > 0) OnPoolsChanged();
+    }
+
+    /// <summary>Rush Order: every candidate pool restocks now (timers restart).</summary>
+    public void RefreshAllPools()
+    {
+        foreach (var pool in candidatePools.Values) pool.ForceRefresh();
+        OnPoolsChanged();
+    }
+
+    private void OnPoolsChanged()
+    {
+        affordPending = true;
+        if (State != PanelState.Open)
+        {
+            SetHiringBadge(true);
+            return;
+        }
+        if (isHireAnimating) return;
+        RebuildRosters();
+        ClampViewIndexToRoster();
+        BuildStack();
+        UpdateCount();
+    }
+
+    // ═════════════════════════════════════════════
     // ROSTER & STACK
     // ═════════════════════════════════════════════
 
@@ -536,6 +619,14 @@ public class HireController : BasePanelController
 
         adventurerRoster = HireRoster.BuildRoster(adventurerPools, rankWeights, maxRosterSize);
         porterRoster = HireRoster.BuildRoster(porterPools, rankWeights, maxRosterSize);
+
+        // Recruitment Favor candidates are guaranteed: pinned to the top of the stack, never left to the weighted draw
+        foreach (var pool in adventurerPools)
+            foreach (var c in pool.Favored)
+            {
+                adventurerRoster.Remove(c);
+                adventurerRoster.Insert(0, c);
+            }
 
         // Map candidates back to their pools for hire tracking
         foreach (var pool in adventurerPools)

@@ -73,7 +73,7 @@ public static class CandidateUIMapper
         // Rank badge (layer-based)
         var rankLabel = candidateRoot.Q<Label>("rank-level");
         if (rankLabel != null)
-            rankLabel.text = candidate.entityDef.rank.ToString();
+            rankLabel.text = (candidate.startRank > 1 ? candidate.startRank : candidate.entityDef.rank).ToString();
                 
         // Traits
         PopulateTraits(candidateRoot, candidate);

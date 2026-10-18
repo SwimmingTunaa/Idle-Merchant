@@ -46,6 +46,11 @@ public static class GameSignals
     // Clicker
     public static event Action<int> OnClickUpgradePurchased;   // click damage upgrade bought → new level
 
+    // Contracts & Guild Seals
+    public static event Action<Contract> OnContractAccepted;   // offer taken (also re-raised on load for the active one)
+    public static event Action<Contract> OnContractCompleted;  // target met / goods handed over → claimable
+    public static event Action<int> OnSealsChanged;            // new seal balance
+
     // Public invoke methods
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
     public static void RaiseGoldSpent(int amount) => OnGoldSpent?.Invoke(amount);
@@ -70,6 +75,9 @@ public static class GameSignals
     public static void RaiseCustomerServed() => OnCustomerServed?.Invoke();
     public static void RaiseUnitHired(EntityDef unitDef, HireRole role) => OnUnitHired?.Invoke(unitDef, role);
     public static void RaiseClickUpgradePurchased(int newLevel) => OnClickUpgradePurchased?.Invoke(newLevel);
+    public static void RaiseContractAccepted(Contract c) => OnContractAccepted?.Invoke(c);
+    public static void RaiseContractCompleted(Contract c) => OnContractCompleted?.Invoke(c);
+    public static void RaiseSealsChanged(int balance) => OnSealsChanged?.Invoke(balance);
 
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]
@@ -97,6 +105,9 @@ public static class GameSignals
         OnMarkedForSaleChanged = null;
         OnCustomerServed = null;
         OnClickUpgradePurchased = null;
+        OnContractAccepted = null;
+        OnContractCompleted = null;
+        OnSealsChanged = null;
 
         Debug.Log("[GameSignals] All listeners cleared");
     }
@@ -126,6 +137,9 @@ public static class GameSignals
         Debug.Log($"OnCustomerServed: {OnCustomerServed?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnUnitHired: {OnUnitHired?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnClickUpgradePurchased: {OnClickUpgradePurchased?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnContractAccepted: {OnContractAccepted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnContractCompleted: {OnContractCompleted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnSealsChanged: {OnSealsChanged?.GetInvocationList().Length ?? 0}");
     }
 #endif
 }

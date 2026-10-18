@@ -58,14 +58,24 @@ public class SaveManager : PersistentSingleton<SaveManager>
     private TimeSpan pendingAway;
     private int goldInFlight;   // collected offline gold still flying to the counter — saved as banked
 
+    // Contract target rates (ContractManager): kills per dungeon layer and customers served. Measured live,
+    // not passive-guarded — they size contracts, never offline income.
+    private const int RateLayers = 11;   // index = layer (1..10)
+    private readonly float[] tickKills = new float[RateLayers], emaKills = new float[RateLayers];
+    private float tickServed, emaServed;
+
     public float GoldPerMin => rateWeight > 0f ? emaGold / rateWeight : 0f;
     public float LootPerMin => rateWeight > 0f ? emaLoot / rateWeight : 0f;
+    public float ServedPerMin => rateWeight > 0f ? emaServed / rateWeight : 0f;
+    public float KillsPerMin(int layer) => rateWeight > 0f && layer > 0 && layer < RateLayers ? emaKills[layer] / rateWeight : 0f;
 
     protected override void Awake()
     {
         base.Awake();
         if (Instance != this) return;
         GameSignals.OnItemSold += OnItemSold;
+        GameSignals.OnEntityDeath += OnEntityDeath;
+        GameSignals.OnCustomerServed += OnCustomerServed;
         if (bootLoadDone) return;
         bootLoadDone = true;
         pending = ReadSave(out savingDisabled);
@@ -73,7 +83,10 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
     void OnDestroy()
     {
-        if (Instance == this) GameSignals.OnItemSold -= OnItemSold;
+        if (Instance != this) return;
+        GameSignals.OnItemSold -= OnItemSold;
+        GameSignals.OnEntityDeath -= OnEntityDeath;
+        GameSignals.OnCustomerServed -= OnCustomerServed;
     }
 
     void Start()
@@ -82,7 +95,10 @@ public class SaveManager : PersistentSingleton<SaveManager>
         playTime = pending.meta.totalPlayTime;
         emaGold = pending.meta.goldPerMin;
         emaLoot = pending.meta.lootPerMin;
-        rateWeight = emaGold + emaLoot > 0f ? 1f : 0f;
+        emaServed = pending.meta.servedPerMin;
+        if (pending.meta.killsPerMin != null)
+            Array.Copy(pending.meta.killsPerMin, emaKills, Mathf.Min(RateLayers, pending.meta.killsPerMin.Length));
+        rateWeight = emaGold + emaLoot + emaServed + emaKills.Sum() > 0f ? 1f : 0f;
         ApplyEarly(pending);
         StartCoroutine(ApplyLate(pending));
         pending = null;
@@ -154,6 +170,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
         d.meta.totalPlayTime = playTime;
         d.meta.goldPerMin = GoldPerMin;
         d.meta.lootPerMin = LootPerMin;
+        d.meta.servedPerMin = ServedPerMin;
+        d.meta.killsPerMin = Enumerable.Range(0, RateLayers).Select(KillsPerMin).ToArray();
 
         d.economy.gold = inv.Gold + goldInFlight;
         foreach (var row in inv.SnapshotAll()) Bank(d, row.item, row.qty);
@@ -183,6 +201,10 @@ public class SaveManager : PersistentSingleton<SaveManager>
                 d.roster.Add(ToUnitSave(p, HireRole.Porter, m.LayerIndex));
                 foreach (var s in p.CarriedLoot) Bank(d, s.itemDef, s.qty);
             }
+
+        if (ContractManager.Instance != null) d.contracts = ContractManager.Instance.ToSave();
+        var hire = FindAnyObjectByType<HireController>();
+        if (hire != null) d.contracts.favors = hire.FavorsToSave();
 
         if (GameManager.Instance != null) d.settings.gameSpeed = GameManager.Instance.GameSpeed;
         var sfx = SfxManager.Instance;
@@ -330,11 +352,18 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         SpawnRoster(d.roster);
 
+        // After stock: an old save without the chunk rolls fresh offers against the restored stockpile
+        if (ContractManager.Instance != null) ContractManager.Instance.LoadFrom(d.contracts, items);
+
         // Same signals live play raises, so camera bounds, hire pools and the Cursor page catch up
         if (pm != null)
             for (int layer = 2; layer <= pm.maxUnlockedLayer; layer++) GameSignals.RaiseLayerUnlocked(layer);
         var clicker = FindAnyObjectByType<ClickerManager>();
         if (clicker != null) GameSignals.RaiseClickUpgradePurchased(clicker.ClickDamageLevel);
+
+        // After the layer signals: favors re-pin into pools those signals may have just created
+        var hire = FindAnyObjectByType<HireController>();
+        if (hire != null) hire.RestoreFavors(d.contracts.favors);
 
         restoring = false;
         Debug.Log($"[SaveManager] Loaded save: {d.economy.gold}g, {d.economy.stock.Count} item types, " +
@@ -350,19 +379,30 @@ public class SaveManager : PersistentSingleton<SaveManager>
     // Customer sales only (SalesManager + CounterService) — never click gold, milestone claims, hiring refunds or debug.
     private void OnItemSold(ResourceStack sale) => tickGold += sale.sellValue;
 
+    private void OnCustomerServed() => tickServed++;
+
+    private void OnEntityDeath(GameObject dead)
+    {
+        if (dead != null && dead.TryGetComponent<MobAgent>(out var mob) && mob.layerIndex > 0 && mob.layerIndex < RateLayers)
+            tickKills[mob.layerIndex]++;
+    }
+
     // Game time, so pause doesn't dilute the rate and a 3x session doesn't claim 3x offline (offline runs at 1x).
     private void TickRates(float dt)
     {
         // Rates freeze while an award is unclaimed: quitting on the panel re-derives the exact same award
-        if (pendingAway > TimeSpan.Zero) { rateTimer = tickGold = tickLoot = 0f; return; }
+        if (pendingAway > TimeSpan.Zero) { rateTimer = tickGold = tickLoot = tickServed = 0f; Array.Clear(tickKills, 0, RateLayers); return; }
         if ((rateTimer += dt) < RateTick) return;
         // §3 honesty guard: only a working guild (adventurers AND porters on the books) measures passive income
         bool passive = HasUnits<AdventurerManager>() && HasUnits<PorterManager>();
         float a = Mathf.Min(1f, rateTimer / RateWindow), perMin = 60f / rateTimer;
         emaGold += a * ((passive ? tickGold * perMin : 0f) - emaGold);
         emaLoot += a * ((passive ? tickLoot * perMin : 0f) - emaLoot);
+        emaServed += a * (tickServed * perMin - emaServed);
+        for (int i = 0; i < RateLayers; i++) emaKills[i] += a * (tickKills[i] * perMin - emaKills[i]);
         rateWeight += a * (1f - rateWeight);
-        rateTimer = tickGold = tickLoot = 0f;
+        rateTimer = tickGold = tickLoot = tickServed = 0f;
+        Array.Clear(tickKills, 0, RateLayers);
     }
 
     private static bool HasUnits<T>() where T : MonoBehaviour, IUnitManager =>
@@ -399,13 +439,19 @@ public class SaveManager : PersistentSingleton<SaveManager>
         if (LootPile.Instance != null)
             for (int i = 0; i < Mathf.Min(6, items.Count * 2); i++) LootPile.Instance.FlyIn(items[i % items.Count].item, from);
 
-        // Gold banks per coin on landing; until then it's saved as banked, so a quit mid-shower loses nothing
-        goldInFlight = gold;
         var tracker = FindAnyObjectByType<MilestoneTracker>();
         ProgressionManager.PayMilestoneGold(gold, from,
             source == null || tracker == null ? null : (count, land) => tracker.LaunchCoins(source, count, land),
-            amount => { goldInFlight -= amount; inv.AddGold(amount); });
+            InFlightBank(gold));
         Debug.Log($"[SaveManager] Collected offline earnings: {gold}g, {items.Sum(i => i.qty)} items");
+    }
+
+    /// <summary>Delayed-bank flows (coin showers) commit `amount` now: it's saved as banked until each coin's
+    /// share lands through the returned bank action, so a quit mid-shower loses nothing.</summary>
+    public Action<int> InFlightBank(int amount)
+    {
+        goldInFlight += amount;
+        return share => { goldInFlight -= share; Inventory.Instance.AddGold(share); };
     }
 
     /// <summary>gold = goldPerMin × min × 50%; items = lootPerMin × min × 50%, split across what the unlocked
@@ -418,11 +464,30 @@ public class SaveManager : PersistentSingleton<SaveManager>
         int count = (int)(lootPerMin * awayMinutes * OfflineEfficiency);
         var items = new List<(ItemDef item, int qty)>();
 
-        // ponytail: every spawner weighs the same regardless of its spawn rate/maxAlive; weight by those if layers diverge
+        var weights = DropWeights(1, maxLayer);
+        float sum = weights.Values.Sum();
+        if (count <= 0 || sum <= 0f) return (gold, items);
+        var shares = weights.Select(kv => (item: kv.Key, exact: count * kv.Value / sum))
+            .OrderByDescending(x => x.exact - Math.Floor(x.exact)).ThenBy(x => x.item.name).ToList();
+        int remainder = count - shares.Sum(x => (int)x.exact);
+        for (int i = 0; i < shares.Count; i++)
+        {
+            int qty = (int)shares[i].exact + (i < remainder ? 1 : 0);
+            if (qty > 0) items.Add((shares[i].item, qty));
+        }
+        items.Sort((x, y) => y.qty != x.qty ? y.qty.CompareTo(x.qty) : string.CompareOrdinal(x.item.name, y.item.name));
+        return (gold, items);
+    }
+
+    /// <summary>Expected units of each item per kill on layers [minLayer, maxLayer], summed across the layers'
+    /// spawners (spawn weight × drop chance × avg stack). Shared by the offline split and contract targets.</summary>
+    // ponytail: every spawner weighs the same regardless of its spawn rate/maxAlive; weight by those if layers diverge
+    public static Dictionary<ItemDef, float> DropWeights(int minLayer, int maxLayer)
+    {
         var weights = new Dictionary<ItemDef, float>();
         foreach (var s in FindObjectsByType<Spawner>(FindObjectsInactive.Include))
         {
-            if (s.layerIndex < 1 || s.layerIndex > maxLayer) continue;
+            if (s.layerIndex < Mathf.Max(1, minLayer) || s.layerIndex > maxLayer) continue;
             float total = s.candidates.Where(c => c != null).Sum(c => Mathf.Max(0.001f, c.spawnWeight));
             foreach (var c in s.candidates)
             {
@@ -436,19 +501,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
                 }
             }
         }
-
-        float sum = weights.Values.Sum();
-        if (count <= 0 || sum <= 0f) return (gold, items);
-        var shares = weights.Select(kv => (item: kv.Key, exact: count * kv.Value / sum))
-            .OrderByDescending(x => x.exact - Math.Floor(x.exact)).ThenBy(x => x.item.name).ToList();
-        int remainder = count - shares.Sum(x => (int)x.exact);
-        for (int i = 0; i < shares.Count; i++)
-        {
-            int qty = (int)shares[i].exact + (i < remainder ? 1 : 0);
-            if (qty > 0) items.Add((shares[i].item, qty));
-        }
-        items.Sort((x, y) => y.qty != x.qty ? y.qty.CompareTo(x.qty) : string.CompareOrdinal(x.item.name, y.item.name));
-        return (gold, items);
+        return weights;
     }
 
     /// <summary>Debug: save now, then rewrite the file's lastPlayedUtc to `minutes` ago. Saving stops for this
@@ -525,6 +578,7 @@ public class SaveData
     public ClickerSave clicker = new ClickerSave();
     public GuildSave guild = new GuildSave();
     public List<UnitSave> roster = new List<UnitSave>();
+    public ContractSave contracts = new ContractSave();
     public SettingsSave settings = new SettingsSave();
 }
 
@@ -535,6 +589,8 @@ public class MetaSave
     public double totalPlayTime;   // seconds, all sessions
     public float goldPerMin;       // phase 2 (offline earnings)
     public float lootPerMin;       // phase 2
+    public float servedPerMin;     // contracts: customers/min
+    public float[] killsPerMin;    // contracts: kills/min by layer index
 }
 
 public class EconomySave
@@ -557,6 +613,26 @@ public class ProgressionSave
 public class ClickerSave
 {
     public int clickDamage, pickupRadius, damageAOE, autoClick, autoCollect;
+}
+
+public class ContractSave
+{
+    public int seals, lifetimeSeals;               // balance + total ever earned (spent = lifetime − balance)
+    public float rotationLeft;                     // seconds until the offers rotate
+    public List<Contract> offers = new List<Contract>();   // 3 slots, null = accepted/empty; empty list = never rolled
+    public Contract active;                        // kind + params + progress + snapshot target/rewards
+    public List<FavorSave> favors = new List<FavorSave>(); // unhired Recruitment Favor candidates (pools aren't saved)
+}
+
+public class FavorSave
+{
+    public string def;             // EntityDef asset name
+    public int layer;              // pool's dungeon layer
+    public Identity identity;
+    public TraitInstance[] traits;
+    public CharacterAppearanceIndices appearance;
+    public int startRank, hireCost;
+    public string cursedCombo;     // CursedComboDef asset name, null if none
 }
 
 public class GuildSave

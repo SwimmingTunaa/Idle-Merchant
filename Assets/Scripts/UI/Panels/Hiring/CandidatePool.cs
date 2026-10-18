@@ -18,6 +18,7 @@ public class CandidatePool
     public EntityDef EntityDef { get; private set; }
 
     private readonly List<HiringCandidate> candidates = new List<HiringCandidate>();
+    private readonly List<HiringCandidate> favored = new List<HiringCandidate>(); // paid for — survive refreshes until hired
     private float refreshTimer;
     private float refreshInterval = 300f;
     private float traitChance = 0.7f;
@@ -95,7 +96,28 @@ public class CandidatePool
     /// </summary>
     public bool ConsumeCandidate(HiringCandidate candidate)
     {
+        favored.Remove(candidate);
         return candidates.Remove(candidate);
+    }
+
+    /// <summary>Favored candidates (Recruitment Favor) still in the pool — HireController pins them to the roster top.</summary>
+    public IReadOnlyList<HiringCandidate> Favored => favored;
+
+    /// <summary>Recruitment Favor: one guaranteed candidate that joins at startRank, always with a trait.</summary>
+    public HiringCandidate AddFavored(int startRank)
+    {
+        var c = HiringCandidateGenerator.GenerateCandidates(EntityDef, 1, BaseCost(), 1f)[0];
+        c.startRank = startRank;
+        return AddFavored(c);
+    }
+
+    /// <summary>Pins an existing favored candidate (purchase path above, or a save restore).</summary>
+    public HiringCandidate AddFavored(HiringCandidate c)
+    {
+        c.newspaperName = "The Crown's Favour";
+        favored.Add(c);
+        candidates.Add(c);
+        return c;
     }
 
     /// <summary>
@@ -118,6 +140,7 @@ public class CandidatePool
     private void RegeneratePool()
     {
         candidates.Clear();
+        candidates.AddRange(favored);
 
         if (EntityDef == null)
         {
@@ -125,17 +148,20 @@ public class CandidatePool
             return;
         }
 
-        // Cost scales x1.25 per unit of this role already owned; baked at generation (pool keeps pre-hire prices until refresh)
-        int owned = ownedCount != null ? ownedCount() : 0;
-        int baseCost = Mathf.RoundToInt(EntityDef.hireCost * Mathf.Pow(COST_SCALE_PER_OWNED, owned));
-
         var newCandidates = HiringCandidateGenerator.GenerateCandidates(
             EntityDef,
             BASE_POOL_SIZE,
-            baseCost,
+            BaseCost(),
             traitChance
         );
 
         candidates.AddRange(newCandidates);
+    }
+
+    // Cost scales x1.25 per unit of this role already owned; baked at generation (pool keeps pre-hire prices until refresh)
+    private int BaseCost()
+    {
+        int owned = ownedCount != null ? ownedCount() : 0;
+        return Mathf.RoundToInt(EntityDef.hireCost * Mathf.Pow(COST_SCALE_PER_OWNED, owned));
     }
 }

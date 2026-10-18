@@ -14725,6 +14725,64 @@ Transform:
   - {fileID: 1278443958}
   m_Father: {fileID: 597281041}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &788272034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 788272035}
+  - component: {fileID: 788272036}
+  m_Layer: 0
+  m_Name: Contract Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &788272035
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788272034}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945178581}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &788272036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788272034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c83f37ee04aaf874981779e93de9ab56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContractManager
+  rotationMinutes: 10
+  rateMinutes: {x: 5, y: 10}
+  stockBite: {x: 0.3, y: 0.4}
+  minDeliver: 5
+  minHunt: 10
+  minPatronage: 5
+  deliverPremium: 1.6
+  counterGoldShare: 0.5
+  minGoldPerMin: 30
+  commonSeals: 10
+  tierLayer: 3
+  favorCost: 50
+  rushCost: 20
+  showDebugLogs: 0
 --- !u!1 &789669656
 GameObject:
   m_ObjectHideFlags: 0
@@ -22133,6 +22191,7 @@ Transform:
   - {fileID: 1709701987}
   - {fileID: 1780078281}
   - {fileID: 2044110758}
+  - {fileID: 788272035}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &945178582
@@ -29138,6 +29197,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MilestoneTracker
   uiDocument: {fileID: 1433364562}
   cardTemplate: {fileID: 9197481963319205126, guid: b0c987ef044b5401b9925f2c249d41b0, type: 3}
+  contractIcon: {fileID: 21300000, guid: 1f20b428f177408a805f644670704f78, type: 3}
   refreshInterval: 1
   startExpanded: 1
   coinFlightTime: 0.65
@@ -32368,6 +32428,7 @@ GameObject:
   - component: {fileID: 1657271962}
   - component: {fileID: 1657271963}
   - component: {fileID: 1657271964}
+  - component: {fileID: 1657271965}
   m_Layer: 0
   m_Name: Book UI
   m_TagString: Untagged
@@ -32416,6 +32477,7 @@ MonoBehaviour:
   craftingPage: {fileID: 811366031}
   settingsPage: {fileID: 1875925581}
   cursorPage: {fileID: 1657271964}
+  contractsPage: {fileID: 1657271965}
 --- !u!114 &1657271964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32435,6 +32497,23 @@ MonoBehaviour:
   iconAutoClick: {fileID: 21300000, guid: e991a2d095dc45f799bfe879cf2a83cd, type: 3}
   iconAutoCollect: {fileID: 21300000, guid: 738579583e144efebf74c87c6537ebe1, type: 3}
   showDebugLogs: 0
+--- !u!114 &1657271965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657271961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ed3b761d3444d4d96bf4d0081b64fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContractsPage
+  cardTemplate: {fileID: 9197481963319205126, guid: 98299fba2387c4fc6972a5c0cf06489b, type: 3}
+  iconHunt: {fileID: 4618711388415579949, guid: d47fbbccd6f4a48da9e057d26ca35484, type: 3}
+  iconPatronage: {fileID: -3508794999336203909, guid: d47fbbccd6f4a48da9e057d26ca35484, type: 3}
+  iconFavor: {fileID: -6791402613607464848, guid: d47fbbccd6f4a48da9e057d26ca35484, type: 3}
+  iconRush: {fileID: 21300000, guid: 66b7da6b5c67846118c747aee23dc048, type: 3}
 --- !u!1 &1671205707
 GameObject:
   m_ObjectHideFlags: 0

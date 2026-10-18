@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss?fileID=7433441132597879392&amp;guid=492d8502d093f41ecb20460e908cfc39&amp;type=3#ProgressBar" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Contracts/ContractsPageStyle.uss" />
+    <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 24px 56px 24px 40px; margin-right: 4px;">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 8px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Contracts" class="contracts-page-title" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=2800000&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right&quot;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
+            </ui:VisualElement>
+            <ui:Label name="rotation-label" text="New offers in 10:00" class="contracts-note" />
+            <ui:VisualElement name="offer-list" class="contracts-list" />
+        </ui:VisualElement>
+        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 24px 8px 24px 55px; margin-left: 4px;">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 8px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Commission" class="contracts-page-title" style="font-size: 52px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=2800000&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right&quot;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="active-slot" class="contracts-list" />
+            <ui:Label name="active-empty" text="No contract in hand. Take one from the board." class="contracts-note contracts-empty" />
+            <ui:VisualElement class="contracts-shop-header">
+                <ui:Label text="Seal Shop" class="contracts-shop-title" />
+                <ui:VisualElement class="contracts-balance">
+                    <ui:Label name="seal-balance" text="0" class="contracts-balance-label" />
+                    <ui:VisualElement class="btn-seal" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="shop-list" class="contracts-list" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

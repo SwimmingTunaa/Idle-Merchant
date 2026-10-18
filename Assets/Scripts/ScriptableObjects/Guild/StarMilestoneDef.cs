@@ -38,6 +38,9 @@ public class StarMilestoneDef : ScriptableObject
     [Header("Reward")]
     [Tooltip("Gold paid (as a coin burst to the counter) when the player claims this milestone")]
     public int goldReward;
+
+    [Tooltip("Guild Seals granted on claim (0 = none). Keep to one or two Crown-flavoured milestones per tier.")]
+    public int sealReward;
 }
 
 /// <summary>

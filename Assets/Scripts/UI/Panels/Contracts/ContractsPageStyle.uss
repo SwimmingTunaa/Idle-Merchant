@@ -1,0 +1,148 @@
+.contracts-page-title {
+    color: rgb(128, 75, 24);
+}
+
+.contracts-note {
+    font-size: 20px;
+    color: rgb(155, 112, 72);
+    -unity-text-align: middle-center;
+    margin: 0 0 10px 0;
+    -unity-font-definition: var(--font-body);
+}
+
+.contracts-empty {
+    margin: 12px 0 18px 0;
+    white-space: normal;
+}
+
+.contracts-list {
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+/* Torn-paper card (9-slice inline in ContractCard.uxml): icon | ask + reward | action */
+.contract-card {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+}
+
+.contract-card--claimable {
+    -unity-background-image-tint-color: rgb(255, 222, 140);
+}
+
+.contract-card-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.contract-card-info {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-right: 10px;
+}
+
+.contract-card-name {
+    font-size: 24px;
+    white-space: normal;
+    color: rgb(101, 67, 33);
+    margin: 0;
+    padding: 0;
+    -unity-font-definition: var(--font-body);
+}
+
+.contract-card-desc {
+    font-size: 16px;
+    white-space: normal;
+    color: rgb(155, 112, 72);
+    margin: 2px 0 0 0;
+    padding: 0;
+    -unity-font-definition: var(--font-body);
+}
+
+.contract-card-bar.progress-track {
+    flex-grow: 0;
+    margin-top: 8px;
+    height: 20px;
+    background-color: var(--primary-200);
+    border-width: 2px;
+    border-color: var(--color-box-border);
+    border-radius: 3px;
+}
+
+.contract-card .progress-fill {
+    border-radius: 0;
+}
+
+.contract-card .progress-label {
+    color: var(--color-text-strong);
+    -unity-font-definition: var(--font-body);
+}
+
+.contract-card-reward {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.contract-reward-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+.contract-reward-seal {
+    margin-left: 14px;
+}
+
+.contract-reward-label {
+    font-size: 20px;
+    color: rgb(128, 75, 24);
+    margin: 0;
+    padding: 0;
+    -unity-font-definition: var(--font-body);
+}
+
+.contract-card-action {
+    width: 128px;
+    height: 52px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 3px 10px 9px 10px;
+}
+
+.contracts-shop-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(200, 180, 150);
+}
+
+.contracts-shop-title {
+    font-size: 32px;
+    color: rgb(128, 75, 24);
+    margin: 0;
+    padding: 0;
+    -unity-font-definition: var(--font-body);
+}
+
+.contracts-balance {
+    flex-direction: row;
+    align-items: center;
+}
+
+.contracts-balance-label {
+    font-size: 28px;
+    color: rgb(101, 67, 33);
+    margin: 0 4px 0 0;
+    padding: 0;
+    -unity-font-definition: var(--font-body);
+}

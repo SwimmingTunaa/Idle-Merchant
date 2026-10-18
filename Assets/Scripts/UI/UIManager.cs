@@ -81,6 +81,10 @@ public class UIManager : PersistentSingleton<UIManager>
         RefreshGuildStars();
 
         SetUpClickUpgradeButton();
+
+        sealLabel = uiDocument != null ? uiDocument.rootVisualElement?.Q<Label>("seal-label") : null;
+        GameSignals.OnSealsChanged += OnSealsChanged;
+        if (sealLabel != null) sealLabel.text = (ContractManager.Instance != null ? ContractManager.Instance.Seals : 0).ToString("N0");
     }
 
     private void OnDisable() => CleanupInputActions();
@@ -94,6 +98,23 @@ public class UIManager : PersistentSingleton<UIManager>
             cursorBoardButton.clicked -= OnCursorBoardClicked;
         GameSignals.GoldChanged -= OnGoldChangedForClickUpgrade;
         GameSignals.OnClickUpgradePurchased -= OnClickUpgradePurchased;
+        GameSignals.OnSealsChanged -= OnSealsChanged;
+    }
+
+    // ═════════════════════════════════════════════
+    // SEAL COUNTER (top bar) — count + a pop on change, no shower
+    // ═════════════════════════════════════════════
+
+    private Label sealLabel;
+
+    private void OnSealsChanged(int balance)
+    {
+        if (sealLabel == null) return;
+        sealLabel.text = balance.ToString("N0");
+        var icon = sealLabel.parent?.Q<VisualElement>("seal-icon");
+        if (icon == null) return;
+        icon.style.scale = new Scale(new Vector2(1.35f, 1.35f));
+        icon.schedule.Execute(() => icon.style.scale = StyleKeyword.Null).StartingIn(180);
     }
 
     void Update()

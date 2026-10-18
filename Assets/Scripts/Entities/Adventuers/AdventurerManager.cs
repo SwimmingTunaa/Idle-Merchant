@@ -146,7 +146,9 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
             }
         }
 
-    
+        // Recruitment Favor candidates arrive promoted (save restore passes 0 and re-applies progress itself)
+        if (candidate.startRank > 1) agent.RestoreProgress(candidate.startRank, 1, 0f);
+
         return agent;
     }
 

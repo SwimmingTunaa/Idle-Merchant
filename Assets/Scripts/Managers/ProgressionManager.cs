@@ -63,6 +63,9 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private bool milestoneCheckPending = false;
     
 
+    // Guild Seals granted per star earned (1★–5★) — a fixed lifetime supply, see CONTRACTS_DESIGN.md
+    private static readonly int[] StarSeals = { 30, 50, 80, 120, 200 };
+
     // Events for decoupling
     public static event Action<int> OnStarEarned;
     public static event Action<GuildUpgradeDef> OnUpgradePurchased;
@@ -244,6 +247,10 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
             return false;
 
         PayMilestoneGold(milestone.goldReward, coinOrigin, uiCoinFlight);
+        // Claim payouts are granted, not earned — keep them out of the GoldEarned milestone counter
+        // (the banking path increments it on arrival; this nets it to zero).
+        totalGoldEarned -= milestone.goldReward;
+        ContractManager.Instance?.GrantSeals(milestone.sealReward);
         GrantMilestoneReward(milestone);
         GameSignals.RaiseMilestoneClaimed(milestone);
 
@@ -420,8 +427,9 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             UnlockLayer(layerToUnlock);
         }
 
-        // Grant star rewards
+        // Grant star rewards (+ the one-time seal injection, granted with the fanfare)
         GrantStarReward(star);
+        ContractManager.Instance?.GrantSeals(StarSeals[star - 1]);
 
         // Fire events
         OnStarEarned?.Invoke(star);

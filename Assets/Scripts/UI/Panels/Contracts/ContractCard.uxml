@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss?fileID=7433441132597879392&amp;guid=492d8502d093f41ecb20460e908cfc39&amp;type=3#ProgressBar" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Contracts/ContractsPageStyle.uss" />
+    <ui:VisualElement name="card-root" class="contract-card" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&amp;guid=e202a8ab367e41aead07308c65d8c8a8&amp;type=3#card-torn&quot;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 3px;">
+        <ui:VisualElement name="card-icon" class="contract-card-icon" />
+        <ui:VisualElement name="card-info" class="contract-card-info">
+            <ui:Label name="card-name" text="Contract" class="contract-card-name" />
+            <ui:Label name="card-desc" text="" class="contract-card-desc" />
+            <ui:VisualElement name="card-bar" class="progress-track contract-card-bar">
+                <ui:VisualElement name="progress-fill" class="progress-fill progress-fill--warning" />
+                <ui:Label name="progress-label" text="0 / 0" class="progress-label" />
+            </ui:VisualElement>
+            <ui:VisualElement name="card-reward" class="contract-card-reward">
+                <ui:VisualElement class="btn-coin contract-reward-icon" />
+                <ui:Label name="reward-gold" text="0" class="contract-reward-label" />
+                <ui:VisualElement class="btn-seal contract-reward-icon contract-reward-seal" />
+                <ui:Label name="reward-seals" text="0" class="contract-reward-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="card-action" class="btn-success contract-card-action">
+            <ui:Label name="card-action-label" text="Accept" class="btn-label" />
+            <ui:VisualElement name="card-action-seal" class="btn-seal" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

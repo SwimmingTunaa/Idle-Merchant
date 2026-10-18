@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Hosts the unified Book UI — a 1200x900 open-book overlay with bookmark tabs.
-/// Tabs: 0=Roster, 1=Guild, 2=Inventory, 3=Crafting, 4=Settings, 5=Cursor.
+/// Tabs: 0=Roster, 1=Guild, 2=Inventory, 3=Crafting, 4=Settings, 5=Cursor, 6=Contracts.
 /// All page content is embedded in BookPanel.uxml as merged page-N instances.
 /// SwitchToTab shows/hides the active page TemplateContainer and passes
 /// its left-content / right-content children to the IBookPage controller.
@@ -17,10 +17,12 @@ public class BookPanelController : BasePanelController
     [SerializeField] private MonoBehaviour craftingPage;
     [SerializeField] private MonoBehaviour settingsPage;
     [SerializeField] private MonoBehaviour cursorPage;
+    [SerializeField] private MonoBehaviour contractsPage;
 
     public override string PanelID => "BookPanel";
 
-    private const int TAB_COUNT = 6;
+    private const int TAB_COUNT = 7;
+    public const int ContractsTab = 6;
 
     // Cached UI elements
     private readonly Button[] tabButtons = new Button[TAB_COUNT];
@@ -42,7 +44,7 @@ public class BookPanelController : BasePanelController
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        _pages = new MonoBehaviour[] { rosterPage, guildPage, inventoryPage, craftingPage, settingsPage, cursorPage };
+        _pages = new MonoBehaviour[] { rosterPage, guildPage, inventoryPage, craftingPage, settingsPage, cursorPage, contractsPage };
 
         GameSignals.OnAdventurerFocusRequested += OnAdventurerFocusRequested;
     }
@@ -96,7 +98,7 @@ public class BookPanelController : BasePanelController
         }
 
         // Wire tab buttons and collect badge refs
-        string[] tabNames = { "tab-roster", "tab-guild", "tab-inventory", "tab-crafting", "tab-settings", "tab-cursor" };
+        string[] tabNames = { "tab-roster", "tab-guild", "tab-inventory", "tab-crafting", "tab-settings", "tab-cursor", "tab-contracts" };
         for (int i = 0; i < TAB_COUNT; i++)
         {
             int idx = i;

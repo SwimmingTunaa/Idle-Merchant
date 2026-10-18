@@ -65,6 +65,12 @@
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="right" class="stats-section">
+            <ui:VisualElement name="seal-container" class="coin-plate seal-plate">
+                <ui:VisualElement name="seal" class="coin">
+                    <ui:Label name="seal-label" text="0" class="coin-label"/>
+                    <ui:VisualElement name="seal-icon" class="seal-icon"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="coin-container" class="coin-plate">
                 <ui:VisualElement name="coin" class="coin">
                     <ui:Label name="coin-label" text="100k" class="coin-label"/>

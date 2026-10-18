@@ -13,6 +13,9 @@ public class MilestoneTracker : MonoBehaviour
     [Tooltip("Row template (MilestoneCard.uxml): torn-paper card with progress, reward and claim button.")]
     [SerializeField] private VisualTreeAsset cardTemplate;
 
+    [Tooltip("Icon for the contract card when the ask has no item icon (hunt/patronage/board teaser)")]
+    [SerializeField] private Sprite contractIcon;
+
     [Header("Settings")]
     [Tooltip("Seconds between live progress refreshes")]
     [SerializeField] private float refreshInterval = 1f;
@@ -43,6 +46,8 @@ public class MilestoneTracker : MonoBehaviour
     private Coroutine refreshCoroutine;
     private Coroutine accordionCoroutine;
     private MilestoneProgressEvents progressEvents;
+    private VisualElement contractRow;   // the active contract (or a board teaser), sorted with the milestones
+    private Label contractSealLabel;
 
     // Coin shower: UI elements over the whole HUD; each banks its share on landing
     private const float CoinSize = 26f;
@@ -81,7 +86,11 @@ public class MilestoneTracker : MonoBehaviour
 
         progressEvents = new MilestoneProgressEvents(RefreshProgress, Refresh);
         progressEvents.Subscribe();
+        GameSignals.OnContractAccepted += OnContractChanged;
+        GameSignals.OnContractCompleted += OnContractChanged;
+        GameSignals.OnSealsChanged += OnSealsChanged;
 
+        contractRow = CreateContractRow();
         Refresh();
 
         isExpanded = startExpanded;
@@ -98,6 +107,9 @@ public class MilestoneTracker : MonoBehaviour
     void OnDestroy()
     {
         progressEvents?.Unsubscribe();
+        GameSignals.OnContractAccepted -= OnContractChanged;
+        GameSignals.OnContractCompleted -= OnContractChanged;
+        GameSignals.OnSealsChanged -= OnSealsChanged;
 
         if (refreshCoroutine != null)
             StopCoroutine(refreshCoroutine);
@@ -154,6 +166,7 @@ public class MilestoneTracker : MonoBehaviour
 
         list.Clear();
         rows.Clear();
+        if (contractRow != null) list.Add(contractRow);   // RefreshProgress slots it in
 
         int currentStars = ProgressionManager.Instance.GetCurrentStars();
         int nextStar     = currentStars + 1;
@@ -189,8 +202,16 @@ public class MilestoneTracker : MonoBehaviour
         }
 
         // Claimable → in progress → claimed. Stable: rows stays in asset order, we only move DOM children.
+        // The contract card leads its group (claimable when complete or ready to fulfil).
+        int contractGroup = RefreshContractRow();
         int slot = 0;
         for (int group = 0; group < 3; group++)
+        {
+            if (contractGroup == group)
+            {
+                if (list.IndexOf(contractRow) != slot) list.Insert(slot, contractRow);
+                slot++;
+            }
             foreach (var (def, row) in rows)
             {
                 int g = pm.IsMilestoneClaimed(def) ? 2 : pm.IsMilestoneReached(def) ? 0 : 1;
@@ -198,12 +219,100 @@ public class MilestoneTracker : MonoBehaviour
                 if (list.IndexOf(row) != slot) list.Insert(slot, row);
                 slot++;
             }
+        }
 
         UpdateCountLabel(claimed, rows.Count);
 
-        int claimable = pm.ClaimableCount;
+        int claimable = pm.ClaimableCount + (contractGroup == 0 ? 1 : 0);
         if (claimBadge != null) claimBadge.text = claimable.ToString();
         UIManager.SetBoardBadge(claimBadge, claimable > 0, claimable > 0);
+    }
+
+    private void OnContractChanged(Contract _) => RefreshProgress();
+    private void OnSealsChanged(int _) => RefreshProgress();
+
+    // ═════════════════════════════════════════════
+    // CONTRACT CARD (same MilestoneCard markup, custom bind)
+    // ═════════════════════════════════════════════
+
+    private VisualElement CreateContractRow()
+    {
+        var row = cardTemplate.CloneTree().Q<VisualElement>("card-root");
+        var reward = row.Q<VisualElement>("card-reward");
+        var seal = new VisualElement { pickingMode = PickingMode.Ignore };
+        seal.AddToClassList("btn-seal");
+        seal.AddToClassList("mt-card-reward-coin");
+        seal.style.marginLeft = 8f;
+        reward.Add(seal);
+        contractSealLabel = new Label();
+        contractSealLabel.AddToClassList("mt-card-reward-label");
+        reward.Add(contractSealLabel);
+
+        var claim = row.Q<Button>("card-claim");
+        claim.clicked += () =>
+        {
+            var cm = ContractManager.Instance;
+            if (cm == null || cm.Active == null) return;
+            SfxManager.Instance?.Play(SfxId.UiTick);
+            if (cm.Active.complete)
+            {
+                claim.SetEnabled(false);   // re-enabled when the next contract shows
+                cm.Claim(BurstOrigin(row), (count, land) => LaunchCoins(claim, count, land));
+            }
+            else cm.Fulfil();
+            RefreshProgress();
+        };
+        // Anywhere else on the card opens the board
+        row.RegisterCallback<ClickEvent>(e =>
+        {
+            if (e.target is VisualElement t && claim.Contains(t)) return;
+            FindAnyObjectByType<BookPanelController>()?.OpenToTab(BookPanelController.ContractsTab);
+        });
+        return row;
+    }
+
+    /// <summary>Binds the contract card; returns its sort group (0 claimable, 1 in progress, -1 hidden).</summary>
+    private int RefreshContractRow()
+    {
+        var cm = ContractManager.Instance;
+        if (contractRow == null || cm == null) return -1;
+
+        var row = contractRow;
+        var a = cm.Active;
+        var bar = row.Q<VisualElement>(className: "mt-card-bar");
+        var reward = row.Q<VisualElement>("card-reward");
+        row.Q<VisualElement>("card-icon").style.backgroundImage =
+            new StyleBackground(a?.itemDef != null && a.itemDef.icon != null ? a.itemDef.icon : contractIcon);
+
+        if (a == null)
+        {
+            int offers = 0;
+            for (int i = 0; i < ContractManager.OfferSlots; i++) if (cm.GetOffer(i) != null) offers++;
+            row.style.display = offers > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            row.RemoveFromClassList("mt-card--claimable");
+            row.Q<Label>("card-name").text = "Guild Contracts";
+            row.Q<Label>("card-desc").text = $"{offers} offer{(offers == 1 ? "" : "s")} on the board — take one";
+            bar.style.display = reward.style.display = DisplayStyle.None;
+            return offers > 0 ? 1 : -1;
+        }
+
+        int progress = cm.ProgressOf(a);
+        bool claimable = a.complete || cm.CanFulfil;
+        row.style.display = bar.style.display = reward.style.display = DisplayStyle.Flex;
+        row.EnableInClassList("mt-card--claimable", claimable);
+        row.Q<Label>("card-name").text = "Contract";
+        row.Q<Label>("card-desc").text = a.Title;
+        row.Q<VisualElement>("progress-fill").style.width = Length.Percent(100f * progress / Mathf.Max(1, a.target));
+        row.Q<Label>("progress-label").text = $"{AnimatedNumberUITK.Abbrev(progress)} / {AnimatedNumberUITK.Abbrev(a.target)}";
+        row.Q<Label>("card-reward-label").text = $"Reward: {AnimatedNumberUITK.Abbrev(a.gold)}";
+        contractSealLabel.text = a.seals.ToString();
+
+        var claim = row.Q<Button>("card-claim");
+        claim.Q<Label>().text = a.complete ? "Claim" : "Fulfil";
+        row.Q<Label>("card-claim-amount").text = a.complete ? $"+{AnimatedNumberUITK.Abbrev(a.gold)}" : "";
+        claim.Q<VisualElement>(className: "mt-card-claim-coin").style.display = a.complete ? DisplayStyle.Flex : DisplayStyle.None;
+        claim.SetEnabled(true);
+        return claimable ? 0 : 1;
     }
 
     private void UpdateCountLabel(int completed, int total)
@@ -284,7 +393,7 @@ public class MilestoneTracker : MonoBehaviour
 
     // Panel point → world point (z=0) just LEFT of the card: world sprites draw under UI Toolkit,
     // so a burst at the button itself would fly hidden behind the tracker column.
-    private static Vector3 BurstOrigin(VisualElement element)
+    public static Vector3 BurstOrigin(VisualElement element)
     {
         Camera cam = Camera.main;
         if (cam == null || element.panel == null) return Vector3.zero;

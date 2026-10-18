@@ -331,6 +331,23 @@
     -unity-background-scale-mode: scale-to-fit;
 }
 
+/* Guild Seal plate, left of the gold plate: 7px wax-seal sprite at the HUD's 5px texel scale */
+.coin-plate.seal-plate {
+    width: auto;
+    min-width: 120px;
+    margin-right: var(--space-md);
+}
+
+.seal-icon {
+    width: 35px;
+    height: 35px;
+    margin-left: 10px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/wax-seal.png?fileID=21300000&guid=1f20b428f177408a805f644670704f78&type=3#wax-seal");
+    -unity-background-scale-mode: scale-to-fit;
+    transition-property: scale;
+    transition-duration: 0.12s;
+}
+
 /* Click damage upgrade buy button (top bar, left of the coin plate).
    No gap in UI Toolkit — margin-right separates it from the coin plate. */
 .click-upgrade-button {

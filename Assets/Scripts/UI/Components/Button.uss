@@ -297,6 +297,17 @@
     background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&guid=16798bfa02f8d44348f9fffdaf153786&type=3#Copper Coin_0");
 }
 
+/* Guild Seal twin of .btn-coin (wax-seal.png, 7px sprite) */
+.btn-seal {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-left: 2px;
+    margin-bottom: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/wax-seal.png?fileID=21300000&guid=1f20b428f177408a805f644670704f78&type=3#wax-seal");
+}
+
 .btn-sm {
     font-size: var(--font-size-body-md);
     padding: var(--space-xs) var(--space-sm);
