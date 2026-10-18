@@ -17,7 +17,6 @@
                 <ui:VisualElement name="star-4" class="star star-empty" />
                 <ui:VisualElement name="star-5" class="star star-empty" />
             </ui:VisualElement>
-            <ui:Label name="current-star-label" text="Current: 0&#x2605;" class="current-star-label" />
             <ui:Label name="next-star-label" text="Progress to 1&#x2605;" class="next-star-label" />
             <ui:ScrollView name="milestones-scroll" class="milestones-scroll" style="flex-grow: 1;">
                 <ui:VisualElement name="milestones-container" class="milestones-container" />

@@ -132,8 +132,6 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
             }
         }
 
-        if (currentStarLabel != null)
-            currentStarLabel.text = $"Current: {currentStars}★";
 
         if (nextStarLabel != null)
             nextStarLabel.text = currentStars >= 5 ? "Max Stars Achieved!" : $"Progress to {currentStars + 1}★:";
