@@ -3,6 +3,7 @@
     <ui:Template name="HirePanel" src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uxml?fileID=9197481963319205126&amp;guid=c1ede03fd56874438b8360843c981f3d&amp;type=3#HirePanel"/>
     <ui:Template name="MilestoneTracker" src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uxml?fileID=9197481963319205126&amp;guid=c986dfdbce2d64a2a9ee5099f22caa9e&amp;type=3#MilestoneTracker"/>
     <ui:Template name="PausePanel" src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/Pause_Panel.uxml?fileID=9197481963319205126&amp;guid=d86de3818b09844edb6036a25b22e634&amp;type=3#Pause_Panel"/>
+    <ui:Template name="WelcomeBack" src="project://database/Assets/Scripts/UI/Panels/Welcome%20Back/WelcomeBack.uxml"/>
     <ui:Template name="TopNavigation" src="project://database/Assets/Scripts/UI/TopNavigation.uxml?fileID=9197481963319205126&amp;guid=ea5112a68ff84455992e270c7a46c49f&amp;type=3#TopNavigation"/>
     <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI"/>
     <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel"/>
@@ -16,5 +17,6 @@
             <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;"/>
         </ui:VisualElement>
         <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
+        <ui:Instance template="WelcomeBack" name="WelcomeBack" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
     </ui:VisualElement>
 </ui:UXML>

@@ -782,6 +782,7 @@ public class GameDebugger : EditorWindow
     // ===== SAVE TAB =====
 
     const string ReenterPlayKey = "GameDebugger.ReenterPlay";
+    private float awayMinutes = 120f;
 
     void DrawSaveTab()
     {
@@ -803,6 +804,21 @@ public class GameDebugger : EditorWindow
             RestartPlayMode();
         }
         GUI.enabled = true;
+
+        // Offline earnings: live rolling rates, and a fake absence (rewrites lastPlayedUtc, then cold-boots from file)
+        EditorGUILayout.Space(5);
+        GUILayout.Label("Offline Earnings", EditorStyles.boldLabel);
+        if (Application.isPlaying && SaveManager.Instance != null)
+            EditorGUILayout.LabelField("Rates (passive):",
+                $"{SaveManager.Instance.GoldPerMin:F1} gold/min, {SaveManager.Instance.LootPerMin:F2} loot/min");
+        GUILayout.BeginHorizontal();
+        awayMinutes = EditorGUILayout.FloatField("Away (min)", awayMinutes);
+        if (GUILayout.Button("Simulate Away", GUILayout.Width(120)))
+        {
+            SaveManager.SimulateAway(awayMinutes);
+            if (Application.isPlaying) RestartPlayMode();
+        }
+        GUILayout.EndHorizontal();
 
         if (GUILayout.Button("Wipe Save", GUILayout.Height(30)) &&
             EditorUtility.DisplayDialog("Wipe Save", "Delete save.json and save.json.bak? This cannot be undone.", "Wipe", "Cancel"))

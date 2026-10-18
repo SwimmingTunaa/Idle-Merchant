@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Single local save slot (see SAVE_DESIGN.md). Asks each manager for its chunk — no per-component
@@ -44,18 +45,44 @@ public class SaveManager : PersistentSingleton<SaveManager>
     private float autosaveTimer;
     private double playTime;
 
+    // ===== Offline earnings (§3) =====
+    public const float OfflineEfficiency = 0.5f;
+    public static readonly TimeSpan OfflineCap = TimeSpan.FromHours(8), WelcomeThreshold = TimeSpan.FromMinutes(2);
+    private const float RateWindow = 600f;   // seconds of game time the rolling rates average over (~10 min)
+    private const float RateTick = 10f;
+
+    // Bias-corrected EMA: rateWeight ramps 0→1 so a fresh session reads its real rate, not one dragged toward 0.
+    private float rateTimer, tickGold, tickLoot, emaGold, emaLoot, rateWeight;
+    // lastPlayedUtc is saved as "now − uncollected away time": while the welcome-back award is unclaimed it stays
+    // pinned behind the away period (live play excluded), so quitting on the panel re-offers it next boot.
+    private TimeSpan pendingAway;
+    private int goldInFlight;   // collected offline gold still flying to the counter — saved as banked
+
+    public float GoldPerMin => rateWeight > 0f ? emaGold / rateWeight : 0f;
+    public float LootPerMin => rateWeight > 0f ? emaLoot / rateWeight : 0f;
+
     protected override void Awake()
     {
         base.Awake();
-        if (Instance != this || bootLoadDone) return;
+        if (Instance != this) return;
+        GameSignals.OnItemSold += OnItemSold;
+        if (bootLoadDone) return;
         bootLoadDone = true;
         pending = ReadSave(out savingDisabled);
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) GameSignals.OnItemSold -= OnItemSold;
     }
 
     void Start()
     {
         if (pending == null) return;
         playTime = pending.meta.totalPlayTime;
+        emaGold = pending.meta.goldPerMin;
+        emaLoot = pending.meta.lootPerMin;
+        rateWeight = emaGold + emaLoot > 0f ? 1f : 0f;
         ApplyEarly(pending);
         StartCoroutine(ApplyLate(pending));
         pending = null;
@@ -63,6 +90,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
     void Update()
     {
+        TickRates(Time.deltaTime);
         playTime += Time.unscaledDeltaTime;
         if ((autosaveTimer += Time.unscaledDeltaTime) < AutosaveInterval) return;
         autosaveTimer = 0f;
@@ -122,10 +150,12 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         var d = new SaveData();
         d.meta.version = CurrentVersion;
-        d.meta.lastPlayedUtc = DateTime.UtcNow;
+        d.meta.lastPlayedUtc = DateTime.UtcNow - pendingAway;
         d.meta.totalPlayTime = playTime;
+        d.meta.goldPerMin = GoldPerMin;
+        d.meta.lootPerMin = LootPerMin;
 
-        d.economy.gold = inv.Gold;
+        d.economy.gold = inv.Gold + goldInFlight;
         foreach (var row in inv.SnapshotAll()) Bank(d, row.item, row.qty);
         // §4: loot on the ground and in porters' arms banks into the saved stock — items are never dropped
         foreach (var loot in FindObjectsByType<Loot>()) Bank(d, loot.GetItemDef(), loot.GetQuantity());
@@ -295,6 +325,132 @@ public class SaveManager : PersistentSingleton<SaveManager>
         restoring = false;
         Debug.Log($"[SaveManager] Loaded save: {d.economy.gold}g, {d.economy.stock.Count} item types, " +
                   $"{d.roster.Count} units, {d.progression.stars}★ (saved {d.meta.lastPlayedUtc:u})");
+        OfferOfflineEarnings(d);
+    }
+
+    // ===== OFFLINE EARNINGS =====
+
+    /// <summary>Porter deposits are the loot pipeline that keeps running "while away" (click pickups don't count).</summary>
+    public void RecordPorterDelivery(int qty) => tickLoot += qty;
+
+    // Customer sales only (SalesManager + CounterService) — never click gold, milestone claims, hiring refunds or debug.
+    private void OnItemSold(ResourceStack sale) => tickGold += sale.sellValue;
+
+    // Game time, so pause doesn't dilute the rate and a 3x session doesn't claim 3x offline (offline runs at 1x).
+    private void TickRates(float dt)
+    {
+        // Rates freeze while an award is unclaimed: quitting on the panel re-derives the exact same award
+        if (pendingAway > TimeSpan.Zero) { rateTimer = tickGold = tickLoot = 0f; return; }
+        if ((rateTimer += dt) < RateTick) return;
+        // §3 honesty guard: only a working guild (adventurers AND porters on the books) measures passive income
+        bool passive = HasUnits<AdventurerManager>() && HasUnits<PorterManager>();
+        float a = Mathf.Min(1f, rateTimer / RateWindow), perMin = 60f / rateTimer;
+        emaGold += a * ((passive ? tickGold * perMin : 0f) - emaGold);
+        emaLoot += a * ((passive ? tickLoot * perMin : 0f) - emaLoot);
+        rateWeight += a * (1f - rateWeight);
+        rateTimer = tickGold = tickLoot = 0f;
+    }
+
+    private static bool HasUnits<T>() where T : MonoBehaviour, IUnitManager =>
+        FindObjectsByType<T>(FindObjectsInactive.Include).Any(m => m.GetTotalCount() > 0);
+
+    private void OfferOfflineEarnings(SaveData d)
+    {
+        var away = DateTime.UtcNow - d.meta.lastPlayedUtc.ToUniversalTime();
+        if (away < TimeSpan.Zero) away = TimeSpan.Zero;   // clock went backwards
+        if (away > OfflineCap) away = OfflineCap;
+        if (away <= WelcomeThreshold) return;
+
+        int maxLayer = ProgressionManager.Instance != null ? ProgressionManager.Instance.maxUnlockedLayer : 1;
+        var (gold, items) = ComputeOfflineAward(d.meta.goldPerMin, d.meta.lootPerMin, away.TotalMinutes, maxLayer);
+        if (gold <= 0 && items.Count == 0) return;
+
+        pendingAway = away;   // nothing banks, and lastPlayedUtc stays behind the away period, until Collect
+        Debug.Log($"[SaveManager] Offline {away.TotalMinutes:F1} min @ {d.meta.goldPerMin:F1}g/min, {d.meta.lootPerMin:F2} loot/min " +
+                  $"→ {gold}g, {items.Sum(i => i.qty)} items ({string.Join(", ", items.Select(i => $"{i.item.name} x{i.qty}"))})");
+        if (!WelcomeBackPanel.Show(away, gold, items, source => CollectOffline(gold, items, source)))
+            CollectOffline(gold, items, null);   // no panel in this HUD — bank directly, never drop it
+    }
+
+    private void CollectOffline(int gold, List<(ItemDef item, int qty)> items, VisualElement source)
+    {
+        pendingAway = TimeSpan.Zero;   // lastPlayedUtc advances from the next save on
+        var inv = Inventory.Instance;
+        foreach (var (item, qty) in items)
+            inv.Add(inv.GetInventoryType(item.itemCategory), new ResourceStack(item, qty, 0));
+
+        var cam = Camera.main;
+        Vector3 from = cam != null ? cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0f)) : Vector3.zero;
+        from.z = 0f;
+        if (LootPile.Instance != null)
+            for (int i = 0; i < Mathf.Min(6, items.Count * 2); i++) LootPile.Instance.FlyIn(items[i % items.Count].item, from);
+
+        // Gold banks per coin on landing; until then it's saved as banked, so a quit mid-shower loses nothing
+        goldInFlight = gold;
+        var tracker = FindAnyObjectByType<MilestoneTracker>();
+        ProgressionManager.PayMilestoneGold(gold, from,
+            source == null || tracker == null ? null : (count, land) => tracker.LaunchCoins(source, count, land),
+            amount => { goldInFlight -= amount; inv.AddGold(amount); });
+        Debug.Log($"[SaveManager] Collected offline earnings: {gold}g, {items.Sum(i => i.qty)} items");
+    }
+
+    /// <summary>gold = goldPerMin × min × 50%; items = lootPerMin × min × 50%, split across what the unlocked
+    /// layers' mobs drop (spawn weight × drop chance × avg stack), largest remainder so it's deterministic —
+    /// quitting on the welcome panel re-derives the same split.</summary>
+    public static (int gold, List<(ItemDef item, int qty)> items) ComputeOfflineAward(
+        float goldPerMin, float lootPerMin, double awayMinutes, int maxLayer)
+    {
+        int gold = (int)(goldPerMin * awayMinutes * OfflineEfficiency);
+        int count = (int)(lootPerMin * awayMinutes * OfflineEfficiency);
+        var items = new List<(ItemDef item, int qty)>();
+
+        // ponytail: every spawner weighs the same regardless of its spawn rate/maxAlive; weight by those if layers diverge
+        var weights = new Dictionary<ItemDef, float>();
+        foreach (var s in FindObjectsByType<Spawner>(FindObjectsInactive.Include))
+        {
+            if (s.layerIndex < 1 || s.layerIndex > maxLayer) continue;
+            float total = s.candidates.Where(c => c != null).Sum(c => Mathf.Max(0.001f, c.spawnWeight));
+            foreach (var c in s.candidates)
+            {
+                if (!(c is MobDef mob) || mob.loot == null) continue;
+                float perKill = Mathf.Max(0.001f, mob.spawnWeight) / total * (mob.lootDropAmount.x + mob.lootDropAmount.y) * 0.5f;
+                foreach (var item in mob.loot)
+                {
+                    if (item == null) continue;
+                    weights.TryGetValue(item, out float w);
+                    weights[item] = w + perKill * item.chance;
+                }
+            }
+        }
+
+        float sum = weights.Values.Sum();
+        if (count <= 0 || sum <= 0f) return (gold, items);
+        var shares = weights.Select(kv => (item: kv.Key, exact: count * kv.Value / sum))
+            .OrderByDescending(x => x.exact - Math.Floor(x.exact)).ThenBy(x => x.item.name).ToList();
+        int remainder = count - shares.Sum(x => (int)x.exact);
+        for (int i = 0; i < shares.Count; i++)
+        {
+            int qty = (int)shares[i].exact + (i < remainder ? 1 : 0);
+            if (qty > 0) items.Add((shares[i].item, qty));
+        }
+        items.Sort((x, y) => y.qty != x.qty ? y.qty.CompareTo(x.qty) : string.CompareOrdinal(x.item.name, y.item.name));
+        return (gold, items);
+    }
+
+    /// <summary>Debug: save now, then rewrite the file's lastPlayedUtc to `minutes` ago. Saving stops for this
+    /// session so the quit-save can't undo it — restart play mode to load it.</summary>
+    public static void SimulateAway(double minutes)
+    {
+        if (Instance != null)
+        {
+            Instance.Save();
+            Instance.SuspendSaving();
+        }
+        var data = TryRead(SavePath);
+        if (data == null) { Debug.LogError("[SaveManager] SimulateAway: no readable save"); return; }
+        data.meta.lastPlayedUtc = DateTime.UtcNow - TimeSpan.FromMinutes(minutes);
+        Write(data, SavePath);
+        Debug.Log($"[SaveManager] lastPlayedUtc set {minutes} min ago (rates in file: {data.meta.goldPerMin:F1}g/min, {data.meta.lootPerMin:F2} loot/min)");
     }
 
     /// <summary>ItemDef by asset name. Items live in Resources/Items and in Prefabs/Loot (mob loot tables), so

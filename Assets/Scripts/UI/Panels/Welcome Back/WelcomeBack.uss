@@ -1,0 +1,128 @@
+/* Welcome-back parchment — the book's torn-card language (card-torn.png 9-slice at 3px, like the Guild page cards)
+   with the HUD Box.png plate holding the rewards. Body text is --font-body, the title NotJam. */
+
+.wb-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-overlay);
+}
+
+.wb-card {
+    width: 560px;
+    align-items: stretch;
+    padding: 32px 36px 40px 36px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&guid=e202a8ab367e41aead07308c65d8c8a8&type=3#card-torn");
+    -unity-slice-left: 8;
+    -unity-slice-top: 8;
+    -unity-slice-right: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 3px;
+}
+
+.wb-title {
+    font-size: var(--font-size-h1);
+    color: var(--color-text-strong);
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+    -unity-text-align: middle-center;
+    margin: 0 0 6px 0;
+    padding: 0;
+}
+
+.wb-away {
+    font-size: 32px;
+    color: var(--color-text-primary);
+    -unity-font-definition: var(--font-body);
+    -unity-text-align: middle-center;
+    margin: 0;
+    padding: 0;
+}
+
+.wb-flavour {
+    font-size: 20px;
+    color: var(--color-text-secondary);
+    -unity-font-definition: var(--font-body);
+    -unity-text-align: middle-center;
+    margin: 0 0 16px 0;
+    padding: 0;
+}
+
+.wb-plate {
+    padding: 16px 20px 18px 20px;
+    margin-bottom: 20px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Box.png?fileID=2800000&guid=b1a09ce780a154f14af9ecb3b7d86965&type=3#Box");
+    -unity-slice-left: 5;
+    -unity-slice-right: 5;
+    -unity-slice-top: 5;
+    -unity-slice-bottom: 5;
+    -unity-slice-scale: 3px;
+}
+
+.wb-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.wb-gold-row {
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.wb-coin {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.wb-gold-amount {
+    font-size: var(--font-size-body-xl);
+    color: var(--color-text-strong);
+    -unity-font-definition: var(--font-body);
+    margin: 0;
+    padding: 0;
+}
+
+/* wood-framed icon slot, same as the milestone / guild cards */
+.wb-icon-frame {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    padding: 4px;
+    background-color: var(--color-box-bg);
+    border-width: 3px;
+    border-color: var(--color-border-dark);
+    border-radius: var(--radius-sm);
+}
+
+.wb-icon {
+    flex-grow: 1;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.wb-amount {
+    font-size: 26px;
+    color: var(--color-text-primary);
+    -unity-font-definition: var(--font-body);
+    margin: 0;
+    padding: 0;
+}
+
+.wb-more {
+    font-size: 24px;
+    color: var(--color-text-secondary);
+    -unity-font-definition: var(--font-body);
+    -unity-text-align: middle-center;
+    margin: 2px 0 0 0;
+    padding: 0;
+}
+
+.wb-collect {
+    height: 64px;
+    font-size: 36px;
+}

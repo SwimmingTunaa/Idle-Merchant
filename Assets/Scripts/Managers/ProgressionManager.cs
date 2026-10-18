@@ -258,21 +258,24 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     }
 
     // Gold banks as the coins land (house rule): UI shower → world burst → direct, every path banks in full.
-    private static void PayMilestoneGold(int amount, Vector3 from, System.Func<int, System.Action, bool> uiCoinFlight)
+    // Public: offline earnings (SaveManager) pay out through the same chain. bank defaults to Inventory.AddGold.
+    public static void PayMilestoneGold(int amount, Vector3 from, System.Func<int, System.Action, bool> uiCoinFlight,
+        System.Action<int> bank = null)
     {
         if (amount <= 0) return;
+        bank ??= Inventory.Instance.AddGold;
 
         int coins = Mathf.Clamp(amount / 25, 14, 36);
         int share = amount / coins;
         int left = coins;
         // Last coin to land carries the remainder, so the total is exact whatever the arrival order
-        System.Action land = () => Inventory.Instance.AddGold(--left == 0 ? amount - share * (coins - 1) : share);
+        System.Action land = () => bank(--left == 0 ? amount - share * (coins - 1) : share);
 
         if (uiCoinFlight != null && uiCoinFlight(coins, land)) return;
         if (ItemExplosionVFX.Instance != null)
             ItemExplosionVFX.Instance.SpawnExplosion(null, from, coins, coins, onEachArrival: land);
         else
-            Inventory.Instance.AddGold(amount);
+            bank(amount);
     }
 
     /// <summary>Debug: flag a milestone reached without grinding its counter.</summary>

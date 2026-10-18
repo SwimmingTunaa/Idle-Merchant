@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Welcome%20Back/WelcomeBack.uss" />
+    <!-- Offline earnings parchment (SAVE_DESIGN.md §3). Filled + shown by WelcomeBackPanel.Show. -->
+    <ui:VisualElement name="welcome-back" class="wb-overlay">
+        <ui:VisualElement class="wb-card">
+            <ui:Label text="While you were away" class="wb-title" />
+            <ui:Label name="wb-away" text="You were gone 0m" class="wb-away" />
+            <ui:Label text="the guild kept working" class="wb-flavour" />
+            <ui:VisualElement class="wb-plate">
+                <ui:VisualElement name="wb-gold" class="wb-row wb-gold-row">
+                    <ui:VisualElement class="btn-coin wb-coin" />
+                    <ui:Label name="wb-gold-amount" text="+0 gold" class="wb-gold-amount" />
+                </ui:VisualElement>
+                <ui:VisualElement name="wb-items" />
+                <ui:Label name="wb-more" text="+ 0 more" class="wb-more" />
+            </ui:VisualElement>
+            <ui:Button name="wb-collect" class="btn-success wb-collect">
+                <ui:Label text="Collect" class="btn-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -449,6 +449,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
                 var inventory = Inventory.Instance.GetInventoryType(stack.itemDef.itemCategory);
                 Inventory.Instance.Add(inventory, stack);
                 if (LootPile.Instance != null) LootPile.Instance.FlyIn(stack.itemDef, transform.position + Vector3.up * 0.5f);
+                if (SaveManager.Instance != null) SaveManager.Instance.RecordPorterDelivery(stack.qty);   // offline loot rate
 
                 if (showDebugLogs)
                     Debug.Log($"[{name}] Deposited {stack.qty}x {stack.itemDef.displayName}");
