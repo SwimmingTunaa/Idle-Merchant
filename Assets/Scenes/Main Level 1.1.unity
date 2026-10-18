@@ -5487,6 +5487,106 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &275036000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 275036002}
+  - component: {fileID: 275036001}
+  m_Layer: 0
+  m_Name: SfxManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &275036001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 275036000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d94d9cb874264d6c9b3709d261ccc9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxManager
+  sounds:
+  - id: 0
+    clip: {fileID: 8300000, guid: 1eb5c562d8c0942808b05f0092855699, type: 3}
+    volume: 0.7
+    pitchJitter: 0.06
+    minInterval: 0.05
+  - id: 1
+    clip: {fileID: 8300000, guid: f8fd92f355fa14bf0be26e9130c0651c, type: 3}
+    volume: 0.9
+    pitchJitter: 0.05
+    minInterval: 0.05
+  - id: 2
+    clip: {fileID: 8300000, guid: 6a3a210156cd84154a84613120ba01ac, type: 3}
+    volume: 0.5
+    pitchJitter: 0.06
+    minInterval: 0.05
+  - id: 3
+    clip: {fileID: 8300000, guid: d91d3b735651643f8855cba8c99df721, type: 3}
+    volume: 0.8
+    pitchJitter: 0.03
+    minInterval: 0.1
+  - id: 4
+    clip: {fileID: 8300000, guid: 4958cb755788c49ddba354c130c58b2d, type: 3}
+    volume: 0.9
+    pitchJitter: 0.03
+    minInterval: 0.05
+  - id: 5
+    clip: {fileID: 8300000, guid: 8e9277d3bb8f8401cbf060c2b1ba268c, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0.2
+  - id: 6
+    clip: {fileID: 8300000, guid: f06033bb3aec34e01976d8c80baa68f8, type: 3}
+    volume: 0.9
+    pitchJitter: 0
+    minInterval: 0.5
+  - id: 7
+    clip: {fileID: 8300000, guid: ae600590e4bc541309b6fb800d92b73f, type: 3}
+    volume: 0.6
+    pitchJitter: 0.05
+    minInterval: 0.08
+  - id: 8
+    clip: {fileID: 8300000, guid: b0ae2b0ec291040cb95d7f5222fd69eb, type: 3}
+    volume: 0.6
+    pitchJitter: 0.04
+    minInterval: 0.03
+  - id: 9
+    clip: {fileID: 8300000, guid: 09cf4f01ee178491d86f4ce98247eda3, type: 3}
+    volume: 0.7
+    pitchJitter: 0.06
+    minInterval: 0.05
+  masterVolume: 0.8
+  sfxVolume: 1
+  musicVolume: 1
+  voices: 8
+  showDebugLogs: 0
+--- !u!4 &275036002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 275036000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &275885546
 GameObject:
   m_ObjectHideFlags: 0
@@ -48365,3 +48465,4 @@ SceneRoots:
   - {fileID: 1433364563}
   - {fileID: 1685740137}
   - {fileID: 1293385180}
+  - {fileID: 275036002}

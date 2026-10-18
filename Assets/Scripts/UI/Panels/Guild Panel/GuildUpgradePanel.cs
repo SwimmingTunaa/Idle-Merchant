@@ -247,6 +247,7 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
 
     private void OnPurchaseClicked(GuildUpgradeDef upgrade)
     {
+        SfxManager.Instance?.Play(SfxId.UiTick);
         ProgressionManager.Instance.PurchaseUpgrade(upgrade);
     }
 

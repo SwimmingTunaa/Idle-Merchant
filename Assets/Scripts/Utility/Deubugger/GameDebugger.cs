@@ -686,6 +686,28 @@ public class GameDebugger : EditorWindow
             timeScale = 0f;
             Debug.Log($"[GameDebugger] Paused");
         }
+
+        // Audio: master/sfx/music volumes (saved with the game) + audition buttons
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Audio", EditorStyles.boldLabel);
+        var sfx = SfxManager.Instance;
+        if (!Application.isPlaying || sfx == null)
+        {
+            EditorGUILayout.HelpBox("Enter play mode to audition SFX", MessageType.Info);
+            return;
+        }
+        sfx.MasterVolume = EditorGUILayout.Slider("Master Volume", sfx.MasterVolume, 0f, 1f);
+        sfx.SfxVolume = EditorGUILayout.Slider("SFX Volume", sfx.SfxVolume, 0f, 1f);
+        sfx.MusicVolume = EditorGUILayout.Slider("Music Volume (no music yet)", sfx.MusicVolume, 0f, 1f);
+        var ids = (SfxId[])System.Enum.GetValues(typeof(SfxId));
+        for (int i = 0; i < ids.Length; i += 5)
+        {
+            EditorGUILayout.BeginHorizontal();
+            for (int j = i; j < Mathf.Min(i + 5, ids.Length); j++)
+                if (GUILayout.Button($"{ids[j]} ({sfx.PlayCount(ids[j])})")) sfx.Play(ids[j]);
+            EditorGUILayout.EndHorizontal();
+        }
+        EditorGUILayout.LabelField("Last played:", sfx.LastPlayed?.ToString() ?? "-");
     }
 
     void SetTimeScale(float scale)

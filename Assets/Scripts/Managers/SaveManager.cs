@@ -185,6 +185,13 @@ public class SaveManager : PersistentSingleton<SaveManager>
             }
 
         if (GameManager.Instance != null) d.settings.gameSpeed = GameManager.Instance.GameSpeed;
+        var sfx = SfxManager.Instance;
+        if (sfx != null)
+        {
+            d.settings.masterVolume = sfx.MasterVolume;
+            d.settings.sfxVolume = sfx.SfxVolume;
+            d.settings.musicVolume = sfx.MusicVolume;
+        }
         return d;
     }
 
@@ -291,6 +298,13 @@ public class SaveManager : PersistentSingleton<SaveManager>
                 d.clicker.autoClick, d.clicker.autoCollect);
 
         if (GameManager.Instance != null) GameManager.Instance.SetTimeScale(d.settings.gameSpeed);
+        var sfx = SfxManager.Instance;
+        if (sfx != null)
+        {
+            sfx.MasterVolume = d.settings.masterVolume;
+            sfx.SfxVolume = d.settings.sfxVolume;
+            sfx.MusicVolume = d.settings.musicVolume;
+        }
     }
 
     // One frame later: every Start has run, so saved layers are active, CraftingManager has its inventory
@@ -565,4 +579,5 @@ public class UnitSave
 public class SettingsSave
 {
     public float gameSpeed = 1f;
+    public float masterVolume = 0.8f, sfxVolume = 1f, musicVolume = 1f;   // SfxManager volumes
 }

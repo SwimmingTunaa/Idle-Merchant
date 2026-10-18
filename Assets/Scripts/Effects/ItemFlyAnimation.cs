@@ -167,6 +167,9 @@ public class ItemFlyAnimation : MonoBehaviour
             );
         }
         
+        // Screen-target flights are coins landing on the gold counter (world hops are item → pile)
+        if (!worldTarget.HasValue) SfxManager.Instance?.Play(SfxId.Coin);
+
         // Invoke callback if provided
         onArrivalCallback?.Invoke();
         onArrivalCallback = null;

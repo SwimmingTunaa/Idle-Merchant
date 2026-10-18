@@ -102,6 +102,7 @@ public class ClickHitVFX : MonoBehaviour
     public void PlayHit(Vector3 hitPos, Transform mob)
     {
         hitPos.z = 0f;   // cursor world pos arrives at raw camera z — pin to the gameplay plane
+        SfxManager.Instance?.Play(SfxId.ClickHit);
         for (int i = 0; i < 6; i++)
         {
             float a = Mathf.PI * 2f * i / 6f + Random.Range(-0.25f, 0.25f);
@@ -121,6 +122,7 @@ public class ClickHitVFX : MonoBehaviour
     public void PlayKill(Vector3 mobPos)
     {
         mobPos.z = 0f;
+        SfxManager.Instance?.Play(SfxId.Kill);
         // crack star: 8 fast rays, white core aging handled by two waves (white then red)
         for (int i = 0; i < 8; i++)
         {
@@ -148,6 +150,7 @@ public class ClickHitVFX : MonoBehaviour
     {
         center.z = 0f;   // cursor world pos arrives at raw camera z — pin to the gameplay plane
         ring.Clear();
+        SfxManager.Instance?.Play(SfxId.Vacuum);
 
         const float duration = 0.18f;
         int count = Mathf.Clamp(Mathf.RoundToInt(radius * 40f), 20, 64);

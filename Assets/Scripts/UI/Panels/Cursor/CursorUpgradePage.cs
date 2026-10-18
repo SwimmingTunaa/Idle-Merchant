@@ -185,7 +185,7 @@ public class CursorUpgradePage : MonoBehaviour, IBookPage
         var buyLabel = card.Q<Label>("card-buy-label");
         var coin = card.Q<VisualElement>("card-buy-coin");
 
-        buyButton.clicked += () => buy();
+        buyButton.clicked += () => { SfxManager.Instance?.Play(SfxId.UiTick); buy(); };
 
         cardRefreshers.Add(() =>
         {

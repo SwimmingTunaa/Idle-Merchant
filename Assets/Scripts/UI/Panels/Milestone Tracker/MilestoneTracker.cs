@@ -256,6 +256,7 @@ public class MilestoneTracker : MonoBehaviour
         claimButton.clicked += () =>
         {
             claimButton.SetEnabled(false);   // no double-claims; the row flips to claimed on the signal
+            SfxManager.Instance?.Play(SfxId.UiTick);
             ProgressionManager.Instance?.TryClaimMilestone(def, BurstOrigin(row),
                 coinFlight == null ? null : (count, land) => coinFlight(claimButton, count, land));
         };
@@ -361,6 +362,7 @@ public class MilestoneTracker : MonoBehaviour
                 coins.RemoveAt(i);
                 c.land();
                 iconPulse?.Pulse();
+                SfxManager.Instance?.Play(SfxId.Coin);   // throttled: a 36-coin shower ticks, never buzzes
                 continue;
             }
 

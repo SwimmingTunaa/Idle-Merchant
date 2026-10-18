@@ -103,7 +103,7 @@ public class BookPanelController : BasePanelController
             tabButtons[i] = panel.Q<Button>(tabNames[i]);
             if (tabButtons[i] == null) continue;
 
-            tabButtons[i].clicked += () => SwitchToTab(idx);
+            tabButtons[i].clicked += () => { SfxManager.Instance?.Play(SfxId.PageFlip); SwitchToTab(idx); };
             tabBadges[i] = tabButtons[i].Q<VisualElement>("tab-badge");
         }
 
@@ -143,6 +143,7 @@ public class BookPanelController : BasePanelController
         SetTopNavBookmarksVisible(false);
         SwitchToTab(lastActiveTab);
         State = PanelState.Open;
+        SfxManager.Instance?.Play(SfxId.PageFlip);
         InvokeOnOpenComplete();
         return true;
     }
@@ -157,6 +158,7 @@ public class BookPanelController : BasePanelController
         if (panel.parent != null) panel.parent.style.display = DisplayStyle.None;
         SetTopNavBookmarksVisible(true);
         State = PanelState.Closed;
+        SfxManager.Instance?.Play(SfxId.PageFlip);
         InvokeOnCloseComplete();
         return true;
     }
