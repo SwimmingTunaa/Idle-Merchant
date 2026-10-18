@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62033a92236854f6f978fa12fbb82832, type: 3}
-  m_Name: 4_Milestone_1Star_DungeonCurious
+  m_Name: 1_Milestone_1Star_DungeonCurious
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
   displayName: Dungeon Curious
-  description: Defeat 50 dungeon creatures
-  flavorText: Fifteen down, several thousand to go. But hey, it's a start!
+  description: Defeat 15 dungeon creatures
+  flavorText: Five down, several thousand to go. But hey, it's a start!
   icon: {fileID: 0}
   starLevel: 1
   milestoneType: 3
-  targetValue: 50
+  targetValue: 15
   requiredUpgrade: {fileID: 0}
   reward: {fileID: 0}
-  goldReward: 200
+  goldReward: 150
