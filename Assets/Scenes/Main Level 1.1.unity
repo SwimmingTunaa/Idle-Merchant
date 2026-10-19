@@ -1028,8 +1028,9 @@ MonoBehaviour:
   spawnerType: 0
   layerIndex: 3
   candidates:
-  - {fileID: 11400000, guid: 1f630e5ddcfde4f76b4de5c085136176, type: 2}
-  - {fileID: 11400000, guid: 95cadcd8073b840e6929f8dc26116b8c, type: 2}
+  - {fileID: 11400000, guid: 484be23e34d134767b534ad4b86a5851, type: 2}
+  - {fileID: 11400000, guid: 4edcff70aed2d4c41ab595888732ba2c, type: 2}
+  - {fileID: 11400000, guid: 281cb8994e5944d2bab8949f7694a9b3, type: 2}
   spawnsPerMinute: 50
   maxAlive: 15
   spawnArea: {fileID: 569436698}
@@ -9734,8 +9735,9 @@ MonoBehaviour:
   spawnerType: 0
   layerIndex: 5
   candidates:
-  - {fileID: 11400000, guid: 1f630e5ddcfde4f76b4de5c085136176, type: 2}
-  - {fileID: 11400000, guid: 95cadcd8073b840e6929f8dc26116b8c, type: 2}
+  - {fileID: 11400000, guid: 4f3001e618b424f0cb924c4098312670, type: 2}
+  - {fileID: 11400000, guid: d86c6722da46f44ea9acb0dd27c25a80, type: 2}
+  - {fileID: 11400000, guid: 59a259abb1a8847d3b73beff1452a9a8, type: 2}
   spawnsPerMinute: 50
   maxAlive: 15
   spawnArea: {fileID: 1121239926}
@@ -12883,6 +12885,8 @@ MonoBehaviour:
   candidates:
   - {fileID: 11400000, guid: 46c87652a78254405bbdad27b63643d7, type: 2}
   - {fileID: 11400000, guid: 5b96350e763244ec0818fcc9b0bd2c86, type: 2}
+  - {fileID: 11400000, guid: 455cc9d2be604429983f4b2da1c56905, type: 2}
+  - {fileID: 11400000, guid: 516a5c37cb024e36a2fc97ca7f58e3c0, type: 2}
   spawnsPerMinute: 30
   maxAlive: 10
   spawnArea: {fileID: 2059042693}
@@ -12890,8 +12894,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 0
-  craftedUnlocked: 0
-  luxuryUnlocked: 0
+  adventurerUnlockStar: 2
+  nobleUnlockStar: 3
   maxCommoner: 999
   maxAdventurer: 5
   maxNoble: 3
@@ -31602,8 +31606,9 @@ MonoBehaviour:
   spawnerType: 0
   layerIndex: 4
   candidates:
-  - {fileID: 11400000, guid: 1f630e5ddcfde4f76b4de5c085136176, type: 2}
-  - {fileID: 11400000, guid: 95cadcd8073b840e6929f8dc26116b8c, type: 2}
+  - {fileID: 11400000, guid: fcc15dfd40da949f6a71a70063b9113f, type: 2}
+  - {fileID: 11400000, guid: 12e47178761de42eeb3c786d356da700, type: 2}
+  - {fileID: 11400000, guid: 1b2499f590b9247c99d4d8948f1a4b52, type: 2}
   spawnsPerMinute: 50
   maxAlive: 15
   spawnArea: {fileID: 1976879463}
@@ -37692,9 +37697,9 @@ MonoBehaviour:
   inventoryHolder: {fileID: 0}
   debugText: {fileID: 0}
   itemsToAdd:
-  - item: {fileID: 11400000, guid: 3bdb892dfe97241b3acaef188a896fba, type: 2}
+  - item: {fileID: 11400000, guid: 55284c34a41b841e093a08f3d9a71534, type: 2}
     quantity: 15
-  - item: {fileID: 11400000, guid: b78b9d8fc7c414f2b847061059c7e01f, type: 2}
+  - item: {fileID: 11400000, guid: 821acb548e9bb46fd9f9d39b69a2f4e1, type: 2}
     quantity: 20
 --- !u!1 &1889693033
 GameObject:
@@ -43782,8 +43787,9 @@ MonoBehaviour:
   spawnerType: 0
   layerIndex: 2
   candidates:
-  - {fileID: 11400000, guid: 1f630e5ddcfde4f76b4de5c085136176, type: 2}
-  - {fileID: 11400000, guid: 95cadcd8073b840e6929f8dc26116b8c, type: 2}
+  - {fileID: 11400000, guid: 353039b3c9c55440d83585fbf8c77817, type: 2}
+  - {fileID: 11400000, guid: 2f9a4977902ef4edab25e3aa597a471c, type: 2}
+  - {fileID: 11400000, guid: da9314534b0154841abf71aed4c121b4, type: 2}
   spawnsPerMinute: 50
   maxAlive: 15
   spawnArea: {fileID: 166850357}

@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: 5072e2c6175db46a983a0f01a034430e, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_CorruptedDwarf
   displayName: Corrupted Dwarf
-  description: "Former miners twisted by prolonged crystal exposure. They still swing
-    their pickaxes\u2014just not at rocks anymore."
+  description: "Former miners twisted by prolonged crystal exposure. They still swing their pickaxes\u2014just not at rocks anymore."
   hireCost: 500
-  assignedLayer: 3
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 1.5
@@ -75,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1

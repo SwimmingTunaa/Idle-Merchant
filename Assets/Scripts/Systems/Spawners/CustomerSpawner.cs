@@ -2,13 +2,13 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-// Customer-only spawner: filters candidate customer defs by unlock state before the weighted roll.
+// Customer-only spawner: filters candidate customer defs by guild-star unlock before the weighted roll.
 // This lets you keep archetype weights static (on each CustomerDef.spawnWeight) while gating by progression.
 public class CustomerSpawner : Spawner
 {
-    [Header("Eligibility (hook these to progression later)")]
-    [SerializeField] private bool craftedUnlocked = false;
-    [SerializeField] private bool luxuryUnlocked = false;
+    [Header("Archetype Unlocks (guild stars)")]
+    [SerializeField] private int adventurerUnlockStar = 2;
+    [SerializeField] private int nobleUnlockStar = 3;
 
     [Header("Spawn Config")]
     [SerializeField] private int maxCommoner = 999;
@@ -91,6 +91,7 @@ public class CustomerSpawner : Spawner
             return;
 
         eligible.Clear();
+        int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
 
         for (int i = 0; i < candidates.Count; i++)
         {
@@ -100,12 +101,9 @@ public class CustomerSpawner : Spawner
             if (def is not CustomerDef customerDef)
                 continue;
 
-            // If customer is Adventurer but crafted isn't unlocked, skip
-            if (!craftedUnlocked && customerDef.customerArcheType == CustomerArcheType.Adventurer)
+            if (customerDef.customerArcheType == CustomerArcheType.Adventurer && stars < adventurerUnlockStar)
                 continue;
-
-            // If customer is Noble but luxury isn't unlocked, skip
-            if (!luxuryUnlocked && customerDef.customerArcheType == CustomerArcheType.Noble)
+            if (customerDef.customerArcheType == CustomerArcheType.Noble && stars < nobleUnlockStar)
                 continue;
 
             // Check spawn limits for all types
@@ -160,7 +158,4 @@ public class CustomerSpawner : Spawner
     {
         DecrementGroup(type);
     }
-
-    public void SetCraftedUnlocked(bool value) => craftedUnlocked = value;
-    public void SetLuxuryUnlocked(bool value) => luxuryUnlocked = value;
 }

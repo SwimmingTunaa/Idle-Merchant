@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: c73f7015b25514d41affe729a1cb8d59, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_IronGolem
   displayName: Iron Golem
-  description: Rare metallic constructs forged in the earth's heat. Their bodies
-    contain rich veins of workable iron ore.
+  description: Rare metallic constructs forged in the earth's heat. Their bodies contain rich veins of workable iron ore.
   hireCost: 500
-  assignedLayer: 2
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 1
@@ -75,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1

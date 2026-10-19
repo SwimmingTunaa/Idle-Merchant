@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: 83efc8befed9b4f73baa7f1e65bed275, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_Skeleton
   displayName: Skeleton
-  description: "Restless bones animated by lingering magic. They're not evil\u2014just
-    very committed to their guard duty."
+  description: "Restless bones animated by lingering magic. They're not evil\u2014just very committed to their guard duty."
   hireCost: 500
-  assignedLayer: 4
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 2
@@ -75,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1

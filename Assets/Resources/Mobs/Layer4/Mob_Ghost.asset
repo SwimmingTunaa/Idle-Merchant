@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: ec14bdcf7ed674f2680bf647e22f4e04, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_Ghost
   displayName: Ghost
-  description: Wispy spirits who phase through walls. Their ectoplasm is surprisingly
-    useful for enchanting.
+  description: Wispy spirits who phase through walls. Their ectoplasm is surprisingly useful for enchanting.
   hireCost: 500
-  assignedLayer: 4
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 1.5
@@ -75,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1

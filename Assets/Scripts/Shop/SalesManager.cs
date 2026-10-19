@@ -136,6 +136,31 @@ public class SalesManager : PersistentSingleton<SalesManager>
         out int desiredQty,
         out WalkoutReason reason)
     {
+        // Preferred category first; only if it yields nothing, the best affordable item from any other category.
+        // ponytail: strict preferred-then-fallback (no weighted mix) — commoners stay Basic-focused because Basic is
+        // almost always stocked; add a per-archetype fallback chance if they start draining Advanced stock.
+        if (TryPickFrom(inventory, preference, true, budget, batchRange, out desiredItem, out desiredQty, out reason))
+            return true;
+        bool sawStock = reason == WalkoutReason.TooExpensive;
+        if (TryPickFrom(inventory, preference, false, budget, batchRange, out desiredItem, out desiredQty, out reason))
+            return true;
+        if (sawStock) reason = WalkoutReason.TooExpensive;
+        return false;
+    }
+
+    private static readonly ItemCategory[] AllCategories = { ItemCategory.Basic, ItemCategory.Advanced, ItemCategory.Premium };
+
+    // preferredOnly: scan just `preference`; otherwise scan every category except it.
+    private bool TryPickFrom(
+        Inventory inventory,
+        ItemCategory preference,
+        bool preferredOnly,
+        int budget,
+        Vector2Int batchRange,
+        out ItemDef desiredItem,
+        out int desiredQty,
+        out WalkoutReason reason)
+    {
         desiredItem = null;
         desiredQty = 0;
         reason = WalkoutReason.NoStock;
@@ -144,25 +169,26 @@ public class SalesManager : PersistentSingleton<SalesManager>
 
         _sellableBuffer.Clear();
 
-        // Pull the right inventory dictionary (same mapping your Inventory already uses).
-        var dict = inventory.GetInventoryType(preference);
-        if (dict == null || dict.Count == 0) return false;
-
-        // Build candidate list from *sellable* stock, not raw inventory.
-        foreach (var kvp in dict)
+        foreach (var cat in AllCategories)
         {
-            var item = kvp.Key;
-            if (item == null) continue;
+            if ((cat == preference) != preferredOnly) continue;
+            var dict = inventory.GetInventoryType(cat);
+            if (dict == null) continue;
 
-            if (!CanSell(item)) continue;                 // your existing rule
-            int available = GetAvailableForSale(item);    // your existing rule
-            if (available <= 0) continue;
+            // Build candidate list from *sellable* stock, not raw inventory.
+            foreach (var kvp in dict)
+            {
+                var item = kvp.Key;
+                if (item == null) continue;
 
-            if (item.sellPrice <= 0) continue;
-            reason = WalkoutReason.TooExpensive; // stock matched preference; only budget can fail now
-            if (item.sellPrice > budget) continue;
+                if (GetAvailableForSale(item) <= 0) continue;
 
-            _sellableBuffer.Add(item);
+                if (item.sellPrice <= 0) continue;
+                reason = WalkoutReason.TooExpensive; // stock matched; only budget can fail now
+                if (item.sellPrice > budget) continue;
+
+                _sellableBuffer.Add(item);
+            }
         }
 
         if (_sellableBuffer.Count == 0) return false;

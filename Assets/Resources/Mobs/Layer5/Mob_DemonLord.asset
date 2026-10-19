@@ -14,17 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: 1a84298c273b64d7a8eff91dd81b02df, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_DemonLord
   displayName: Demon Lord
   description: 
   hireCost: 500
-  assignedLayer: 5
+  rank: 1
   startingSkills: []
   sortingType: 1
-  spawnWeight: 0
+  spawnWeight: 0.3
   moveSpeed: 1.2
   stopDistance: 0.05
   idleTimeRange: {x: 0, y: 0}
@@ -74,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1

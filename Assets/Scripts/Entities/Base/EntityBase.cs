@@ -74,7 +74,7 @@ public class EntityBase : MonoBehaviour
 
         traitComponent = GetComponent<TraitComponent>();
 
-        if (overriderAnimatorController && entityDef.animatorOverrideController != null && animator != null)
+        if (overriderAnimatorController && entityDef.animatorOverrideController is { Length: > 0 } && animator != null)
         {
             int index = UnityEngine.Random.Range(0, entityDef.animatorOverrideController.Length);
             animator.runtimeAnimatorController = entityDef.animatorOverrideController[index];

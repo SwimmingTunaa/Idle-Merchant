@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: 9d9465b749e6240a8b7bc81d7baf16d5, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_Imp
   displayName: Imp
-  description: Mischievous fiends who dart around cackling. Their horns are prized
-    for their dark enchantment properties.
+  description: Mischievous fiends who dart around cackling. Their horns are prized for their dark enchantment properties.
   hireCost: 500
-  assignedLayer: 5
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 2
@@ -75,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1

@@ -78,8 +78,10 @@ public class CraftingManager : MonoBehaviour
         {
             if (activeCrafts[i].timeRemaining <= 0f)
             {
-                CompleteCraft(activeCrafts[i].recipe);
+                // Remove first so CompleteCraft's restart check doesn't see this recipe as still crafting
+                RecipeDef done = activeCrafts[i].recipe;
                 activeCrafts.RemoveAt(i);
+                CompleteCraft(done);
             }
         }
     }
@@ -116,24 +118,24 @@ public class CraftingManager : MonoBehaviour
 
     public bool CanCraft(RecipeDef recipe)
     {
-        Debug.Log($"[CanCraft] Checking recipe: {recipe.Output.displayName}");
-        
+        if (showDebugLogs) Debug.Log($"[CanCraft] Checking recipe: {recipe.Output.displayName}");
+
         foreach (var ingredient in recipe.Ingredients)
         {
             int availableQty = inventory.Get(ingredient.Item.itemCategory, ingredient.Item);
             int reserveQty = Inventory.Instance.GetReserve(ingredient.Item);
             int neededQty = ingredient.Qty;
             
-            Debug.Log($"  - {ingredient.Item.displayName}: Have {availableQty}, Need {neededQty}, Reserve {reserveQty}, Available: {availableQty - reserveQty}");
+            if (showDebugLogs) Debug.Log($"  - {ingredient.Item.displayName}: Have {availableQty}, Need {neededQty}, Reserve {reserveQty}, Available: {availableQty - reserveQty}");
             
             if (availableQty - reserveQty < ingredient.Qty)
             {      
-                Debug.Log($"  - NOT ENOUGH!");
+                if (showDebugLogs) Debug.Log($"  - NOT ENOUGH!");
                 return false;
             }
         }
     
-        Debug.Log($"  - CAN CRAFT!");
+        if (showDebugLogs) Debug.Log($"  - CAN CRAFT!");
         return true;
     }
 

@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MobDef
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
-  animatorOverrideController: []
+  animatorOverrideController:
+  - {fileID: 22100000, guid: ac50ac4795414417e9be2a9d7199dd6b, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_RedSlime
   displayName: Red Slime
-  description: "Molten cousins of the blue variety. They guard their rocky puddles
-    with surprising ferocity\u2014but only if you get too close."
+  description: "Molten cousins of the blue variety. They guard their rocky puddles with surprising ferocity\u2014but only if you get too close."
   hireCost: 500
-  assignedLayer: 2
+  rank: 1
   startingSkills: []
   sortingType: 1
   spawnWeight: 1.8
@@ -75,6 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  baseXPReward: 10
   stunTime: 0.2
   combatConfig:
     canAttack: 1
