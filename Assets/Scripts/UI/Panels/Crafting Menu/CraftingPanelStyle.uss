@@ -1,167 +1,556 @@
-.recipe-book {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
+/* Crafting book page — left: recipe tiles on torn sheets per layer; right: inventory-style recipe detail at ~85%.
+   Mock: scratchpad/crafting-mock/crafting.html (v27). Sizes here are budgeted so the right page fits 650px
+   with 3 ingredient rows (46px each) and no scrolling — change one size, rebalance another. Book sprites 9-slice at 3px. */
 
-.book-title {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.page {
-    background-image: none;
-}
-
-.page-header {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    border-bottom-width: 1px;
-    border-color: rgba(139, 90, 60, 0.3);
-    padding-bottom: 4px;
-}
-
-.recipe-card {
-    transition-property: background-color;
-    transition-duration: 0.2s;
-}
-
-.recipe-card:hover {
-    background-color: rgba(139, 90, 60, 0.15);
-}
-
-.recipe-card.crafting {
-    background-color: rgba(139, 180, 90, 0.2);
-    border-left-width: 3px;
-    border-left-color: rgb(139, 180, 90);
-}
-
-.recipe-card.cannot-craft {
-    opacity: 0.5;
-}
-
-.item-icon {
-    border-width: 1px;
-    border-color: rgba(50, 30, 10, 0.3);
-}
-
-.recipe-name {
-    -unity-font-style: normal;
-}
-
-.control-dropdown {
-    background-color: rgba(139, 90, 60, 0.2);
-    border-radius: 4px;
-    padding: 4px;
-}
-
-.control-dropdown > Label {
-    color: rgb(50, 30, 10);
-    font-size: 12px;
-    min-width: 40px;
-}
-
-.recipe-toggle {
-}
-
-.recipe-toggle:checked {
-    background-color: rgba(139, 180, 90, 0.3);
-}
-
-.progress-bar {
-    transition-property: width;
-    transition-duration: 0.1s;
-}
-
-.recipe-list {
-}
-
-.reserve-list {
-}
-
-.recipe-list > #unity-content-container {
-    padding: 4px;
-}
-
-.reserve-list > #unity-content-container {
-    padding: 4px;
-}
-
-.close-button {
-    transition-property: background-color;
-    transition-duration: 0.2s;
-}
-
-.close-button:hover {
-    background-color: rgba(180, 90, 60, 0.7);
-}
-
-.close-button:active {
-    background-color: rgba(160, 70, 40, 0.9);
-}
-
-.reserve-item {
+.craft-page {
     flex-direction: row;
-    align-items: center;
-    padding: 8px;
-    margin-bottom: 4px;
-    background-color: rgba(250, 240, 220, 0.5);
-    border-radius: 4px;
-    border-bottom-width: 1px;
-    border-color: rgba(139, 90, 60, 0.2);
-}
-
-.reserve-item-icon {
-    width: 32px;
-    height: 32px;
-    margin-right: 8px;
-    background-color: rgba(139, 90, 60, 0.2);
-    border-radius: 4px;
-}
-
-.reserve-item-name {
     flex-grow: 1;
-    font-size: 14px;
-    color: rgb(50, 30, 10);
+    -unity-font-definition: var(--font-body);
 }
 
-.reserve-item-stock {
-    font-size: 12px;
-    color: rgb(90, 60, 40);
-    margin-right: 8px;
-    min-width: 60px;
-    -unity-text-align: middle-right;
+Label {
+    margin: 0;
+    padding: 0;
 }
 
-.reserve-slider {
-    width: 120px;
+/* ═════ LEFT ═════ */
+.craft-left {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0 55px 0 0;
 }
 
-.ingredient-slot {
+.craft-scroll {
+    flex-grow: 1;
+    padding-left: 12px; /* ~half the scroller (16 + 6) so 3 tiles still fit per sheet; sheets sit ~5px left of the header centre */
+}
+
+.craft-scroll > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container {
+    padding-top: 4px;
+    padding-bottom: 6px;
+}
+
+.ct-sheet {
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&guid=e202a8ab367e41aead07308c65d8c8a8&type=3#card-torn");
+    -unity-slice-left: 8;
+    -unity-slice-top: 8;
+    -unity-slice-right: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 3px;
+    padding: 12px 18px 20px 18px;
+    margin: 0 -4px 8px -4px;
+}
+
+.ct-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 6px;
+}
+
+.ct-tile {
+    width: 142px;
+    margin: 3px;
+    padding: 14px 8px 12px 8px;
+    align-items: center;
+    cursor: link;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/22.png?fileID=-7371509505491802261&guid=e7a8a10c7d9d84c87b2423fc792360b0&type=3#22_0");
+    -unity-slice-left: 4;
+    -unity-slice-top: 4;
+    -unity-slice-right: 4;
+    -unity-slice-bottom: 4;
+    -unity-slice-scale: 3px;
+}
+
+.ct-tile:hover {
+    -unity-background-image-tint-color: rgb(255, 244, 225);
+}
+
+.ct-sel-ring {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    right: 6px;
+    bottom: 6px;
+    border-width: 2px;
+    border-color: var(--color-box-border);
+    display: none;
+}
+
+.ct-tile--sel .ct-sel-ring {
+    display: flex;
+}
+
+.ct-name {
+    margin-top: 5px;
+    font-size: 18px;
+    color: var(--color-text-strong);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.ct-tile--locked .ct-name {
+    color: var(--color-text-muted);
+}
+
+.ct-value-row {
     flex-direction: row;
     align-items: center;
+    margin-top: 3px;
+}
+
+.ct-value-row .craft-coin {
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+}
+
+.ct-value {
+    font-size: 17px;
+    color: var(--color-text-gold);
+}
+
+/* pixel slip: hard 2px border, heavier right/bottom edge stands in for the mock's offset shadow */
+.ct-stock {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    min-width: 28px;
+    height: 24px;
+    padding: 0 6px 2px 6px;
+    background-color: rgb(233, 217, 184);
+    border-color: var(--primary-900);
+    border-left-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    font-size: 15px;
+    color: var(--primary-900);
+    -unity-text-align: middle-center;
+}
+
+.ct-stock--capped {
+    background-color: var(--color-gold-hi);
+    color: rgb(58, 36, 8);
+}
+
+.ct-on-mark {
+    position: absolute;
+    left: -6px;
+    top: -6px;
+    width: 22px;
+    height: 22px;
+    rotate: -17deg;
+    display: none;
+    -unity-background-scale-mode: scale-and-crop;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/for-sale-stamp-sheet.png?fileID=1729883773912937322&guid=019c67496337345b5b1654dbcc071b00&type=3#for-sale-stamp-sheet_0");
+}
+
+.ct-tile--on .ct-on-mark {
+    display: flex;
+}
+
+/* ═════ STATUS FRAME (StatusFrame.cs) — the border carries state ═════ */
+.status-frame {
+    flex-shrink: 0;
+    background-color: var(--primary-900);
+    border-radius: 4px;
+}
+
+.status-frame__in {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-box-bg);
+    border-radius: 2px;
+}
+
+.status-frame__icon {
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.status-frame__lock {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: none;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/padlock.png?fileID=2800000&guid=7f9a8792edfd64ebfb10315f0209a27f&type=3#padlock");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.status-frame--big {
+    border-radius: 6px;
+}
+
+.status-frame--big > .status-frame__in {
+    background-color: rgba(215, 181, 148, 0.55);
+    border-radius: 3px;
+}
+
+.status-frame--blocked {
+    background-color: var(--color-text-danger);
+}
+
+.status-frame--capped {
+    background-color: var(--color-gold-hi);
+}
+
+.status-frame--locked {
+    background-color: var(--color-status-locked);
+}
+
+.status-frame--locked > .status-frame__in,
+.status-frame--big.status-frame--locked > .status-frame__in {
+    background-color: rgb(201, 188, 162);
+}
+
+.status-frame--locked .status-frame__icon {
+    -unity-background-image-tint-color: rgba(110, 100, 85, 0.4);
+}
+
+.status-frame--locked > .status-frame__lock {
+    display: flex;
+}
+
+/* ═════ RIGHT ═════ */
+.craft-right {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 10px 14px 0 57px;
+}
+
+.craft-sprite-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.craft-dline {
+    width: 110px;
+    height: 51px;
+    margin-left: 12px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-line.png?fileID=2800000&guid=2113edcd15d6a4096a25fbbc91c2bad5&type=3#deco-diamond-line");
+}
+
+.craft-dline--left {
+    scale: -1 1;
+    margin-left: 0;
     margin-right: 12px;
+}
+
+.craft-slot {
+    width: 150px;
+    height: 150px;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=2800000&guid=dc67f5857d1cc48f49c6bf8c91eedf54&type=3#deco-diamond-big");
+}
+
+.craft-banner {
+    width: 340px;
+    height: 66px;
+    margin-top: 4px;
+    padding-bottom: 12px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-title-banner.png?fileID=2800000&guid=992d1ea8d5ec74d89b5301bb26534a78&type=3#deco-title-banner");
+}
+
+.craft-banner__text {
+    font-size: 28px;
+    color: var(--color-text-strong);
+    -unity-text-align: middle-center;
+}
+
+.craft-metrics {
+    flex-direction: row;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 46px;
+    margin-top: 8px;
+}
+
+.craft-plank {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&guid=7431fc87a504d4dc29fd217299608c7f&type=3#box-splice_0");
+    -unity-slice-left: 8;
+    -unity-slice-top: 3;
+    -unity-slice-right: 8;
+    -unity-slice-bottom: 3;
+    -unity-slice-scale: 3px;
+}
+
+.craft-plank--station {
+    flex-grow: 1.15;
+    flex-basis: 0;
+}
+
+.craft-plank--value {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-left: 8px;
+}
+
+.craft-plank--cap {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-left: 8px;
+    padding: 6px 8px 6px 14px;
+}
+
+.craft-plank__text {
+    font-size: 24px;
+    color: var(--color-text-strong);
+    white-space: nowrap;
+}
+
+.craft-plank__num {
+    font-size: 34px;
+    color: var(--color-text-strong);
+}
+
+.craft-coin {
+    width: 26px;
+    height: 24px;
+    margin-right: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&guid=16798bfa02f8d44348f9fffdaf153786&type=3#Copper Coin_0");
+}
+
+.craft-cap-num {
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+}
+
+.craft-stepper {
+    align-self: stretch;
+    width: 28px;
+    flex-shrink: 0;
+    background-color: var(--primary-200);
+}
+
+.craft-step {
+    flex-grow: 1;
+    flex-basis: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+#cap-up {
+    border-bottom-width: 1px;
+    border-bottom-color: var(--primary-300);
+}
+
+.craft-arrow {
+    width: 12.5px;
+    height: 5px;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/arrow-up.svg?fileID=7388822144124034973&guid=d74b06c23651248108bf294c044d919a&type=3#arrow-up");
+}
+
+.craft-arrow--down {
+    scale: 1 -1;
+}
+
+.craft-desc {
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 58px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    overflow: hidden;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/text-box-slice.png?fileID=3997786295894542459&guid=4c3028ba947224aa4a305c692c8087ed&type=3#text-box-slice_0");
+    -unity-slice-left: 1;
+    -unity-slice-top: 1;
+    -unity-slice-right: 1;
+    -unity-slice-bottom: 1;
+    -unity-slice-scale: 5px;
+}
+
+.craft-desc__text {
+    font-size: 19px;
+    white-space: normal;
+    color: var(--color-text-strong);
+}
+
+.craft-section-head {
+    align-self: stretch;
+    margin-top: 6px;
     margin-bottom: 4px;
 }
 
-.ingredient-icon {
-    width: 32px;
-    height: 32px;
-    background-color: rgba(139, 90, 60, 0.2);
-    border-radius: 4px;
-    border-width: 1px;
-    border-color: rgba(50, 30, 10, 0.2);
-    margin-right: 4px;
+.craft-ings {
+    align-self: stretch;
+    flex-shrink: 0;
 }
 
-.ingredient-quantity {
-    font-size: 12px;
-    color: rgb(50, 30, 10);
+.craft-ing {
+    flex-direction: row;
+    align-items: center;
+    height: 46px;
+    padding: 0 16px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/22.png?fileID=-7371509505491802261&guid=e7a8a10c7d9d84c87b2423fc792360b0&type=3#22_0");
+    -unity-slice-left: 4;
+    -unity-slice-top: 4;
+    -unity-slice-right: 4;
+    -unity-slice-bottom: 4;
+    -unity-slice-scale: 3px;
 }
 
-.flash-complete {
-    background-color: rgba(139, 180, 90, 0.5);
-    transition-property: background-color;
-    transition-duration: 0.3s;
+.craft-ing--stacked {
+    margin-top: -2px;
 }
 
-.instruction-text {
-    opacity: 0.7;
-    font-style: italic;
+.craft-ing__icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.craft-ing__name {
+    flex-grow: 1;
+    font-size: 19px;
+    color: var(--color-text-strong);
+}
+
+.craft-ing__src {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-right: 8px;
+}
+
+.craft-ing__have {
+    font-size: 19px;
+    min-width: 34px;
+    -unity-text-align: middle-right;
+    color: var(--color-text-success);
+}
+
+.craft-ing__have--short {
+    color: var(--color-text-danger);
+}
+
+.craft-prod {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 4px;
+    margin-bottom: 14px;
+}
+
+.craft-prod Label {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+    margin-left: 8px;
+}
+
+.craft-prod #detail-time {
+    color: var(--color-text-strong);
+    margin-left: 0;
+}
+
+.craft-prod .craft-prod__sep {
+    color: var(--color-text-muted);
+}
+
+.craft-pips {
+    flex-direction: row;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.craft-pip {
+    width: 12px;
+    height: 12px;
+    margin-left: 4px;
+    border-width: 2px;
+    border-color: var(--primary-900);
+    background-color: var(--color-box-bg);
+    cursor: link;
+}
+
+.craft-pip--on {
+    background-color: var(--color-gold-hi);
+}
+
+/* foot stamp plank: "Craft" when off; the red CRAFTING badge is slammed over it when on */
+.craft-stampslot {
+    width: 300px;
+    height: 52px;
+    flex-shrink: 0;
+    margin-top: auto;
+    margin-bottom: 20px;
+    cursor: link;
+}
+
+.craft-foot-plank {
+    flex-grow: 1;
+    padding: 0 4px;
+}
+
+.craft-stampslot:hover .craft-foot-plank {
+    -unity-background-image-tint-color: rgb(255, 248, 235);
+}
+
+.craft-foot-text {
+    font-size: 26px;
+    color: var(--primary-900);
+    -unity-text-align: middle-center;
+}
+
+.craft-stampslot--locked {
+    cursor: arrow;
+}
+
+.craft-stampslot--locked .craft-foot-text {
+    font-size: 19px;
+    color: rgb(181, 157, 126);
+}
+
+.craft-badge {
+    position: absolute;
+    left: -6px;
+    top: -3px;
+    width: 312px;
+    height: 58px;
+    rotate: -7deg;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/for-sale-stamp-sheet.png?fileID=1729883773912937322&guid=019c67496337345b5b1654dbcc071b00&type=3#for-sale-stamp-sheet_0");
+}
+
+.craft-badge__text {
+    font-size: 30px;
+    letter-spacing: 2px;
+    padding-bottom: 2px;
+    color: var(--color-box-bg);
+    -unity-text-align: middle-center;
+}
+
+/* slam overlay: sized (920px) and positioned in code — CraftingController.SlamSize / BookStamp.AimAt */
+.craft-slam {
+    position: absolute;
+    display: none;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/Stamp.png?fileID=5564853175316236378&guid=6fdb63f54eb1349438d92a27ec084b83&type=3#Stamp_5");
 }

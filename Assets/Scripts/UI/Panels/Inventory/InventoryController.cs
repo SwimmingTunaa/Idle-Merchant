@@ -385,7 +385,7 @@ public class InventoryController : MonoBehaviour, IBookPage
         if (reservedBadge != null)
         {
             reservedBadge.style.display = reserved > 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            if (reserved > 0) reservedBadge.text = $"Held: {reserved}";
+            if (reserved > 0) reservedBadge.text = $"Keep: {reserved}";
         }
 
         var forSaleBadge = slot.Q<Label>("slot-forsale");
@@ -469,7 +469,7 @@ public class InventoryController : MonoBehaviour, IBookPage
         }
     }
 
-    // Reserve stepper — supports hold-to-repeat. PointerDown fires StepReserve once,
+    // Floor (keep-N) stepper — supports hold-to-repeat. PointerDown fires StepReserve once,
     // then after a short delay starts auto-repeating until pointer is released or leaves.
     private void OnReserveUpPointerDown(PointerDownEvent evt) => StartReserveHold(+1);
     private void OnReserveDownPointerDown(PointerDownEvent evt) => StartReserveHold(-1);
@@ -515,49 +515,16 @@ public class InventoryController : MonoBehaviour, IBookPage
         if (forsaleLabel != null) forsaleLabel.style.display = DisplayStyle.None;
         if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.None;
 
-        if (stampAnim == null || stampSlamAnim?.frames == null || stampSlamAnim.frames.Length == 0)
-        {
-            // No overlay — just reveal the badge stamp now
-            if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.Flex;
-            onComplete?.Invoke();
-            return;
-        }
-
-        int impactFrame = stampSlamAnim.frames.Length / 2; // midway = the "slam lands" moment
-
-        stampAnim.style.display = DisplayStyle.Flex;
-        stampSlamAnim.Play(
-            stampAnim,
-            onComplete: onComplete,
-            onFrame: idx =>
-            {
-                // Reveal the persistent badge stamp the instant the slam reaches impact
-                if (idx == impactFrame && forsaleStamp != null)
-                    forsaleStamp.style.display = DisplayStyle.Flex;
-            });
+        BookStamp.SlamIn(stampSlamAnim, stampAnim,
+            onImpact: () => { if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.Flex; },
+            onComplete: onComplete);
     }
 
-    // Pixel-art dither-erase: swap backgroundImage through the for-sale-stamp-sheet frames.
-    // Frame 0 is the full stamp, the last frame is fully erased. The overlay "FOR SALE"
-    // text is hidden during the animation since the dither frames have the text baked in,
-    // and "Not For Sale" is shown underneath so it reveals as the stamp erases.
+    // Pixel-art dither-erase on the badge; "Not For Sale" shows underneath so it reveals as the stamp erases.
     private void PlayStampDitherOut(System.Action onComplete)
     {
-        if (forsaleStamp == null) { onComplete?.Invoke(); return; }
-
-        var stampText = forsaleStamp.Q<Label>("forsale-stamp-text");
-        if (stampText != null) stampText.style.display = DisplayStyle.None;
         if (forsaleLabel != null) forsaleLabel.style.display = DisplayStyle.Flex;
-
-        forsaleDitherAnim.Play(
-            forsaleStamp,
-            onComplete: () =>
-            {
-                // Restore the text so the next time the stamp is shown (re-marked for sale),
-                // the label appears overlaid on frame 0 correctly.
-                if (stampText != null) stampText.style.display = DisplayStyle.Flex;
-                onComplete?.Invoke();
-            });
+        BookStamp.DitherOut(forsaleDitherAnim, forsaleStamp, forsaleStamp?.Q<Label>("forsale-stamp-text"), onComplete);
     }
 
     private void UpdateHeaderLabels()

@@ -17,10 +17,10 @@
             <ui:ScrollView name="roster-scroll" mode="Vertical" style="flex-grow: 1;">
                 <ui:VisualElement name="layers-container" style="flex-direction: column; padding: 0; padding-top: 20px;">
                     <ui:VisualElement class="layer-section">
-                        <ui:VisualElement class="layer-header">
-                            <ui:VisualElement class="layer-deco-line" />
-                            <ui:Label text="Abandoned Mines" class="layer-name" />
-                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
+                        <ui:VisualElement class="book-subhead">
+                            <ui:VisualElement class="book-subhead__rule" />
+                            <ui:Label text="Abandoned Mines" class="book-subhead__label" />
+                            <ui:VisualElement class="book-subhead__rule book-subhead__rule--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
@@ -33,10 +33,10 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
-                        <ui:VisualElement class="layer-header">
-                            <ui:VisualElement class="layer-deco-line" />
-                            <ui:Label text="Deep Caverns" class="layer-name" />
-                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
+                        <ui:VisualElement class="book-subhead">
+                            <ui:VisualElement class="book-subhead__rule" />
+                            <ui:Label text="Deep Caverns" class="book-subhead__label" />
+                            <ui:VisualElement class="book-subhead__rule book-subhead__rule--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
@@ -50,10 +50,10 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
-                        <ui:VisualElement class="layer-header">
-                            <ui:VisualElement class="layer-deco-line" />
-                            <ui:Label text="Crystal Hollows" class="layer-name" />
-                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
+                        <ui:VisualElement class="book-subhead">
+                            <ui:VisualElement class="book-subhead__rule" />
+                            <ui:Label text="Crystal Hollows" class="book-subhead__label" />
+                            <ui:VisualElement class="book-subhead__rule book-subhead__rule--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:Instance template="AdventurerSlot" class="adv-slot-container" />
@@ -66,10 +66,10 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
-                        <ui:VisualElement class="layer-header">
-                            <ui:VisualElement class="layer-deco-line" />
-                            <ui:Label text="Cursed Crypts" class="layer-name" />
-                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
+                        <ui:VisualElement class="book-subhead">
+                            <ui:VisualElement class="book-subhead__rule" />
+                            <ui:Label text="Cursed Crypts" class="book-subhead__label" />
+                            <ui:VisualElement class="book-subhead__rule book-subhead__rule--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:VisualElement class="empty-slot">
@@ -84,10 +84,10 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="layer-section">
-                        <ui:VisualElement class="layer-header">
-                            <ui:VisualElement class="layer-deco-line" />
-                            <ui:Label text="Infernal Depths" class="layer-name" />
-                            <ui:VisualElement class="layer-deco-line layer-deco-line--right" />
+                        <ui:VisualElement class="book-subhead">
+                            <ui:VisualElement class="book-subhead__rule" />
+                            <ui:Label text="Infernal Depths" class="book-subhead__label" />
+                            <ui:VisualElement class="book-subhead__rule book-subhead__rule--right" />
                         </ui:VisualElement>
                         <ui:VisualElement class="slot-row">
                             <ui:VisualElement class="empty-slot">

@@ -54,6 +54,10 @@
     --color-text-info: rgb(42, 93, 143);        /* #2A5D8F — Figma Text/Info (skill values) */
     --color-text-inverse: rgb(250, 240, 220);   /* #FAF0DC — Figma Text/Inverse */
     --color-text-link: rgb(180, 130, 50);       /* Unity-only */
+    --color-text-danger: rgb(150, 45, 38);      /* #962D26 — short ingredient, blocked frame */
+    --color-text-gold: rgb(168, 118, 0);        /* #A87600 — coin values on parchment */
+    --color-gold-hi: rgb(240, 180, 41);         /* #F0B429 — capped frame / crafting sweep / on-pips */
+    --color-status-locked: rgb(154, 140, 118);  /* #9A8C76 — frame of a recipe whose station isn't owned */
     --color-exp: var(--blue-500);               /* mirrors Figma color-exp → Blue/500 */
     --color-accent: rgb(255, 190, 97);
     --color-accent-hover: rgb(255, 210, 140);
@@ -114,6 +118,14 @@
     --font-size-body-lg:     32px;   /* Figma Body/LG — pixel-perfect (BrightLinger 2×) */
     --font-size-body-xl:     40px;   /* Figma Body/XL — NOT pixel-perfect */
     --font-size-heading-lg:  52px;   /* Figma Heading/LG — pixel-perfect (NotJam 4×) */
+    /* ── Book sub-header: rule · label · rule (.book-subhead in BookPanel.uss) ── */
+    --subhead-size: 26px;
+    --subhead-color: var(--color-text-primary);
+    --subhead-gap: 8px;
+    --subhead-margin-top: 8px;
+    --subhead-margin-bottom: 6px;
+    --rule-w: 100px;
+    --rule-h: 10px;
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;

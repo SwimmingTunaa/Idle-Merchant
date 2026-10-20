@@ -1,63 +1,67 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Crafting page — recipe list on the left, active crafts status on the right.
-/// Implements IBookPage; lives inside BookPanelController as tab 3.
+/// Crafting book page (tab 3). Left: one torn sheet per dungeon layer, recipe tiles (select only) with a
+/// StatusFrame, stock slip and a red "on" corner. Right: inventory-style detail — cap stepper, ingredients,
+/// priority pips, and the foot stamp plank that toggles the recipe (slam on / dither off, BookStamp).
+/// A recipe's layer = the deepest layer any raw ingredient first drops on (crafted ingredients inherit theirs).
 /// </summary>
 public class CraftingController : MonoBehaviour, IBookPage
 {
-    [Header("UXML References")]
-    [SerializeField] private VisualTreeAsset recipeCardAsset;
-
-    // UI Elements
-    private ScrollView recipeScroll;
-    private DropdownField filterDropdown;
-    private DropdownField sortDropdown;
-    private Label activeCraftsLabel;
-    private Label statusLabel;
-
-    // State
-    private List<RecipeCardData> recipeCards = new List<RecipeCardData>();
-    private bool isShown = false;
-
-    private enum FilterMode { All, CanCraft, MissingMaterials, Enabled }
-    private enum SortMode { UnlockOrder, CraftTime, OutputValue }
-
-    private FilterMode currentFilter = FilterMode.All;
-    private SortMode currentSort = SortMode.UnlockOrder;
+    [Header("Stamp Animation")]
+    [Tooltip("Big Stamp.png slam overlay played over the foot plank when a recipe is switched on.")]
+    [SerializeField] private FrameAnim stampSlamAnim = new() { frameMs = 40, fadeMs = 150, end = UIFrameAnimator.EndBehaviour.HideAndReset };
+    [Tooltip("Dither-erase (for-sale-stamp-sheet) played on the CRAFTING badge when a recipe is switched off.")]
+    [SerializeField] private FrameAnim stampDitherAnim = new() { frameMs = 40, end = UIFrameAnimator.EndBehaviour.HideAndReset };
 
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
 
-    private class RecipeCardData
-    {
-        public RecipeDef recipe;
-        public VisualElement cardElement;
-        public VisualElement ingredientsContainer;
-        public VisualElement progressContainer;
-        public VisualElement progressBar;
-        public Label craftTimeLabel;
-        public Toggle enableToggle;
-    }
-
     public string PageTitle => "Crafting";
 
-    void Awake() => hideFlags = HideFlags.HideInInspector;
+    // Stamp face ≈ 1/3 of the Stamp.png frame, so 920px puts it over the 300px foot plank
+    // (the inventory's 593px overlay over its 175px badge is the same ratio)
+    private const float SlamSize = 920f;
+    private const int TickMs = 100;          // sweep repaint cadence
+    private const int SafetyRefreshTicks = 10; // full state refresh at least once a second (catches stock changes no signal reports)
 
-    // ═════════════════════════════════════════════
-    // UNITY LIFECYCLE
-    // ═════════════════════════════════════════════
-
-    void Update()
+    private class Tile
     {
-        if (!isShown) return;
-        UpdateCraftingProgress();
-        UpdateFooter();
+        public RecipeDef recipe;
+        public VisualElement root;
+        public StatusFrame frame;
+        public Label stock;
     }
+
+    private class IngRow
+    {
+        public ItemDef item;
+        public int need;
+        public Label have;
+    }
+
+    private readonly List<Tile> tiles = new();
+    private readonly List<IngRow> ingRows = new();
+    private readonly Dictionary<RecipeDef, int> recipeLayer = new();
+    private readonly Dictionary<ItemDef, RecipeDef> recipeFor = new();
+    private readonly Dictionary<ItemDef, int> dropLayer = new();
+    private static readonly Dictionary<CraftingStation, string> stationNames = new();
+
+    private RecipeDef selected;
+    private bool dirty, busy;
+    private int ticksSinceRefresh;
+    private IVisualElementScheduledItem tick;
+
+    // Elements (UXML instances persist across page shows; callbacks are wired once per root)
+    private VisualElement wiredRoot;
+    private ScrollView scroll;
+    private StatusFrame detailFrame;
+    private Label dName, dStation, dValue, dCap, dDesc, dTime, stampText;
+    private VisualElement ingList, pips, stampSlot, stampBadge, stampBadgeText, slamOverlay;
+
+    void Awake() => hideFlags = HideFlags.HideInInspector;
 
     // ═════════════════════════════════════════════
     // IBOOK PAGE
@@ -65,247 +69,374 @@ public class CraftingController : MonoBehaviour, IBookPage
 
     public void OnPageShown(VisualElement leftPage, VisualElement rightPage)
     {
-        recipeScroll = leftPage.Q<ScrollView>("recipe-scroll");
-        filterDropdown = leftPage.Q<DropdownField>("filter-dropdown");
-        sortDropdown = leftPage.Q<DropdownField>("sort-dropdown");
-        activeCraftsLabel = rightPage.Q<Label>("active-crafts-label");
-        statusLabel = rightPage.Q<Label>("status-label");
+        if (CraftingManager.Instance == null || leftPage == null || rightPage == null)
+        {
+            Debug.LogError("[CraftingController] Missing CraftingManager or page containers");
+            return;
+        }
+        if (wiredRoot != rightPage) Wire(leftPage, rightPage);
 
-        filterDropdown.choices = new List<string> { "All", "Can Craft", "Missing Materials", "Enabled" };
-        filterDropdown.value = "All";
-        filterDropdown.RegisterValueChangedCallback(OnFilterChanged);
+        GameSignals.OnCraftingConfigChanged += MarkDirty;
+        GameSignals.OnCraftStarted += OnRecipeSignal;
+        GameSignals.OnProductCrafted += OnStockSignal;
+        GameSignals.OnItemAdded += OnStockSignal;
+        GameSignals.OnItemSold += OnStockSignal;
+        ProgressionManager.OnUpgradePurchased += OnUpgradePurchased;
 
-        sortDropdown.choices = new List<string> { "Unlock Order", "Craft Time (Fast→Slow)", "Output Value (High→Low)" };
-        sortDropdown.value = "Unlock Order";
-        sortDropdown.RegisterValueChangedCallback(OnSortChanged);
+        busy = false;
+        BuildLayerMap();
+        BuildList();
+        Select(selected != null && recipeLayer.ContainsKey(selected) ? selected : (tiles.Count > 0 ? tiles[0].recipe : null));
 
-        GameSignals.OnProductCrafted += OnProductCrafted;
-        GameSignals.OnCraftStarted += OnCraftStarted;
-
-        isShown = true;
-        PopulateRecipes();
+        tick ??= rightPage.schedule.Execute(Tick).Every(TickMs);
+        tick.Resume();
     }
 
     public void OnPageHidden()
     {
-        GameSignals.OnProductCrafted -= OnProductCrafted;
-        GameSignals.OnCraftStarted -= OnCraftStarted;
+        GameSignals.OnCraftingConfigChanged -= MarkDirty;
+        GameSignals.OnCraftStarted -= OnRecipeSignal;
+        GameSignals.OnProductCrafted -= OnStockSignal;
+        GameSignals.OnItemAdded -= OnStockSignal;
+        GameSignals.OnItemSold -= OnStockSignal;
+        ProgressionManager.OnUpgradePurchased -= OnUpgradePurchased;
 
-        if (filterDropdown != null) filterDropdown.UnregisterValueChangedCallback(OnFilterChanged);
-        if (sortDropdown != null) sortDropdown.UnregisterValueChangedCallback(OnSortChanged);
-
-        isShown = false;
-        recipeScroll = null;
-        filterDropdown = null;
-        sortDropdown = null;
-        activeCraftsLabel = null;
-        statusLabel = null;
-        recipeCards.Clear();
+        tick?.Pause();
+        // Cancel any in-flight stamp so the badge isn't left on a half-erased frame
+        slamOverlay?.Stop();
+        if (slamOverlay != null) slamOverlay.style.display = DisplayStyle.None;
+        stampBadge?.Stop();
+        if (stampBadge != null && stampDitherAnim.frames != null && stampDitherAnim.frames.Length > 0)
+            stampBadge.style.backgroundImage = new StyleBackground(stampDitherAnim.frames[0]);
+        if (stampBadgeText != null) stampBadgeText.style.display = DisplayStyle.Flex;
+        busy = false;
     }
 
-    // ═════════════════════════════════════════════
-    // RECIPE LIST
-    // ═════════════════════════════════════════════
-
-    private void PopulateRecipes()
+    private void Wire(VisualElement left, VisualElement right)
     {
-        recipeScroll.Clear();
-        recipeCards.Clear();
+        wiredRoot = right;
+        scroll = left.Q<ScrollView>("recipe-scroll");
+        dName = right.Q<Label>("detail-name");
+        dStation = right.Q<Label>("detail-station");
+        dValue = right.Q<Label>("detail-value");
+        dCap = right.Q<Label>("detail-cap");
+        dDesc = right.Q<Label>("detail-desc");
+        dTime = right.Q<Label>("detail-time");
+        ingList = right.Q<VisualElement>("ingredient-list");
+        pips = right.Q<VisualElement>("priority-pips");
+        stampSlot = right.Q<VisualElement>("stamp-slot");
+        stampText = right.Q<Label>("stamp-text");
+        stampBadge = right.Q<VisualElement>("stamp-badge");
+        stampBadgeText = right.Q<VisualElement>("stamp-badge-text");
+        // Stampanim lives at page-root level (sibling of the pages) so the stamp hand isn't clipped.
+        slamOverlay = (right.parent ?? right).Q<VisualElement>("Stampanim");
 
-        if (CraftingManager.Instance == null)
+        detailFrame = new StatusFrame(120, 4, 96, 44, 48, big: true);
+        right.Q<VisualElement>("detail-slot")?.Add(detailFrame);
+
+        // Clickable(delay, interval) = press-and-hold repeat, like the inventory floor stepper
+        right.Q<VisualElement>("cap-up")?.AddManipulator(new Clickable(() => StepCap(+1), 350, 70));
+        right.Q<VisualElement>("cap-down")?.AddManipulator(new Clickable(() => StepCap(-1), 350, 70));
+
+        for (int i = 0; i < CraftingManager.MaxPriority; i++)
         {
-            Debug.LogError("[CraftingController] CraftingManager.Instance is null");
-            return;
+            int prio = i + 1;
+            var pip = new VisualElement();
+            pip.AddToClassList("craft-pip");
+            pip.RegisterCallback<ClickEvent>(_ => { if (selected != null) CraftingManager.Instance.SetPriority(selected, prio); });
+            pips.Add(pip);
         }
 
-        foreach (var recipe in CraftingManager.Instance.GetAllRecipes())
-            CreateRecipeCard(recipe);
-
-        ApplyFilterAndSort();
-    }
-
-    private void CreateRecipeCard(RecipeDef recipe)
-    {
-        VisualElement card = recipeCardAsset.CloneTree().Q<VisualElement>("recipe-card");
-
-        var outputIcon = card.Q<VisualElement>("output-icon");
-        var recipeName = card.Q<Label>("recipe-name");
-        var outputQuantity = card.Q<Label>("output-quantity");
-
-        if (recipe.Output.icon != null)
-            outputIcon.style.backgroundImage = new StyleBackground(recipe.Output.icon);
-        recipeName.text = recipe.Output.displayName;
-        outputQuantity.text = $"x{recipe.OutputQty}";
-
-        var ingredientsContainer = card.Q<VisualElement>("ingredients-container");
-        foreach (var ingredient in recipe.Ingredients)
-            CreateIngredientSlot(ingredientsContainer, ingredient);
-
-        var craftTimeLabel = card.Q<Label>("craft-time");
-        craftTimeLabel.text = $"{recipe.CraftSeconds:F1}s";
-
-        var progressContainer = card.Q<VisualElement>("progress-container");
-        var progressBar = card.Q<VisualElement>("progress-bar");
-
-        var enableToggle = card.Q<Toggle>("enable-toggle");
-        enableToggle.value = CraftingManager.Instance.IsRecipeEnabled(recipe);
-        enableToggle.RegisterValueChangedCallback(evt => OnRecipeToggled(recipe, evt.newValue));
-
-        var cardData = new RecipeCardData
-        {
-            recipe = recipe,
-            cardElement = card,
-            ingredientsContainer = ingredientsContainer,
-            progressContainer = progressContainer,
-            progressBar = progressBar,
-            craftTimeLabel = craftTimeLabel,
-            enableToggle = enableToggle
-        };
-
-        recipeCards.Add(cardData);
-        recipeScroll.Add(card);
-        UpdateRecipeCardState(cardData);
-    }
-
-    private void CreateIngredientSlot(VisualElement container, RecipeDef.Ingredient ingredient)
-    {
-        var slot = new VisualElement();
-        slot.AddToClassList("ingredient-slot");
-
-        var icon = new VisualElement();
-        icon.AddToClassList("ingredient-icon");
-        if (ingredient.Item.icon != null)
-            icon.style.backgroundImage = new StyleBackground(ingredient.Item.icon);
-
-        var quantity = new Label($"x{ingredient.Qty}");
-        quantity.AddToClassList("ingredient-quantity");
-
-        slot.Add(icon);
-        slot.Add(quantity);
-        container.Add(slot);
-    }
-
-    private void UpdateRecipeCardState(RecipeCardData cardData)
-    {
-        bool canCraft = CraftingManager.Instance.CanCraft(cardData.recipe);
-        bool isCrafting = CraftingManager.Instance.IsCrafting(cardData.recipe);
-
-        cardData.cardElement.EnableInClassList("cannot-craft", !canCraft && !isCrafting);
-        cardData.cardElement.EnableInClassList("crafting", isCrafting);
-        cardData.progressContainer.style.display = isCrafting ? DisplayStyle.Flex : DisplayStyle.None;
-        cardData.craftTimeLabel.style.display = isCrafting ? DisplayStyle.None : DisplayStyle.Flex;
-    }
-
-    private void UpdateCraftingProgress()
-    {
-        foreach (var cardData in recipeCards)
-        {
-            if (CraftingManager.Instance.IsCrafting(cardData.recipe))
-            {
-                float progress = CraftingManager.Instance.GetCraftingProgress(cardData.recipe);
-                cardData.progressBar.style.width = Length.Percent(progress * 100f);
-            }
-        }
-    }
-
-    private void RefreshRecipeList()
-    {
-        foreach (var cardData in recipeCards)
-            UpdateRecipeCardState(cardData);
+        stampSlot?.RegisterCallback<ClickEvent>(_ => OnStampClicked());
     }
 
     // ═════════════════════════════════════════════
-    // FILTERING & SORTING
+    // LAYERS
     // ═════════════════════════════════════════════
 
-    private void ApplyFilterAndSort()
+    private void BuildLayerMap()
     {
-        List<RecipeCardData> visibleCards = recipeCards;
+        dropLayer.Clear();
+        recipeFor.Clear();
+        recipeLayer.Clear();
+        foreach (var s in FindObjectsByType<Spawner>(FindObjectsInactive.Include))
+            foreach (var c in s.candidates)
+                if (c is MobDef mob && mob.loot != null)
+                    foreach (var item in mob.loot)
+                        if (item != null && (!dropLayer.TryGetValue(item, out int l) || s.layerIndex < l))
+                            dropLayer[item] = s.layerIndex;
 
-        switch (currentFilter)
+        var all = CraftingManager.Instance.GetAllRecipes();
+        foreach (var r in all) if (r.Output != null) recipeFor[r.Output] = r;
+        foreach (var r in all) recipeLayer[r] = LayerOf(r, 0);
+    }
+
+    private int LayerOf(RecipeDef r, int depth)
+    {
+        if (recipeLayer.TryGetValue(r, out int known)) return known;
+        int layer = 1;
+        if (depth < 8)
+            foreach (var ing in r.Ingredients)
+                if (ing.Item != null)
+                    layer = Mathf.Max(layer, recipeFor.TryGetValue(ing.Item, out var sub) ? LayerOf(sub, depth + 1) : ItemLayer(ing.Item));
+        return layer;
+    }
+
+    private int ItemLayer(ItemDef item) => dropLayer.TryGetValue(item, out int l) ? Mathf.Max(1, l) : 1;
+
+    // ═════════════════════════════════════════════
+    // LEFT: TILES
+    // ═════════════════════════════════════════════
+
+    private void BuildList()
+    {
+        scroll.Clear();
+        tiles.Clear();
+
+        var byLayer = new SortedDictionary<int, List<RecipeDef>>();
+        foreach (var r in CraftingManager.Instance.GetAllRecipes())
         {
-            case FilterMode.CanCraft:
-                visibleCards = recipeCards.Where(c => CraftingManager.Instance.CanCraft(c.recipe)).ToList();
-                break;
-            case FilterMode.MissingMaterials:
-                visibleCards = recipeCards.Where(c => !CraftingManager.Instance.CanCraft(c.recipe)).ToList();
-                break;
-            case FilterMode.Enabled:
-                visibleCards = recipeCards.Where(c => CraftingManager.Instance.IsRecipeEnabled(c.recipe)).ToList();
-                break;
+            int l = recipeLayer[r];
+            if (!byLayer.TryGetValue(l, out var list)) byLayer[l] = list = new List<RecipeDef>();
+            list.Add(r);
         }
 
-        switch (currentSort)
+        foreach (var kv in byLayer)
         {
-            case SortMode.CraftTime:
-                visibleCards = visibleCards.OrderBy(c => c.recipe.CraftSeconds).ToList();
-                break;
-            case SortMode.OutputValue:
-                visibleCards = visibleCards.OrderByDescending(c => c.recipe.Output.sellPrice).ToList();
-                break;
+            var sheet = new VisualElement();
+            sheet.AddToClassList("ct-sheet");
+            sheet.Add(Subhead(RosterPanelController.GetLayerName(kv.Key)));
+            var grid = new VisualElement();
+            grid.AddToClassList("ct-grid");
+            foreach (var r in kv.Value) grid.Add(BuildTile(r));
+            sheet.Add(grid);
+            scroll.Add(sheet);
+        }
+        dirty = true;
+    }
+
+    private static VisualElement Subhead(string text)
+    {
+        var head = new VisualElement();
+        head.AddToClassList("book-subhead");
+        var l = new VisualElement(); l.AddToClassList("book-subhead__rule");
+        var r = new VisualElement(); r.AddToClassList("book-subhead__rule"); r.AddToClassList("book-subhead__rule--right");
+        var label = new Label(text); label.AddToClassList("book-subhead__label");
+        head.Add(l); head.Add(label); head.Add(r);
+        return head;
+    }
+
+    private VisualElement BuildTile(RecipeDef r)
+    {
+        var t = new Tile { recipe = r, root = new VisualElement() };
+        t.root.AddToClassList("ct-tile");
+
+        var ring = new VisualElement { pickingMode = PickingMode.Ignore };
+        ring.AddToClassList("ct-sel-ring");
+        t.root.Add(ring);
+
+        t.frame = new StatusFrame(60, 4, 44, 33, 36);
+        if (r.Output.icon != null) t.frame.Icon.style.backgroundImage = new StyleBackground(r.Output.icon);
+        t.root.Add(t.frame);
+
+        var name = new Label(r.Output.displayName) { pickingMode = PickingMode.Ignore };
+        name.AddToClassList("ct-name");
+        t.root.Add(name);
+
+        var valueRow = new VisualElement { pickingMode = PickingMode.Ignore };
+        valueRow.AddToClassList("ct-value-row");
+        var coin = new VisualElement { pickingMode = PickingMode.Ignore };
+        coin.AddToClassList("craft-coin");
+        var value = new Label($"{r.Output.sellPrice:N0}") { pickingMode = PickingMode.Ignore };
+        value.AddToClassList("ct-value");
+        valueRow.Add(coin); valueRow.Add(value);
+        t.root.Add(valueRow);
+
+        t.stock = new Label("0") { pickingMode = PickingMode.Ignore };
+        t.stock.AddToClassList("ct-stock");
+        t.root.Add(t.stock);
+
+        var onMark = new VisualElement { pickingMode = PickingMode.Ignore };
+        onMark.AddToClassList("ct-on-mark");
+        t.root.Add(onMark);
+
+        t.root.RegisterCallback<ClickEvent>(_ => Select(r));
+        tiles.Add(t);
+        return t.root;
+    }
+
+    // ═════════════════════════════════════════════
+    // RIGHT: DETAIL
+    // ═════════════════════════════════════════════
+
+    private void Select(RecipeDef r)
+    {
+        selected = r;
+        foreach (var t in tiles) t.root.EnableInClassList("ct-tile--sel", t.recipe == r);
+        if (r == null) return;
+
+        detailFrame.Icon.style.backgroundImage = r.Output.icon != null ? new StyleBackground(r.Output.icon) : null;
+        dName.text = r.Output.displayName;
+        dStation.text = StationName(r.Station);
+        dValue.text = $"{r.Output.sellPrice:N0}";
+        dDesc.text = r.Output.description;
+        dTime.text = $"{r.CraftSeconds:0.#}s";
+
+        ingList.Clear();
+        ingRows.Clear();
+        foreach (var ing in r.Ingredients)
+        {
+            if (ing.Item == null) continue;
+            var row = new VisualElement();
+            row.AddToClassList("craft-ing");
+            if (ingRows.Count > 0) row.AddToClassList("craft-ing--stacked");
+            var icon = new VisualElement();
+            icon.AddToClassList("craft-ing__icon");
+            if (ing.Item.icon != null) icon.style.backgroundImage = new StyleBackground(ing.Item.icon);
+            var name = new Label(ing.Item.displayName);
+            name.AddToClassList("craft-ing__name");
+            var src = new Label(recipeFor.ContainsKey(ing.Item) ? "crafted" : $"Layer {ItemLayer(ing.Item)}");
+            src.AddToClassList("craft-ing__src");
+            var have = new Label();
+            have.AddToClassList("craft-ing__have");
+            row.Add(icon); row.Add(name); row.Add(src); row.Add(have);
+            ingList.Add(row);
+            ingRows.Add(new IngRow { item = ing.Item, need = ing.Qty, have = have });
+        }
+        Refresh();
+    }
+
+    // ═════════════════════════════════════════════
+    // STATE
+    // ═════════════════════════════════════════════
+
+    private static StatusFrame.State StateOf(RecipeDef r)
+    {
+        var cm = CraftingManager.Instance;
+        if (!cm.IsStationOwned(r.Station)) return StatusFrame.State.Locked;
+        if (cm.IsCrafting(r)) return StatusFrame.State.Crafting;
+        if (!cm.IsRecipeEnabled(r)) return StatusFrame.State.Idle;
+        // Not GetBlockReason: it reports "Station busy" before cap/materials, which would hide both
+        if (Inventory.Instance.Get(r.Output.itemCategory, r.Output) >= cm.GetCap(r)) return StatusFrame.State.Capped;
+        return cm.CanCraft(r) ? StatusFrame.State.Idle : StatusFrame.State.Blocked; // idle = waiting for a slot
+    }
+
+    private void Tick()
+    {
+        if (dirty || ++ticksSinceRefresh >= SafetyRefreshTicks) { Refresh(); return; }
+        // Between refreshes only the sweeps move
+        var cm = CraftingManager.Instance;
+        foreach (var t in tiles)
+            if (cm.IsCrafting(t.recipe)) t.frame.SetState(StatusFrame.State.Crafting, cm.GetCraftingProgress(t.recipe));
+        if (selected != null && cm.IsCrafting(selected))
+            detailFrame.SetState(StatusFrame.State.Crafting, cm.GetCraftingProgress(selected));
+    }
+
+    private void Refresh()
+    {
+        dirty = false;
+        ticksSinceRefresh = 0;
+        var cm = CraftingManager.Instance;
+        var inv = Inventory.Instance;
+        if (cm == null || inv == null) return;
+
+        foreach (var t in tiles)
+        {
+            var st = StateOf(t.recipe);
+            t.frame.SetState(st, cm.GetCraftingProgress(t.recipe));
+            int stock = inv.Get(t.recipe.Output.itemCategory, t.recipe.Output);
+            bool capped = st == StatusFrame.State.Capped;
+            t.stock.text = capped ? $"{stock} / {cm.GetCap(t.recipe)}" : $"{stock}";
+            t.stock.EnableInClassList("ct-stock--capped", capped);
+            t.root.EnableInClassList("ct-tile--locked", st == StatusFrame.State.Locked);
+            t.root.EnableInClassList("ct-tile--on", cm.IsRecipeEnabled(t.recipe));
         }
 
-        foreach (var cardData in recipeCards)
-            cardData.cardElement.style.display = visibleCards.Contains(cardData) ? DisplayStyle.Flex : DisplayStyle.None;
+        if (selected == null) return;
+        var state = StateOf(selected);
+        detailFrame.SetState(state, cm.GetCraftingProgress(selected));
+        dCap.text = $"{cm.GetCap(selected)}";
+
+        // "have" = usable stock (above the item's keep floor), matching what CanCraft checks
+        foreach (var row in ingRows)
+        {
+            int usable = Mathf.Max(0, inv.Get(row.item.itemCategory, row.item) - inv.GetFloor(row.item));
+            row.have.text = $"{usable}/{row.need}";
+            row.have.EnableInClassList("craft-ing__have--short", usable < row.need);
+        }
+
+        int prio = cm.GetPriority(selected);
+        for (int i = 0; i < pips.childCount; i++) pips[i].EnableInClassList("craft-pip--on", i < prio);
+
+        if (!busy) RefreshStamp(state == StatusFrame.State.Locked, cm.IsRecipeEnabled(selected));
+    }
+
+    private void RefreshStamp(bool locked, bool on)
+    {
+        stampSlot.EnableInClassList("craft-stampslot--locked", locked);
+        stampText.text = locked ? $"Needs {StationName(selected.Station)}" : "Craft";
+        stampText.style.visibility = on && !locked ? Visibility.Hidden : Visibility.Visible;
+        stampBadge.style.display = on && !locked ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     // ═════════════════════════════════════════════
-    // CALLBACKS
+    // INPUT
     // ═════════════════════════════════════════════
 
-    private void OnFilterChanged(ChangeEvent<string> evt)
+    private void StepCap(int delta)
     {
-        currentFilter = evt.newValue switch
-        {
-            "Can Craft" => FilterMode.CanCraft,
-            "Missing Materials" => FilterMode.MissingMaterials,
-            "Enabled" => FilterMode.Enabled,
-            _ => FilterMode.All
-        };
-        ApplyFilterAndSort();
+        if (selected != null) CraftingManager.Instance.SetCap(selected, CraftingManager.Instance.GetCap(selected) + delta);
     }
 
-    private void OnSortChanged(ChangeEvent<string> evt)
+    // The foot plank is the switch: off → slam the CRAFTING stamp on; on → dither it off.
+    private void OnStampClicked()
     {
-        currentSort = evt.newValue switch
-        {
-            "Craft Time (Fast→Slow)" => SortMode.CraftTime,
-            "Output Value (High→Low)" => SortMode.OutputValue,
-            _ => SortMode.UnlockOrder
-        };
-        ApplyFilterAndSort();
-    }
+        var cm = CraftingManager.Instance;
+        var r = selected;
+        if (busy || r == null || !cm.IsStationOwned(r.Station)) return;
+        busy = true;
 
-    private void OnRecipeToggled(RecipeDef recipe, bool enabled)
-    {
-        if (enabled)
-            CraftingManager.Instance.EnableRecipe(recipe);
+        if (!cm.IsRecipeEnabled(r))
+        {
+            BookStamp.AimAt(slamOverlay, stampSlot, SlamSize);
+            BookStamp.SlamIn(stampSlamAnim, slamOverlay,
+                onImpact: () =>
+                {
+                    cm.EnableRecipe(r);
+                    if (selected == r) RefreshStamp(false, true);
+                },
+                onComplete: () => { busy = false; dirty = true; });
+        }
         else
-            CraftingManager.Instance.DisableRecipe(recipe);
+        {
+            stampText.style.visibility = Visibility.Visible; // "Craft" reveals as the stamp erases
+            BookStamp.DitherOut(stampDitherAnim, stampBadge, stampBadgeText, () =>
+            {
+                busy = false;
+                cm.DisableRecipe(r);
+                Refresh();
+            });
+        }
+        if (showDebugLogs) Debug.Log($"[CraftingController] Stamp toggled on {r.name}");
     }
 
-    private void OnCraftStarted(RecipeDef _) => RefreshRecipeList();
+    // ═════════════════════════════════════════════
+    // SIGNALS
+    // ═════════════════════════════════════════════
 
-    private void OnProductCrafted(ResourceStack stack)
-    {
-        RefreshRecipeList();
-        var cardData = recipeCards.FirstOrDefault(c => c.recipe.Output == stack.itemDef);
-        if (cardData != null)
-        {
-            cardData.cardElement.AddToClassList("flash-complete");
-            cardData.cardElement.schedule.Execute(() =>
-                cardData.cardElement.RemoveFromClassList("flash-complete")).StartingIn(300);
-        }
-    }
+    private void MarkDirty() => dirty = true;
+    private void OnRecipeSignal(RecipeDef _) => dirty = true;
+    private void OnStockSignal(ResourceStack _) => dirty = true;
+    private void OnUpgradePurchased(GuildUpgradeDef _) => dirty = true;
 
-    private void UpdateFooter()
+    // Station display name comes from its GuildUpgradeDef (asset names don't match: "Potion Station" shows "Smithy").
+    private static string StationName(CraftingStation station)
     {
-        if (activeCraftsLabel != null)
-            activeCraftsLabel.text = $"Active Crafts: {CraftingManager.Instance.GetActiveCraftCount()}";
-        if (statusLabel != null)
-        {
-            int enabledCount = CraftingManager.Instance.GetEnabledRecipes().Count;
-            statusLabel.text = enabledCount > 0 ? $"{enabledCount} recipes enabled" : "No recipes enabled";
-        }
+        if (stationNames.TryGetValue(station, out var n)) return n;
+        var type = CraftingManager.StationUpgradeType(station);
+        n = station.ToString();
+        foreach (var u in Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades"))
+            if (u.upgradeType == type) { n = u.upgradeName; break; }
+        return stationNames[station] = n;
     }
 }

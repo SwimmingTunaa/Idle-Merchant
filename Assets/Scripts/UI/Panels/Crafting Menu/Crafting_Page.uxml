@@ -1,18 +1,73 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/CraftingPanelStyle.uss?fileID=7433441132597879392&amp;guid=1f55b20e0fbeb4ea98827c037085e89a&amp;type=3#CraftingPanelStyle" />
-    <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
-        <ui:VisualElement name="left-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-right: 4px;">
-            <ui:Label text="Available Recipes" class="page-header" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 10px;" />
-            <ui:VisualElement name="controls-row" style="flex-direction: row; margin-bottom: 8px; justify-content: space-between;">
-                <ui:DropdownField name="filter-dropdown" label="Filter:" class="control-dropdown" style="flex-grow: 1; margin-right: 6px;" />
-                <ui:DropdownField name="sort-dropdown" label="Sort:" class="control-dropdown" style="flex-grow: 1;" />
+    <ui:VisualElement name="page-root" class="craft-page">
+        <ui:VisualElement name="left-content" class="craft-left">
+            <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 8px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="deco-swirl 1" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl.PNG?fileID=2800000&amp;guid=7f697000926e54b27b639ae0ee9a7656&amp;type=3#deco-swirl&quot;);" />
+                    <ui:Label name="page-title" text="Crafting" style="font-size: 52px; color: rgb(128, 75, 24); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&amp;guid=bf0206d6060cb4ed89e74ae40ea01e22&amp;type=3#NotJamBlkltr13&quot;); -unity-text-align: middle-center; margin-left: 16px; margin-right: 16px;" />
+                    <ui:VisualElement name="deco-swirl 2" style="width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-swirl-right.PNG?fileID=2800000&amp;guid=ee8e6e92ee45b4ebeaa0699d75dc2999&amp;type=3#deco-swirl-right&quot;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
             </ui:VisualElement>
-            <ui:ScrollView name="recipe-scroll" class="recipe-list" style="flex-grow: 1; background-color: rgba(139, 90, 60, 0.1); border-radius: 4px; padding: 4px;" />
+            <ui:ScrollView name="recipe-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden" class="craft-scroll" />
         </ui:VisualElement>
-        <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 16px; margin-left: 4px;">
-            <ui:Label text="Active Crafts" class="page-header" style="font-size: 18px; -unity-font-style: bold; color: rgb(50, 30, 10); margin-bottom: 12px;" />
-            <ui:Label name="active-crafts-label" text="Active Crafts: 0" style="font-size: 14px; color: rgb(50, 30, 10); margin-bottom: 6px;" />
-            <ui:Label name="status-label" text="Ready to craft" style="font-size: 14px; color: rgb(70, 45, 20);" />
+        <ui:VisualElement name="right-content" class="craft-right">
+            <ui:VisualElement class="craft-sprite-row">
+                <ui:VisualElement class="craft-dline craft-dline--left" />
+                <ui:VisualElement name="detail-slot" class="craft-slot" />
+                <ui:VisualElement class="craft-dline" />
+            </ui:VisualElement>
+            <ui:VisualElement class="craft-banner">
+                <ui:Label name="detail-name" text="Recipe" class="craft-banner__text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="craft-metrics">
+                <ui:VisualElement class="craft-plank craft-plank--station">
+                    <ui:Label name="detail-station" text="Forging Station" class="craft-plank__text" />
+                </ui:VisualElement>
+                <ui:VisualElement class="craft-plank craft-plank--value">
+                    <ui:VisualElement class="craft-coin" />
+                    <ui:Label name="detail-value" text="0" class="craft-plank__num" />
+                </ui:VisualElement>
+                <ui:VisualElement class="craft-plank craft-plank--cap">
+                    <ui:Label text="CAP" class="plank-caption" />
+                    <ui:Label name="detail-cap" text="10" class="craft-plank__num craft-cap-num" />
+                    <ui:VisualElement class="craft-stepper">
+                        <ui:VisualElement name="cap-up" class="reserve-step-btn craft-step">
+                            <ui:VisualElement picking-mode="Ignore" class="craft-arrow" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="cap-down" class="reserve-step-btn craft-step">
+                            <ui:VisualElement picking-mode="Ignore" class="craft-arrow craft-arrow--down" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="craft-desc">
+                <ui:Label name="detail-desc" text="" class="craft-desc__text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="book-subhead craft-section-head">
+                <ui:VisualElement class="book-subhead__rule" />
+                <ui:Label text="Ingredients" class="book-subhead__label" />
+                <ui:VisualElement class="book-subhead__rule book-subhead__rule--right" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ingredient-list" class="craft-ings" />
+            <ui:VisualElement class="craft-prod">
+                <ui:Label name="detail-time" text="5s" />
+                <ui:Label text="per craft" />
+                <ui:Label text="·" class="craft-prod__sep" />
+                <ui:Label text="priority" />
+                <ui:VisualElement name="priority-pips" class="craft-pips" />
+            </ui:VisualElement>
+            <ui:VisualElement name="stamp-slot" class="craft-stampslot">
+                <ui:VisualElement picking-mode="Ignore" class="craft-plank craft-foot-plank">
+                    <ui:Label name="stamp-text" text="Craft" picking-mode="Ignore" class="craft-foot-text" />
+                </ui:VisualElement>
+                <ui:VisualElement name="stamp-badge" picking-mode="Ignore" class="craft-badge">
+                    <ui:Label name="stamp-badge-text" text="CRAFTING" picking-mode="Ignore" class="craft-badge__text" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="Stampanim" picking-mode="Ignore" class="craft-slam" />
     </ui:VisualElement>
 </ui:UXML>

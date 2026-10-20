@@ -188,3 +188,47 @@
 .unity-scroller--vertical .unity-base-slider__dragger:hover {
     background-color: rgb(155, 112, 72);
 }
+
+/* ── Shared sub-header: rule · label · rule (Roster layers, Crafting sheets + sections) ── */
+.book-subhead {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: var(--subhead-margin-top);
+    margin-bottom: var(--subhead-margin-bottom);
+}
+
+.book-subhead__rule {
+    width: var(--rule-w);
+    height: var(--rule-h);
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/17_16x16.png?fileID=2800000&guid=83b416998b1d04cac9d9a7d906b610ae&type=3#17_16x16");
+}
+
+.book-subhead__rule--right {
+    scale: -1 1;
+}
+
+.book-subhead__label {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: var(--subhead-gap);
+    margin-right: var(--subhead-gap);
+    padding: 0;
+    font-size: var(--subhead-size);
+    color: var(--subhead-color);
+    -unity-text-align: middle-center;
+    -unity-font-definition: var(--font-body);
+}
+
+/* Small muted caption inside a plank (CAP on Crafting, KEEP on Inventory) */
+.plank-caption {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    color: var(--color-text-muted);
+    -unity-font-definition: var(--font-body);
+}

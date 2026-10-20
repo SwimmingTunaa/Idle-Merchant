@@ -406,35 +406,9 @@
     margin-bottom: var(--space-md);
 }
 
-.layer-header {
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
+/* Shared .book-subhead (BookPanel.uss) — extra room under it for the slots' overhanging rank gems */
+.layer-section > .book-subhead {
     margin-bottom: 16px;
-}
-
-.layer-deco-line {
-    width: 100px;
-    height: 10px;
-    flex-shrink: 0;
-    -unity-background-scale-mode: scale-to-fit;
-    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/17_16x16.png?fileID=2800000&guid=83b416998b1d04cac9d9a7d906b610ae&type=3#17_16x16");
-}
-
-.layer-deco-line--right {
-    scale: -1 1;
-}
-
-.layer-name {
-    flex-grow: 1;
-    flex-basis: 0;
-    margin-left: var(--space-sm);
-    margin-right: var(--space-sm);
-    font-size: var(--font-size-body-lg);
-    color: var(--color-text-primary);
-    -unity-font-style: normal;
-    -unity-text-align: middle-center;
-    -unity-font-definition: var(--font-body);
 }
 
 #page-title {

@@ -53,7 +53,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="reserved-input" style="flex-grow: 1; flex-basis: 0; height: 52px; flex-direction: row; align-items: center; justify-content: center; margin-left: 8px; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/box-splice.png?fileID=1142012838051687708&amp;guid=7431fc87a504d4dc29fd217299608c7f&amp;type=3#box-splice_0&quot;); -unity-slice-left: 8; -unity-slice-top: 3; -unity-slice-right: 8; -unity-slice-bottom: 3; -unity-slice-scale: 3px; padding-left: 16px; padding-right: 8px; padding-top: 5px; padding-bottom: 5px;">
                     <ui:VisualElement name="icon &amp; text" style="flex-grow: 1; flex-basis: 0; flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="Lock" style="width: 20px; height: 24px; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/lock.svg?fileID=7388822144124034973&amp;guid=b85ff3f7aa304a0d8c6996191dbc0ddb&amp;type=3#lock&quot;);" />
+                        <ui:Label name="floor-label" text="KEEP" class="plank-caption" />
                         <ui:Label name="reserve-count" text="0" style="font-size: 40px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Ithaca.ttf?fileID=12800000&amp;guid=01964068568548bfbb7b65d7756844fc&amp;type=3#Ithaca&quot;); margin-left: 8px;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="reserve-stepper" style="flex-direction: column; align-items: stretch; justify-content: center; flex-shrink: 1; align-self: stretch; margin-bottom: 8px; margin-top: 8px;">

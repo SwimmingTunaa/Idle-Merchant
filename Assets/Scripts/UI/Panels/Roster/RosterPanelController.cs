@@ -114,17 +114,17 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
         // Header: flourish line · centered layer name · mirrored flourish line
         var header = new VisualElement();
-        header.AddToClassList("layer-header");
+        header.AddToClassList("book-subhead");
 
         var lineLeft = new VisualElement();
-        lineLeft.AddToClassList("layer-deco-line");
+        lineLeft.AddToClassList("book-subhead__rule");
 
         var nameLabel = new Label(GetLayerName(manager.LayerIndex));
-        nameLabel.AddToClassList("layer-name");
+        nameLabel.AddToClassList("book-subhead__label");
 
         var lineRight = new VisualElement();
-        lineRight.AddToClassList("layer-deco-line");
-        lineRight.AddToClassList("layer-deco-line--right");
+        lineRight.AddToClassList("book-subhead__rule");
+        lineRight.AddToClassList("book-subhead__rule--right");
 
         header.Add(lineLeft);
         header.Add(nameLabel);
@@ -207,7 +207,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         return slot;
     }
 
-    private static string GetLayerName(int layerIndex) =>
+    public static string GetLayerName(int layerIndex) =>
         layerIndex >= 1 && layerIndex < LayerNames.Length
             ? LayerNames[layerIndex]
             : $"Layer {layerIndex}";

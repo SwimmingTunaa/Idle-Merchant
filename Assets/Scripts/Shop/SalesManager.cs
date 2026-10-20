@@ -340,7 +340,7 @@ public class SalesManager : PersistentSingleton<SalesManager>
                 int total = GetTotalStock(kvp.Key);
                 int reserved = Inventory.Instance.GetFloor(kvp.Key);
                 int forSale = GetAvailableForSale(kvp.Key);
-                Debug.Log($"{kvp.Key.displayName}: Total={total}, Reserved={reserved}, For Sale={forSale}");
+                Debug.Log($"{kvp.Key.displayName}: Total={total}, Floor={reserved}, For Sale={forSale}");
             }
         }
     }

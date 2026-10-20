@@ -11,7 +11,7 @@ Ordered roughly by intended sequence. Pull from the top.
 ## Crafting (in flight — see mocks)
 
 - [ ] **Batch 2 — engine**: output caps, unified keep-N floor (crafting + sales), priority, stations-as-slots (Forging / Smithy / Arcane Workshop ↔ the three chains), save all of it
-- [ ] **Batch 3a — book page**: icon tiles on torn sheets grouped by layer, frame-carried status (Painter2D progress sweep / red / gold / grey), Craft→Crafting buttons, pixel stock badge, right-page recipe detail
+- [x] **Batch 3a — book page**: icon tiles on torn sheets grouped by layer, frame-carried status (Painter2D progress sweep / red / gold / grey), Craft→Crafting buttons, pixel stock badge, right-page recipe detail
 - [ ] **Batch 3b — world workshops**: inactive prop prefabs behind the guild activated on station purchase (ProgressionActivator), click → themed workshop panel owning slots + slot purchases
 - [ ] **Book close button**: pixel slip "X" hanging off the book's top-right corner (BookPanel), per the crafting mock
 
@@ -30,7 +30,7 @@ Ordered roughly by intended sequence. Pull from the top.
 - [ ] **"3 Stars" milestone filenames** — named Milestone_2Star_* (data is correct, names lie).
 - [ ] **Mob "Hit" flinch** — MobAgent fires the Hit trigger but mob controllers lack the param (console warning per non-lethal hit); add flinch states or guard the call.
 - [ ] **Stray empty save write** — during batch-2 testing a near-empty save.json (gold 0, no roster) was written at 13:06 while saving was suspended, real save pushed to .bak (kept at scratchpad/stray-empty-save-1306.json). Cause unknown (editor logs lost to a crash). If it recurs: audit every SaveManager write path for the suspend flag, and check for a second Unity instance sharing persistentDataPath.
-- [ ] **Inventory "reserve" stepper** now sets the keep-N floor but still says "reserve" — relabel in the crafting/inventory UI pass. Contracts hand-ins deliberately ignore floors (explicit player action).
+- [x] **Inventory "reserve" stepper** now sets the keep-N floor but still said "reserve" — relabelled KEEP (batch 3a). Contracts hand-ins deliberately ignore floors (explicit player action).
 - [ ] **First-play NREs** — Stats.cs:196 / Health.cs:91 throw on a fresh play session (seen repeatedly by agents; also CharacterAppearanceManager.Start entityDef null). Root-cause the init order.
 
 ## Older backlog
