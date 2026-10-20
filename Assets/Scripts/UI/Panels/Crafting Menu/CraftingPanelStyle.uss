@@ -85,7 +85,7 @@ Label {
 
 .ct-name {
     margin-top: 5px;
-    font-size: 18px;
+    font-size: var(--font-size-small);
     color: var(--color-text-strong);
     white-space: nowrap;
     overflow: hidden;
@@ -110,7 +110,7 @@ Label {
 }
 
 .ct-value {
-    font-size: 17px;
+    font-size: var(--font-size-small);
     color: var(--color-text-gold);
 }
 
@@ -128,7 +128,7 @@ Label {
     border-top-width: 2px;
     border-right-width: 4px;
     border-bottom-width: 4px;
-    font-size: 15px;
+    font-size: var(--font-size-caption);
     color: var(--primary-900);
     -unity-text-align: middle-center;
 }
@@ -248,8 +248,8 @@ Label {
 }
 
 .craft-slot {
-    width: 150px;
-    height: 150px;
+    width: 144px;
+    height: 144px;
     align-items: center;
     justify-content: center;
     -unity-background-scale-mode: stretch-to-fill;
@@ -370,9 +370,9 @@ Label {
 .craft-desc {
     align-self: stretch;
     flex-shrink: 0;
-    height: 58px;
-    margin-top: 8px;
-    padding: 6px 12px;
+    height: 64px;
+    margin-top: 6px;
+    padding: 4px 12px;
     overflow: hidden;
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/text-box-slice.png?fileID=3997786295894542459&guid=4c3028ba947224aa4a305c692c8087ed&type=3#text-box-slice_0");
     -unity-slice-left: 1;
@@ -383,7 +383,7 @@ Label {
 }
 
 .craft-desc__text {
-    font-size: 19px;
+    font-size: var(--font-size-body);
     white-space: normal;
     color: var(--color-text-strong);
 }
@@ -426,12 +426,12 @@ Label {
 
 .craft-ing__name {
     flex-grow: 1;
-    font-size: 19px;
+    font-size: var(--font-size-body);
     color: var(--color-text-strong);
 }
 
 .craft-ing__have {
-    font-size: 19px;
+    font-size: var(--font-size-body);
     min-width: 34px;
     -unity-text-align: middle-right;
     color: var(--color-text-success);
@@ -446,12 +446,12 @@ Label {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-top: 4px;
-    margin-bottom: 14px;
+    margin-top: 2px;
+    margin-bottom: 12px;
 }
 
 .craft-prod Label {
-    font-size: 18px;
+    font-size: var(--font-size-small);
     color: var(--color-text-secondary);
     margin-left: 8px;
 }
@@ -487,11 +487,11 @@ Label {
 
 /* foot stamp plank: "Craft" when off; the red CRAFTING badge is slammed over it when on */
 .craft-stampslot {
-    width: 300px;
-    height: 52px;
+    align-self: stretch;
+    height: 56px;
     flex-shrink: 0;
     margin-top: auto;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     cursor: link;
 }
 
@@ -526,7 +526,7 @@ Label {
 }
 
 .craft-foot-text {
-    font-size: 26px;
+    font-size: 30px;
     color: var(--primary-900);
     -unity-text-align: middle-center;
 }
@@ -536,17 +536,17 @@ Label {
 }
 
 .craft-stampslot--locked .craft-foot-text {
-    font-size: 19px;
+    font-size: 22px;
     color: rgb(181, 157, 126);
 }
 
 .craft-badge {
     position: absolute;
     left: -6px;
+    right: -6px;
     top: -3px;
-    width: 312px;
-    height: 58px;
-    rotate: -7deg;
+    height: 62px;
+    rotate: -4deg;
     align-items: center;
     justify-content: center;
     display: none;
@@ -555,7 +555,7 @@ Label {
 }
 
 .craft-badge__text {
-    font-size: 30px;
+    font-size: 34px;
     letter-spacing: 2px;
     padding-bottom: 2px;
     color: var(--color-box-bg);

@@ -21,9 +21,9 @@ public class CraftingController : MonoBehaviour, IBookPage
 
     public string PageTitle => "Crafting";
 
-    // Stamp face ≈ 1/3 of the Stamp.png frame, so 920px puts it over the 300px foot plank
+    // Stamp face ≈ 1/3 of the Stamp.png frame; the overlay scales with the plank so the face matches it
     // (the inventory's 593px overlay over its 175px badge is the same ratio)
-    private const float SlamSize = 920f;
+    private const float SlamPerPlankWidth = 2.8f;
     private const int TickMs = 100;          // sweep repaint cadence
     private const int SafetyRefreshTicks = 10; // full state refresh at least once a second (catches stock changes no signal reports)
 
@@ -396,7 +396,7 @@ public class CraftingController : MonoBehaviour, IBookPage
 
         if (!cm.IsRecipeEnabled(r))
         {
-            BookStamp.AimAt(slamOverlay, stampSlot, SlamSize);
+            BookStamp.AimAt(slamOverlay, stampSlot, stampSlot.resolvedStyle.width * SlamPerPlankWidth);
             BookStamp.SlamIn(stampSlamAnim, slamOverlay,
                 onImpact: () =>
                 {

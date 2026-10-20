@@ -86,24 +86,29 @@
     --color-border-accent: rgb(255, 190, 97);
     /* ── Numeric font scale ──────────────────────────────────────────
        NotJamBlkltr13 (headings)  pixel-perfect at: 13px, 26px
-       BrightLinger   (body/UI)   pixel-perfect at: 16px, 32px
-       Rule: use BrightLinger 16px for all readable labels/captions.
-             use NotJam 26px for headings only. 13px is too small to read.
+       Ithaca         (body/UI)   the body font (--font-body); 24px is the
+                                  legibility floor for anything the player
+                                  must read, 18px the absolute floor for tags.
+       Rule: body text = --font-size-body (24). Secondary labels = --font-size-small (20).
+             Captions/tags (stock slips, "CAP") = --font-size-caption (18), nothing smaller.
+             Headings use NotJam at --font-size-h* only.
     ── */
-    --text-2xs:  16px;   /* BrightLinger 1× — smallest readable size      */
-    --text-xs:   16px;   /* BrightLinger 1×                                */
-    --text-sm:   16px;   /* BrightLinger 1×                                */
-    --text-base: 16px;   /* BrightLinger 1×                                */
+    /* legacy BrightLinger scale — still consumed by Roster + Components; migrate them to the
+       semantic aliases below page by page rather than bumping these in place */
+    --text-2xs:  16px;
+    --text-xs:   16px;
+    --text-sm:   16px;
+    --text-base: 16px;
     --text-lg:   26px;   /* NotJam 2×                                      */
     --text-xl:   26px;   /* NotJam 2×                                      */
-    --text-2xl:  32px;   /* BrightLinger 2×                                */
+    --text-2xl:  32px;
     --text-3xl:  32px;
     --text-4xl:  32px;
 
-    /* ── Semantic aliases ── */
-    --font-size-caption: 16px;   /* BrightLinger 1× */
-    --font-size-small:   16px;   /* BrightLinger 1× */
-    --font-size-body:    16px;   /* BrightLinger 1× */
+    /* ── Semantic aliases (Ithaca body font) — new pages use these ── */
+    --font-size-caption: 18px;   /* tags, stock slips, "CAP"        */
+    --font-size-small:   20px;   /* tile names, values, meta lines  */
+    --font-size-body:    24px;   /* anything the player must read   */
     --font-size-h3:      26px;   /* NotJam 2×       */
     --font-size-h2:      26px;   /* NotJam 2×       */
     --font-size-h1:      26px;   /* NotJam 2×       */
