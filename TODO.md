@@ -12,7 +12,7 @@ Ordered roughly by intended sequence. Pull from the top.
 
 - [ ] **Customer archetypes** — whale / bulk buyer / window-shopper as CustomerDef data + distinct palettes + spawn weights. Makes walkout signals richer for free.
 - [ ] **Queue patience** — patience meter, angry storm-out; needs a counter-speed upgrade to exist as the player's answer first.
-- [ ] **Physical shelves** — Shelf.cs is fully commented out; items displayed in-shop, customers walk to them. Big charm feature, own design conversation.
+- [ ] **Physical shelves** — Shelf.cs is fully commented out; items displayed in-shop, customers walk to them. Big charm feature, own design conversation. Include: shopkeeper restocks shelves from the loot bin as a background behavior (the "cashier carries items" idea — off the sale's critical path so it can't nerf throughput).
 
 ## Data & content fixes
 
@@ -22,6 +22,7 @@ Ordered roughly by intended sequence. Pull from the top.
 - [ ] **Orphaned Guild UXMLs** — GuildUpgradePanel.uxml, Guild_Left.uxml, Guild_Right.uxml look unreferenced; confirm and delete.
 - [ ] **"3 Stars" milestone filenames** — named Milestone_2Star_* (data is correct, names lie).
 - [ ] **Mob "Hit" flinch** — MobAgent fires the Hit trigger but mob controllers lack the param (console warning per non-lethal hit); add flinch states or guard the call.
+- [ ] **First-play NREs** — Stats.cs:196 / Health.cs:91 throw on a fresh play session (seen repeatedly by agents; also CharacterAppearanceManager.Start entityDef null). Root-cause the init order.
 
 ## Older backlog
 

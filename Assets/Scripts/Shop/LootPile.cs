@@ -5,7 +5,7 @@ using UnityEngine;
 /// up to <see cref="maxSprites"/> item sprites inside a bin, round-robin across item types,
 /// newest item on top. Rebuilt once per frame after OnItemAdded / OnItemSold (dirty flag).
 /// Also the landing point for item fly-ins (vacuumed loot, porter deposits) and the launch
-/// point for the sale hop to the counter.
+/// point for the sale relay (pile → counter → buyer, see <see cref="FlySale"/>).
 /// </summary>
 public class LootPile : PersistentSingleton<LootPile>
 {
@@ -27,11 +27,17 @@ public class LootPile : PersistentSingleton<LootPile>
     [Header("Fly")]
     [Tooltip("Where sold items hop to. Empty = the queue's counter point, lifted onto the counter top.")]
     [SerializeField] private Transform saleTarget;
+    [Tooltip("Speed multiplier for both sale-relay legs (1 = the flyer prefab's own timing, ~0.7s per leg).")]
+    [SerializeField] private float saleHopSpeed = 2f;
+    [Tooltip("Shopkeeper sprite: turns to face the pile (flipX inverted from rest) while any sale's pile→counter leg is in flight. Optional.")]
+    [SerializeField] private SpriteRenderer shopkeeper;
 
     private SpriteRenderer[] slots;
     private int visibleCount;
     private bool pending = true;
     private ItemDef lastAdded;
+    private int summoning;          // pile→counter legs in flight
+    private bool shopkeeperRestFlip;
 
     protected override void Awake()
     {
@@ -56,6 +62,7 @@ public class LootPile : PersistentSingleton<LootPile>
             slots[i] = sr;
         }
         if (binFront != null) binFront.sortingOrder = baseSortingOrder + maxSprites;
+        if (shopkeeper != null) shopkeeperRestFlip = shopkeeper.flipX;
 
         GameSignals.OnItemAdded += OnItemAdded;
         GameSignals.OnItemSold += OnItemSold;
@@ -78,14 +85,35 @@ public class LootPile : PersistentSingleton<LootPile>
     // ponytail: TryRemove raises no signal, so crafting-ingredient removals show on the next add/sale.
     private void OnItemAdded(ResourceStack stack) { lastAdded = stack.itemDef; pending = true; }
 
-    private void OnItemSold(ResourceStack stack)
+    // The sale hop itself is driven by the buyer (CustomerCarryDisplay → FlySale), so it can hand off to them.
+    private void OnItemSold(ResourceStack stack) => pending = true;
+
+    /// <summary>Sale relay (VFX only): item hops pile → counter, then homes on <paramref name="buyer"/>.
+    /// <paramref name="onArrive"/> fires when it lands — or right away if a leg can't run / the buyer is gone.</summary>
+    public void FlySale(ItemDef item, Transform buyer, System.Action onArrive)
     {
-        pending = true;
-        if (ItemExplosionVFX.Instance == null || stack.itemDef == null) return;
-        Vector3 to = saleTarget != null ? saleTarget.position
+        var vfx = ItemExplosionVFX.Instance;
+        if (vfx == null || item == null || buyer == null) { onArrive?.Invoke(); return; }
+
+        Sprite icon = Icon(item);
+        Vector3 counter = saleTarget != null ? saleTarget.position
             : QueueController.Instance != null ? QueueController.Instance.counterPoint.position + Vector3.up * 0.8f
             : transform.position;
-        ItemExplosionVFX.Instance.FlyToWorld(Icon(stack.itemDef), TopOfHeap, to);
+
+        Summon(+1);
+        vfx.FlyToWorld(icon, TopOfHeap, counter, speed: saleHopSpeed, onArrive: () =>
+        {
+            Summon(-1);   // leg-1 callback always fires (arrival, despawn, or sync on spawn failure) → counter can't leak
+            if (buyer == null || !buyer.gameObject.activeInHierarchy) { onArrive?.Invoke(); return; }   // left mid-hop
+            vfx.FlyToWorld(icon, counter, buyer.position, homing: buyer, speed: saleHopSpeed, onArrive: onArrive);
+        });
+    }
+
+    // Shopkeeper faces the pile while any leg 1 is flying ("summoning" the item), back to the customers otherwise.
+    private void Summon(int delta)
+    {
+        summoning = Mathf.Max(0, summoning + delta);
+        if (shopkeeper != null) shopkeeper.flipX = summoning > 0 ? !shopkeeperRestFlip : shopkeeperRestFlip;
     }
 
     /// <summary>Fly one item icon from a world point into the pile (VFX only — the item is already banked).</summary>

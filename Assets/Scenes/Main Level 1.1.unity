@@ -29259,6 +29259,8 @@ MonoBehaviour:
   baseSortingOrder: 3
   binFront: {fileID: 215874370}
   saleTarget: {fileID: 0}
+  saleHopSpeed: 2
+  shopkeeper: {fileID: 1941216135}
 --- !u!1 &1449877901
 GameObject:
   m_ObjectHideFlags: 0
@@ -38569,6 +38571,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!212 &1941216135 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3626916397498700004, guid: 05b009f5283364f00baddc7c1fc055ba, type: 3}
+  m_PrefabInstance: {fileID: 1933190338}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1945963606
 GameObject:
   m_ObjectHideFlags: 0

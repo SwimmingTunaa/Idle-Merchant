@@ -1,9 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Shows a carry sprite above the customer and sets the Carry animator bool
-/// when the customer transitions to Leaving after a successful purchase (desiredItem != null).
-/// Pool-safe: resets fully in OnDisable.
+/// Shows a carry sprite above the customer and sets the Carry animator bool once the bought item
+/// lands on them: Leaving after a purchase (desiredItem != null) starts the LootPile sale relay
+/// (pile → counter → customer) and the carry shows on its arrival, so the item is never in two places.
+/// Pool-safe: every Hide (incl. OnDisable) invalidates a pending relay.
 /// </summary>
 [DefaultExecutionOrder(1000)]
 public class CustomerCarryDisplay : MonoBehaviour
@@ -16,6 +17,7 @@ public class CustomerCarryDisplay : MonoBehaviour
     [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.4f, 0f);
 
     private Animator _animator;
+    private int _relay;   // bumped by Hide; a relay arrival with a stale id is ignored
 
     void Awake()
     {
@@ -40,10 +42,14 @@ public class CustomerCarryDisplay : MonoBehaviour
 
     private void OnCustomerStateChanged(CustomerState prev, CustomerState next)
     {
-        if (next == CustomerState.Leaving && customer.desiredItem != null)
-            Show(customer.desiredItem);
-        else
-            Hide();
+        Hide();
+        if (next != CustomerState.Leaving || customer.desiredItem == null) return;
+
+        ItemDef item = customer.desiredItem;
+        if (LootPile.Instance == null) { Show(item); return; }
+        int id = _relay;
+        Transform landing = iconRenderer != null ? iconRenderer.transform : transform;
+        LootPile.Instance.FlySale(item, landing, () => { if (id == _relay) Show(item); });
     }
 
     private void Show(ItemDef item)
@@ -60,6 +66,7 @@ public class CustomerCarryDisplay : MonoBehaviour
 
     private void Hide(bool force = false)
     {
+        _relay++;
         if (iconRenderer != null)
             iconRenderer.enabled = false;
 

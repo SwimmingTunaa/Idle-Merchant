@@ -30,6 +30,8 @@ public class ItemFlyAnimation : MonoBehaviour
     
     private Vector2 targetScreenPosition;
     private Vector3? worldTarget;   // set → world→world flight, re-projected every frame (camera may pan)
+    private Transform homing;       // set → worldTarget follows this each frame (moving target, e.g. a walking customer)
+    private float speed = 1f;       // phase-time multiplier; >1 = snappier hop
     private Vector3 explosionVelocity;
     private System.Action onArrivalCallback;
     
@@ -54,14 +56,19 @@ public class ItemFlyAnimation : MonoBehaviour
     public void StartFlight(Vector2 screenTarget, Vector3 randomExplosionDir, System.Action onComplete = null)
         => Begin(screenTarget, null, randomExplosionDir, onComplete);
 
-    /// <summary>Fly to a world point (e.g. the shop loot pile) instead of a UI screen point.</summary>
-    public void StartFlightToWorld(Vector3 target, Vector3 explosionDir, System.Action onComplete = null)
-        => Begin(WorldToScreen(target), target, explosionDir, onComplete);
+    /// <summary>Fly to a world point (e.g. the shop loot pile) instead of a UI screen point.
+    /// With <paramref name="homingTarget"/>, the point tracks that transform until it deactivates (then freezes).</summary>
+    public void StartFlightToWorld(Vector3 target, Vector3 explosionDir, System.Action onComplete = null,
+        Transform homingTarget = null, float speedMultiplier = 1f)
+        => Begin(WorldToScreen(target), target, explosionDir, onComplete, homingTarget, speedMultiplier);
 
-    private void Begin(Vector2 screenTarget, Vector3? world, Vector3 randomExplosionDir, System.Action onComplete)
+    private void Begin(Vector2 screenTarget, Vector3? world, Vector3 randomExplosionDir, System.Action onComplete,
+        Transform homingTarget = null, float speedMultiplier = 1f)
     {
         targetScreenPosition = screenTarget;
         worldTarget = world;
+        homing = homingTarget;
+        speed = Mathf.Max(0.01f, speedMultiplier);
         explosionVelocity = randomExplosionDir * explosionForce;
         onArrivalCallback = onComplete;
         
@@ -87,7 +94,7 @@ public class ItemFlyAnimation : MonoBehaviour
         
         while (elapsed < explosionDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.deltaTime * speed;
             float t = elapsed / explosionDuration;
             
             Vector3 offset = explosionVelocity * t;
@@ -107,10 +114,11 @@ public class ItemFlyAnimation : MonoBehaviour
         
         while (elapsed < flightDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.deltaTime * speed;
             float t = elapsed / flightDuration;
             
             float easedT = Mathf.SmoothStep(0f, 1f, t);
+            if (homing != null && homing.gameObject.activeInHierarchy) worldTarget = homing.position;
             if (worldTarget.HasValue) targetScreenPosition = WorldToScreen(worldTarget.Value);
 
             Vector2 currentScreenPos = Vector2.Lerp(startScreenPos, targetScreenPosition, easedT);
@@ -139,7 +147,7 @@ public class ItemFlyAnimation : MonoBehaviour
         
         while (elapsed < arrivalDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.deltaTime * speed;
             float t = elapsed / arrivalDuration;
             
             float scale = Mathf.Lerp(1f, 1.2f, t);
@@ -170,7 +178,9 @@ public class ItemFlyAnimation : MonoBehaviour
         // Screen-target flights are coins landing on the gold counter (world hops are item → pile)
         if (!worldTarget.HasValue) SfxManager.Instance?.Play(SfxId.Coin);
 
-        // Invoke callback if provided
+        // Landed: hide before the callback so the receiver (e.g. a carry icon) never shares a frame with us.
+        // Pool-symmetric: SpawnFlyer resets color to white on every spawn.
+        spriteRenderer.color = Color.clear;
         onArrivalCallback?.Invoke();
         onArrivalCallback = null;
     }

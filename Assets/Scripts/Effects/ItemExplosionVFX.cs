@@ -73,14 +73,18 @@ public class ItemExplosionVFX : PersistentSingleton<ItemExplosionVFX>
         }
     }
 
-    /// <summary>One item icon arcing world→world (e.g. loot → shop pile, pile → counter). Pure VFX, no callback.
-    /// Default scale 1 = a dropped item's size, so items keep their size mid-journey.</summary>
-    public void FlyToWorld(Sprite sprite, Vector3 from, Vector3 to, float scale = 1f)
+    /// <summary>One item icon arcing world→world (e.g. loot → shop pile, pile → counter). Pure VFX.
+    /// Default scale 1 = a dropped item's size, so items keep their size mid-journey.
+    /// <paramref name="homing"/> makes the target track a moving transform; <paramref name="onArrive"/> also fires
+    /// immediately if the flight can't spawn, so callers can chain without a stuck state.</summary>
+    public void FlyToWorld(Sprite sprite, Vector3 from, Vector3 to, float scale = 1f,
+        Transform homing = null, float speed = 1f, System.Action onArrive = null)
     {
-        if (itemPrefab == null || sprite == null) return;
-        ItemFlyAnimation animation = SpawnFlyer(sprite, from, scale);
+        ItemFlyAnimation animation = itemPrefab != null && sprite != null ? SpawnFlyer(sprite, from, scale) : null;
         if (animation != null)
-            animation.StartFlightToWorld(to, new Vector3(Random.Range(-0.2f, 0.2f), 0.2f, 0f));   // small pop, not a burst
+            animation.StartFlightToWorld(to, new Vector3(Random.Range(-0.2f, 0.2f), 0.2f, 0f), onArrive, homing, speed);   // small pop, not a burst
+        else
+            onArrive?.Invoke();
     }
 
     private void SpawnSingleItem(Sprite sprite, Vector3 worldPos, Vector2 screenTarget, System.Action onComplete, float scale = 1f)
