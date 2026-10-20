@@ -115,7 +115,11 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
     void OnApplicationPause(bool paused)
     {
+        // The editor raises pause whenever the Unity window loses focus (run-in-background off),
+        // which wrote stray saves seconds into agent test sessions. Builds still save on pause.
+#if !UNITY_EDITOR
         if (paused) Save();
+#endif
     }
 
     void OnApplicationQuit()

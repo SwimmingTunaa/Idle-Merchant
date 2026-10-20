@@ -406,7 +406,12 @@
     margin-bottom: var(--space-md);
 }
 
-/* Shared .book-subhead (BookPanel.uss) — extra room under it for the slots' overhanging rank gems */
+/* Shared .book-subhead (BookPanel.uss) — the roster keeps its larger 32px layer label (the slots'
+   promote arrows overhang it) and extra room under it for the overhanging rank gems */
+.layer-section > .book-subhead .book-subhead__label {
+    font-size: var(--font-size-body-lg);
+}
+
 .layer-section > .book-subhead {
     margin-bottom: 16px;
 }
