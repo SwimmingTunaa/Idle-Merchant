@@ -57,15 +57,29 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 - `GameSignals` drives reactive UI updates (gold display, unit counts, etc.)
 - Design tokens: `Scripts/UI/GlobalVariables.uss` — colour / text / spacing / font-size `--vars` mirrored from Figma; consume via `var()` in `.class`/`#id` rules
 - Reusable Button: `Scripts/UI/Components/Button.uss` + `Button.uxml` — tint-driven 9-slice variants (`btn-primary` / `-secondary` / `-success` / `-danger` / `-disabled`)
-- Top-nav board badges: `UIManager.SetBoardBadge(badge, visible, wiggle)` — shared badge toggle + ~5s button tilt-wiggle (scheduled item kept in the badge's `userData`); used by the cursor and hiring boards
+- Top-nav board badges: `UIManager.SetBoardBadge(badge, visible, wiggle)` — shared badge toggle + ~5s button tilt-wiggle (scheduled item kept in the badge's `userData`); used by the cursor and hiring boards and the Units bookmark (promote-ready count via pure `AdventurerManager.CountPromoteReady`, gold dirty flag)
+- Book pages (`BookPanelController`, tabs 0 Roster · 1 Guild · 2 Inventory · 3 Crafting · 4 Settings · 5 Cursor · 6 Contracts) share: `.book-subhead` rule·label·rule header (`BookPanel.uss`, `--subhead-*` tokens), `UI/BookStamp.cs` slam-on / dither-off stamp (Inventory FOR SALE, Crafting CRAFTING), `UI/Components/StatusFrame.cs` (Painter2D progress sweep; idle/crafting/blocked/capped/locked)
 - **UI Toolkit gotchas:** no `gap` (use margins) · no `box-shadow` / `text-shadow` · `var()` resolves only in USS rules, never inline `style=""` (inline `var()` throws an NRE that aborts the whole `CloneTree` → blank panel) · a margin reset must be a bare `*`, not `#scope *` (id specificity wipes class margins)
 
 ### Shop Pipeline
 `Shop/Inventory.cs` → gold source of truth (use `Inventory.Instance` for gold ops)
 `Shop/ShopManager.cs` → orchestrates shelf, counter, sales
-`Shop/SalesManager.cs` → sells items to customers; `TryPickDesiredForCustomer` resolves a want and reports a `WalkoutReason` (`NoStock` / `TooExpensive`) on failure
-`Shop/Shelf.cs` → holds items for sale
+`Shop/SalesManager.cs` → sells items to customers; `TryPickDesiredForCustomer` resolves a want (archetype's preferred category first, else best affordable anywhere) and reports a `WalkoutReason` (`NoStock` / `TooExpensive`) on failure
+`Shop/Inventory.cs` floors → `SetFloor/GetFloor` "keep at least N" per item; respected by sales and crafting (UI label KEEP)
+`Shop/LootPile.cs` → stock heap behind the counter; `FlySale` relays a sold item pile → counter → homing onto the buyer (`CustomerCarryDisplay` shows the carry on arrival); shopkeeper flips toward the bin while a leg is in flight
+`Shop/Shelf.cs` → holds items for sale (fully commented out)
 `Shop/QueueController.cs` → customer queue
+
+### Crafting
+`Crafting/CraftingManager.cs` (scene singleton, not persistent) → auto-crafts enabled recipes: per-recipe output cap (default 10, 1–999) and priority 1–4; one job per recipe; stations are slot pools (`RecipeDef.station`: Forging 2 base slots / Smithy 1 / Arcane Workshop 1, `BuyStationSlot` 2500×1.6^bought — debugger-only until batch 3b); `GetBlockReason` → `Crafting` / `No station` / `Station busy` / `At cap` / `Missing materials`. Signals `OnCraftStarted`, `OnCraftingConfigChanged`
+`UI/Panels/Crafting Menu/CraftingController.cs` → book Crafting page (tiles per layer on torn sheets, inventory-style right page, foot-plank stamp toggles the recipe)
+
+### Contracts & Seals
+`Managers/ContractManager.cs` → 3 offers rotating every 10 min, accept 1 (never expires); Deliver (raw items, fulfilled from stock) / Hunt (kills on a staffed layer) / Patronage (customers served). Target snapshotted at roll = max(rate × 5–10 min, stock × 30–40%, floor). Deliver gold = target × sellPrice × 1.6; counters pay 50% of passive gold/min over the work time. Seals: 10, or 20–30 for layer ≥3. Also owns the Guild Seal balance + seal shop (Recruitment Favor 50, Rush Order 20). Seals also come from star awards (30/50/80/120/200, `ProgressionManager`) and `StarMilestoneDef.sealReward`. Signals `OnContractAccepted/Completed`, `OnSealsChanged`. Design: `CONTRACTS_DESIGN.md`
+`UI/Panels/Contracts/ContractsPage.cs` → book Contracts tab; the active contract also rides the HUD milestone tracker
+
+### Audio
+`Managers/SfxManager.cs` → `PersistentSingleton`, 8-voice round-robin pool, per-`SfxId` volume / pitch jitter / unscaled throttle; `Play(SfxId)` from VFX/UI seams, signal-driven for sale/hire/milestone/star. Volumes Master/SFX/Music (`SfxGain = master × sfx`; music is an empty slot) saved in `SaveData.settings`. Clips are synthesized by `Tools/gen_sfx.py` (project root, deterministic) into `Assets/Audio/SFX`
 
 ### Loot Pipeline
 `Loot/LootManager.cs` → spawns loot drops
@@ -124,7 +138,7 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/Entities/Health.cs` | Reusable health, damage flash, death/revive |
 | `Scripts/Utility/ProgressionActivator.cs` | Activates GameObjects on layer/star/upgrade events |
 | `Scripts/Managers/ClickerManager.cs` | Left-click damage/loot (friendlies transparent), right-click inspect, hover outline |
-| `Scripts/Systems/DamageNumber/DamageNumberManager.cs` | Floating damage/gold/text numbers (pooled); gold banks on coin arrival |
+| `Scripts/Systems/DamageNumber/DamageNumberManager.cs` | Floating damage/gold/text numbers (pooled, sorting order 10000); gold banks on coin arrival; level-up float uses TMP sprite asset `UpArrow` (BrightLinger has no ↑) |
 | `Scripts/Effects/ItemExplosionVFX.cs` | Coins/items fly from world to UI counter (`ItemFlyAnimation`, `UITargetMarker`) |
 | `Scripts/Entities/Adventuers/PromoteIndicator.cs` | Persistent badge+arrow above promote-ready adventurers |
 | `Scripts/Rendering/HoverOutlineFeature.cs` | URP outline render feature — two instances on `Renderer2D`: hover/selection (layer bit 2, yellow) and permanent friendly outline (bit 4, near-black via `PermanentOutline`) |
@@ -133,6 +147,14 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/UI/Panels/Cursor/CursorUpgradePage.cs` | Book Cursor page — clones `CursorUpgradeCard.uxml` per upgrade, binds via closures |
 | `Scripts/Managers/SaveManager.cs` | Single-slot save (`SaveData` DTO, Newtonsoft JSON, atomic .tmp/.bak writes, 30 s autosave), cold-boot restore, offline rates + award; design in `SAVE_DESIGN.md` |
 | `Scripts/UI/Panels/Welcome Back/WelcomeBackPanel.cs` | "While you were away" panel — display only, `SaveManager` banks on Collect |
+| `Scripts/Managers/SfxManager.cs` | One-shot SFX pool + Master/SFX/Music volumes |
+| `Scripts/Managers/ContractManager.cs` | Contract offers/active/claim, Guild Seals, seal shop |
+| `Scripts/Crafting/CraftingManager.cs` | Auto-crafting: caps, priority, station slots, block reasons |
+| `Scripts/UI/Panels/Crafting Menu/CraftingController.cs` | Book Crafting page (`Crafting_Page.uxml`, `CraftingPanelStyle.uss`) |
+| `Scripts/UI/Panels/Contracts/ContractsPage.cs` | Book Contracts page (offers, active card, seal shop) |
+| `Scripts/UI/BookStamp.cs` | Shared stamp slam/dither for book pages |
+| `Scripts/UI/Components/StatusFrame.cs` | State-carrying icon frame with Painter2D progress sweep |
+| `Scripts/Shop/LootPile.cs` | Stock heap; fly-in target and sale relay (`FlySale`) |
 
 ---
 
@@ -165,6 +187,13 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **ScriptableObject asset names are save keys** — items, milestones, guild upgrades and unit `EntityDef`s are saved by `.name`; renaming one orphans it in existing saves (not restored; only items log an error)
 - **Offline rates count passive income only** — customer sales (`OnItemSold`) and porter deliveries (`RecordPorterDelivery`); clicks, milestone claims and debug gold never count. A new income source must decide explicitly whether it's passive
 - **Gold in flight rides the save** — gold that's committed but still animating (offline Collect shower) is tracked in `goldInFlight` and saved as banked, decremented per coin on arrival; follow that pattern for any new delayed-bank flow
+- **Editor never saves on pause** — `OnApplicationPause` saves only in builds (`#if !UNITY_EDITOR`; the editor raises pause on focus loss). Autosave (30 s) and quit still save in the editor, so agents still back up `save.json` and call `SaveManager.SuspendSaving()` before play-testing
+- **Station defs keep old asset names as save keys** — `Potion Station.asset` is the Smithy, `Crafting Station.asset` the Arcane Workshop; don't rename. `UpgradeType` values are serialized ints, so append new ones only
+- **One stock floor** — `Inventory.SetFloor` is the only "keep N"; sales and crafting respect it. Contract hand-ins (`ContractManager.Fulfil`) deliberately ignore it (explicit player action)
+- **Crafting display state ≠ `GetBlockReason`** — that check order (busy before cap/materials) suits the start loop and debugger; UI derives capped/blocked itself (`CraftingController.StateOf`)
+- **Stamp overlays sit at page-root level** — the `Stampanim` element is a sibling of left/right content, never inside a page (pages clip overflow); aim it with `BookStamp.AimAt`
+- **Crafting right page is height-budgeted** — fits 650px with three 46px ingredient rows and the 56px foot plank 22px off the bottom, no scrolling; growing one block means shrinking another (budget note atop `CraftingPanelStyle.uss`)
+- **New pages use `--font-size-body` 24 / `-small` 20 / `-caption` 18** (Ithaca, nothing smaller) — never the legacy `--text-*` scale; Roster + `Components/*.uss` still consume it, so migrate page by page, don't bump it in place
 - **`lastPlayedUtc` means "collected up to", not "last seen"** — while a welcome-back award is unclaimed it's saved as `now − pendingAway` and rates freeze, so quitting on the panel re-offers the identical award; don't "fix" it to `UtcNow`
 
 ---

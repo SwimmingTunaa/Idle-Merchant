@@ -1,6 +1,6 @@
 # Save System & Offline Progress — Design Doc
 
-Status: draft for review · Owner: Tuan · Scope: design only, no code yet
+Status: **built** (`SaveManager`, `WelcomeBackPanel`) · Owner: Tuan · Updated 2026-10-20 — later chunks (contracts, crafting, volumes) are listed in §1; the code is the source of truth for field names
 
 ## Goals
 
@@ -23,13 +23,17 @@ One `SaveData` DTO, collected by a new `SaveManager` (PersistentSingleton). No p
 | Chunk | Fields | Source of truth |
 |---|---|---|
 | Meta | save version (int), last played UTC timestamp, total play time | SaveManager |
-| Economy | gold; per-item stock counts (itemId → qty) | Inventory |
+| Economy | gold; per-item stock counts (itemId → qty); per-item keep-N floors (itemId → N) | Inventory |
 | Progression | stars; unlocked layers; lifetime counters (gold earned, mobs killed, loot collected, units hired/promoted, items crafted, crafted sold, customers served); reached + claimed milestone ids | ProgressionManager |
 | Clicker | all ladder levels (damage, pickup radius, AOE, auto click, auto collect) | ClickerManager |
 | Guild | owned upgrade ids | GuildUpgradePanel's backing data (move ownership into ProgressionManager or a small GuildState if it currently lives in UI — flag for implementation) |
 | Roster | per unit: type (adventurer/porter), identity (name, appearance seed/indices), traits + tiers, rank, level/xp, assigned layer | AdventurerManager / PorterManager / IdentityComponent / TraitComponent |
 | Offline-rate stats | rolling gold/min and loot/min from the last session (see §3) | SaveManager |
-| Settings | game speed preference, (future: audio volumes) | GameManager |
+| Settings | game speed; Master / SFX / Music volumes | GameManager, SfxManager |
+| Contracts | seal balance + lifetime seals, rotation time left, the 3 offers (null = taken), active contract (kind, params, snapshot target, progress, rewards), unhired Recruitment Favor candidates | ContractManager, HireController |
+| Crafting | per recipe (RecipeDef name): enabled, cap, priority; slots per station; running jobs (recipe + seconds left — ingredients were already consumed, so jobs resume rather than refund) | CraftingManager |
+
+The offline-rate meta also carries customers/min and kills/min per layer (contract sizing only — never offline income). Old saves without the contracts or crafting chunk load defaults (fresh offers rolled against the restored stock; every unlocked recipe enabled).
 
 **Deliberately not saved:** candidate pools (regenerate on load — fresh stock is a feature), live customers, loot on the ground (banked: see §4), mob state (respawn naturally), VFX/UI state.
 
@@ -41,7 +45,7 @@ One `SaveData` DTO, collected by a new `SaveManager` (PersistentSingleton). No p
 - **Location:** `Application.persistentDataPath/save.json`.
 - **Atomic writes:** write to `save.json.tmp`, then File.Replace into `save.json`, keeping the previous file as `save.json.bak`. On load: if `save.json` fails to parse, fall back to `.bak` (and log loudly). A corrupt save never silently wipes progress.
 - **Threading:** collect the DTO on the main thread (Unity objects aren't thread-safe), but serialize + write on a background Task so autosaves never hitch a frame; one in-flight save at a time, quit waits for the last write.
-- **When to save:** every 30s (timer), on application pause/focus-loss, on quit. Manual "Save" not needed.
+- **When to save:** every 30s (timer), on application pause/focus-loss, on quit. Manual "Save" not needed. *As built:* the pause-save is compiled out in the editor (`#if !UNITY_EDITOR`) — the editor raises pause whenever its window loses focus, which wrote stray saves during agent test sessions. Autosave and quit still save in the editor, so back up `save.json` and call `SaveManager.SuspendSaving()` before play-testing.
 - **When to load:** once on boot, before managers spawn units. Load order: Inventory/Progression/Clicker state first → then managers spawn roster from data → then UI refreshes off the usual GameSignals (raise the existing changed-events after load rather than inventing new ones).
 - **Versioning:** `version` int in the DTO. Migrations are a switch in one place; unknown-future-version loads refuse (don't destroy the file). Missing fields default safely (JsonUtility already zero-defaults).
 - **New game:** no file = fresh start. A debug "wipe save" button goes in the Game Debugger.

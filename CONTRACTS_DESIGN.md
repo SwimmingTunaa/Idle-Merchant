@@ -1,6 +1,7 @@
 # Guild Contracts & Guild Seals — Design Doc
 
-Status: draft for review · Owner: Tuan · Scope: design only
+Status: **phase 1 built** (`ContractManager`, `ContractsPage`, 2026-10-19) · phases 2–3 planned · Owner: Tuan
+Player-facing summary of what shipped: GDD §10.6. "As built" notes below mark where phase 1 settled a detail.
 Reference feel: Against the Storm's order system — chosen offers, fulfil from stock.
 
 ## Why
@@ -38,6 +39,7 @@ For deliverables of item X: `target = max(rateTerm, stockTerm)`
 - `stockTerm` = **30–40% of current stock of X** — the late-game bite; contracts always take a real chunk of the hoard.
 - **Snapshot the target at offer time** (not accept time) so dumping stock can't shrink an offer.
 - Counter contracts scale on their measured rates alone (kills/min, customers/min).
+- *As built:* every target also has a floor (deliver 5, hunt 10, patronage 5) so a fresh guild with unmeasured rates still gets sensible asks. Deliver offers are raw items only (from the unlocked layers' drop tables); Hunt picks a layer that has adventurers. Hand-ins ignore the item's keep-N floor.
 
 A player who never stockpiles sees small deliverable contracts — intended; contracts reward holding inventory, a new decision that doesn't exist today.
 
@@ -47,6 +49,7 @@ A player who never stockpiles sees small deliverable contracts — intended; con
 - **Guild Seals:** **flat per contract, scaled only by tier — never by size** (or seals inherit gold's inflation):
   - common contracts: **10 seals**
   - star-tiered / crafted / bulk: **20–30 seals**
+  - *As built:* tier = depth — Deliver/Hunt on layer 3+ pay 20, +5 per layer beyond, max 30; Patronage always 10. Hunt/Patronage gold (no goods leave stock) = 50% of passive gold/min × the minutes the target takes at the measured rate (capped at 30 min; 30 gold/min assumed before rates exist).
 - Seals are **active-play currency by design**: contracts need active fulfilment, so offline time never mints seals. (Welcome-back screen stays gold+items only.)
 
 ## Guild Seals — the shop
@@ -84,10 +87,11 @@ Milestones are one-time, so seal grants here are a fixed lifetime supply — the
 - New SaveData chunk per convention: active contract (template id + params + progress + snapshot target), current offers + rotation timer, lifetime seals earned/spent, seal balance.
 - New signals: OnContractAccepted / OnContractCompleted / OnSealsChanged (Raise* convention).
 - Measured rates already persist; per-item rates for rateTerm need a small extension of the rate tracker (per-item EMA or a cheaper windowed count — implementation's choice).
+- *As built:* no per-item tracker — an item's rate is the overall loot/min × its share of the unlocked drop tables. SaveManager gained kills/min per layer and customers/min (saved in meta) for the counter contracts.
 
 ## Phases
 
-1. **Contracts core:** board tab + offer gen (deliver-raw, hunt, patronage) + accept/fulfil/claim + gold premium + seal balance + HUD card + save chunk. Seal shop with Recruitment Favor + Rush Order.
+1. ✅ **Contracts core (built):** board tab + offer gen (deliver-raw, hunt, patronage) + accept/fulfil/claim + gold premium + seal balance + HUD card + save chunk. Seal shop with Recruitment Favor + Rush Order. Star seals and milestone `sealReward` shipped with it. The board shows a rotation countdown on the page; the bookmark badge/watch is still phase 2.
 2. **Depth:** crafted/bulk templates, second active slot as a guild upgrade, new-offer badge + rotation watch on the tab/board, contract stats in GDD/debugger.
 3. **With equipment:** armory vendor in the seal shop.
 

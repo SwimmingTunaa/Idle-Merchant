@@ -1,7 +1,7 @@
 # Idle Merchant Guild — Game Design Document
 
-**Version:** 2.5
-**Date:** 2026-06-10
+**Version:** 2.6
+**Date:** 2026-10-20
 **Engine:** Unity 2D (URP, UI Toolkit, Spine/SpriteLibrary)
 **Genre:** Idle / Management
 **Platform:** PC (primary)
@@ -222,8 +222,14 @@ Early levels arrive fast (frequent small wins); the rank gate at Level V is the 
 - Levels cap at V within a rank; ranks cap at Gold (`maxRank` 5) — Gold V is the ceiling, no further gates after that
 
 **In-world feedback (implemented):**
-- Each level-up floats a green **"lvl +"** text above the adventurer (via the damage-number system)
-- When an adventurer reaches a rank's top level, a **persistent promote indicator** — the next rank's badge plus a green up-arrow — bobs above their head until promoted (`PromoteIndicator`). This is the standing prompt to open the Roster and spend the gold; it disappears on promotion.
+- Each level-up floats a green **"lvl ↑"** above the adventurer (via the damage-number system; the arrow is a pixel sprite since the font has no ↑ glyph)
+- When an adventurer reaches a rank's top level, a **persistent promote indicator** — the next rank's badge plus a green up-arrow — bobs above their head until promoted (`PromoteIndicator`). This is the standing prompt to open the Roster and spend the gold; it disappears on promotion. (The indicator's arrow is still the generated placeholder; the new pixel up-arrow is used in the UI and the level-up float.)
+
+**Roster promote affordances (implemented):**
+- A promote-ready adventurer's slot gem turns gold and shows the pixel up-arrow; it **pulses only while the promotion is affordable** (motion = actionable).
+- The **Units bookmark** carries a badge with the number of promote-ready adventurers and wiggles while any of those promotions is affordable.
+- The Promote button reads "Promote <cost>" with the copper coin, like the other buy buttons.
+- Layer rows in the Roster wrap at five slots.
 - Rank badge art exists for Rank 1 only — ranks 2–5 badges are pending art (the indicator clamps to the last available badge)
 
 ---
@@ -302,9 +308,10 @@ Idle → Wander → SeekingQueue → Queueing → Buying → Leaving → Exited
 - Joins queue when within 1m of the queue tail
 - Queue position calculated dynamically (spacing tightens as queue grows: 0.08–0.35m gap)
 - Each customer has an **archetype** — Commoner / Adventurer / Noble (`CustomerDef.customerArcheType`) — with a preferred item category (`CustomerDef.itemPreferance`), a budget range (`CustomerDef.budget`), and a per-visit batch quantity (`CustomerDef.batchRange`)
-- On reaching the counter: resolves a **want** against current stock within budget (`SalesManager.TryPickDesiredForCustomer`), favouring higher-value affordable items biased by archetype preference; the desired item is shown via a want-bubble above the customer
+- On reaching the counter: resolves a **want** against current stock within budget (`SalesManager.TryPickDesiredForCustomer`) — the most expensive affordable item in the archetype's **preferred category first**, and only if that yields nothing, the most expensive affordable item from any other category; the desired item is shown via a want-bubble above the customer
 - Buys a quantity within the batch range that budget and stock allow
-- Leaves after purchase, despawns on exit
+- **Archetypes as built:** Commoner (Villager, Potion Lady — Basic, 200–600g, from the start), Adventurer (Advanced, 600–3,000g, from 2★), Noble (Premium, 6,000–10,000g, from 3★). Star gates live on `CustomerSpawner`; Adventurer/Noble customers have no distinct art yet
+- Leaves after purchase, despawns on exit. The bought item **relays** from the loot pile to the counter, then homes onto the walking buyer; the overhead carry icon and Carry Walk start only when it lands, so the item is never in two places
 - **Intent bubbles (implemented):** "?" while browsing, a 0.6s "!" flash on picking a want, then the item + qty while queueing; an empty-handed walkout shows **why** — crossed crate (nothing matching in stock) or crossed coin (over budget) — including counter rejections
 - **Animation (implemented):** Browse at wander pauses, Pay at the counter, Carry Walk when leaving with a purchase, Upset Walk on empty-handed walkouts
 
@@ -503,7 +510,7 @@ The shop is the gold-generation endpoint of the pipeline. Loot flows in from por
 `Inventory` is the single source of truth for all items and gold.
 
 - Three item dictionaries: **Basic**, **Advanced**, **Premium**
-- Items can be **reserved** (for crafting or other use) — reserved items are not available for sale
+- Each item can have a **keep-N floor** ("KEEP" stepper on the Inventory page, `Inventory.SetFloor`) — customer sales and crafting never take stock below it. ✅ *Reconciled: the old separate "reserve" became this single floor (crafting batch 2). Contract hand-ins ignore it — handing goods over is an explicit player action.*
 - Gold supports both integer addition (sales) and fractional addition (clicker income)
 - All gold operations go through `Inventory.Instance.TrySpendGold()` / `AddGold()`
 
@@ -511,9 +518,9 @@ The shop is the gold-generation endpoint of the pipeline. Loot flows in from por
 
 - **Shelf**: Displays items available for sale, organised by category. Visual representation of shop stock.
 - **Counter**: Where sales happen. `SalesManager.TrySellItem()` validates stock, removes the item from inventory, and adds gold.
-- **SalesManager** tracks which items are "marked for sale" and calculates available quantity (total − reserved − allocated to waiting customers).
+- **SalesManager** tracks which items are "marked for sale" and calculates available quantity (total − floor; there is no per-customer allocation).
 - **Shopkeeper**: The counter is always staffed by the player's avatar. No staffing mechanic — the counter is never unstaffed.
-- **Loot pile (implemented)**: shop stock is shown as a physical heap in an open bin behind the shopkeeper (capped at 16 sprites, a mix of the stocked item types). Porter deposits and vacuumed loot fly into it; each sale hops an icon from the pile to the counter — stock level is readable at a glance.
+- **Loot pile (implemented)**: shop stock is shown as a physical heap in an open bin behind the shopkeeper (capped at 16 sprites, a mix of the stocked item types). Porter deposits and vacuumed loot fly into it; each sale hops the item from the pile to the counter and on into the buyer's hands (the shopkeeper turns to face the bin while it lifts out) — stock level is readable at a glance.
 
 ### 6.4 Customer Spawn System
 
@@ -551,9 +558,9 @@ This ensures the game never hard-locks, while still making gold mismanagement fe
 
 1. Customer decides to buy → enters `SeekingQueue` state
 2. Joins queue when within 1m of queue tail
-3. At counter: `SalesManager.TryPickDesiredForCustomer()` resolves the customer's **want** — the best affordable in-stock item within budget, biased by the customer's archetype category preference
+3. At counter: `SalesManager.TryPickDesiredForCustomer()` resolves the customer's **want** — the best affordable in-stock item in the archetype's preferred category, else the best affordable item anywhere
 4. Transaction: item removed from inventory, gold added, `GameSignals.RaiseItemSold()` fired
-5. Customer exits
+5. Customer leaves; the item relays pile → counter → buyer (4.5), then the customer exits
 
 ### 6.7 Queue System
 
@@ -628,7 +635,9 @@ Progression is measured in **stars** (1★ to 5★). Stars gate layer unlocks an
 | 4★ | Layers 6–7 | Star rewards |
 | 5★ | Layers 8–10 | Star rewards (max progression) |
 
-To earn a star, the player must complete **and claim** all milestones for the next star level (see 8.3).
+To earn a star, the player must complete **and claim** all milestones for the next star level (see 8.3). Each star also grants a one-time **Guild Seal** award — 30 / 50 / 80 / 120 / 200 for 1★–5★ (see 10.6).
+
+⚠️ *Divergence (pre-existing, not yet reconciled):* the build starts the guild at **0★** with Layer 1 and unlocks **one layer per star** (`ProgressionManager`: star N → Layer N+1), so 5★ reaches Layer 6, not 10. The table above is the original 10-layer intent; decide which one stands.
 
 ### 8.2 Milestones
 
@@ -638,7 +647,7 @@ Milestones are tracked progress gates tied to in-game events. Each milestone has
 
 | Type | Tracks |
 |---|---|
-| GoldEarned | Cumulative gold earned (all time) |
+| GoldEarned | Cumulative gold earned (all time), **excluding** milestone claim payouts — granted gold isn't earned gold |
 | MobsKilled | Total mob deaths |
 | UnitsHired | Total units hired |
 | LootCollected | Total loot pieces collected |
@@ -657,11 +666,13 @@ Milestones are tracked progress gates tied to in-game events. Each milestone has
 | 3★ → 4★ | Rank up 2 adventurers, earn 25,000 gold, craft 10 items, serve 50 customers |
 | 4★ → 5★ | Earn 100,000 gold, sell 20 Premium items, achieve 5 total rank-ups, buy 3 upgrades |
 
+**First star — the implicit tutorial (implemented):** the 1★ tier teaches one verb per claim, and each payout funds the next step. Tracker order: kill 15 mobs (150g) → collect 25 loot (200g) → serve 1 customer (300g) → earn 2,500 gold (500g) → hire an adventurer (750g) → hire a porter (1,000g). Targets were stretched so the star lands around the **3-minute mark** (a first cut starred in under a minute). Tracker order comes from the asset file-name prefixes (`1_` … `6_`).
+
 **Performance note:** Milestone checks use a dirty flag (`milestoneCheckPending`). Events set the flag; the actual O(n) scan runs once per frame at most, not on every gold tick.
 
 ### 8.3 Milestone Rewards
 
-**Claiming (implemented):** reaching a milestone's target makes it **claimable** rather than completing it. The player presses Claim (HUD tracker or the Guild page in the Book); only then does it pay out and count toward the next star. Every milestone pays a **gold reward** (`goldReward`, ~100–300g at 1★ scaling to 500K at 5★), flown as a coin shower from the Claim button to the gold counter — gold banks per coin on arrival and every failure path banks directly. Unlock rewards (below) also grant at claim time.
+**Claiming (implemented):** reaching a milestone's target makes it **claimable** rather than completing it. The player presses Claim (HUD tracker or the Guild page in the Book); only then does it pay out and count toward the next star. Every milestone pays a **gold reward** (`goldReward`, ~100–300g at 1★ scaling to 500K at 5★), flown as a coin shower from the Claim button to the gold counter — gold banks per coin on arrival and every failure path banks directly. Unlock rewards (below) also grant at claim time. A few Crown-flavoured milestones also carry a **seal reward** (`sealReward`: The Tax Collector Noticed, 3★ tier, 20; The Crown Sent a Letter, 4★ tier, 30); everything else is gold-only, so a seal on a card stays special.
 
 **Milestone tracker (implemented):** a torn-paper card list on the HUD, under the gold counter, sorted claimable > in progress > claimed, each card showing progress / gold Claim button / claimed state. The header badges and wiggles while anything is claimable. The Book's Guild page lists the same milestones with the same three states (and claims from there too), beside the guild upgrade cards (buy button, "Requires N-star" lock, or Owned).
 
@@ -695,7 +706,9 @@ Upgrades are one-time purchases from `GuildUpgradeDef` ScriptableObjects. They a
 
 | Upgrade | Effect |
 |---|---|
-| **Forging Station** | Unlocks the crafting system |
+| **Forging Station** | Crafting station for the blade line; starts with 2 crafting slots |
+| **Smithy** | Crafting station for the armor line; 1 slot |
+| **Arcane Workshop** | Crafting station for the charm/jewelry line; 1 slot |
 | **Research Station** | Unlocks a research/tech tree |
 | **Elevator** | Faster porter transit on a specific layer |
 | **Teleporter** | Instant porter transit on a specific layer |
@@ -725,17 +738,20 @@ Elevator and Teleporter upgrades are per-layer. The player selects the target la
 
 ### 10.1 Gold
 
-Gold is the sole currency. All operations flow through `Inventory.Instance`.
+Gold is the main currency; all gold operations flow through `Inventory.Instance`. **Guild Seals** are a second, time-gated currency (10.6).
 
 **Income sources:**
 - Counter sales (primary) — customer buys item, gold added
 - Clicker income — manual tapping for small fractional gold amounts
 - Milestone claims — one-off gold rewards (8.3)
+- Contract claims — wholesale premium for handing over stock, or a share of passive income for counter contracts (10.6)
 - Offline earnings — collected on return (10.5)
 
 **Spending:**
 - Hiring units (cost varies by rank + traits, ×1.25 per unit of that role already owned)
+- Promoting adventurers (rank-scaled gold cost, 4.2)
 - Purchasing upgrades (fixed cost from `GuildUpgradeDef`)
+- Crafting station slots (2,500 × 1.6^slots bought at that station; currently bought from the Game Debugger only, until the world workshops land)
 
 ### 10.2 Item Pricing
 
@@ -747,7 +763,7 @@ Higher-tier items (Advanced, Premium) have significantly higher `sellPrice`. Thi
 
 ### 10.3 Customer Budget
 
-Each customer has a randomly determined budget (`CustomerDef.budgetRange`, e.g. 50–100g). They will buy the **most expensive item they can afford** from available stock. Players who have expensive items but few cheap ones may see customers unable to buy, so keeping stock variety matters.
+Each customer has a randomly determined budget from their archetype (`CustomerDef.budget`): Commoner 200–600g, Adventurer 600–3,000g (2★+), Noble 6,000–10,000g (3★+). They buy the **most expensive item they can afford** in their preferred category, falling back to any category only when that yields nothing. Players who have expensive items but few cheap ones may see customers unable to buy, so keeping stock variety matters. ✅ *Reconciled: the old "50–100g generic budget" predates the archetype budgets; live item prices sit far above the original design tables (see the 13.3 note).*
 
 ### 10.4 Economy Balance Levers
 
@@ -769,11 +785,23 @@ Each customer has a randomly determined budget (`CustomerDef.budgetRange`, e.g. 
 
 While the game is running, the loop continues on its own (3.4). While it's **closed**, nothing is simulated — the guild is paid from rates measured during play (implemented; full design in `SAVE_DESIGN.md`):
 
-- **Autosave:** every 30s, on pause/focus loss and on quit — no Save button. One local slot. What persists: gold, shop stock, stars, milestone reached/claimed state, lifetime counters, clicker ladder levels, owned guild upgrades, game speed, and the full roster (identity, appearance, traits, rank, level/XP, assigned layer). Loot on the floor or in porters' arms banks into stock on save. Not persisted: hire pools (fresh candidates on return), customers, mobs, VFX.
+- **Autosave:** every 30s, on pause/focus loss (builds only — the editor raises pause on focus loss) and on quit — no Save button. One local slot. What persists: gold, shop stock and keep-N floors, stars, milestone reached/claimed state, lifetime counters, clicker ladder levels, owned guild upgrades, game speed and Master/SFX/Music volumes, the full roster (identity, appearance, traits, rank, level/XP, assigned layer), contracts (offers, active contract + progress, rotation timer, seal balance, unhired Recruitment Favor candidates) and crafting (per-recipe on/cap/priority, station slots, running jobs with their remaining time). Loot on the floor or in porters' arms banks into stock on save. Not persisted: hire pools (fresh candidates on return), customers, mobs, VFX.
 - **Passive rates:** while playing, the game keeps rolling ~10-minute averages of gold/min and loot/min — **customer sales and porter deliveries only**. Clicks, milestone claims and debug gold never count, and the rate reads zero unless at least one adventurer and one porter are employed: clicking isn't passive income. Measured on game time, so a 3× session doesn't earn 3× offline.
 - **Offline award:** away time (capped at **8 hours**) × rate × **50%** efficiency, for both gold and items. Items split across what the unlocked layers' mobs drop, weighted by drop rates. Crafting does not run offline (v1).
 - **Welcome back:** if away more than 2 minutes, a parchment panel shows time away, gold earned and the top 3 items ("+ N more"). Nothing banks until the big **Collect** button: gold flies as a coin shower to the counter, items fly into the loot pile. Quitting on the panel — or mid-shower — re-offers the same award next launch; nothing is lost or doubled.
 - **Future knobs:** upgradeable cap ("Night Shift") and efficiency, offline events.
+
+### 10.6 Guild Contracts & Guild Seals
+
+Full design, rationale and phase plan: `CONTRACTS_DESIGN.md`. Phase 1 is built (`ContractManager`); the summary below is what ships.
+
+- **Board:** a Contracts tab in the Book (7th bookmark) shows **3 offers**; the player accepts **1** at a time. Offers rotate every **10 minutes** (ignoring them is free); an accepted contract never expires. The active contract also appears as a card in the HUD milestone tracker.
+- **Kinds:** **Deliver** a raw item (fulfilled from stock with a Fulfil button, ignoring keep-N floors) · **Hunt** — cull N mobs on a staffed layer · **Patronage** — serve N customers. Hunt/Patronage count from accept time.
+- **Sizing:** target = max(measured rate × 5–10 min, 30–40% of current stock for Deliver, a small floor), **snapshotted when the offer rolls** so dumping stock can't shrink it.
+- **Rewards:** Deliver pays target × sell price × **1.6** in gold (via the coin shower); Hunt/Patronage pay half the passive gold/min over the time the work takes. Plus flat seals: **10**, or **20–30** for contracts on layer 3 and deeper.
+- **Seals** are active-play currency: they never come from offline time. Other sources are one-off — star awards (8.1) and a couple of Crown milestones (8.3). Seal count shows on a wax-seal plate beside the gold counter.
+- **Seal shop:** **Recruitment Favor** (50) — an adventurer candidate joins the best adventurer pool (highest-rank def, then deepest layer) already promoted (rank = stars + 1, at least Bronze), survives pool refreshes and is kept in the save until hired; **Rush Order** (20) — every hiring pool restocks now.
+- **Not yet built (phase 2+):** crafted/bulk deliver templates, a second active slot, a new-offer badge and rotation watch on the bookmark, the armory seal vendor.
 
 ---
 
@@ -877,18 +905,31 @@ EntityDef (design-time) → BaseStats → StatsMediator (runtime modifiers) → 
 
 ### 13.1 Overview
 
-The crafting system is unlocked via the **Forging Station** upgrade. It converts raw loot into higher-tier goods with greater sell value.
+Crafting converts raw loot into higher-tier goods with greater sell value. Three guild stations each run one chain: **Forging Station** (blades), **Smithy** (armor), **Arcane Workshop** (charms/jewelry), each bought as a guild upgrade (5,000g; Arcane Workshop needs 2★).
 
 ### 13.2 Recipes
 
-- Defined as `RecipeDef` ScriptableObjects (linked to `CraftingManager`)
+- Defined as `RecipeDef` ScriptableObjects (linked to `CraftingManager`); each names its **station**
 - Recipes unlock via star rewards or milestone rewards
 - Each recipe specifies: input items (type + quantity), output item (type + quantity), crafting time
-- A configurable **reserve amount** prevents crafting from consuming all stock of an input item — the station auto-crafts only when stock exceeds the reserve threshold
+- Ingredients are consumed when a job **starts**; output lands when it finishes
+- ✅ *Reconciled: the per-recipe "reserve amount" became the shared per-item **keep-N floor** (6.2) — crafting never takes an ingredient below it.*
+
+### 13.2a Production Controls (implemented — Against the Storm–shaped)
+
+An enabled recipe auto-starts a job when all of these hold:
+- its **station is owned** and has a **free slot** — stations are slot pools: Forging starts with 2, Smithy and Arcane Workshop with 1; extra slots cost 2,500 × 1.6^(slots bought there)
+- the output's stock is **below the recipe's cap** ("produce until stock ≥ N"; default 10, 1–999)
+- every ingredient stays **at or above its floor** after the job takes its share
+- it isn't already running (one job per recipe)
+
+**Priority 1–4** decides who goes first when recipes compete for slots or materials (higher first; ties in chain/tier order). Settings, floors, slots and running jobs all persist; a job running at quit resumes with its remaining time, so ingredients are never lost.
 
 ### 13.3 Recipe Reference
 
 Recipes are organised in tiers. Each tier requires the crafted output of the previous tier as an ingredient, creating a crafting chain that spans all five dungeon zones.
+
+> **Note:** the chains below match the build; **sell prices and a few ingredients/quantities are the original design targets** (e.g. Crystal Plate takes Runed Stone, not Spirit Essence; Runed Focus also takes Iron Ore). Live prices in the `ItemDef` assets are roughly 10–25× higher (Fanged Dagger 250g, Iron Sword 1,500g, Abyssal Armor 7,500g), and every recipe step is priced to clear **≥ 1.4×** the sell value of its ingredients. Treat the assets as the price source.
 
 **Tier 1 — Basic Crafted (Zone 1 inputs only)**
 
@@ -944,6 +985,13 @@ Each recipe tier requires inputs from at least one zone deeper than the previous
 
 Crafting adds a secondary economy loop: instead of selling raw loot directly, the player can invest items into higher-value goods. The choice — sell basic items for steady low income, or hold stock and craft for bigger payouts — is the core tension. Cross-layer dependencies give the player a reason to care about multiple layers at once rather than just stacking the deepest one.
 
+### 13.6 Crafting Page (implemented)
+
+The Book's Crafting tab:
+- **Left page:** recipes grouped by dungeon layer on torn sheets under the shared sub-header, three tiles per row. Each tile's frame carries its state: brown idle (or waiting for a slot), **gold progress sweep** while crafting, **red** when blocked on materials, **solid gold** at cap, **grey + padlock** when the station isn't owned. A pixel stock slip and a red "on" corner sit on the tile. Tiles only select.
+- **Right page:** inventory-style detail — icon in the status frame, name banner, station / value / cap stepper planks, description, ingredient rows with have/need, craft time and priority pips. A full-width foot plank toggles the recipe: switching it on slams a **CRAFTING** stamp onto it, switching it off dithers the stamp away (the same stamp grammar as the Inventory's FOR SALE).
+- Station slot purchases are not on this page; they move to the world workshops (planned: batch 3b).
+
 ---
 
 ## 14. UI & Presentation
@@ -956,12 +1004,13 @@ All panels use **Unity UI Toolkit** (UXML/USS). Panels are orchestrated by `UIMa
 - **Main HUD / Top Navigation** — gold display (animated count-up), star indicator, bookmark tabs, hiring sign (affordable-hire coin / new-stock "!" badge, refresh pocket-watch — see 7.4), cursor board (opens the Cursor page; badge while any click upgrade is affordable); boards tilt-wiggle every ~5s while actionable; the bookmarks hide while the Book UI is open (its own edge tabs take over)
 - **Cursor Page (Book tab 6)** — cursor stats on the left page, upgrade cards on the right: template-cloned torn-paper cards (icon, name, current ➜ next in green, full-width price button with trailing coin), star-gated cards swap a lock pill for the buy button when unlocked
 - **Hiring Panel** — tabs per unit type, candidate cards, layer selector; hiring badge refreshes with the candidate pool
-- **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met); right-page detail panel aligned to Figma, selecting a unit outlines them in-world and locks the camera to them
+- **Roster Panel** — active units, current rank, XP progress bar, promote button (when rank-up threshold is met) and promote affordances (gold gems, Units bookmark badge — see 4.2); right-page detail panel aligned to Figma, selecting a unit outlines them in-world and locks the camera to them
 - **Milestone Tracker (HUD)** — torn-paper milestone cards under the gold counter with Claim buttons (see 8.3)
 - **Guild Page (Book)** — star progress, claimable milestone list, guild upgrade cards
 - **Welcome Back** — offline earnings summary + Collect, shown on launch after >2 min away (see 10.5)
-- **Crafting Panel** — recipe list, input/output display, reserve settings
-- **Inventory Panel** — item counts by category
+- **Crafting Page (Book tab 4)** — recipe tiles per layer with state frames, recipe detail with cap/priority and the stamp toggle (see 13.6)
+- **Inventory Page (Book)** — item counts by category, FOR SALE stamp, KEEP (floor) stepper
+- **Contracts Page (Book tab 7)** — offers, active contract with Fulfil/Claim, rotation clock, seal shop (see 10.6); a wax-seal counter sits beside the gold plate
 
 **UI look (implemented):** body text is **Ithaca** via the `--font-body` token (headers stay NotJam blackletter, the Guild Bulletin keeps Salmon Typewriter); buttons share one raised-key pixel sprite with a pressed-state swap on click and tint-driven variants; costs show the Copper Coin icon trailing the number everywhere; Book scroll views use a wooden-plank scrollbar on a parchment groove.
 
@@ -1010,7 +1059,8 @@ Key animation states (via `AnimatorOverrideController`):
 `DamageNumberManager` spawns pooled floating indicators above entities (BrightLinger pixel font):
 - **Damage** (white) — adventurer attacks, driven by the attacker in `CombatBehavior`
 - **Gold + coin** (warm gold) — player clicks; the coin hands off to `ItemExplosionVFX` at the end of its float and flies to the gold counter, banking the gold on arrival
-- **Level-up** (green "lvl +") and arbitrary hint text via `ShowText(message, transform, colour)`
+- **Level-up** (green "lvl ↑", the arrow a TMP sprite) and arbitrary hint text via `ShowText(message, transform, colour)`
+- Floats render at sorting order 10000 so they draw over entities
 - **Loot multiplier** (green ×N) — manual pickup bonus
 
 Gold integrity rule: gold carried by a flying coin is banked by the arrival callback, and every failure path (spawn failure, mid-flight despawn) banks it immediately — visual effects may be skipped, gold is never lost.
@@ -1023,7 +1073,20 @@ On hit, entities flash red via a shader (`_BlendAmount` property). Short duratio
 
 ## 15. Audio & Feel
 
-*Note: Audio systems are not yet documented in code — this section describes design intent.*
+**First audio pass (implemented):** ten synthesized chiptune one-shots (`Tools/gen_sfx.py`, deterministic) played by `SfxManager` through an 8-voice pool, with per-sound pitch jitter and a throttle so bursts stay musical (a 36-coin shower ticks at ~12/s; 40 same-frame auto-clicks collapse to one hit). Master / SFX / Music volumes persist in the save; they are set from the Game Debugger for now (no in-game settings UI yet). **Ambience and music are not built** — Music is an empty volume slot.
+
+| Built sound | Plays on |
+|---|---|
+| Click hit / Kill | player click damage / click kill |
+| Vacuum | click loot vacuum |
+| Coin | coin arrivals (fly-to-counter, claim showers) |
+| Ka-ching | every item sold |
+| Hire | unit hired (not on save-load respawns) |
+| Milestone ding / Star fanfare | milestone reached / star earned |
+| UI tick | buy / claim / accept buttons |
+| Page flip | Book open, close and tab switch |
+
+The table below is the original intent; loot pickup, promotion, mob hits by adventurers and a distinct upgrade sound are still unbuilt.
 
 ### 15.1 Ambience
 
@@ -1070,7 +1133,7 @@ On hit, entities flash red via a shader (`_BlendAmount` property). Short duratio
 |---|---|
 | Adventurer (Rank 1–5) | Multiple base visual variants; equipment sprites upgrade per rank |
 | Porter | Fewer visual variants; focused on carry/speed stats |
-| Customer (Regular) | Visual variety, randomised budget |
+| Customer (Regular) | Archetypes Commoner / Adventurer (2★) / Noble (3★) with archetype budgets — see 4.5 |
 | Customer (Party) | Rare event; 2–4 member group, leader only queues |
 | Mob (15 types) | 3 mobs per zone; see Section 5.6 for full reference |
 
@@ -1091,13 +1154,15 @@ See Section 5.7 for full reference. Summary:
 | 4 (Zones 3+4) | 3 | Advanced | 280–350g |
 | 5 (Zones 4+5) | 3 | Premium | 600–750g |
 
-See Section 13.3 for full recipe table.
+See Section 13.3 for full recipe table. Price ranges above are the original design targets; live prices are ~10–25× higher (13.3 note).
 
 ### 16.5 Upgrades
 
 | Name | Unlock | Notes |
 |---|---|---|
-| Forging Station | 2★ milestone | Unlocks crafting |
+| Forging Station | 1★, 5,000g | Blade chain; 2 crafting slots |
+| Smithy | 1★, 5,000g | Armor chain; 1 slot (asset `Potion Station`) |
+| Arcane Workshop | 2★, 5,000g | Charm/jewelry chain; 1 slot (asset `Crafting Station`) |
 | Research Station | 3★ | Unlocks tech tree |
 | Elevator (per layer) | Milestone-gated | Faster porter transit |
 | Teleporter (per layer) | Late-game | Instant porter transit |
@@ -1136,8 +1201,7 @@ Letting players name their guild and potentially customise the shop's visual sty
 **Porter Route Visualisation**
 A subtle dotted-line or indicator showing a porter's planned route could help players understand bottlenecks. Low priority but high readability value.
 
-**Contract / Quest System**
-A `ContractManager` class exists in code but is currently an **empty stub** — no contract logic is implemented. Contracts could give players short-term goals ("sell 10 Steel Swords by end of day") with gold/XP rewards, supplementing the milestone system for mid-session engagement. Still undecided; worth prototyping.
+**Contract / Quest System** — ✅ *Resolved (implemented, phase 1).* Built as Guild Contracts + Guild Seals (`ContractManager`): 3 rotating offers, accept 1, deliver-from-stock / hunt / patronage, gold premium + a seal currency with its own shop — see 10.6 and `CONTRACTS_DESIGN.md`. Retained here for design-history context.
 
 **Rank-Up Timing** — ✅ *Resolved (implemented).* Adventurers do **not** auto-rank-up; promotion is an explicit player action (`AdventurerAgent.Promote()`). The Roster panel surfaces a promote button (with its gold cost) once the adventurer reaches the rank's top level. Note the redesign changed the delay calculus: promotion now **costs gold**, and XP earned while parked at a rank's top level is **discarded** (not banked) — so delaying a promote wastes that adventurer's XP output. This is a deliberate anti-hoarding pressure toward prompt promotion. Retained here for design-history context.
 
@@ -1147,8 +1211,7 @@ How frequent should parties be? Too rare and they feel like a lottery. Too commo
 **End Game / Post-5★ Loop**
 What keeps a 5★ player engaged? Options: a prestige/rebirth system, endless wave layers beyond Layer 10, seasonal leaderboards, or simply "optimisation sandbox" mode. No decision yet — defer until the core loop is fully stable.
 
-**Crafting Reserve Threshold UX**
-The Forging Station auto-crafts when stock exceeds a reserve amount. How does the player set this reserve? A simple number input per ingredient seems right, but the UI for managing 5+ recipes each with 2–3 inputs could get cluttered. Needs UI design attention.
+**Crafting Reserve Threshold UX** — ✅ *Resolved (implemented).* One per-item keep-N floor set on the Inventory page (KEEP stepper), shared by sales and crafting, plus a per-recipe output cap and priority on the Crafting page (13.2a, 13.6) — no per-ingredient inputs per recipe. Retained here for design-history context.
 
 **Party Size Scaling**
 At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be evaluated carefully — two parties at once could overflow the queue and frustrate regular customers. A safer alternative: larger parties (5–6 members) rather than two simultaneous groups.
@@ -1204,9 +1267,11 @@ At 5★ the GDD notes "potentially 2 parties simultaneously." This needs to be e
 
 ### 18.10 Save System
 - `SaveManager` collects one `SaveData` DTO from each manager; new persistent state adds its chunk there and restores by re-raising the existing `GameSignals`
-- ScriptableObject asset names are save keys — renaming a milestone, item, upgrade or unit def orphans it in existing saves
+- ScriptableObject asset names are save keys — renaming a milestone, item, upgrade, recipe or unit def orphans it in existing saves (hence the Smithy and Arcane Workshop keep their old `Potion Station` / `Crafting Station` asset names)
+- Chunks so far: meta (+ rates), economy (gold, stock, floors), progression, clicker, guild, roster, contracts (+ favors), crafting, settings (game speed, volumes)
+- Pause-saves run in builds only; the editor still autosaves every 30s and on quit
 - New income sources must decide whether they count toward the offline rate (only sales + porter deliveries do today)
 
 ---
 
-*End of Game Design Document — Idle Merchant Guild v2.5*
+*End of Game Design Document — Idle Merchant Guild v2.6*
