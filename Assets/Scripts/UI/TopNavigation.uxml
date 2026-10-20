@@ -10,6 +10,7 @@
                     <ui:VisualElement name="bookmark-banner" class="bookmark-banner" style="-unity-background-image-tint-color: rgb(34, 125, 176);">
                         <ui:VisualElement name="bookmark-icon" class="bookmark-icon" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Icons/Icons.png?fileID=-8179040606652740800&amp;guid=15c5d06bd9ee94e5a83666ad75fb289f&amp;type=3#adv&quot;); -unity-background-image-tint-color: rgb(117, 180, 224);"/>
                     </ui:VisualElement>
+                    <ui:Label name="units-badge" text="0" picking-mode="Ignore" class="hiring-badge units-badge"/>
                 </ui:Button>
                 <ui:Button name="inventory-button" class="bookmark-button">
                     <ui:VisualElement name="bookmark-banner" class="bookmark-banner" style="-unity-background-image-tint-color: rgb(145, 66, 156);">

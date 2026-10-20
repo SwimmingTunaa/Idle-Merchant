@@ -448,18 +448,22 @@
     bottom: 0;
 }
 
+/* Wraps at 5 per row: fixed slot size + margins sized so exactly 5 fit (5×88 + 4×12 = 488);
+   RosterPanelController clears margin-right on every 5th slot. margin-bottom clears the
+   overhanging rank gem of the row below. */
 .slot-row {
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: flex-start;
+    margin-bottom: -20px;
 }
 
 .adv-slot-container {
-    width: 95px;
-    height: 95px;
-    flex-shrink: 1;
-    min-width: 0;
-    margin-right: var(--space-md);
+    width: 88px;
+    height: 88px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    margin-bottom: 20px;
 }
 
 .slot-wrapper {
@@ -555,6 +559,33 @@
     justify-content: center;
     -unity-background-scale-mode: scale-to-fit;
     background-image: url("project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=2800000&guid=d825792e71a5342959a9c727f20b2749&type=3#Rank 1");
+    transition-property: scale;
+    transition-duration: 0.7s;
+    transition-timing-function: ease-in-out;
+}
+
+/* Promote-ready gem: gold tint + up arrow. --affordable adds the slow pulse (motion = actionable),
+   driven by RosterPanelController toggling .roster-pulse on the left page every 700ms. */
+.slot-rank--ready {
+    -unity-background-image-tint-color: rgb(255, 205, 70);
+}
+
+.roster-pulse .slot-rank--affordable {
+    scale: 1.18;
+}
+
+.slot-rank-arrow {
+    position: absolute;
+    right: -2px;
+    top: -6px;
+    width: 18px;
+    height: 22px;
+    background-image: url("/Assets/Sprites/Icons/up-arrow.png");
+    display: none;
+}
+
+.slot-rank--ready .slot-rank-arrow {
+    display: flex;
 }
 
 .slot-rank-label {
@@ -567,11 +598,11 @@
 }
 
 .empty-slot {
-    width: 95px;
-    height: 95px;
-    flex-shrink: 1;
-    min-width: 0;
-    margin-right: var(--space-md);
+    width: 88px;
+    height: 88px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    margin-bottom: 20px;
     align-items: center;
     justify-content: center;
     cursor: pointer;

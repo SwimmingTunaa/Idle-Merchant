@@ -81,6 +81,7 @@ public class UIManager : PersistentSingleton<UIManager>
         RefreshGuildStars();
 
         SetUpClickUpgradeButton();
+        SetUpUnitsBadge();
 
         sealLabel = uiDocument != null ? uiDocument.rootVisualElement?.Q<Label>("seal-label") : null;
         GameSignals.OnSealsChanged += OnSealsChanged;
@@ -99,6 +100,10 @@ public class UIManager : PersistentSingleton<UIManager>
         GameSignals.GoldChanged -= OnGoldChangedForClickUpgrade;
         GameSignals.OnClickUpgradePurchased -= OnClickUpgradePurchased;
         GameSignals.OnSealsChanged -= OnSealsChanged;
+        GameSignals.GoldChanged -= OnGoldChangedForUnits;
+        GameSignals.OnAdventurerLeveledUp -= OnLeveledUpForUnits;
+        GameSignals.OnAdventurerPromoted -= OnPromotedForUnits;
+        GameSignals.OnUnitHired -= OnHiredForUnits;
     }
 
     // ═════════════════════════════════════════════
@@ -120,6 +125,52 @@ public class UIManager : PersistentSingleton<UIManager>
     void Update()
     {
         ProcessRequestQueue();
+
+        if (unitsBadgeDirty)
+        {
+            unitsBadgeDirty = false;
+            RefreshUnitsBadge();
+        }
+    }
+
+    // ═════════════════════════════════════════════
+    // UNITS BOOKMARK — badge = promote-ready count, wiggle = a promotion is affordable
+    // ═════════════════════════════════════════════
+
+    private Label unitsBadge;
+    private AdventurerManager[] advManagers;
+    private bool unitsBadgeDirty = true;   // dirty-flag: gold ticks often; scan at most once per frame
+
+    private void SetUpUnitsBadge()
+    {
+        unitsBadge = uiDocument != null ? uiDocument.rootVisualElement?.Q<Button>("units-button")?.Q<Label>("units-badge") : null;
+        GameSignals.GoldChanged += OnGoldChangedForUnits;
+        GameSignals.OnAdventurerLeveledUp += OnLeveledUpForUnits;
+        GameSignals.OnAdventurerPromoted += OnPromotedForUnits;
+        GameSignals.OnUnitHired += OnHiredForUnits;
+    }
+
+    private void OnGoldChangedForUnits(int _) => unitsBadgeDirty = true;
+    private void OnLeveledUpForUnits(AdventurerAgent _, int __) => unitsBadgeDirty = true;
+    private void OnPromotedForUnits(EntityBase _, string __, string ___) => unitsBadgeDirty = true;
+    private void OnHiredForUnits(EntityDef _, HireRole __) => unitsBadgeDirty = true;
+
+    private void RefreshUnitsBadge()
+    {
+        if (unitsBadge == null) return;
+
+        // Layer managers are scene objects; re-find only when the scene's set is gone (UIManager persists).
+        if (advManagers == null || advManagers.Length == 0 || advManagers[0] == null)
+            advManagers = FindObjectsByType<AdventurerManager>(FindObjectsInactive.Include);
+
+        int gold = Inventory.Instance != null ? Inventory.Instance.Gold : 0;
+        int ready = 0;
+        bool affordable = false;
+        foreach (var m in advManagers)
+            if (m != null) m.CountPromoteReady(gold, ref ready, ref affordable);
+
+        unitsBadge.text = ready.ToString();
+        SetBoardBadge(unitsBadge, ready > 0, affordable);
     }
 
     // ═════════════════════════════════════════════

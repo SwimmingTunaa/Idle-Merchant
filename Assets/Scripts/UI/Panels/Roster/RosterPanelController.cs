@@ -34,6 +34,11 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     private VisualElement leftContent;
     private VisualElement rightContent;
 
+    private const int SlotsPerRow = 5;
+    private const long PulseIntervalMs = 700;   // matches .slot-rank transition-duration
+    private bool goldDirty;                      // GoldChanged → re-check promote affordability once per frame
+    private IVisualElementScheduledItem pulseItem;
+
     public string PageTitle => "Roster";
 
     // ═════════════════════════════════════════════
@@ -47,7 +52,11 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         GameSignals.OnAdventurerXPChanged += OnAdventurerXPChanged;
         GameSignals.OnAdventurerPromoted += OnAdventurerPromoted;
         GameSignals.OnUnitHired += OnUnitHired;
+        GameSignals.GoldChanged += OnGoldChanged;
         RebuildRoster(leftPage);
+
+        // One page-level ticker drives every affordable gem's pulse via .roster-pulse (USS transitions the scale)
+        pulseItem = leftPage.schedule.Execute(() => leftContent?.ToggleInClassList("roster-pulse")).Every(PulseIntervalMs);
 
         var dismissBtn = rightPage.Q<Button>("detail-dismiss-btn");
         if (dismissBtn != null)
@@ -65,6 +74,10 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         GameSignals.OnAdventurerXPChanged -= OnAdventurerXPChanged;
         GameSignals.OnAdventurerPromoted -= OnAdventurerPromoted;
         GameSignals.OnUnitHired -= OnUnitHired;
+        GameSignals.GoldChanged -= OnGoldChanged;
+        pulseItem?.Pause();
+        pulseItem = null;
+        leftContent?.RemoveFromClassList("roster-pulse");
         // Roster page is gone (book closed or tab switched away) → drop the world outline
         // and release the camera lock; they only live while you're viewing the Roster.
         SetWorldFocus(null);
@@ -135,10 +148,10 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         for (int i = 0; i < emptyCount; i++)
             slotRow.Add(BuildEmptySlot(manager.LayerIndex));
 
-        // No `gap` in UI Toolkit — slots carry margin-right; clear it on the last
-        // slot so the trailing gap doesn't eat width (keeps slots at full size).
-        if (slotRow.childCount > 0)
-            slotRow[slotRow.childCount - 1].style.marginRight = 0;
+        // No `gap` / :nth-child in UI Toolkit — slots carry margin-right; clear it on every
+        // 5th slot so exactly 5 fit per wrapped row.
+        for (int i = SlotsPerRow - 1; i < slotRow.childCount; i += SlotsPerRow)
+            slotRow[i].style.marginRight = 0;
 
         section.Add(slotRow);
         return section;
@@ -467,6 +480,34 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         var hpFill = slot.Q<VisualElement>("slot-hp-fill");
         if (hpFill != null)
             hpFill.style.width = Length.Percent(health != null ? health.HealthPercent * 100f : 0f);
+
+        ApplyPromoteState(slot, agent);
+    }
+
+    /// <summary>Gem state: ready → gold tint + arrow; ready AND affordable → also pulses.</summary>
+    private static void ApplyPromoteState(VisualElement slot, AdventurerAgent agent)
+    {
+        var gem = slot.Q<VisualElement>("rank-container");
+        if (gem == null) return;
+        bool ready = agent.CanPromote;
+        gem.EnableInClassList("slot-rank--ready", ready);
+        gem.EnableInClassList("slot-rank--affordable",
+            ready && Inventory.Instance != null && Inventory.Instance.CanAfford(agent.PromoteCost));
+    }
+
+    // Gold ticks often — flag it and re-check affordability once per frame while the page is open.
+    private void OnGoldChanged(int _) => goldDirty = true;
+
+    void Update()
+    {
+        if (!goldDirty) return;
+        goldDirty = false;
+        if (leftContent == null) return;
+
+        foreach (var kv in agentSlots)
+            if (kv.Key != null) ApplyPromoteState(kv.Value, kv.Key);
+        if (selectedAgent != null)
+            RefreshDetailRank(selectedAgent);   // Promote button enable tracks gold too
     }
 
     /// <summary>Optional per-rank gem sprite (1-based rank); null falls back to the slot placeholder.</summary>

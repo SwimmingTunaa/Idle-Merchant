@@ -53,9 +53,10 @@
     border-width: 0;
     position: relative;
     overflow: visible;
-    transition-property: translate, scale;
-    transition-duration: 0.15s;
-    transition-timing-function: ease-out;
+    /* rotate = attention wiggle driven by UIManager.SetBoardBadge (Units bookmark promote badge) */
+    transition-property: translate, scale, rotate;
+    transition-duration: 0.15s, 0.15s, 0.08s;
+    transition-timing-function: ease-out, ease-out, ease-in-out;
 }
 
 .bookmark-button:hover {
@@ -194,6 +195,25 @@
     background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&guid=16798bfa02f8d44348f9fffdaf153786&type=3#Copper Coin_0");
     -unity-background-scale-mode: scale-to-fit;
+}
+
+/* Units bookmark promote-ready count: gold slip (same look as the tracker's claim badge)
+   on the banner's lower-right, clear of the icon. Base visibility from .hiring-badge. */
+.units-badge {
+    top: auto;
+    bottom: 8px;
+    right: 2px;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    border-width: 3px;
+    border-color: rgb(20, 14, 10);
+    background-color: var(--color-warning);
+    color: var(--color-text-strong);
+    font-size: 26px;
+    -unity-text-align: middle-center;
+    -unity-font-definition: var(--font-body);
 }
 
 /* Refresh-countdown stopwatch (centred on left edge; badge owns top-right). Frames set by HireController. */

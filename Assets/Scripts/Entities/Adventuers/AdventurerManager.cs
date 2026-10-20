@@ -209,4 +209,17 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
     {
         return GetAllUnits();
     }
+
+    /// <summary>No-alloc, pure promote scan (Units bookmark badge): adds this layer's promote-ready
+    /// count to <paramref name="ready"/>; sets <paramref name="affordable"/> if any of them costs ≤ gold.</summary>
+    public void CountPromoteReady(int gold, ref int ready, ref bool affordable)
+    {
+        foreach (var list in spawnedByType.Values)
+            foreach (var a in list)
+            {
+                if (a == null || !a.CanPromote) continue;
+                ready++;
+                if (a.PromoteCost <= gold) affordable = true;
+            }
+    }
 }

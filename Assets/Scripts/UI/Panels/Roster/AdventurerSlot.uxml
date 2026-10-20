@@ -17,6 +17,7 @@
             <ui:VisualElement name="slot-selector" class="slot-selector" />
             <ui:VisualElement name="rank-container" class="slot-rank" style="background-image: url(&quot;project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=217491548971362121&amp;guid=d825792e71a5342959a9c727f20b2749&amp;type=3#Rank 1_0&quot;); top: -19px; right: -15px;">
                 <ui:Label name="rank-level" text="1" class="slot-rank-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                <ui:VisualElement name="rank-arrow" picking-mode="Ignore" class="slot-rank-arrow" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
