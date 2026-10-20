@@ -742,6 +742,14 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         return upgrade != null && ownedUpgrades.Contains(upgrade);
     }
 
+    /// <summary>Any owned upgrade of this type (global upgrades such as the crafting stations). No-alloc.</summary>
+    public bool HasUpgrade(UpgradeType type)
+    {
+        foreach (var u in ownedUpgrades)
+            if (u != null && u.upgradeType == type) return true;
+        return false;
+    }
+
     /// <summary>
     /// Check if a layer-specific upgrade is owned (e.g., Elevator on Layer 2).
     /// </summary>

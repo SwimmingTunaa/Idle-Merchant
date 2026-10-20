@@ -80,6 +80,7 @@ public class CraftingController : MonoBehaviour, IBookPage
         sortDropdown.RegisterValueChangedCallback(OnSortChanged);
 
         GameSignals.OnProductCrafted += OnProductCrafted;
+        GameSignals.OnCraftStarted += OnCraftStarted;
 
         isShown = true;
         PopulateRecipes();
@@ -88,6 +89,7 @@ public class CraftingController : MonoBehaviour, IBookPage
     public void OnPageHidden()
     {
         GameSignals.OnProductCrafted -= OnProductCrafted;
+        GameSignals.OnCraftStarted -= OnCraftStarted;
 
         if (filterDropdown != null) filterDropdown.UnregisterValueChangedCallback(OnFilterChanged);
         if (sortDropdown != null) sortDropdown.UnregisterValueChangedCallback(OnSortChanged);
@@ -281,6 +283,8 @@ public class CraftingController : MonoBehaviour, IBookPage
         else
             CraftingManager.Instance.DisableRecipe(recipe);
     }
+
+    private void OnCraftStarted(RecipeDef _) => RefreshRecipeList();
 
     private void OnProductCrafted(ResourceStack stack)
     {

@@ -17,6 +17,8 @@ public static class GameSignals
     public static event Action<ResourceStack> OnItemSold;             // item sold to customer
     public static event Action<ResourceStack> OnLootCollected;        // from dungeon/porter/click
     public static event Action<ResourceStack> OnProductCrafted;       // artisan → shelf
+    public static event Action<RecipeDef> OnCraftStarted;             // job started (ingredients consumed)
+    public static event Action OnCraftingConfigChanged;               // recipe enabled/cap/priority, item floor, station slots
 
     // Combat
     public static event Action<GameObject, float, GameObject> OnDamageTaken;
@@ -59,6 +61,8 @@ public static class GameSignals
     public static void RaiseItemSold(ResourceStack stack) => OnItemSold?.Invoke(stack);
     public static void RaiseLootCollected(ResourceStack stack) => OnLootCollected?.Invoke(stack);
     public static void RaiseProductCrafted(ResourceStack stack) => OnProductCrafted?.Invoke(stack);
+    public static void RaiseCraftStarted(RecipeDef recipe) => OnCraftStarted?.Invoke(recipe);
+    public static void RaiseCraftingConfigChanged() => OnCraftingConfigChanged?.Invoke();
     public static void RaiseDamageTaken(GameObject entity, float damage, GameObject source) => OnDamageTaken?.Invoke(entity, damage, source);
     public static void RaiseEntityDeath(GameObject deadEntity) => OnEntityDeath?.Invoke(deadEntity);
     public static void RaiseSkillActivated(EntityBase caster, string skillName) => OnSkillActivated?.Invoke(caster, skillName);
@@ -90,6 +94,8 @@ public static class GameSignals
         OnItemSold = null;
         OnLootCollected = null;
         OnProductCrafted = null;
+        OnCraftStarted = null;
+        OnCraftingConfigChanged = null;
         OnDamageTaken = null;
         OnEntityDeath = null;
         OnSkillActivated = null;
@@ -123,6 +129,8 @@ public static class GameSignals
         Debug.Log($"OnItemSold: {OnItemSold?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnLootCollected: {OnLootCollected?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnProductCrafted: {OnProductCrafted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnCraftStarted: {OnCraftStarted?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnCraftingConfigChanged: {OnCraftingConfigChanged?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnDamageTaken: {OnDamageTaken?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnEntityDeath: {OnEntityDeath?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnSkillActivated: {OnSkillActivated?.GetInvocationList().Length ?? 0}");

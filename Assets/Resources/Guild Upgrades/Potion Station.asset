@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d104bfc79eea6439390eebc84fc7f607, type: 3}
   m_Name: Potion Station
   m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradeDef
-  upgradeName: Potion Station
-  description: Unlock the crafting system to turn raw materials into valuable goods.
+  upgradeName: Smithy
+  description: Opens the armor line - padded vests through abyssal armor.
   icon: {fileID: 0}
   goldCost: 5000
   starRequirement: 1
-  upgradeType: 0
+  upgradeType: 7
   layerSpecific: 0
   targetLayer: 1
   requiresResearch: 0

@@ -378,7 +378,7 @@ public class InventoryController : MonoBehaviour, IBookPage
     private void UpdateSlotBadges(VisualElement slot, ItemDef item)
     {
         if (slot == null || item == null) return;
-        int reserved = SalesManager.Instance.GetReservedAmount(item);
+        int reserved = Inventory.Instance.GetFloor(item);
         int forSale = SalesManager.Instance.GetAvailableForSale(item);
 
         var reservedBadge = slot.Q<Label>("slot-reserved");
@@ -419,7 +419,7 @@ public class InventoryController : MonoBehaviour, IBookPage
         if (detailName != null) detailName.text = item.displayName;
         if (detailDescription != null) detailDescription.text = item.description;
 
-        int reserved = SalesManager.Instance.GetReservedAmount(item);
+        int reserved = Inventory.Instance.GetFloor(item);
         bool isForSale = SalesManager.Instance.IsMarkedForSale(item);
 
         if (forsaleLabel != null) forsaleLabel.style.display = isForSale ? DisplayStyle.None : DisplayStyle.Flex;
@@ -498,10 +498,10 @@ public class InventoryController : MonoBehaviour, IBookPage
     {
         if (selectedItem == null) return;
         int totalStock = SalesManager.Instance.GetTotalStock(selectedItem);
-        int current = Inventory.Instance.GetReserve(selectedItem);
+        int current = Inventory.Instance.GetFloor(selectedItem);
         int next = Mathf.Clamp(current + delta, 0, totalStock);
         if (next == current) return; // already at bound — no work
-        Inventory.Instance.SetReserve(selectedItem, next);
+        Inventory.Instance.SetFloor(selectedItem, next);
         // Refresh the slot badge + detail labels for the changed item
         IncrementalUpdateItem(selectedItem);
     }

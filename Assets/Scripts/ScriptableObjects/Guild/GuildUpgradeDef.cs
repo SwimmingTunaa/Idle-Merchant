@@ -51,11 +51,13 @@ public class GuildUpgradeDef : ScriptableObject
 /// </summary>
 public enum UpgradeType
 {
-    ForgingStation,   // Unlocks crafting system
+    ForgingStation,   // Crafting station: blades
     ResearchStation,  // Unlocks research tree
     Elevator,         // Faster porter transport (per layer)
     Teleporter,       // Instant porter transport (per layer)
     PorterLodging,    // Increases porter capacity
     StorageExpansion, // Increases inventory size
     GuildHall,        // Visual upgrade
+    Smithy,           // Crafting station: armor (appended — values are serialized as ints)
+    ArcaneWorkshop,   // Crafting station: charms/jewelry
 }

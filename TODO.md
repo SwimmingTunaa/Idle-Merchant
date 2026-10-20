@@ -29,6 +29,8 @@ Ordered roughly by intended sequence. Pull from the top.
 - [ ] **Orphaned Guild UXMLs** — GuildUpgradePanel.uxml, Guild_Left.uxml, Guild_Right.uxml look unreferenced; confirm and delete.
 - [ ] **"3 Stars" milestone filenames** — named Milestone_2Star_* (data is correct, names lie).
 - [ ] **Mob "Hit" flinch** — MobAgent fires the Hit trigger but mob controllers lack the param (console warning per non-lethal hit); add flinch states or guard the call.
+- [ ] **Stray empty save write** — during batch-2 testing a near-empty save.json (gold 0, no roster) was written at 13:06 while saving was suspended, real save pushed to .bak (kept at scratchpad/stray-empty-save-1306.json). Cause unknown (editor logs lost to a crash). If it recurs: audit every SaveManager write path for the suspend flag, and check for a second Unity instance sharing persistentDataPath.
+- [ ] **Inventory "reserve" stepper** now sets the keep-N floor but still says "reserve" — relabel in the crafting/inventory UI pass. Contracts hand-ins deliberately ignore floors (explicit player action).
 - [ ] **First-play NREs** — Stats.cs:196 / Health.cs:91 throw on a fresh play session (seen repeatedly by agents; also CharacterAppearanceManager.Start entityDef null). Root-cause the init order.
 
 ## Older backlog
@@ -41,6 +43,11 @@ Ordered roughly by intended sequence. Pull from the top.
 - [ ] Porter bag-carry sprite rework (then swap the overhead icon stack for in-bag peek)
 - [ ] Book milestone list: sort claimable-first like the HUD tracker
 - [ ] Doc sync: milestone claim system, tracker, guild restyle, save system once built
+
+## Equipment (design next, after crafting)
+
+- [ ] **Equipment loop design doc** — two slots (weapon/armor) to start, auto-assign armory pool with manual override later, stat modifiers via StatsMediator, gear outgrown via tiers
+- [ ] **Material-tier recipe variants** — one recipe family with a tier-selectable material slot (Iron Sword → Obsidian Sword: better stats, higher value, uses the eight material tints already in the weapon/armor packs). This is how the game does "choose your ingredient" — deliberately NOT AtS-style any-of substitutes (our materials are deterministic per layer, so substitutes solve a problem we don't have). Revisit any-of only for tier-1 common slots if surplus still feels unabsorbed after contracts phase 2.
 
 ## Someday / deliberate
 

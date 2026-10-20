@@ -174,6 +174,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
         d.meta.killsPerMin = Enumerable.Range(0, RateLayers).Select(KillsPerMin).ToArray();
 
         d.economy.gold = inv.Gold + goldInFlight;
+        d.economy.floors = inv.FloorsToSave();
         foreach (var row in inv.SnapshotAll()) Bank(d, row.item, row.qty);
         // §4: loot on the ground and in porters' arms banks into the saved stock — items are never dropped
         foreach (var loot in FindObjectsByType<Loot>()) Bank(d, loot.GetItemDef(), loot.GetQuantity());
@@ -203,6 +204,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
             }
 
         if (ContractManager.Instance != null) d.contracts = ContractManager.Instance.ToSave();
+        if (CraftingManager.Instance != null) d.crafting = CraftingManager.Instance.ToSave();
         var hire = FindAnyObjectByType<HireController>();
         if (hire != null) d.contracts.favors = hire.FavorsToSave();
 
@@ -347,8 +349,13 @@ public class SaveManager : PersistentSingleton<SaveManager>
                 Debug.LogError($"[SaveManager] Unknown item '{kv.Key}' x{kv.Value} in save (asset renamed?) — not restored");
         }
 
+        inv.LoadFloors(d.economy.floors, items);
+
+        // Crafting chunk restores the player's own enabled set (+ caps, priorities, slots, running jobs);
+        // a save from before the chunk falls back to enabling every unlocked recipe with default settings.
         var pm = ProgressionManager.Instance;
-        if (pm != null) pm.EnableUnlockedRecipes();
+        if (d.crafting != null && CraftingManager.Instance != null) CraftingManager.Instance.LoadFrom(d.crafting);
+        else if (pm != null) pm.EnableUnlockedRecipes();
 
         SpawnRoster(d.roster);
 
@@ -579,6 +586,7 @@ public class SaveData
     public GuildSave guild = new GuildSave();
     public List<UnitSave> roster = new List<UnitSave>();
     public ContractSave contracts = new ContractSave();
+    public CraftingSave crafting;   // null in saves from before crafting batch 2 → defaults
     public SettingsSave settings = new SettingsSave();
 }
 
@@ -597,6 +605,26 @@ public class EconomySave
 {
     public int gold;
     public Dictionary<string, int> stock = new Dictionary<string, int>(); // ItemDef asset name → qty
+    public Dictionary<string, int> floors = new Dictionary<string, int>(); // ItemDef asset name → "keep at least N"
+}
+
+public class CraftingSave
+{
+    public Dictionary<string, RecipeSave> recipes = new Dictionary<string, RecipeSave>();   // RecipeDef asset name
+    public Dictionary<CraftingStation, int> stationSlots = new Dictionary<CraftingStation, int>();
+    public List<CraftJobSave> jobs = new List<CraftJobSave>();   // running jobs (ingredients already consumed)
+}
+
+public class RecipeSave
+{
+    public bool enabled;
+    public int cap = CraftingManager.DefaultCap, priority = CraftingManager.DefaultPriority;
+}
+
+public class CraftJobSave
+{
+    public string recipe;     // RecipeDef asset name
+    public float remaining;   // seconds left
 }
 
 public class ProgressionSave

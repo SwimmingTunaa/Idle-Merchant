@@ -27,7 +27,7 @@ public class Inventory : PersistentSingleton<Inventory>
     private readonly Dictionary<ItemDef, int> commonInventory  = new();
     private readonly Dictionary<ItemDef, int> craftedInventory = new();
     private readonly Dictionary<ItemDef, int> luxuryInventory  = new();
-    private readonly Dictionary<ItemDef, int> itemReserves = new();
+    private readonly Dictionary<ItemDef, int> itemFloors = new();   // "keep at least N": sales and crafting stop here
 
     protected override void Awake() 
     {
@@ -77,16 +77,32 @@ public class Inventory : PersistentSingleton<Inventory>
         return true;
     }
 
-    public void SetReserve(ItemDef item, int amount)
+    /// <summary>"Keep at least N" — the one stock floor. Customer sales (SalesManager.GetAvailableForSale) and
+    /// crafting consumption (CraftingManager.CanCraft) never take an item below it. Contract hand-ins ignore it.</summary>
+    public void SetFloor(ItemDef item, int amount)
     {
         if (item == null) return;
-        itemReserves[item] = Mathf.Max(0, amount);
+        amount = Mathf.Max(0, amount);
+        if (GetFloor(item) == amount) return;
+        if (amount == 0) itemFloors.Remove(item);
+        else itemFloors[item] = amount;
+        GameSignals.RaiseCraftingConfigChanged();
     }
 
-    public int GetReserve(ItemDef item)
+    public int GetFloor(ItemDef item)
     {
         if (item == null) return 0;
-        return itemReserves.TryGetValue(item, out int qty) ? qty : 0;
+        return itemFloors.TryGetValue(item, out int qty) ? qty : 0;
+    }
+
+    public Dictionary<string, int> FloorsToSave() => itemFloors.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.name, kv => kv.Value);
+
+    public void LoadFloors(Dictionary<string, int> floors, Dictionary<string, ItemDef> items)
+    {
+        itemFloors.Clear();
+        if (floors == null) return;
+        foreach (var kv in floors)
+            if (items.TryGetValue(kv.Key, out var item)) itemFloors[item] = Mathf.Max(0, kv.Value);
     }
 
     // ===== GOLD MANAGEMENT =====

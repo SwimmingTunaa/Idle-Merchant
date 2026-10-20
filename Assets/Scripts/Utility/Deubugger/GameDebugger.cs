@@ -30,8 +30,9 @@ public class GameDebugger : EditorWindow
     private Vector2 mobScrollPos;
 
     // Crafting
-    private RecipeDef selectedRecipe;
-    private Vector2 recipeScrollPos;
+    private ItemDef floorItem;
+    private int floorAmount = 20;
+    private int chainMaterialQty = 50;
 
     // Time Control
     private float timeScale = 1f;
@@ -53,6 +54,12 @@ public class GameDebugger : EditorWindow
     void OnEnable()
     {
         LoadSettings();
+    }
+
+    // Live job timers / stock on the Crafting tab
+    void OnInspectorUpdate()
+    {
+        if (Application.isPlaying && currentTab == DebugTab.Crafting) Repaint();
     }
 
     void OnGUI()
@@ -356,88 +363,93 @@ public class GameDebugger : EditorWindow
     void DrawCraftingTab()
     {
         GUILayout.Label("Crafting System", EditorStyles.boldLabel);
+        var cm = CraftingManager.Instance;
+        if (!Application.isPlaying || cm == null || Inventory.Instance == null)
+        {
+            EditorGUILayout.HelpBox("Enter play mode to use crafting controls", MessageType.Info);
+            return;
+        }
+        var inv = Inventory.Instance;
+        var recipes = cm.GetAllRecipes();
+        var stationDefs = Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades");
+
+        // Stations: ownership, slots, buy, running jobs
         EditorGUILayout.Space(5);
-
-        if (Application.isPlaying && CraftingManager.Instance != null)
+        GUILayout.Label("Stations", EditorStyles.boldLabel);
+        foreach (CraftingStation st in System.Enum.GetValues(typeof(CraftingStation)))
         {
-            EditorGUILayout.LabelField("Active Crafts:", CraftingManager.Instance.GetActiveCraftCount().ToString());
-            EditorGUILayout.LabelField("Enabled Recipes:", CraftingManager.Instance.GetEnabledRecipes().Count.ToString());
-            EditorGUILayout.Space(5);
+            var def = stationDefs.FirstOrDefault(u => u.upgradeType == CraftingManager.StationUpgradeType(st));
+            bool owned = cm.IsStationOwned(st);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField($"{(def != null ? def.upgradeName : st.ToString())}", EditorStyles.boldLabel, GUILayout.Width(130));
+            EditorGUILayout.LabelField(owned ? $"jobs {cm.GetRunningCount(st)}/{cm.GetStationSlots(st)}" : "not owned", GUILayout.Width(80));
+            if (owned)
+            {
+                if (GUILayout.Button($"Buy slot ({cm.GetSlotCost(st)}g)", GUILayout.Width(130)) && !cm.BuyStationSlot(st))
+                    Debug.LogWarning($"[GameDebugger] Can't afford {st} slot ({cm.GetSlotCost(st)}g)");
+            }
+            else if (def != null && GUILayout.Button($"Buy station ({def.goldCost}g, {def.starRequirement}★)", GUILayout.Width(170))
+                     && !ProgressionManager.Instance.PurchaseUpgrade(def))
+                Debug.LogWarning($"[GameDebugger] Can't buy {def.upgradeName} (gold/stars)");
+            if (GUILayout.Button("Give mats", GUILayout.Width(80))) GiveChainMaterials(recipes, st, chainMaterialQty);
+            EditorGUILayout.EndHorizontal();
+            foreach (var job in cm.ActiveJobs)
+                if (job.recipe.Station == st)
+                    EditorGUILayout.LabelField($"    • {job.recipe.Output.displayName}", $"{job.timeRemaining:F1}s left");
         }
+        chainMaterialQty = EditorGUILayout.IntField("Give mats qty (raw inputs):", Mathf.Max(1, chainMaterialQty));
 
-        selectedRecipe = (RecipeDef)EditorGUILayout.ObjectField("Recipe:", selectedRecipe, typeof(RecipeDef), false);
-
+        // Recipes: enabled / cap / priority / live status
+        EditorGUILayout.Space(10);
+        GUILayout.Label($"Recipes ({cm.GetEnabledRecipes().Count} enabled, {cm.GetActiveCraftCount()} running)", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
-        GUI.enabled = Application.isPlaying && selectedRecipe != null && CraftingManager.Instance != null;
-
-        if (GUILayout.Button("Enable Recipe"))
+        GUILayout.Label("on  recipe", EditorStyles.miniLabel, GUILayout.Width(170));
+        GUILayout.Label("stock / cap", EditorStyles.miniLabel, GUILayout.Width(95));
+        GUILayout.Label("priority", EditorStyles.miniLabel, GUILayout.Width(125));
+        GUILayout.Label("status", EditorStyles.miniLabel);
+        EditorGUILayout.EndHorizontal();
+        foreach (var r in recipes)
         {
-            CraftingManager.Instance.EnableRecipe(selectedRecipe);
-            Debug.Log($"[GameDebugger] Enabled recipe: {selectedRecipe.Output.displayName}");
+            EditorGUILayout.BeginHorizontal();
+            bool on = cm.IsRecipeEnabled(r);
+            bool newOn = EditorGUILayout.ToggleLeft($"{r.Output.displayName}", on, GUILayout.Width(170));
+            if (newOn != on) { if (newOn) cm.EnableRecipe(r); else cm.DisableRecipe(r); }
+            GUILayout.Label(inv.Get(r.Output.itemCategory, r.Output).ToString(), GUILayout.Width(35));
+            int cap = EditorGUILayout.DelayedIntField(cm.GetCap(r), GUILayout.Width(55));
+            if (cap != cm.GetCap(r)) cm.SetCap(r, cap);
+            int pr = EditorGUILayout.IntSlider(cm.GetPriority(r), CraftingManager.MinPriority, CraftingManager.MaxPriority, GUILayout.Width(125));
+            if (pr != cm.GetPriority(r)) cm.SetPriority(r, pr);
+            string reason = cm.GetBlockReason(r);
+            GUILayout.Label(cm.IsCrafting(r) ? $"running {cm.GetCraftingProgress(r):P0}" : !on ? "off" : reason ?? "ready");
+            EditorGUILayout.EndHorizontal();
         }
+        if (GUILayout.Button("Enable All Recipes"))
+            foreach (var r in recipes) cm.EnableRecipe(r);
 
-        if (GUILayout.Button("Disable Recipe"))
-        {
-            CraftingManager.Instance.DisableRecipe(selectedRecipe);
-            Debug.Log($"[GameDebugger] Disabled recipe: {selectedRecipe.Output.displayName}");
-        }
-
+        // Item floors ("keep at least N" — crafting and customer sales both stop here)
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Item Floor (keep at least N)", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+        floorItem = (ItemDef)EditorGUILayout.ObjectField(floorItem, typeof(ItemDef), false);
+        floorAmount = Mathf.Max(0, EditorGUILayout.IntField(floorAmount, GUILayout.Width(60)));
+        GUI.enabled = floorItem != null;
+        if (GUILayout.Button("Set", GUILayout.Width(50))) inv.SetFloor(floorItem, floorAmount);
         GUI.enabled = true;
         EditorGUILayout.EndHorizontal();
+        if (floorItem != null)
+            EditorGUILayout.LabelField($"{floorItem.displayName}:", $"stock {inv.Get(floorItem.itemCategory, floorItem)}, floor {inv.GetFloor(floorItem)}, " +
+                $"for sale {(SalesManager.Instance != null ? SalesManager.Instance.GetAvailableForSale(floorItem) : 0)}");
+    }
 
-        EditorGUILayout.Space(10);
-
-        GUILayout.Label("All Recipes", EditorStyles.boldLabel);
-        
-        recipeScrollPos = EditorGUILayout.BeginScrollView(recipeScrollPos, GUILayout.Height(200));
-        
-        if (Application.isPlaying && CraftingManager.Instance != null)
-        {
-            var recipes = CraftingManager.Instance.GetAllRecipes();
-            
-            foreach (var recipe in recipes)
-            {
-                EditorGUILayout.BeginHorizontal();
-                
-                bool isEnabled = CraftingManager.Instance.IsRecipeEnabled(recipe);
-                bool canCraft = CraftingManager.Instance.CanCraft(recipe);
-                
-                string status = isEnabled ? "[ENABLED]" : "[DISABLED]";
-                string craftStatus = canCraft ? "✓" : "✗";
-                
-                EditorGUILayout.LabelField($"{status} {recipe.Output.displayName} {craftStatus}", GUILayout.Width(250));
-                
-                if (GUILayout.Button(isEnabled ? "Disable" : "Enable", GUILayout.Width(80)))
-                {
-                    if (isEnabled)
-                        CraftingManager.Instance.DisableRecipe(recipe);
-                    else
-                        CraftingManager.Instance.EnableRecipe(recipe);
-                }
-                
-                EditorGUILayout.EndHorizontal();
-            }
-        }
-        else
-        {
-            EditorGUILayout.LabelField("Enter play mode to see recipes");
-        }
-
-        EditorGUILayout.EndScrollView();
-
-        EditorGUILayout.Space(10);
-
-        GUI.enabled = Application.isPlaying && CraftingManager.Instance != null;
-        if (GUILayout.Button("Enable All Recipes", GUILayout.Height(30)))
-        {
-            var recipes = CraftingManager.Instance.GetAllRecipes();
-            foreach (var recipe in recipes)
-            {
-                CraftingManager.Instance.EnableRecipe(recipe);
-            }
-            Debug.Log($"[GameDebugger] Enabled all {recipes.Count} recipes");
-        }
-        GUI.enabled = true;
+    // Raw inputs of a chain = its ingredients that no recipe produces.
+    static void GiveChainMaterials(System.Collections.Generic.List<RecipeDef> recipes, CraftingStation station, int qty)
+    {
+        var inv = Inventory.Instance;
+        var crafted = new System.Collections.Generic.HashSet<ItemDef>(recipes.Select(r => r.Output));
+        var raw = recipes.Where(r => r.Station == station).SelectMany(r => r.Ingredients).Select(i => i.Item)
+            .Where(i => i != null && !crafted.Contains(i)).Distinct().ToList();
+        foreach (var item in raw) inv.Add(inv.GetInventoryType(item.itemCategory), new ResourceStack(item, qty, 0));
+        Debug.Log($"[GameDebugger] Gave {qty}x of {string.Join(", ", raw.Select(i => i.displayName))}");
     }
 
     // ===== PROGRESSION TAB (UPDATED FOR GUILD SYSTEM) =====

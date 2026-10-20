@@ -64,15 +64,8 @@ public class SalesManager : PersistentSingleton<SalesManager>
             return 0;
 
         int totalStock = Inventory.Instance.Get(item.itemCategory, item);
-        int reserved = Inventory.Instance.GetReserve(item);
-        return Mathf.Max(0, totalStock - reserved);
-    }
-
-
-    public int GetReservedAmount(ItemDef item)
-    {
-        if (item == null) return 0;
-        return Inventory.Instance.GetReserve(item);
+        int floor = Inventory.Instance.GetFloor(item);
+        return Mathf.Max(0, totalStock - floor);
     }
 
     public int GetTotalStock(ItemDef item)
@@ -86,7 +79,7 @@ public class SalesManager : PersistentSingleton<SalesManager>
         if (item == null) return 0;
 
         int total = GetTotalStock(item);
-        int reserved = GetReservedAmount(item);
+        int reserved = Inventory.Instance.GetFloor(item);
         int forSale = GetAvailableForSale(item);
 
         return Mathf.Max(0, total - reserved - forSale);
@@ -345,7 +338,7 @@ public class SalesManager : PersistentSingleton<SalesManager>
             if (kvp.Value)
             {
                 int total = GetTotalStock(kvp.Key);
-                int reserved = GetReservedAmount(kvp.Key);
+                int reserved = Inventory.Instance.GetFloor(kvp.Key);
                 int forSale = GetAvailableForSale(kvp.Key);
                 Debug.Log($"{kvp.Key.displayName}: Total={total}, Reserved={reserved}, For Sale={forSale}");
             }
