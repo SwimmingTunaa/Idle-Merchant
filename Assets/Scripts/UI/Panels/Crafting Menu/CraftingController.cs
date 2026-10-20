@@ -295,11 +295,9 @@ public class CraftingController : MonoBehaviour, IBookPage
             if (ing.Item.icon != null) icon.style.backgroundImage = new StyleBackground(ing.Item.icon);
             var name = new Label(ing.Item.displayName);
             name.AddToClassList("craft-ing__name");
-            var src = new Label(recipeFor.ContainsKey(ing.Item) ? "crafted" : $"Layer {ItemLayer(ing.Item)}");
-            src.AddToClassList("craft-ing__src");
             var have = new Label();
             have.AddToClassList("craft-ing__have");
-            row.Add(icon); row.Add(name); row.Add(src); row.Add(have);
+            row.Add(icon); row.Add(name); row.Add(have);
             ingList.Add(row);
             ingRows.Add(new IngRow { item = ing.Item, need = ing.Qty, have = have });
         }

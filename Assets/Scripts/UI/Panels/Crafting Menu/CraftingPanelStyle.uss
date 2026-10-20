@@ -430,12 +430,6 @@ Label {
     color: var(--color-text-strong);
 }
 
-.craft-ing__src {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    margin-right: 8px;
-}
-
 .craft-ing__have {
     font-size: 19px;
     min-width: 34px;
@@ -506,8 +500,29 @@ Label {
     padding: 0 4px;
 }
 
+/* hover/press follow .btn-success: warm gold tint + a little scale, pressed sinks */
 .craft-stampslot:hover .craft-foot-plank {
-    -unity-background-image-tint-color: rgb(255, 248, 235);
+    -unity-background-image-tint-color: rgb(255, 222, 150);
+    scale: 1.03 1.03;
+}
+
+.craft-stampslot:hover .craft-foot-text {
+    color: rgb(80, 48, 16);
+}
+
+.craft-stampslot:active .craft-foot-plank {
+    -unity-background-image-tint-color: rgb(232, 196, 120);
+    scale: 0.98 0.98;
+}
+
+.craft-stampslot--locked:hover .craft-foot-plank,
+.craft-stampslot--locked:active .craft-foot-plank {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    scale: 1 1;
+}
+
+.craft-stampslot--locked:hover .craft-foot-text {
+    color: rgb(181, 157, 126);
 }
 
 .craft-foot-text {
