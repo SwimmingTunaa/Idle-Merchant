@@ -89,7 +89,7 @@
 }
 
 .adventurer-rank {
-    font-size: 14px;
+    font-size: 16px;
     color: rgb(100, 60, 20);
     background-color: rgb(195, 137, 93);
     border-width: 2px;
@@ -131,7 +131,7 @@
 }
 
 .xp-label {
-    font-size: 13px;
+    font-size: 16px;
     color: rgb(70, 45, 20);
     min-width: 110px;
     flex-shrink: 0;
@@ -145,7 +145,7 @@
     border-color: rgb(40, 100, 40);
     border-radius: 4px;
     padding: 5px 14px;
-    font-size: 15px;
+    font-size: 16px;
     flex-shrink: 0;
     -unity-font-style: bold;
 }
@@ -589,8 +589,10 @@
 }
 
 .slot-rank-label {
-    font-size: var(--font-size-body-md);
+    font-size: 32px;                     /* Ithaca cap ≈ 0.57em → ~18px numeral */
     color: rgb(255, 255, 255);
+    -unity-text-outline-width: 2px;      /* white reads on grey + gold gem; 1px vanishes at small Game-view scale */
+    -unity-text-outline-color: rgb(6, 6, 8);
     -unity-text-align: middle-center;
     padding-bottom: 4px;
     -unity-font-definition: var(--font-body);
@@ -842,7 +844,10 @@
     border-radius: 0;
 }
 #detail-class {
-    font-size: 24px;                     /* Body/MD */
+    font-size: 36px;                     /* cap ≈ 20px — fills the pill */
+    height: 32px;                        /* = old line box; keeps the pill at 50px (text overflows centred) */
+    padding-top: 0;
+    padding-bottom: 0;
     color: var(--color-text-primary);    /* Text/Primary */
     -unity-text-align: middle-center;
 }
@@ -869,7 +874,7 @@
     background-image: url("project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=2800000&guid=d825792e71a5342959a9c727f20b2749&type=3#Rank 1");
 }
 #detail-rank-number {
-    font-size: 24px;                     /* Body/MD */
+    font-size: 40px;                     /* cap ≈ 22px numeral */
     color: var(--color-text-inverse);
     -unity-text-align: middle-center;
     padding-bottom: 4px;
@@ -882,19 +887,20 @@
 }
 .exp-head {                              /* Figma "Label": left-grouped, gap 8 */
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;               /* mixed sizes share a bottom edge ≈ shared baseline */
     margin-bottom: 4px;                  /* Spacing/XS */
 }
 .exp-label {
-    font-size: 16px;                     /* Body/SM */
+    font-size: 28px;                     /* cap ≈ 16px */
     color: var(--color-text-primary);    /* Text/Primary */
 }
 #detail-rank-name {                      /* rank tier (e.g. "Wood") in the EXP row */
-    font-size: 16px;                     /* Body/SM */
+    font-size: 28px;                     /* cap ≈ 16px */
+    margin-left: 8px;                    /* Spacing/SM — gap after "EXP" */
     color: var(--color-text-primary);  /* Text/Primary */
 }
 #xp-label-value {
-    font-size: 16px;                     /* Body/SM */
+    font-size: 32px;                     /* cap ≈ 18px — carries the "0 / 40" numerals */
     color: var(--color-text-secondary);  /* Text/Secondary */
     margin-left: 8px;                    /* Spacing/SM — gap before the value */
 }
@@ -975,13 +981,21 @@
     -unity-slice-scale: 2px;
 }
 .badge-label {
-    font-size: 16px;                     /* Body/SM */
+    font-size: 16px;                     /* Body/SM — trait names stay here: up to ~19 chars in ⅓-width badges */
     color: var(--color-text-secondary);  /* Text/Secondary */
     -unity-text-align: middle-center;
     margin-bottom: 4px;
 }
+#Stats .badge-label {                    /* DPS / SPD / HP captions */
+    font-size: 28px;                     /* cap ≈ 16px */
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: -4px;                 /* Ithaca's empty ascent/descent; keeps the pair inside the 64px badge */
+}
 .badge-value {
     font-size: 40px;                     /* Body/XL (stat values) */
+    padding-top: 0;
+    padding-bottom: 0;
     color: var(--color-text-secondary);  /* Text/Secondary */
     -unity-text-align: middle-center;
 }

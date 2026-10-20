@@ -555,7 +555,9 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (promoteBtn != null)
         {
             promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
-            promoteBtn.text = agent.CanPromote ? $"Promote ({agent.PromoteCost}g)" : "Promote";
+            var promoteLabel = promoteBtn.Q<Label>("detail-promote-label");
+            if (promoteLabel != null)
+                promoteLabel.text = agent.CanPromote ? $"Promote {agent.PromoteCost:N0}" : "Promote";
             promoteBtn.SetEnabled(Inventory.Instance != null && Inventory.Instance.CanAfford(agent.PromoteCost));
             promoteBtn.clicked -= OnPromoteClicked;
             promoteBtn.clicked += OnPromoteClicked;

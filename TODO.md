@@ -8,6 +8,13 @@ Ordered roughly by intended sequence. Pull from the top.
 - [ ] **Audio pass** — click thock, kill crack, coin clink/shower jingle, purchase ka-ching, hire stamp, claim fanfare, ambient tavern/forest loop. Asset-wiring job (Kenney/itch packs), pooled AudioSource helper, volume settings (needs save system for persistence).
 - [ ] **First-five-minutes sequencing** — order 1★ milestones as an implicit tutorial (kill mobs → collect loot → first sale → first hire), tune rewards so each claim funds the next step. Mostly milestone data tweaks.
 
+## Crafting (in flight — see mocks)
+
+- [ ] **Batch 2 — engine**: output caps, unified keep-N floor (crafting + sales), priority, stations-as-slots (Forging / Smithy / Arcane Workshop ↔ the three chains), save all of it
+- [ ] **Batch 3a — book page**: icon tiles on torn sheets grouped by layer, frame-carried status (Painter2D progress sweep / red / gold / grey), Craft→Crafting buttons, pixel stock badge, right-page recipe detail
+- [ ] **Batch 3b — world workshops**: inactive prop prefabs behind the guild activated on station purchase (ProgressionActivator), click → themed workshop panel owning slots + slot purchases
+- [ ] **Book close button**: pixel slip "X" hanging off the book's top-right corner (BookPanel), per the crafting mock
+
 ## Shop depth
 
 - [ ] **Customer archetypes** — whale / bulk buyer / window-shopper as CustomerDef data + distinct palettes + spawn weights. Makes walkout signals richer for free.
