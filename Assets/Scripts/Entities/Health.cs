@@ -136,6 +136,14 @@ public class Health : MonoBehaviour, IDamageable
     }
 
     // Set HP directly (bypasses damage/heal logic and events).
+    /// <summary>Change max HP keeping the current HP percentage (and dead/alive state).</summary>
+    public void SetMaxHP(float maxHP)
+    {
+        float ratio = HealthPercent;
+        baseMaxHP = maxHP;
+        currentHP = maxHP * ratio;
+    }
+
     public void SetHP(float hp)
     {
         currentHP = Mathf.Clamp(hp, 0f, MaxHP);

@@ -24,7 +24,7 @@ public class HireController : BasePanelController
 
     [Header("Roster Settings")]
     [SerializeField] private int maxRosterSize = 5;
-    [Tooltip("Weight per rank (index 0 = Rank 1). Higher = more likely to appear. Normalized at runtime.")]
+    [Tooltip("Porter weight per pool layer (index 0 = layer 1). Adventurer tier odds live on Resources/ClassCatalog.")]
     [SerializeField] private float[] rankWeights = { 40f, 25f, 20f, 10f, 5f };
 
     [Header("Stack Visual Settings")]
@@ -87,6 +87,11 @@ public class HireController : BasePanelController
     private readonly Dictionary<VisualElement, float> rotationByCard = new();
 
     private bool isHireAnimating;
+
+    // Newest tier's odds boost after its layer unlocks (ClassCatalog.unlockBoost / unlockBoostSeconds).
+    // ponytail: not saved — quitting inside the window drops the rest of the boost.
+    private int boostTier;
+    private float boostUntil;
 
     // Top-bar sign: badge = coin (can afford a hire, wiggles) > "!" (new stock while closed); stopwatch = refresh countdown
     private Label hiringBadge;
@@ -475,58 +480,108 @@ public class HireController : BasePanelController
 
     private void InitializeCandidatePools()
     {
-        CreatePools(adventurerManagers, HireRole.Adventurer, adventurerPools);
-        CreatePools(porterManagers, HireRole.Porter, porterPools);
+        for (int i = 0; i < adventurerManagers.Count; i++)
+            if (adventurerManagers[i] == null)
+                Debug.LogError($"[HireController] Adventurer manager slot {i + 1} is empty — assign that layer's manager on the Hiring Menu");
+
+        CreatePools(HireRole.Adventurer);
+        CreatePools(HireRole.Porter);
     }
 
-    // Creates candidate pools gated by maxUnlockedLayer.
-    // Pools are keyed by (role, manager.LayerIndex, def) so each layer gets its own pool per def.
-    private void CreatePools<T>(List<T> managers, HireRole role, List<CandidatePool> outList)
-        where T : IUnitManager
+    // Creates candidate pools gated by maxUnlockedLayer (def.rank <= unlocked layer); skips existing keys.
+    // Adventurers: one pool per ClassCatalog def, pool "layer" = the def's tier, which HireRoster weights by.
+    // Porters: one pool per (manager layer, hireable def).
+    private void CreatePools(HireRole role)
     {
         int maxLayer = ProgressionManager.Instance != null
             ? ProgressionManager.Instance.maxUnlockedLayer
             : 1;
 
-        // A rebuilt dungeon level leaves empty slots here; one empty slot used to NRE every pool's cost lambda
-        for (int i = 0; i < managers.Count; i++)
-            if (managers[i] == null)
-                Debug.LogError($"[HireController] {role} manager slot {i + 1} is empty — assign that layer's manager on the Hiring Menu");
+        bool adv = role == HireRole.Adventurer;
+        var outList = adv ? adventurerPools : porterPools;
+        Func<int> owned = adv ? () => OwnedCount(adventurerManagers) : () => OwnedCount(porterManagers);
 
-        foreach (var m in managers)
+        foreach (var (layer, def) in HireableDefs(role))
         {
-            if (m == null) continue;
-            foreach (var def in m.HireableDefs)
-            {
-                if (def == null) continue;
+            if (def == null) continue;
 
-                // Gate by rank — higher rank candidates only appear when that layer is unlocked
-                if (def.rank > maxLayer)
-                    continue;
+            // Gate by rank — higher rank candidates only appear when that layer is unlocked
+            if (def.rank > maxLayer)
+                continue;
 
-                var key = (role, m.LayerIndex, def);
-                if (candidatePools.ContainsKey(key)) continue;
+            var key = (role, layer, def);
+            if (candidatePools.ContainsKey(key)) continue;
 
-                var pool = new CandidatePool(role, m.LayerIndex, def, refreshIntervalSeconds, traitChance, () =>
-                {
-                    int owned = 0;
-                    foreach (var mgr in managers) if (mgr != null) owned += mgr.GetTotalCount();
-                    return owned;
-                });
-                candidatePools[key] = pool;
-                outList.Add(pool);
-            }
+            var pool = new CandidatePool(role, layer, def, refreshIntervalSeconds, traitChance, owned);
+            candidatePools[key] = pool;
+            outList.Add(pool);
         }
     }
 
-    // Called when a new layer is unlocked mid-session.
+    private IEnumerable<(int layer, EntityDef def)> HireableDefs(HireRole role)
+    {
+        if (role == HireRole.Adventurer)
+        {
+            var catalog = ClassCatalog.Instance;
+            if (catalog == null)
+            {
+                Debug.LogError("[HireController] Resources/ClassCatalog missing — no adventurer candidates");
+                yield break;
+            }
+            foreach (var d in catalog.defs)
+                if (d != null) yield return (d.rank, d);
+            yield break;
+        }
+
+        // A rebuilt dungeon level leaves empty slots here; one empty slot used to NRE every pool's cost lambda
+        for (int i = 0; i < porterManagers.Count; i++)
+        {
+            var m = porterManagers[i];
+            if (m == null)
+            {
+                Debug.LogError($"[HireController] Porter manager slot {i + 1} is empty — assign that layer's manager on the Hiring Menu");
+                continue;
+            }
+            foreach (var d in ((IUnitManager)m).HireableDefs)
+                yield return (m.LayerIndex, d);
+        }
+    }
+
+    // Guild-wide units of a role (null slots skipped) — drives the ×1.25-per-owned price
+    private static int OwnedCount<T>(List<T> managers) where T : IUnitManager
+    {
+        int owned = 0;
+        foreach (var m in managers) if (m != null) owned += m.GetTotalCount();
+        return owned;
+    }
+
+    // Catalog tier weights, newest tier ×unlockBoost while its post-unlock window runs
+    private float[] AdventurerTierWeights()
+    {
+        var catalog = ClassCatalog.Instance;
+        if (catalog == null) return rankWeights;
+        var w = (float[])catalog.tierWeights.Clone();
+        if (Time.time < boostUntil && boostTier >= 1 && boostTier <= w.Length)
+            w[boostTier - 1] *= catalog.unlockBoost;
+        return w;
+    }
+
+    // Called when a new layer is unlocked mid-session (and re-raised by a save restore).
     // Delegates to CreatePools which already skips existing keys.
     private void OnLayerUnlocked(int layer)
     {
-        CreatePools(adventurerManagers, HireRole.Adventurer, adventurerPools);
-        CreatePools(porterManagers, HireRole.Porter, porterPools);
+        CreatePools(HireRole.Adventurer);
+        CreatePools(HireRole.Porter);
         UpdateLayerSelector();
         affordPending = true;
+
+        // A real unlock (not the load-time replay) boosts that tier's odds for a while
+        var catalog = ClassCatalog.Instance;
+        if (catalog != null && (SaveManager.Instance == null || !SaveManager.Instance.IsRestoring))
+        {
+            boostTier = layer;
+            boostUntil = Time.time + catalog.unlockBoostSeconds;
+        }
 
         if (showDebugLogs)
             Debug.Log($"[HirePanel] Layer {layer} unlocked — new rank {layer} candidate pools created");
@@ -538,16 +593,12 @@ public class HireController : BasePanelController
 
     public bool CanGrantFavor => adventurerPools.Count > 0;
 
-    /// <summary>Recruitment Favor: a candidate of the highest unlocked def rank that joins promoted
-    /// (rank = guild stars + 1, min Bronze) and survives pool refreshes until hired.</summary>
+    /// <summary>Recruitment Favor: a Novice that joins promoted (rank = guild stars + 1, min Bronze) and survives
+    /// pool refreshes until hired; as a Novice above Wood it gets the free path pick on its first Roster visit.</summary>
     // Regular pools regenerate on load; only unhired favors persist (SaveManager → ContractSave.favors).
     public void GrantRecruitmentFavor()
     {
-        CandidatePool best = null;
-        foreach (var p in adventurerPools)
-            if (best == null || p.EntityDef.rank > best.EntityDef.rank
-                || (p.EntityDef.rank == best.EntityDef.rank && p.LayerIndex > best.LayerIndex))
-                best = p;
+        var best = NovicePool();
         if (best == null) return;
 
         int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
@@ -577,7 +628,8 @@ public class HireController : BasePanelController
     {
         foreach (var f in favors)
         {
-            var pool = adventurerPools.Find(p => p.LayerIndex == f.layer && p.EntityDef.name == f.def);
+            // By def only: pools are per catalog def now (pre-classes saves keyed by layer too)
+            var pool = adventurerPools.Find(p => p.EntityDef.name == f.def) ?? NovicePool();
             if (pool == null)
             {
                 Debug.LogError($"[HirePanel] No pool for saved favor '{f.identity?.DisplayName}' ({f.def}, layer {f.layer}) — dropped");
@@ -592,6 +644,9 @@ public class HireController : BasePanelController
         }
         if (favors.Count > 0) OnPoolsChanged();
     }
+
+    private CandidatePool NovicePool() =>
+        adventurerPools.Find(p => p.EntityDef is AdventurerDef ad && ad.classLine == ClassLine.Novice);
 
     /// <summary>Rush Order: every candidate pool restocks now (timers restart).</summary>
     public void RefreshAllPools()
@@ -623,7 +678,7 @@ public class HireController : BasePanelController
     {
         candidateToPool.Clear();
 
-        adventurerRoster = HireRoster.BuildRoster(adventurerPools, rankWeights, maxRosterSize);
+        adventurerRoster = HireRoster.BuildRoster(adventurerPools, AdventurerTierWeights(), maxRosterSize);
         porterRoster = HireRoster.BuildRoster(porterPools, rankWeights, maxRosterSize);
 
         // Recruitment Favor candidates are guaranteed: pinned to the top of the stack, never left to the weighted draw
@@ -902,6 +957,13 @@ public class HireController : BasePanelController
         bool typeFull = typeLimit >= 0 && manager.GetUnitCount(candidate.entityDef) >= typeLimit;
 
         bool canHire = canAfford && !layerFull && !typeFull;
+
+        // Warn when the destination layer is deeper than the recruit's rank (allowed — they'll just struggle)
+        var rankWarning = card.Q<Label>("rank-warning");
+        if (rankWarning != null)
+            rankWarning.style.display = currentTab == TabType.Adventurers
+                && Mathf.Max(candidate.startRank, candidate.entityDef.rank) < selectedLayer
+                ? DisplayStyle.Flex : DisplayStyle.None;
         hireButton.SetEnabled(canHire);
 
         if (costLabel != null)

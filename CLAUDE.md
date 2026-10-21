@@ -89,11 +89,17 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 
 ### Hiring Pipeline
 `CharacterGeneration/HiringCandidateGenerator.cs` → generates `HiringCandidate` structs (identity, traits, cost, `newspaperName`)
-`UI/Panels/Hiring/CandidatePool.cs` → timed pool per unit type; exposes `CandidateCount` / `MinHireCost` (no-alloc, pure) and `GetCandidates()` (allocating copy); base cost = `hireCost × 1.25^owned`, baked at generation (owned-count func injected by `HireController`, summed across layer managers)
+`UI/Panels/Hiring/CandidatePool.cs` → timed pool per def; exposes `CandidateCount` / `MinHireCost` (no-alloc, pure) and `GetCandidates()` (allocating copy); base cost = `hireCost × 1.25^owned` (class defs: `ClassCatalog.HireCost` premium instead of `hireCost`), baked at generation (owned-count func injected by `HireController`, summed across layer managers)
 `UI/Panels/Hiring/HireController.cs` → stack UI, tab navigation, layer selector, hire animation; top-bar hiring sign (coin badge = cheapest candidate affordable + wiggle, "!" = restocked while closed; pocket-watch refresh countdown within `stopwatchShowSeconds`)
-`UI/Panels/Hiring/HireRoster.cs` → weighted rank selection from pools
+`UI/Panels/Hiring/HireRoster.cs` → weighted selection by pool `LayerIndex` (adventurer pools: the def's tier), drawn without replacement
 `UI/Panels/Hiring/CandidateUIMapper.cs` → populates Candidate.uxml from `HiringCandidate` data
 `HiringCandidate` struct holds all per-candidate state; `newspaperName` is assigned once at generation, stable across re-populates
+
+### Adventurer Classes (`Entities/Adventuers/ClassCatalog.cs`, design in `CLASSES_DESIGN.md`)
+- `ClassLine` enum (Novice, Warrior, Guardian, Rogue, Mage — serialized ints, append only); one `AdventurerDef` per line × tier in `Prefabs/Entities/Adventurers/Classes/` + `Lvl 1 Novice`. Tier = the def's `rank`; `displayName` = class name, `description` = role line, `classIcon`, `damageMultiplier` / `hpMultiplier` (applied in `BaseStats.FromEntityDef` / `AdventurerDef.MaxHealth`); Rogue = 1.4× attack speed (`attackInterval` 0.71), Mage = `Mage Splash` starting skill
+- `Resources/ClassCatalog.asset` (`ClassCatalog.Instance`) lists every hireable adventurer def + tier weights, unlock boost and hire premium. The hire board builds adventurer pools from it (one per def, gated `rank <= maxUnlockedLayer`); AdventurerManagers' `hireableDefs` are empty and unused — porters still use theirs
+- `AdventurerAgent.Promote(line)` = AdvanceRank + `SetClassDef(next tier)` (base stats, max HP, skills swap; level/trait modifiers stay). A Novice must name a line (Roster "Choose a path" picker); `NeedsPathPick` (Novice above Wood) → free `ChoosePath(line)`, counted by `CanPromote` with `PromoteCost` 0
+- Spawn/restore never swaps defs: units spawn with their tier def and `RestoreProgress` replays ranks/levels; `SpawnUnitWithCandidate` joins at `max(startRank, def.rank)`
 
 ### Object Pooling
 `Systems/Pooling/ObjectPoolManager.cs` — use for frequently spawned objects
@@ -134,7 +140,8 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Editor/EntityDefEditor.cs` | Custom inspector for EntityDef |
 | `Editor/ExcelImporter.cs` | Data import from Excel |
 | `Editor/scriptableobject_generator.cs` | SO batch generation tool |
-| `Scripts/UI/Panels/Hiring/HireController.cs` | Hire panel — stack UI, layer selector, animation |
+| `Scripts/UI/Panels/Hiring/HireController.cs` | Hire panel — stack UI, layer selector, animation, catalog pools + tier odds |
+| `Scripts/Entities/Adventuers/ClassCatalog.cs` | `ClassLine` + class def catalog (Resources), tier odds, premium price |
 | `Scripts/UI/Panels/Hiring/CandidatePool.cs` | Timed candidate pool per unit type |
 | `Scripts/CharacterGeneration/HiringCandidateGenerator.cs` | Generates `HiringCandidate` structs with identity/traits |
 | `Scripts/Entities/Health.cs` | Reusable health, damage flash, death/revive |
@@ -200,6 +207,9 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **Stamp overlays sit at page-root level** — the `Stampanim` element is a sibling of left/right content, never inside a page (pages clip overflow); aim it with `BookStamp.AimAt`
 - **Crafting right page is height-budgeted** — fits 650px with three 46px ingredient rows and the 56px foot plank 22px off the bottom, no scrolling; growing one block means shrinking another (budget note atop `CraftingPanelStyle.uss`)
 - **New pages use `--font-size-body` 24 / `-small` 20 / `-caption` 18** (Ithaca, nothing smaller) — never the legacy `--text-*` scale; Roster + `Components/*.uss` still consume it, so migrate page by page, don't bump it in place
+- **Class tier defs are save keys** — the roster saves the adventurer's *current* tier def name; class def asset names (`Bronze Warrior` … `Gold Archmage`, `Lvl 1 Novice`) are final. An unknown adventurer def restores as the Novice (free path pick if above Wood) — never orphaned
+- **Class power lives on the tier def, not on promotion** — don't reintroduce per-rank damage/HP modifiers in `AdvanceRank`; tune `damageMultiplier` / `hpMultiplier` on the def (only attack speed still steps per rank)
+- **New adventurer classes/tiers go in `ClassCatalog.defs`** — not on a layer manager's `hireableDefs`
 - **`lastPlayedUtc` means "collected up to", not "last seen"** — while a welcome-back award is unclaimed it's saved as `now − pendingAway` and rates freeze, so quitting on the panel re-offers the identical award; don't "fix" it to `UtcNow`
 
 ---

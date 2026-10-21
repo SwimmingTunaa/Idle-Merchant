@@ -20,6 +20,7 @@ using System.Collections.Generic;
 public class PassiveAOEDamageEffect : PassiveEffect
 {
     private readonly float damagePerTick;
+    private readonly float attackDamageFraction;   // > 0: each tick deals this × owner's AttackDamage instead
     private readonly float radius;
     private readonly LayerMask targetLayerMask;
 
@@ -38,10 +39,12 @@ public class PassiveAOEDamageEffect : PassiveEffect
         float radius, 
         float tickInterval, 
         float duration = -1f,
-        LayerMask? targetLayerMask = null) 
+        LayerMask? targetLayerMask = null,
+        float attackDamageFraction = 0f) 
         : base(owner, tickInterval, duration)
     {
         this.damagePerTick = damagePerTick;
+        this.attackDamageFraction = attackDamageFraction;
         this.radius = radius;
         this.targetLayerMask = targetLayerMask ?? LayerMask.GetMask("Mobs");
     }
@@ -65,30 +68,17 @@ public class PassiveAOEDamageEffect : PassiveEffect
             targetLayerMask
         );
 
-        int damageCount = 0;
+        float damage = attackDamageFraction > 0f && owner.Stats != null
+            ? owner.Stats.AttackDamage * attackDamageFraction
+            : damagePerTick;
+
         foreach (var hit in hits)
         {
             // Skip self
             if (hit.gameObject == owner.gameObject) continue;
 
-            // Try to damage
-            var damageable = hit.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                float appliedDamage = damageable.OnDamage(damagePerTick);
-                if (appliedDamage > 0f)
-                {
-                    damageCount++;
-                }
-            }
+            hit.GetComponent<IDamageable>()?.OnDamage(damage);
         }
-
-#if UNITY_EDITOR
-        if (Application.isPlaying && damageCount > 0)
-        {
-            Debug.Log($"[PassiveAOEDamageEffect] {owner.name} damaged {damageCount} enemies for {damagePerTick} each");
-        }
-#endif
     }
 
 #if UNITY_EDITOR

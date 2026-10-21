@@ -133,10 +133,11 @@
                         </ui:VisualElement>
                         <ui:VisualElement name="Class Icon" class="class-circle">
                             <ui:VisualElement name="circle-outline 16x16 1" class="circle-outline" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/circle-outline%2016x16.png?fileID=2800000&amp;guid=f2fa623a4e5dc47679de73bd62d02cea&amp;type=3#circle-outline 16x16&quot;);" />
-                            <ui:VisualElement name="job_icons_doubleoutline - novice" class="job-icon" style="top: 2px; left: 0; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/job_icons_singleoutline.png?fileID=-7428873440664082796&amp;guid=98b2f1c9237cb4662958fb3b4cdf2261&amp;type=3#novice&quot;);" />
+                            <ui:VisualElement name="detail-class-icon" class="job-icon" style="top: 2px; left: 0; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Custom/job_icons_singleoutline.png?fileID=-7428873440664082796&amp;guid=98b2f1c9237cb4662958fb3b4cdf2261&amp;type=3#novice&quot;);" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Label name="detail-layer" text="Abandoned Mines" class="detail-layer" />
+                    <ui:Label name="detail-rank-warning" text="Below this layer&apos;s rank" class="detail-rank-warning" style="display: none;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="Progress Bars" class="progress-bars">
                     <ui:VisualElement name="Level &amp; Rank" class="level-rank">
@@ -196,6 +197,12 @@
                 <ui:VisualElement name="actions" class="frame-6">
                     <ui:Button name="detail-dismiss-btn" text="Dismiss" class="btn-danger" style="width: 126px;" />
                 </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="path-picker" class="path-picker" style="display: none;">
+                <ui:Label name="path-title" text="Choose a path" class="path-title" />
+                <ui:Label name="path-subtitle" text="Promote to Bronze for 1,500" class="path-subtitle" />
+                <ui:VisualElement name="path-cards" class="path-cards" />
+                <ui:Button name="path-cancel-btn" text="Not yet" class="btn-secondary" style="width: 126px;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

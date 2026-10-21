@@ -40,6 +40,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
     private SaveData pending;      // read in Awake, applied in Start + next frame
     private bool restoring;        // half-restored state is never written
+    /// <summary>True while ApplyLate replays the load (layer-unlock signals etc.) — listeners can skip "fresh event" effects.</summary>
+    public bool IsRestoring => restoring;
     private bool savingDisabled;   // unreadable/future-version file on disk (never overwrite it), or wiped this session
     private Task writeTask = Task.CompletedTask;
     private float autosaveTimer;
@@ -545,6 +547,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
     private static void SpawnRoster(List<UnitSave> roster)
     {
+        var catalog = ClassCatalog.Instance;   // loads every class tier def so the name lookup below finds them
         var defs = Resources.FindObjectsOfTypeAll<EntityDef>();
         var advManagers = FindObjectsByType<AdventurerManager>(FindObjectsInactive.Include);
         var porterManagers = FindObjectsByType<PorterManager>(FindObjectsInactive.Include);
@@ -558,6 +561,14 @@ public class SaveManager : PersistentSingleton<SaveManager>
                 traits = u.traits,
                 appearanceIndices = u.appearance,
             };
+
+            // Never orphan an adventurer: an unknown def (deleted pre-classes placeholder) restores as a Novice,
+            // which a rank > 1 turns into a free path pick on its first Roster visit
+            if (candidate.entityDef == null && u.role == HireRole.Adventurer && catalog != null)
+            {
+                Debug.LogWarning($"[SaveManager] Unknown adventurer def '{u.def}' for '{u.identity?.DisplayName}' — restored as {catalog.Novice?.name}");
+                candidate.entityDef = catalog.Novice;
+            }
 
             EntityBase spawned = null;
             if (candidate.entityDef != null && u.role == HireRole.Adventurer)
@@ -666,7 +677,7 @@ public class ContractSave
 public class FavorSave
 {
     public string def;             // EntityDef asset name
-    public int layer;              // pool's dungeon layer
+    public int layer;              // pool's tier (pre-classes: dungeon layer) — restore matches by def only
     public Identity identity;
     public TraitInstance[] traits;
     public CharacterAppearanceIndices appearance;
@@ -682,7 +693,7 @@ public class GuildSave
 public class UnitSave
 {
     public HireRole role;
-    public string def;             // EntityDef asset name
+    public string def;             // EntityDef asset name — adventurers: current class tier def
     public int layer;
     public Identity identity;
     public TraitInstance[] traits;

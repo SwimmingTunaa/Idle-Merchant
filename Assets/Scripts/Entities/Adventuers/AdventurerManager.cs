@@ -7,6 +7,9 @@ using System.Collections.Generic;
 /// </summary>
 public class AdventurerManager : UnitManager<AdventurerAgent>
 {
+    // Adventurers hire from Resources/ClassCatalog (HireController), not per-manager hireableDefs
+    protected override bool UsesHireableDefs => false;
+
     // ===== SPAWNING (Adventurer-Specific) =====
 
     /// <summary>
@@ -146,8 +149,9 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
             }
         }
 
-        // Recruitment Favor candidates arrive promoted (save restore passes 0 and re-applies progress itself)
-        if (candidate.startRank > 1) agent.RestoreProgress(candidate.startRank, 1, 0f);
+        // Class hires join at their tier; Recruitment Favor Novices at startRank (save restore re-applies its own progress after)
+        int joinRank = Mathf.Max(candidate.startRank, advDef.rank);
+        if (joinRank > 1) agent.RestoreProgress(joinRank, 1, 0f);
 
         return agent;
     }

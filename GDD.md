@@ -196,15 +196,21 @@ Adventurers are the engine of loot production. More adventurers = faster mob cle
 Adventurers progress on two nested tracks: **5 ranks** — Wood → Bronze → Iron → Silver → Gold — each holding **5 levels** (shown as roman numerals I–V), for 25 levels total. Killing mobs earns XP, which **auto-levels** the adventurer within their rank (Wood I → Wood II → …). At a rank's top level (V), the player can **promote** to the next rank, which **costs gold** and resets the adventurer to Level I of the higher tier (e.g. Wood V → Bronze I). Auto-leveling is automatic; promotion is a deliberate, player-initiated, gold-gated choice.
 
 **Level & Rank Effects:**
-Each **level-up** applies a small permanent stat bump (attack damage, attack speed). Each **promote** (rank-up) applies a larger milestone bump (attack damage, attack speed, max HP). Values are tuned in `AdventurerDef`. There are no branching paths — both tracks are linear upgrades.
+Each **level-up** applies a small permanent stat bump (attack damage, attack speed). Each **promote** (rank-up) steps attack speed and swaps the adventurer to the **next tier of their class** — the tier def carries the damage / HP multipliers, range and skills (see Classes below). ✅ *Reconciled (classes phase 1): the old flat +20% damage / +25% HP per rank is gone; class tiers carry the power curve.*
 
-| Rank | Relative Power |
-|---|---|
-| 1 | Base (hired state) |
-| 2 | Noticeably stronger — visible in faster mob clear |
-| 3 | Mid-tier — can handle tougher layer mobs reliably |
-| 4 | Strong — preferred for deep layers |
-| 5 | Max — top-end adventurer |
+**Classes (phase 1, implemented — design in [CLASSES_DESIGN.md](CLASSES_DESIGN.md)):**
+Wood is the classless **Novice**. The first promotion (Wood V → Bronze) opens a **"Choose a path"** picker on the Roster's right page — four cards (job icon, name, role line, DMG/HP/RNG arrows vs that tier's Warrior); clicking a card spends the gold and makes the adventurer that line's Bronze class. Later promotions advance along the line and the button names the step ("Promote » Knight 3,750" — Ithaca has no →).
+
+| Line | Bronze | Iron | Silver | Gold | Role |
+|---|---|---|---|---|---|
+| Warrior | Warrior | Knight | Paladin | Champion | balanced melee |
+| Guardian | Guardian | Defender | Bulwark | Juggernaut | high HP, low damage |
+| Rogue | Rogue | Assassin | Shadowblade | Nightstalker | 1.4× attack speed, fragile |
+| Mage | Mage | Sorcerer | Wizard | Archmage | splash aura (Mage Splash skill), fragile |
+
+Damage / HP multipliers on the Novice base (50 / 200) per tier are the CLASSES_DESIGN power-curve table, e.g. Iron Knight 4.5× / 2.8× — target: a rank-N unit kills an average layer-N mob in ~4 hits. A weak unit in a deep layer is allowed; the Roster detail and the hire card say "Below this layer's rank". The Roster badge shows the class icon + name. Phase 1 keeps the Novice sprites; class weapons/outfits, archer projectiles and splash VFX are phase 2.
+
+A Novice already above Wood (pre-classes saves, Recruitment Favor recruits) gets a **free one-time path pick**: the picker opens the first time their Roster detail opens, and the promote gem/indicator/badge light up until they pick.
 
 **Design Notes:**
 - Ranks exist at both hire time (higher-rank candidates cost more gold) and as an in-field upgrade. Levelling within a rank is free via XP; **promoting between ranks costs gold** — a deliberate gold sink and decision point (invest in this adventurer now, or save). ✅ *Reconciled: promotion was originally "free via XP"; the build settled on a gold cost.*
@@ -593,7 +599,8 @@ Players spend gold to hire adventurers, porters, and customers from a rotating c
 - **Identity**: procedurally generated name + epithet (e.g. "Gorn the Relentless") via `IdentityGenerator`
 - **Rank**: 1–5 (affects base stats and hire cost)
 - **Traits**: 0–3 randomly selected traits from the available pool (tier-based)
-- **Hire cost**: base cost from `EntityDef.hireCost` × 1.25^(units of that role already owned, guild-wide across all layers) × rank modifier × trait cost multipliers
+- **Hire cost**: base cost × 1.25^(units of that role already owned, guild-wide across all layers) × trait cost multipliers. Base = `EntityDef.hireCost`; class hires pay a premium — (Novice cost + the promotions they skip) × 1.4 (Bronze 4,200 · Iron 9,450 · Silver 22,575 · Gold 55,388)
+- **Adventurer class + rank**: the board draws from `Resources/ClassCatalog` (Novice + 16 class tier defs). Tier N appears once layer N is unlocked; tier odds Novice 50 · Bronze 25 · Iron 13 · Silver 8 · Gold 4 over the unlocked tiers (the newest tier ×2 for 10 min after its layer unlocks — not re-applied by a save load), line uniform within a tier. Class hires join at their tier's rank. Cards show the class icon + name; tiers above Novice tint the portrait frame and rank badge (bronze / iron / silver / gold)
 - **Newspaper name**: the candidate's display name in the hiring panel, generated once and stable across re-populates
 
 ### 7.3 Candidate Pool
@@ -608,7 +615,7 @@ Players spend gold to hire adventurers, porters, and customers from a rotating c
 
 `HireController` drives the UI:
 - Tab navigation between unit types (Adventurers, Porters, Customers)
-- **Layer selector** — player chooses which layer the hired unit will be assigned to at hire time
+- **Layer selector** — player chooses which layer the hired unit will be assigned to at hire time (one adventurer board for all layers; a card below the selected layer's rank shows a "Below this layer's rank" ribbon)
 - Hire animation plays on successful hire
 - Gold is deducted from `Inventory`; `GameSignals.OnUnitHired` fires
 - **Top-bar hiring sign (implemented):** copper-coin badge + periodic button wiggle when gold covers the cheapest candidate in any pool (`CandidatePool.MinHireCost`); otherwise a paper "!" badge when pools restocked while the board was closed (cleared on open, no wiggle). A pixel pocket-watch on the sign's left edge drains toward the next pool refresh, shown only within the last `stopwatchShowSeconds` (120s default)
@@ -852,11 +859,11 @@ This makes each hire feel like a distinct character, not a stat sheet.
 
 ### 11.4 Skills
 
-Skills are applied to entities at spawn from `EntityDef.startingSkills`.
+Adventurers apply `EntityDef.startingSkills` at spawn and swap them when a promotion changes their class tier def (other entity types don't read the field yet).
 
 **Passive Skills (implemented):**
 - `Regeneration` — periodic HP recovery
-- `AOEDamage` — splash damage on attacks
+- `AOEDamage` — periodic aura: every `tickInterval` it hits enemies within `radius` (flat `damagePerTick`, or `attackDamageFraction` × the owner's AttackDamage). The Mage line uses it as **Mage Splash** (25% of attack every 2 s within 2.5 m, Enemy layer only) — phase 1's stand-in for on-hit splash
 - `GoldGeneration` — passive gold trickle
 
 **Active Skills:** planned for future implementation.
@@ -878,7 +885,7 @@ EntityDef (design-time) → BaseStats → StatsMediator (runtime modifiers) → 
 ### 12.2 How Modifiers Work
 
 - Traits add `IStatModifier` instances to `StatsMediator` at hire time
-- Promotions apply a permanent modifier set at the moment of promotion
+- Level-ups and promotions apply permanent modifiers (damage / attack speed); a promotion also swaps the class tier def, which replaces `BaseStats` (`Stats.SetBaseStats`) and max HP
 - Skills and combat effects (e.g. stun = MoveSpeed → 0) add/remove modifiers at runtime
 - Stats cache invalidates automatically when modifiers change
 - No manual "refresh" calls needed

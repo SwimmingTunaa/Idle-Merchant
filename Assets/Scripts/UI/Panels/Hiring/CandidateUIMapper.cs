@@ -70,10 +70,42 @@ public static class CandidateUIMapper
             }
         }
 
-        // Rank badge (layer-based)
+        // Rank badge — class tier (Recruitment Favor Novices: their start rank)
+        int rank = Mathf.Max(candidate.startRank, candidate.entityDef.rank);
         var rankLabel = candidateRoot.Q<Label>("rank-level");
         if (rankLabel != null)
-            rankLabel.text = (candidate.startRank > 1 ? candidate.startRank : candidate.entityDef.rank).ToString();
+            rankLabel.text = rank.ToString();
+
+        // Class icon + name; tiers above Novice tint the portrait frame + badge so a Gold find pops
+        var advDef = candidate.entityDef as AdventurerDef;
+        var classRow = candidateRoot.Q<VisualElement>("class-row");
+        if (classRow != null)
+            classRow.style.display = advDef != null ? DisplayStyle.Flex : DisplayStyle.None;
+        if (advDef != null)
+        {
+            var classIcon = candidateRoot.Q<VisualElement>("class-icon");
+            if (classIcon != null)
+                classIcon.style.backgroundImage = advDef.classIcon != null ? new StyleBackground(advDef.classIcon) : null;
+            var className = candidateRoot.Q<Label>("class-name");
+            if (className != null)
+                className.text = advDef.displayName;
+        }
+
+        if (advDef != null && advDef.rank > 1)
+        {
+            Color tint = TierTint(advDef.rank);
+            var frame = candidateRoot.Q<VisualElement>("sprite-container");
+            if (frame != null)
+            {
+                frame.style.borderTopColor = tint;
+                frame.style.borderRightColor = tint;
+                frame.style.borderBottomColor = tint;
+                frame.style.borderLeftColor = tint;
+            }
+            var badge = candidateRoot.Q<VisualElement>("rank-container");
+            if (badge != null)
+                badge.style.unityBackgroundImageTintColor = tint;
+        }
                 
         // Traits
         PopulateTraits(candidateRoot, candidate);
@@ -87,6 +119,16 @@ public static class CandidateUIMapper
             newspaperLabel.text = candidate.newspaperName;
     }
     
+    /// <summary>Frame tint per tier (2 = Bronze … 5 = Gold).</summary>
+    public static Color TierTint(int tier) => tier switch
+    {
+        2 => new Color32(184, 115, 51, 255),   // bronze
+        3 => new Color32(140, 146, 158, 255),  // iron
+        4 => new Color32(200, 212, 228, 255),  // silver
+        5 => new Color32(240, 190, 40, 255),   // gold
+        _ => new Color32(195, 137, 93, 255),   // default card brown
+    };
+
     /// <summary>
     /// Populate trait badges.
     /// Shows cursed combo visual treatment if applicable.

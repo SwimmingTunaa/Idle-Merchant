@@ -132,6 +132,13 @@ public class Stats
         RefreshCache();
     }
 
+    /// <summary>Swap the base values (adventurer class promotion swaps defs); modifiers keep applying on top.</summary>
+    public void SetBaseStats(BaseStats baseStats)
+    {
+        BaseStats = baseStats;
+        dirty = true;
+    }
+
     // ===== CACHE MANAGEMENT =====
 
     /// <summary>

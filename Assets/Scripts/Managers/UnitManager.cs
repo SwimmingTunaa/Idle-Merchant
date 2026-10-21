@@ -82,9 +82,12 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         if (_maxUnits <= 0)
             Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] maxUnits is {_maxUnits} — no units can be hired!");
 
-        if (hireableDefs.Count == 0)
+        if (UsesHireableDefs && hireableDefs.Count == 0)
             Debug.LogWarning($"[{GetType().Name} Layer {LayerIndex}] No hireable defs defined — no candidates will appear in hiring panel.");
     }
+
+    /// <summary>False when the hire board sources this unit type elsewhere (adventurers → ClassCatalog).</summary>
+    protected virtual bool UsesHireableDefs => true;
 
     // ===== HIRING SYSTEM =====
 

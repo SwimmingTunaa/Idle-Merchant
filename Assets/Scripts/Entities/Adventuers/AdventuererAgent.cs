@@ -66,8 +66,20 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     /// <summary>Rank tier plus roman level, e.g. "Wood V".</summary>
     public string RankDisplay => AdventurerRank.Display(currentRank, currentLevel);
 
-    /// <summary>Gold cost to promote out of the current rank.</summary>
-    public int PromoteCost => adventurerDef != null ? adventurerDef.PromoteCost(currentRank) : 0;
+    /// <summary>Current class tier def (promotion swaps it; its asset name is the save key).</summary>
+    public AdventurerDef ClassDef => adventurerDef;
+    public ClassLine Line => adventurerDef != null ? adventurerDef.classLine : ClassLine.Novice;
+    public string ClassName => adventurerDef != null ? adventurerDef.displayName : "Novice";
+
+    /// <summary>A Novice above Wood (pre-classes save, Recruitment Favor) owes a free one-time path pick — see ChoosePath.</summary>
+    public bool NeedsPathPick => adventurerDef != null && adventurerDef.classLine == ClassLine.Novice && currentRank > 1;
+
+    /// <summary>Gold cost to promote out of the current rank (the free path pick costs nothing).</summary>
+    public int PromoteCost => adventurerDef == null || NeedsPathPick ? 0 : adventurerDef.PromoteCost(currentRank);
+
+    /// <summary>The def the next promotion turns this unit into (null for a Novice until a line is picked, or at max rank).</summary>
+    public AdventurerDef NextClassDef =>
+        Line == ClassLine.Novice || ClassCatalog.Instance == null ? null : ClassCatalog.Instance.Get(Line, currentRank + 1);
 
     /// <summary>True at the final rank and level — no further progression.</summary>
     public bool IsMaxLevel =>
@@ -86,11 +98,11 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         }
     }
 
-    /// <summary>True once at the top level of a non-max rank — eligible to spend gold and promote.</summary>
+    /// <summary>True once at the top level of a non-max rank — eligible to spend gold and promote —
+    /// or while a free path pick is owed (badges, gem and indicator light up for it too).</summary>
     public bool CanPromote =>
         adventurerDef != null
-        && currentRank < adventurerDef.maxRank
-        && currentLevel >= adventurerDef.levelsPerRank;
+        && (NeedsPathPick || (currentRank < adventurerDef.maxRank && currentLevel >= adventurerDef.levelsPerRank));
 
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = true;
@@ -175,7 +187,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         // Initialize health
         if (health != null && adventurerDef.baseHealth > 0f)
         {
-            health.Init(adventurerDef.baseHealth, fullHP: true);
+            health.Init(adventurerDef.MaxHealth, fullHP: true);
             health.OnDeath += OnDeath;
             health.OnDamaged += OnHit;
         }
@@ -189,7 +201,24 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             combat.OnDamageDealt += OnCombatDamageDealt;
         }
         
+        // Starting skills (Mage splash) — Init made a fresh mediator, so the old list is already gone
+        skillModifiers.Clear();
+        ApplySkills();
+
         ChangeState(adventurerDef.startingState);
+    }
+
+    private readonly System.Collections.Generic.List<StatModifier> skillModifiers = new();
+
+    private void ApplySkills()
+    {
+        foreach (var skill in adventurerDef.startingSkills)
+        {
+            if (skill == null) continue;
+            var mod = skill.CreateModifier(this);
+            Stats.Mediator.AddModifier(mod);
+            skillModifiers.Add(mod);
+        }
     }
 
     protected override void Update()
@@ -572,27 +601,58 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     }
 
     /// <summary>
-    /// Spends gold to advance to the next rank: applies the rank milestone bonuses,
-    /// resets to level 1, and fires OnAdventurerPromoted. Returns false if not eligible,
-    /// not alive, or the guild can't afford the cost.
+    /// Spends gold to advance to the next rank and become the next tier of the class line (a Novice must
+    /// name the line it takes). Resets to level 1 and fires OnAdventurerPromoted. Returns false if not
+    /// eligible, not alive, no next-tier def, or the guild can't afford the cost.
     /// </summary>
-    public bool Promote()
+    public bool Promote(ClassLine line = ClassLine.Novice)
     {
-        if (!CanPromote) return false;
+        if (!CanPromote || NeedsPathPick) return false;
         if (health == null || !health.IsAlive) return false;
 
-        int cost = adventurerDef.PromoteCost(currentRank);
+        if (Line != ClassLine.Novice) line = Line;
+        var next = ClassCatalog.Instance != null ? ClassCatalog.Instance.Get(line, currentRank + 1) : null;
+        if (next == null) return false;
+
+        int cost = PromoteCost;
         if (Inventory.Instance == null || !Inventory.Instance.TrySpendGold(cost)) return false;
 
-        int prevRank = currentRank;
+        string prevClass = ClassName;
         AdvanceRank();
-        GameSignals.RaiseAdventurerPromoted(this, AdventurerRank.Name(prevRank), AdventurerRank.Name(currentRank));
+        SetClassDef(next);
+        GameSignals.RaiseAdventurerPromoted(this, prevClass, ClassName);
         return true;
     }
 
+    /// <summary>Free one-time path pick for a Novice already above Wood: becomes that line's def at its current rank.</summary>
+    public bool ChoosePath(ClassLine line)
+    {
+        if (!NeedsPathPick || line == ClassLine.Novice) return false;
+        var def = ClassCatalog.Instance != null ? ClassCatalog.Instance.Get(line, currentRank) : null;
+        if (def == null) return false;
+        SetClassDef(def);
+        return true;
+    }
+
+    // Swap to another tier def: new base stats (damage multiplier, range…), max HP and starting skills;
+    // level/trait modifiers stay. The unit stays tracked under its hire def in UnitManager — harmless,
+    // adventurer managers have no per-type limits.
+    private void SetClassDef(AdventurerDef next)
+    {
+        adventurerDef = next;
+        def = next;
+        Stats.SetBaseStats(BaseStats.FromEntityDef(next));
+        if (health != null) health.SetMaxHP(next.MaxHealth);
+
+        foreach (var mod in skillModifiers) mod.Dispose();
+        skillModifiers.Clear();
+        ApplySkills();
+    }
+
     /// <summary>
-    /// Load path: replays level-ups and promotions up to the saved rank/level so every stat bonus is
-    /// re-applied exactly as earned — no gold, no signals. Call right after spawn (Init resets to Wood I).
+    /// Load / class-hire path: replays level-ups and rank-ups up to the given rank/level so every stat bonus is
+    /// re-applied exactly as earned — no gold, no signals, no def swap (the unit spawned with its tier def).
+    /// Call right after spawn (Init resets to Wood I).
     /// </summary>
     public void RestoreProgress(int rank, int level, float xp)
     {
@@ -609,17 +669,10 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         currentXP = xp;
     }
 
-    // Rank transition bonuses + reset to level 1 (shared by Promote and RestoreProgress).
+    // Rank transition (shared by Promote and RestoreProgress): attack-speed step + reset to level 1.
+    // Damage/HP per rank come from the tier def (SetClassDef), not from here.
     private void AdvanceRank()
     {
-        // Permanent damage bonus — ID range 1001–1004 (one per rank transition)
-        Stats.Mediator.AddModifier(new BasicStatModifier(
-            StatType.AttackDamage,
-            1000 + currentRank,
-            -1f,
-            v => v * (1f + adventurerDef.rankDamageMultiplier)
-        ));
-
         // Permanent attack speed bonus (reduces interval = faster attacks) — ID range 2001–2004
         Stats.Mediator.AddModifier(new BasicStatModifier(
             StatType.AttackSpeed,
@@ -627,15 +680,6 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             -1f,
             v => v * (1f - adventurerDef.rankAttackSpeedMultiplier)
         ));
-
-        // Max HP bonus applied directly to Health (Health is decoupled from Stats)
-        if (health != null)
-        {
-            float hpRatio = health.HealthPercent;
-            float newMaxHP = health.MaxHP * (1f + adventurerDef.rankHPMultiplier);
-            health.Init(newMaxHP, fullHP: false);
-            health.SetHP(newMaxHP * hpRatio);
-        }
 
         currentRank++;
         currentLevel = 1;

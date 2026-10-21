@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cfaeff72278684abbab7646cb754fa9f, type: 3}
-  m_Name: Lvl 4 Adventuer Temp
+  m_Name: Silver Paladin
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerDef
   prefab: {fileID: 440394158813992520, guid: dd81956239e5c433cbde7b31c8976a97, type: 3}
   useModularCharacter: 1
@@ -18,19 +18,18 @@ MonoBehaviour:
   - {fileID: 0}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
-  id: Novice Adventurer
-  displayName: Novice Adventurer
-  description: 
-  hireCost: 0
-  assignedLayer: 4
-  startingSkills:
-  - {fileID: 0}
+  id: Paladin
+  displayName: Paladin
+  description: Balanced melee
+  hireCost: 1500
+  rank: 4
+  startingSkills: []
   sortingType: 2
   spawnWeight: 1
   moveSpeed: 2
   stopDistance: 0.05
   idleTimeRange: {x: 2, y: 4}
-  attackDamage: 20
+  attackDamage: 50
   attackInterval: 1
   attackRange: 2
   chaseBreakRange: 3
@@ -56,10 +55,31 @@ MonoBehaviour:
   ShirtColourPalette: {fileID: 11400000, guid: 88625ad48b1ef4758b85ab5668f1052e, type: 2}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 11400000, guid: 3f1982374d0784930aea64f7e170ad9c, type: 2}
-  adventurerType: Novice
-  baseHealth: 100
+  classLine: 1
+  classIcon: {fileID: -3743547761521226681, guid: 98b2f1c9237cb4662958fb3b4cdf2261, type: 3}
+  damageMultiplier: 6.5
+  hpMultiplier: 3
+  adventurerType: Paladin
+  baseHealth: 200
+  reviveDelay: 5
+  hitStaggerDuration: 0.4
+  hitStaggerCooldown: 3
   startingState: 1
+  combatConfig:
+    canAttack: 1
+    behaviorType: 2
+    hostileTo: 1
+    territorialRadius: 0
+    attackType: 0
   wanderTimeRange: {x: 5, y: 8}
   returnToSpawn: 0
   leashRange: 0
+  levelsPerRank: 5
+  baseXP: 40
+  xpGrowth: 1.22
+  levelDamageMultiplier: 0.04
+  levelAttackSpeedMultiplier: 0.02
+  maxRank: 5
   basePromoteCost: 1500
+  promoteCostGrowth: 2.5
+  rankAttackSpeedMultiplier: 0.1

@@ -27,6 +27,10 @@ public class AOEDamageSkillDef : SkillDef
     [Min(0.1f)]
     public float damagePerTick = 100f;
 
+    [Tooltip("If > 0, each tick deals this fraction of the owner's AttackDamage instead (scales with class tier/levels)")]
+    [Min(0f)]
+    public float attackDamageFraction = 0f;
+
     [Tooltip("Radius of damage area")]
     [Range(0.5f, 20f)]
     public float radius = 3f;
@@ -60,7 +64,8 @@ public class AOEDamageSkillDef : SkillDef
             radius, 
             tickInterval, 
             duration,
-            targetLayers
+            targetLayers,
+            attackDamageFraction
         );
     }
 

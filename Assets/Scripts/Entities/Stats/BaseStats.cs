@@ -66,6 +66,9 @@ public class BaseStats
             scanRange = def.scanRange
         };
 
+        if (def is AdventurerDef adventurerDef)
+            stats.attackDamage *= adventurerDef.damageMultiplier;   // class tier power curve
+
         if (def is PorterDef porterDef)
         {
             stats.carryCapacity = porterDef.carryCapacity;

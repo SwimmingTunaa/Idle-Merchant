@@ -158,10 +158,14 @@ public class CandidatePool
         candidates.AddRange(newCandidates);
     }
 
-    // Cost scales x1.25 per unit of this role already owned; baked at generation (pool keeps pre-hire prices until refresh)
+    // Cost scales x1.25 per unit of this role already owned; baked at generation (pool keeps pre-hire prices until refresh).
+    // Class hires start from the catalog's premium price (Novice cost + skipped promotions) × 1.4.
     private int BaseCost()
     {
         int owned = ownedCount != null ? ownedCount() : 0;
-        return Mathf.RoundToInt(EntityDef.hireCost * Mathf.Pow(COST_SCALE_PER_OWNED, owned));
+        int baseCost = EntityDef is AdventurerDef ad && ClassCatalog.Instance != null
+            ? ClassCatalog.Instance.HireCost(ad)
+            : EntityDef.hireCost;
+        return Mathf.RoundToInt(baseCost * Mathf.Pow(COST_SCALE_PER_OWNED, owned));
     }
 }

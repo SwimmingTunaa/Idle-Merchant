@@ -58,6 +58,13 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         // One page-level ticker drives every affordable gem's pulse via .roster-pulse (USS transitions the scale)
         pulseItem = leftPage.schedule.Execute(() => leftContent?.ToggleInClassList("roster-pulse")).Every(PulseIntervalMs);
 
+        var cancelPathBtn = rightPage.Q<Button>("path-cancel-btn");
+        if (cancelPathBtn != null)
+        {
+            cancelPathBtn.clicked -= HidePathPicker;
+            cancelPathBtn.clicked += HidePathPicker;
+        }
+
         var dismissBtn = rightPage.Q<Button>("detail-dismiss-btn");
         if (dismissBtn != null)
         {
@@ -228,6 +235,9 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
         SetWorldFocus(agent);
         ShowDetail(agent);
+
+        // Pre-classes veteran (or Recruitment Favor) Novice above Wood: offer the free path pick straight away
+        if (agent.NeedsPathPick) ShowPathPicker(agent);
     }
 
     /// <summary>Outline the hero in the world and lock the camera onto them, moving both off
@@ -272,6 +282,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     private void ShowDetail(AdventurerAgent agent)
     {
         if (rightContent == null) return;
+        HidePathPicker();
 
         var placeholder = rightContent.Q<Label>("roster-placeholder");
         var detailContainer = rightContent.Q<VisualElement>("detail-container");
@@ -332,11 +343,20 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         // Class + layer
         var classLabel = rightContent.Q<Label>("detail-class");
         if (classLabel != null)
-            classLabel.text = "Novice";
+            classLabel.text = agent.ClassName;
+
+        var classIcon = rightContent.Q<VisualElement>("detail-class-icon");
+        if (classIcon != null && agent.ClassDef != null && agent.ClassDef.classIcon != null)
+            classIcon.style.backgroundImage = new StyleBackground(agent.ClassDef.classIcon);
 
         var layerLabel = rightContent.Q<Label>("detail-layer");
         if (layerLabel != null)
             layerLabel.text = GetLayerName(agent.layerIndex);
+
+        // Allowed, but a unit below the layer's rank struggles there (dies and revives)
+        var rankWarning = rightContent.Q<Label>("detail-rank-warning");
+        if (rankWarning != null)
+            rankWarning.style.display = agent.CurrentRank < agent.layerIndex ? DisplayStyle.Flex : DisplayStyle.None;
 
         // Stats
         if (agent.Stats != null)
@@ -417,6 +437,14 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     private void OnPromoteClicked()
     {
         if (selectedAgent == null || !selectedAgent.CanPromote) return;
+
+        // A Novice's promotion is the class pick
+        if (selectedAgent.Line == ClassLine.Novice)
+        {
+            ShowPathPicker(selectedAgent);
+            return;
+        }
+
         selectedAgent.Promote();
         ShowDetail(selectedAgent);
         if (agentSlots.TryGetValue(selectedAgent, out var slot))
@@ -508,6 +536,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             if (kv.Key != null) ApplyPromoteState(kv.Value, kv.Key);
         if (selectedAgent != null)
             RefreshDetailRank(selectedAgent);   // Promote button enable tracks gold too
+        RefreshPathAffordability();
     }
 
     /// <summary>Optional per-rank gem sprite (1-based rank); null falls back to the slot placeholder.</summary>
@@ -535,6 +564,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (xpLabel != null)
         {
             if (agent.IsMaxLevel) xpLabel.text = "Max";
+            else if (agent.NeedsPathPick) xpLabel.text = "Choose a path";
             else if (agent.CanPromote) xpLabel.text = "Ready to Promote";
             else xpLabel.text = $"{agent.CurrentXP:F0} / {agent.XPForNextLevel:F0}";
         }
@@ -556,12 +586,136 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         {
             promoteBtn.style.display = agent.CanPromote ? DisplayStyle.Flex : DisplayStyle.None;
             var promoteLabel = promoteBtn.Q<Label>("detail-promote-label");
+            var next = agent.NextClassDef;
             if (promoteLabel != null)
-                promoteLabel.text = agent.CanPromote ? $"Promote {agent.PromoteCost:N0}" : "Promote";
+                promoteLabel.text = agent.NeedsPathPick ? "Choose a path"
+                    : next != null ? $"Promote » {next.displayName} {agent.PromoteCost:N0}"   // Ithaca has no →
+                    : $"Promote {agent.PromoteCost:N0}";
+            var coin = promoteBtn.Q<VisualElement>("detail-promote-coin");
+            if (coin != null) coin.style.display = agent.NeedsPathPick ? DisplayStyle.None : DisplayStyle.Flex;
             promoteBtn.SetEnabled(Inventory.Instance != null && Inventory.Instance.CanAfford(agent.PromoteCost));
             promoteBtn.clicked -= OnPromoteClicked;
             promoteBtn.clicked += OnPromoteClicked;
         }
+    }
+
+    // ═════════════════════════════════════════════
+    // PATH PICKER (first promotion / free pick)
+    // ═════════════════════════════════════════════
+
+    private static readonly ClassLine[] PathLines = { ClassLine.Warrior, ClassLine.Guardian, ClassLine.Rogue, ClassLine.Mage };
+    private readonly List<VisualElement> pathCards = new();
+
+    /// <summary>"Choose a path": one card per line at the tier the pick lands on. Paid (Wood V → Bronze) or free (pending pick).</summary>
+    private void ShowPathPicker(AdventurerAgent agent)
+    {
+        var picker = rightContent?.Q<VisualElement>("path-picker");
+        var cards = picker?.Q<VisualElement>("path-cards");
+        var catalog = ClassCatalog.Instance;
+        if (cards == null || catalog == null || agent == null) return;
+
+        bool free = agent.NeedsPathPick;
+        int tier = free ? agent.CurrentRank : agent.CurrentRank + 1;
+
+        var subtitle = picker.Q<Label>("path-subtitle");
+        if (subtitle != null)
+            subtitle.text = free
+                ? $"Free pick for a {AdventurerRank.Name(tier)} veteran"
+                : $"Promote to {AdventurerRank.Name(tier)} for {agent.PromoteCost:N0} gold";
+
+        cards.Clear();
+        pathCards.Clear();
+        var baseline = catalog.Get(ClassLine.Warrior, tier);   // balanced line = the "normal" two arrows
+        foreach (var line in PathLines)
+        {
+            var def = catalog.Get(line, tier);
+            if (def == null) continue;
+            var card = BuildPathCard(def, baseline);
+            card.RegisterCallback<ClickEvent>(_ => OnPathPicked(line));
+            cards.Add(card);
+            pathCards.Add(card);
+        }
+
+        rightContent.Q<VisualElement>("detail-container").style.display = DisplayStyle.None;
+        picker.style.display = DisplayStyle.Flex;
+        RefreshPathAffordability();
+    }
+
+    private void HidePathPicker()
+    {
+        if (rightContent == null) return;
+        var picker = rightContent.Q<VisualElement>("path-picker");
+        if (picker == null || picker.style.display == DisplayStyle.None) return;
+        picker.style.display = DisplayStyle.None;
+        pathCards.Clear();
+        if (selectedAgent != null)
+            rightContent.Q<VisualElement>("detail-container").style.display = DisplayStyle.Flex;
+    }
+
+    // Paid picks grey out while gold falls short (re-checked once per frame on GoldChanged)
+    private void RefreshPathAffordability()
+    {
+        if (pathCards.Count == 0 || selectedAgent == null) return;
+        bool ok = selectedAgent.NeedsPathPick
+                  || (Inventory.Instance != null && Inventory.Instance.CanAfford(selectedAgent.PromoteCost));
+        foreach (var c in pathCards) c.SetEnabled(ok);
+    }
+
+    private void OnPathPicked(ClassLine line)
+    {
+        var agent = selectedAgent;
+        if (agent == null) return;
+        bool done = agent.NeedsPathPick ? agent.ChoosePath(line) : agent.Promote(line);
+        if (!done) return;
+
+        ShowDetail(agent);
+        if (agent.Line != ClassLine.Novice && agentSlots.TryGetValue(agent, out var slot))
+            RefreshSlot(slot, agent);
+    }
+
+    private static VisualElement BuildPathCard(AdventurerDef def, AdventurerDef baseline)
+    {
+        var card = new VisualElement();
+        card.AddToClassList("path-card");
+
+        var icon = new VisualElement();
+        icon.AddToClassList("path-card__icon");
+        if (def.classIcon != null) icon.style.backgroundImage = new StyleBackground(def.classIcon);
+        card.Add(icon);
+
+        var name = new Label(def.displayName);
+        name.AddToClassList("path-card__name");
+        card.Add(name);
+
+        var role = new Label(def.description);
+        role.AddToClassList("path-card__role");
+        card.Add(role);
+
+        card.Add(BuildPathStat("DMG", Ratio(def.damageMultiplier, baseline?.damageMultiplier)));
+        card.Add(BuildPathStat("HP", Ratio(def.hpMultiplier, baseline?.hpMultiplier)));
+        card.Add(BuildPathStat("SPD", Ratio(baseline?.attackInterval ?? 0f, def.attackInterval)));   // shorter interval = faster
+        return card;
+    }
+
+    private static float Ratio(float v, float? baseline) => baseline is > 0f ? v / baseline.Value : 1f;
+
+    // Arrows vs the same tier's Warrior: 3 = clearly more (≥1.2×), 2 = about the same, 1 = less
+    private static VisualElement BuildPathStat(string label, float ratio)
+    {
+        var row = new VisualElement();
+        row.AddToClassList("path-stat");
+        var l = new Label(label);
+        l.AddToClassList("path-stat__label");
+        row.Add(l);
+
+        int arrows = ratio >= 1.2f ? 3 : ratio >= 0.85f ? 2 : 1;
+        for (int i = 0; i < arrows; i++)
+        {
+            var a = new VisualElement();
+            a.AddToClassList("path-arrow");
+            row.Add(a);
+        }
+        return row;
     }
 
     // ═════════════════════════════════════════════

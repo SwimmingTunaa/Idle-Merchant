@@ -1828,8 +1828,7 @@ MonoBehaviour:
   operationArea: {fileID: 1242518143}
   _maxUnits: 5
   unitLimits: []
-  hireableDefs:
-  - {fileID: 11400000, guid: 178f8b2081c404e74be48b12e208878a, type: 2}
+  hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &117012853
 GameObject:
@@ -19675,9 +19674,7 @@ MonoBehaviour:
   _layerIndex: 5
   operationArea: {fileID: 1875431948}
   _maxUnits: 10
-  unitLimits:
-  - unitDef: {fileID: 11400000, guid: 6382ecb9d6a2a4377ab376ac63acac61, type: 2}
-    maxCount: 6
+  unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &654019825
@@ -32382,9 +32379,7 @@ MonoBehaviour:
   _layerIndex: 3
   operationArea: {fileID: 1670800987}
   _maxUnits: 10
-  unitLimits:
-  - unitDef: {fileID: 11400000, guid: 19aeb50240abb4c9da06cefd0ac0245f, type: 2}
-    maxCount: 6
+  unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
 --- !u!114 &1036023825
@@ -32471,7 +32466,8 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
-  hireableDefs: []
+  hireableDefs:
+  - {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
   showDebugLogs: 0
   transport: {fileID: 1866519715}
   depositPoint: {fileID: 1426513257}
@@ -33335,9 +33331,7 @@ MonoBehaviour:
   _layerIndex: 4
   operationArea: {fileID: 1804721977}
   _maxUnits: 10
-  unitLimits:
-  - unitDef: {fileID: 11400000, guid: 6382ecb9d6a2a4377ab376ac63acac61, type: 2}
-    maxCount: 6
+  unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &1124415834
@@ -39636,7 +39630,8 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
-  hireableDefs: []
+  hireableDefs:
+  - {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
   showDebugLogs: 0
   transport: {fileID: 1663851992}
   depositPoint: {fileID: 1426513257}
@@ -45694,9 +45689,7 @@ MonoBehaviour:
   _layerIndex: 2
   operationArea: {fileID: 166850357}
   _maxUnits: 10
-  unitLimits:
-  - unitDef: {fileID: 11400000, guid: 351863467aa9345a78d73faa3378d8ff, type: 2}
-    maxCount: 6
+  unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
 --- !u!1 &1769293293
@@ -56734,7 +56727,8 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
-  hireableDefs: []
+  hireableDefs:
+  - {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
   showDebugLogs: 0
   transport: {fileID: 712054821}
   depositPoint: {fileID: 1426513257}
@@ -57337,7 +57331,8 @@ MonoBehaviour:
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
-  hireableDefs: []
+  hireableDefs:
+  - {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
   showDebugLogs: 0
   transport: {fileID: 919667387}
   depositPoint: {fileID: 1426513257}

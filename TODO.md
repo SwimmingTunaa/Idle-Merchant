@@ -22,6 +22,13 @@ Ordered roughly by intended sequence. Pull from the top.
   - **Guild upgrade card icons**: assigned on all three station defs.
 - [ ] **Book close button**: pixel slip "X" hanging off the book's top-right corner (BookPanel), per the crafting mock
 
+## Adventurer classes
+
+- [x] **Classes phase 1** — lines, 17 defs + catalog, tier-gated odds, premium price, path picker, named promotions, save + free-pick migration (see CLASSES_DESIGN.md "Phase 1 as built")
+- [ ] **Classes phase 2 (feel)** — signature mechanics — Warrior cleave, Rogue crits + post-kill dash, Mage bonus vs high-HP mobs (replacing the aura), guardian aggro, class weapon/outfit sprites (all tiers still use the Novice look)
+- [ ] **Playtest the odds / unlock boost / power-curve numbers** (CLASSES_DESIGN "Open" 1)
+- [ ] **Healer + Monk lines** (healer needs targeting AI)
+
 ## Shop depth
 
 - [ ] **Customer archetypes** — buying archetypes done (Commoner / Adventurer 2★ / Noble 3★ budgets + preferred-category fallback). Still open: whale / bulk buyer / window-shopper, and distinct art/palettes for Adventurer + Noble customers (customers don't use the palette system).

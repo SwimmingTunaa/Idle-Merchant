@@ -59,19 +59,14 @@ public static class HireRoster
             return roster;
         }
 
-        // Weighted random selection without duplicates
-        var picked = new HashSet<HiringCandidate>();
-        int maxAttempts = maxCount * 10; // Safety valve to prevent infinite loops
-        int attempts = 0;
-
-        while (roster.Count < maxCount + 1 && attempts < maxAttempts)
+        // Weighted random selection without replacement; an exhausted layer leaves the roll.
+        // (Re-rolling on a repeat used to leak a shallow layer's share to the others — e.g. 5 Novices vs 20 Bronze class candidates.)
+        while (roster.Count < maxCount + 1 && activeLayers.Count > 0 && totalWeight > 0f)
         {
-            attempts++;
-
             // Pick a layer based on weights
             float roll = Random.Range(0f, totalWeight);
             float cumulative = 0f;
-            int selectedLayerIndex = 0;
+            int selectedLayerIndex = activeLayers.Count - 1;
 
             for (int i = 0; i < activeLayers.Count; i++)
             {
@@ -83,22 +78,20 @@ public static class HireRoster
                 }
             }
 
-            int selectedLayer = activeLayers[selectedLayerIndex];
-            var layerCandidates = candidatesByLayer[selectedLayer];
-
             // Pick random candidate from that layer
-            if (layerCandidates.Count == 0) continue;
-
+            var layerCandidates = candidatesByLayer[activeLayers[selectedLayerIndex]];
             int candidateIndex = Random.Range(0, layerCandidates.Count);
-            var candidate = layerCandidates[candidateIndex];
+            roster.Add(layerCandidates[candidateIndex]);
+            layerCandidates.RemoveAt(candidateIndex);
 
-            if (picked.Contains(candidate)) continue;
-
-            picked.Add(candidate);
-            roster.Add(candidate);
+            if (layerCandidates.Count == 0)
+            {
+                totalWeight -= activeWeights[selectedLayerIndex];
+                activeLayers.RemoveAt(selectedLayerIndex);
+                activeWeights.RemoveAt(selectedLayerIndex);
+            }
         }
 
-        Debug.Log($"[HireRoster] Built roster with {roster.Count} candidates from {activeLayers.Count} layers");
         return roster;
     }
 

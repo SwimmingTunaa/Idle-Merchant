@@ -4,6 +4,21 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Data/Adventurer")]
 public class AdventurerDef : EntityDef
 {
+    [Header("Class")]
+    [Tooltip("Class line; tier = the inherited `rank` field (1 = Wood … 5 = Gold). displayName is the class name, description its one-line role.")]
+    public ClassLine classLine = ClassLine.Novice;
+
+    [Tooltip("Job icon shown on the Roster badge, hire card and path picker.")]
+    public Sprite classIcon;
+
+    [Tooltip("AttackDamage multiplier on the def's attackDamage (the CLASSES_DESIGN power-curve table).")]
+    public float damageMultiplier = 1f;
+
+    [Tooltip("Max HP multiplier on baseHealth.")]
+    public float hpMultiplier = 1f;
+
+    public float MaxHealth => baseHealth * hpMultiplier;
+
     [Header("Adventurer Identity")]
     [Tooltip("Display type name (Miner, Militia, Scout, etc.)")]
     public string adventurerType = "Miner";
@@ -51,6 +66,7 @@ public class AdventurerDef : EntityDef
     public float levelAttackSpeedMultiplier = 0.02f;
 
     [Header("Rank & Promote")]
+    // Damage/HP per rank come from the tier def's multipliers (promotion swaps defs); only attack speed still steps per rank.
     [Tooltip("Maximum rank an adventurer can reach.")]
     public int maxRank = 5;
 
@@ -60,14 +76,8 @@ public class AdventurerDef : EntityDef
     [Tooltip("Exponential growth of the promote gold cost per rank (2.5 = ×2.5 each rank).")]
     public float promoteCostGrowth = 2.5f;
 
-    [Tooltip("AttackDamage bonus applied on each promote / rank-up (0.20 = +20%).")]
-    public float rankDamageMultiplier = 0.20f;
-
     [Tooltip("Attack-interval reduction (faster attacks) applied on each promote / rank-up (0.10 = 10% faster).")]
     public float rankAttackSpeedMultiplier = 0.10f;
-
-    [Tooltip("Max HP bonus applied on each promote / rank-up (0.25 = +25%).")]
-    public float rankHPMultiplier = 0.25f;
 
     /// <summary>XP required to go from the given global level (1-based) to the next — exponential.</summary>
     public float XPForLevel(int totalLevel) => baseXP * Mathf.Pow(xpGrowth, Mathf.Max(0, totalLevel - 1));

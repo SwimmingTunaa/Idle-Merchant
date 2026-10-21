@@ -19,8 +19,8 @@ MonoBehaviour:
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Novice Adventurer
-  displayName: Novice Adventurer
-  description: 
+  displayName: Novice
+  description: Classless recruit
   hireCost: 1500
   rank: 1
   startingSkills: []
@@ -55,6 +55,10 @@ MonoBehaviour:
   ShirtColourPalette: {fileID: 11400000, guid: 88625ad48b1ef4758b85ab5668f1052e, type: 2}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 11400000, guid: 3f1982374d0784930aea64f7e170ad9c, type: 2}
+  classLine: 0
+  classIcon: {fileID: -7428873440664082796, guid: 98b2f1c9237cb4662958fb3b4cdf2261, type: 3}
+  damageMultiplier: 1
+  hpMultiplier: 1
   adventurerType: Novice
   baseHealth: 200
   reviveDelay: 5
@@ -70,4 +74,12 @@ MonoBehaviour:
   wanderTimeRange: {x: 5, y: 8}
   returnToSpawn: 0
   leashRange: 0
+  levelsPerRank: 5
+  baseXP: 40
+  xpGrowth: 1.22
+  levelDamageMultiplier: 0.04
+  levelAttackSpeedMultiplier: 0.02
+  maxRank: 5
   basePromoteCost: 1500
+  promoteCostGrowth: 2.5
+  rankAttackSpeedMultiplier: 0.1
