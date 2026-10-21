@@ -42,6 +42,11 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     private Coroutine hitCoroutine;
     private Coroutine deathCoroutine;
 
+    // Class signature state (see the Signature fields on AdventurerDef)
+    private bool pursuitCrit;        // Rogue: next hit after a pursuit dash is a guaranteed crit
+    private Coroutine dashCoroutine; // Rogue pursuit lerp; AI tick + walking pause while it runs
+    private float tauntTimer;        // Guardian: seconds until the next hold-the-line check
+
     // XP, rank & level
     private float currentXP;
     private int currentRank = 1;
@@ -199,11 +204,15 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             combat.OnTargetAcquired += OnCombatTargetAcquired;
             combat.OnTargetLost += OnCombatTargetLost;
             combat.OnDamageDealt += OnCombatDamageDealt;
+            combat.HitOverride = ResolveHit;
         }
+        pursuitCrit = false;
+        tauntTimer = 0f;
         
-        // Starting skills (Mage splash) — Init made a fresh mediator, so the old list is already gone
+        // Starting skills — Init made a fresh mediator, so the old list is already gone
         skillModifiers.Clear();
         ApplySkills();
+        if (health != null) health.DamageTakenMultiplier = 1f - adventurerDef.damageReduction;
 
         ChangeState(adventurerDef.startingState);
     }
@@ -225,7 +234,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     {
         base.Update();
 
-        if (State != AdventurerState.Dead && State != AdventurerState.Hit)
+        if (State != AdventurerState.Dead && State != AdventurerState.Hit && dashCoroutine == null)
             UpdateMovementSmooth();
 
         // Tick hit stagger cooldown
@@ -261,6 +270,8 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             StopCoroutine(hitCoroutine);
             hitCoroutine = null;
         }
+        StopDash();
+        pursuitCrit = false;
 
         ChangeState(AdventurerState.Dead);
     }
@@ -360,6 +371,18 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
     protected override void OnUpdateState(AdventurerState currentState)
     {
+        if (dashCoroutine != null) return;   // mid pursuit dash — the lerp owns the position
+
+        if (adventurerDef.tauntRadius > 0f && currentState != AdventurerState.Dead)
+        {
+            tauntTimer -= TickDelta;
+            if (tauntTimer <= 0f)
+            {
+                tauntTimer = adventurerDef.tauntInterval;
+                HoldTheLine();
+            }
+        }
+
         switch (currentState)
         {
             case AdventurerState.Idle:
@@ -647,6 +670,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         foreach (var mod in skillModifiers) mod.Dispose();
         skillModifiers.Clear();
         ApplySkills();
+        if (health != null) health.DamageTakenMultiplier = 1f - next.damageReduction;
     }
 
     /// <summary>
@@ -686,19 +710,171 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         currentXP = 0f;
     }
 
-    /// <summary>Subscribed to combat.OnDamageDealt — awards XP on kill.</summary>
+    /// <summary>Subscribed to combat.OnDamageDealt — awards XP on kill, then a Rogue pursues.</summary>
     private void OnCombatDamageDealt(GameObject target, float damageDealt)
     {
         if (damageDealt <= 0f || target == null) return;
         if (!target.TryGetComponent<Health>(out var targetHealth)) return;
         if (targetHealth.IsAlive) return; // not a kill
 
+        AwardKillXP(target);
+        if (adventurerDef.pursuitRange > 0f) TryPursuit(target);
+    }
+
+    private void AwardKillXP(GameObject target)
+    {
         if (!target.TryGetComponent<EntityBase>(out var entity)) return;
         if (!(entity.def is MobDef mobDef)) return;
 
         float xp = mobDef.baseXPReward * mobDef.hpMultiplierByLayer.Evaluate(layerIndex);
         GainXP(xp);
     }
+
+    // ═════════════════════════════════════════════
+    // CLASS SIGNATURES
+    // ═════════════════════════════════════════════
+
+    /// <summary>combat.HitOverride: one attack with this tier's procs — Rogue crit, Mage % max-HP bonus,
+    /// Warrior cleave — plus its styled number. Returns damage dealt to the primary target.</summary>
+    private float ResolveHit(Health target)
+    {
+        var d = adventurerDef;
+        float dmg = Stats.AttackDamage;
+
+        bool crit = pursuitCrit || (d.critChance > 0f && Random.value < d.critChance);
+        pursuitCrit = false;
+        if (crit) dmg *= d.critMultiplier;
+
+        float bonus = d.maxHpDamage > 0f ? target.MaxHP * d.maxHpDamage : 0f;
+        float dealt = target.OnDamage(dmg + bonus);
+
+        if (showDebugLogs)
+            Debug.Log($"[AdventurerAgent] {name} hit {target.name}: {dmg:0.#}{(crit ? " CRIT" : "")} +{bonus:0.#} bonus → {dealt:0.#}");
+
+        if (dealt > 0f && DamageNumberManager.Instance != null)
+        {
+            float shown = Mathf.Min(dmg, dealt);   // overkill clamps the bonus first
+            DamageNumberManager.Instance.ShowHitAtEntity(shown, dealt - shown, target.transform,
+                crit ? DamageStyle.Crit : DamageStyle.Normal);
+        }
+
+        if (d.cleaveFraction > 0f) Cleave(target, dmg * d.cleaveFraction, d.cleaveRadius);
+        return dealt;
+    }
+
+    // Warrior: splash every other live mob near the primary target. Plain Health damage, so it never chains.
+    private void Cleave(Health primary, float splash, float radius)
+    {
+        if (MobManager.Instance == null || splash <= 0f) return;
+        Vector3 center = primary.transform.position;
+        int hits = 0;
+
+        foreach (var mob in MobManager.Instance.GetMobsOnLayer(layerIndex))   // copy — a splash kill unregisters
+        {
+            if (mob == null || !mob.IsAlive || mob.gameObject == primary.gameObject) continue;
+            if ((mob.transform.position - center).sqrMagnitude > radius * radius) continue;
+            if (!mob.TryGetComponent<Health>(out var h)) continue;
+
+            float dealt = h.OnDamage(splash);
+            if (dealt <= 0f) continue;
+            hits++;
+            DamageNumberManager.Instance?.ShowHitAtEntity(dealt, 0f, mob.transform, DamageStyle.Splash);
+            if (!h.IsAlive) AwardKillXP(mob.gameObject);
+        }
+
+        if (showDebugLogs)
+            Debug.Log($"[AdventurerAgent] {name} cleave: {hits} splash hits of {splash:0.#}");
+
+        if (hits > 0 && ClickHitVFX.Instance != null)
+            ClickHitVFX.Instance.PlayCleave(CenterOf(primary.transform), transform.localScale.x >= 0f ? 1f : -1f);
+    }
+
+    // Guardian: pull mobs off teammates. Skips mobs already on another taunter so two Guardians don't ping-pong.
+    private void HoldTheLine()
+    {
+        if (MobManager.Instance == null || health == null || !health.IsAlive) return;
+        float r2 = adventurerDef.tauntRadius * adventurerDef.tauntRadius;
+
+        foreach (var mob in MobManager.Instance.GetMobsOnLayer(layerIndex))
+        {
+            if (mob == null || !mob.IsAlive) continue;
+            var mc = mob.Combat;
+            if (mc == null || !mc.HasTarget || mc.CurrentTarget == gameObject) continue;
+            if (!mc.CurrentTarget.TryGetComponent<AdventurerAgent>(out var victim)) continue;
+            if (victim.ClassDef != null && victim.ClassDef.tauntRadius > 0f) continue;
+            if ((mob.transform.position - transform.position).sqrMagnitude > r2) continue;
+            if (!mc.IsValidTarget(gameObject)) continue;
+
+            mc.SetTarget(gameObject);
+            DamageNumberManager.Instance?.ShowText("!", mob.transform, new Color(0.55f, 0.85f, 1f));   // shield blue — reads on gold golems
+            if (showDebugLogs)
+                Debug.Log($"[AdventurerAgent] {name} taunted {mob.name} off {victim.name}");
+        }
+    }
+
+    // Rogue: after a kill, dash to the nearest live mob within range and make the next hit a crit.
+    private void TryPursuit(GameObject killed)
+    {
+        if (MobManager.Instance == null || combat == null || health == null || !health.IsAlive) return;
+        if (State == AdventurerState.Dead || dashCoroutine != null) return;
+
+        MobAgent best = null;
+        float bestD = adventurerDef.pursuitRange * adventurerDef.pursuitRange;
+        foreach (var mob in MobManager.Instance.GetMobsOnLayer(layerIndex))
+        {
+            if (mob == null || !mob.IsAlive || mob.IsDying || mob.gameObject == killed) continue;
+            float d = (mob.transform.position - transform.position).sqrMagnitude;
+            if (d < bestD) { bestD = d; best = mob; }
+        }
+        if (best == null || !combat.IsValidTarget(best.gameObject)) return;   // nothing to chase — stay put
+
+        combat.SetTarget(best.gameObject);
+        pursuitCrit = true;
+        dashCoroutine = StartCoroutine(PursuitDash(best.transform.position));
+        if (State != AdventurerState.Attack && State != AdventurerState.Hit) ChangeState(AdventurerState.Attack);
+    }
+
+    // Short lerp to just inside attack range of the mob, clamped to this unit's wander area (its layer floor).
+    private IEnumerator PursuitDash(Vector3 mobPos)
+    {
+        targetPos = null;
+        Vector3 from = transform.position;
+        Vector3 to = mobPos;
+        to.z = from.z;
+        Vector3 dir = to - from;
+        float dist = dir.magnitude;
+        float stop = Mathf.Min(Stats.AttackRange * 0.5f, dist);
+        Vector3 end = dist > 0.001f ? to - dir / dist * stop : from;
+        if (wanderArea != null)
+        {
+            var b = wanderArea.bounds;
+            end.x = Mathf.Clamp(end.x, b.min.x, b.max.x);
+            end.y = Mathf.Clamp(end.y, Mathf.Min(b.min.y, from.y), Mathf.Max(b.max.y, from.y));
+        }
+
+        FaceDirection(dir.x);
+        ClickHitVFX.Instance?.PlayDust(from);
+
+        float dur = Mathf.Max(0.01f, adventurerDef.pursuitDashTime);
+        for (float t = 0f; t < dur; t += Time.deltaTime)
+        {
+            transform.position = Vector3.Lerp(from, end, t / dur);
+            ClickHitVFX.Instance?.PlayDust(transform.position, 1);   // faint after-image trail
+            yield return null;
+        }
+        transform.position = end;
+        dashCoroutine = null;
+    }
+
+    private void StopDash()
+    {
+        if (dashCoroutine == null) return;
+        StopCoroutine(dashCoroutine);
+        dashCoroutine = null;
+    }
+
+    private static Vector3 CenterOf(Transform t) =>
+        t.TryGetComponent<Collider2D>(out var c) ? c.bounds.center : t.position;
 
     // ═════════════════════════════════════════════
     // CLEANUP
@@ -722,6 +898,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             combat.OnTargetAcquired -= OnCombatTargetAcquired;
             combat.OnTargetLost -= OnCombatTargetLost;
             combat.OnDamageDealt -= OnCombatDamageDealt;
+            combat.HitOverride = null;
             combat.ReleaseTarget();
         }
 
@@ -736,6 +913,8 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             StopCoroutine(deathCoroutine);
             deathCoroutine = null;
         }
+        StopDash();
+        pursuitCrit = false;
         
         base.Despawn();
     }

@@ -58,7 +58,6 @@ public class DamageNumberManager : MonoBehaviour
         if (numberObj.TryGetComponent(out DamageNumber damageNumber))
         {
             damageNumber.Show(damage, spawnPos, isCrit);
-            Debug.Log($"[DamageNumberManager] DamageNumber.Show() called");
         }
         else
         {
@@ -85,6 +84,22 @@ public class DamageNumberManager : MonoBehaviour
             Vector3 spawnPos = entityTransform.position + Vector3.up * offset;
             ShowDamage(damage, spawnPos, isCrit);
         }
+    }
+
+    /// <summary>Adventurer hit number above an entity: crit / cleave-splash style, Mage % max-HP bonus tinted.</summary>
+    public void ShowHitAtEntity(float damage, float bonus, Transform entityTransform, DamageStyle style)
+    {
+        if (damageNumberPrefab == null || entityTransform == null) return;
+
+        float offset = verticalOffset;
+        if (entityTransform.TryGetComponent<Collider2D>(out var col))
+            offset = col.bounds.extents.y + 0.2f;
+        Vector3 spawnPos = entityTransform.position + Vector3.up * offset;
+
+        var numberObj = ObjectPoolManager.Instance.SpawnObject(damageNumberPrefab, spawnPos, Quaternion.identity,
+            ObjectPoolManager.PoolType.GameObject);
+        if (numberObj != null && numberObj.TryGetComponent(out DamageNumber damageNumber))
+            damageNumber.ShowHit(damage, bonus, spawnPos, style);
     }
 
     /// <summary>

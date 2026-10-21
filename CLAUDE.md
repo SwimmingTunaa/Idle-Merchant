@@ -96,7 +96,7 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 `HiringCandidate` struct holds all per-candidate state; `newspaperName` is assigned once at generation, stable across re-populates
 
 ### Adventurer Classes (`Entities/Adventuers/ClassCatalog.cs`, design in `CLASSES_DESIGN.md`)
-- `ClassLine` enum (Novice, Warrior, Guardian, Rogue, Mage — serialized ints, append only); one `AdventurerDef` per line × tier in `Prefabs/Entities/Adventurers/Classes/` + `Lvl 1 Novice`. Tier = the def's `rank`; `displayName` = class name, `description` = role line, `classIcon`, `damageMultiplier` / `hpMultiplier` (applied in `BaseStats.FromEntityDef` / `AdventurerDef.MaxHealth`); Rogue = 1.4× attack speed (`attackInterval` 0.71), Mage = `Mage Splash` starting skill
+- `ClassLine` enum (Novice, Warrior, Guardian, Rogue, Mage — serialized ints, append only); one `AdventurerDef` per line × tier in `Prefabs/Entities/Adventurers/Classes/` + `Lvl 1 Novice`. Tier = the def's `rank`; `displayName` = class name, `description` = role line, `classIcon`, `damageMultiplier` / `hpMultiplier` (applied in `BaseStats.FromEntityDef` / `AdventurerDef.MaxHealth`); Rogue = 1.4× attack speed (`attackInterval` 0.71), Mage = slower heavy hits (`attackInterval` 1.25)
 - `Resources/ClassCatalog.asset` (`ClassCatalog.Instance`) lists every hireable adventurer def + tier weights, unlock boost and hire premium. The hire board builds adventurer pools from it (one per def, gated `rank <= maxUnlockedLayer`); AdventurerManagers' `hireableDefs` are empty and unused — porters still use theirs
 - `AdventurerAgent.Promote(line)` = AdvanceRank + `SetClassDef(next tier)` (base stats, max HP, skills swap; level/trait modifiers stay). A Novice must name a line (Roster "Choose a path" picker); `NeedsPathPick` (Novice above Wood) → free `ChoosePath(line)`, counted by `CanPromote` with `PromoteCost` 0
 - Spawn/restore never swaps defs: units spawn with their tier def and `RestoreProgress` replays ranks/levels; `SpawnUnitWithCandidate` joins at `max(startRank, def.rank)`
@@ -210,6 +210,7 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **Class tier defs are save keys** — the roster saves the adventurer's *current* tier def name; class def asset names (`Bronze Warrior` … `Gold Archmage`, `Lvl 1 Novice`) are final. An unknown adventurer def restores as the Novice (free path pick if above Wood) — never orphaned
 - **Class power lives on the tier def, not on promotion** — don't reintroduce per-rank damage/HP modifiers in `AdvanceRank`; tune `damageMultiplier` / `hpMultiplier` on the def (only attack speed still steps per rank)
 - **New adventurer classes/tiers go in `ClassCatalog.defs`** — not on a layer manager's `hireableDefs`
+- **Class signatures are data on the tier def** — cleave / taunt + damage reduction / crit + pursuit / % max-HP fields on `AdventurerDef` (on iff > 0); resolved in `AdventurerAgent.ResolveHit` via `CombatBehavior.HitOverride`. Splash and other secondary damage go straight to `Health.OnDamage` so procs never chain
 - **`lastPlayedUtc` means "collected up to", not "last seen"** — while a welcome-back award is unclaimed it's saved as `now − pendingAway` and rates freeze, so quitting on the panel re-offers the identical award; don't "fix" it to `UtcNow`
 
 ---

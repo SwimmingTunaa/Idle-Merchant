@@ -47,6 +47,9 @@ public class Health : MonoBehaviour, IDamageable
     public bool IsDead => isDead;
     public bool IsInvulnerable { get => isInvulnerable; set => isInvulnerable = value; }
 
+    /// <summary>Scales every incoming hit (Guardian damage reduction). Owners that use it set it in their Init.</summary>
+    public float DamageTakenMultiplier { get; set; } = 1f;
+
     // ===== INITIALIZATION =====
     
     void Awake()
@@ -106,6 +109,7 @@ public class Health : MonoBehaviour, IDamageable
         if (isDead) return 0f;
         if (isInvulnerable) return 0f;
 
+        amount *= DamageTakenMultiplier;
         float actualDamage = Mathf.Min(amount, currentHP);
         float overkill = amount - actualDamage;
         

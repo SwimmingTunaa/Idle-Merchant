@@ -1,6 +1,6 @@
 # Adventurer Classes — Design Doc
 
-Status: **phase 1 built** (2026-10-21) — see "Phase 1 as built" at the end · Owner: Tuan
+Status: **phase 2 built** (2026-10-21) — see "Phase 1 as built" and "Phase 2 as built" at the end · Owner: Tuan
 
 ## Why
 
@@ -18,7 +18,7 @@ Novice is the classless Wood tier. At the first promotion (Wood V → Bronze) th
 | Warrior | Warrior | Knight | Paladin | Champion | balanced melee |
 | Guardian | Guardian | Defender | Bulwark | Juggernaut | high HP, low damage |
 | Rogue | Rogue | Assassin | Shadowblade | Nightstalker | fast strikes, fragile |
-| Mage | Mage | Sorcerer | Wizard | Archmage | splash damage, fragile |
+| Mage | Mage | Sorcerer | Wizard | Archmage | heavy hits, % max-HP damage, fragile |
 
 Four lines to start. Healer and Monk are reserved for later (a healer needs new targeting AI).
 
@@ -70,12 +70,12 @@ Multipliers on the Novice base (50 damage, 200 HP), per tier, before per-level b
 
 | Tier | Warrior dmg / HP | Guardian dmg / HP | Rogue dmg / HP | Mage dmg / HP |
 |---|---|---|---|---|
-| Bronze | 2.0 / 1.7 | 1.2 / 3.0 | 1.8 / 1.2 | 2.3 / 1.1 + splash |
-| Iron | 4.5 / 2.8 | 2.7 / 5.0 | 4.0 / 2.0 | 5.2 / 1.8 + splash |
-| Silver | 6.5 / 3.0 | 3.9 / 5.5 | 5.8 / 2.1 | 7.5 / 1.9 + splash |
-| Gold | 15 / 5.0 | 9.0 / 9.0 | 13.4 / 3.5 | 17 / 3.2 + splash |
+| Bronze | 2.0 / 1.7 | 1.2 / 3.0 | 1.8 / 1.2 | 2.5 / 1.1 |
+| Iron | 4.5 / 2.8 | 2.7 / 5.0 | 4.0 / 2.0 | 5.6 / 1.8 |
+| Silver | 6.5 / 3.0 | 3.9 / 5.5 | 5.8 / 2.1 | 8.1 / 1.9 |
+| Gold | 11 / 5.0 | 6.6 / 9.0 | 9.8 / 3.5 | 13.8 / 3.2 |
 
-Rogues attack 1.4× as often (`attackInterval` 0.71) for lower damage per hit — same DPS band as the old Archer; Mages hit a small area (the existing AOE skill). The old flat rank multipliers (+20% / +25%) are replaced by these tables. Numbers are starting points for playtest.
+Rogues attack 1.4× as often (`attackInterval` 0.71) for lower damage per hit; Mages attack slower (`attackInterval` 1.25) for heavier hits — same base DPS as the Warrior. Phase 2 retuned Mage and Gold (see "Phase 2 as built"). The old flat rank multipliers (+20% / +25%) are replaced by these tables. Numbers are starting points for playtest.
 
 A weak unit in a deep layer is allowed — it just struggles (dies and revives). The assign/hire screen shows a "below this layer's rank" warning.
 
@@ -121,3 +121,33 @@ Deviations / decisions:
 - **Unlock boost isn't saved** — quitting inside the 10-minute window drops the rest; a save load's replayed unlock signals don't start one.
 - **HireRoster now draws without replacement** — the old re-roll-on-duplicate leaked the shallow Novice pool's share to the 4× deeper class tiers (measured 57/43 instead of 67/33 with two tiers).
 - Promoted units stay tracked under their hire def in `UnitManager.spawnedByType` (harmless: adventurer managers have no per-type limits).
+
+## Phase 2 as built (2026-10-21) — signature mechanics
+
+Every number lives on the tier `AdventurerDef` ("Signature" headers); a mechanic is on iff its number is > 0, so the line is just whichever fields its defs fill. Hit resolution is `AdventurerAgent.ResolveHit` (wired as `CombatBehavior.HitOverride`); the kill hook (XP) is `OnCombatDamageDealt`.
+
+| Line | Mechanic | Bronze | Iron | Silver | Gold |
+|---|---|---|---|---|---|
+| Warrior | **Cleave** — every hit also deals X% of the hit to each other live mob within R of the primary target (plain `Health` damage, so splash never chains; splash kills give XP) | 40% · R 1.5 | 45% · 1.5 | 50% · 1.75 | 60% · 2.0 |
+| Guardian | **Hold the line** — every 1 s, mobs within R whose target is another adventurer switch to the Guardian (skips mobs already on another Guardian, so two don't ping-pong); takes Y% less damage (`Health.DamageTakenMultiplier`) | R 4 · 15% | 4.5 · 20% | 5 · 25% | 6 · 30% |
+| Rogue | **Crits** C% for ×M. **Pursuit** — after a kill, a 0.12 s lerp to the nearest live same-layer mob within 3 (lands at ½ attack range, clamped to the wander area; no target = no dash); the next hit is a guaranteed crit | 20% ×2 | 25% ×2.25 | 30% ×2.5 | 35% ×3 |
+| Mage | **Arcane weight** — each hit adds P% of the target's *max* HP; `attackInterval` 1.25; `Mage Splash` removed from the defs (asset kept) | 2% | 3% | 4% | 5% |
+
+Feedback: crits = big gold number (24 pt, 1.4× lifetime); cleave splash = small grey numbers + a white/gold slash arc at the primary target (only when something was splashed); Mage bonus = violet "+N" after the hit number; pursuit = dust puff at the start + faint dust trail; taunt = a "!" over the switched mob. Particles via `ClickHitVFX` (`PlayCleave`, `PlayDust`, sorting 10000).
+
+UI: each tier def's `description` (role line) names its mechanic — "Cleaves nearby mobs" / "Draws aggro, takes less damage" / "Crits and pursues" / "Heavy hits, % max-HP damage". The path picker shows it; Roster detail leads the description box with it in bold (runtime UI Toolkit has no tooltips).
+
+### Rebalance
+
+Live average mob HP (spawn-weighted, × the layer curve): L2 420 · L3 1,179 · L4 1,860 · L5 4,101 — higher than the phase-1 table. Damage per hit at rank N, level I (incl. the earned +4%/level bumps, ×1.17 / ×1.37 / ×1.60 / ×1.87), and hits to kill that average mob before procs:
+
+| Rank → layer | Warrior | Guardian | Rogue | Mage (+ % max HP) |
+|---|---|---|---|---|
+| Bronze → L2 | 117 · 3.6 | 70 · 6.0 | 105 · 4.0 | 146 · 2.9 (2.7) |
+| Iron → L3 | 308 · 3.8 | 185 · 6.4 | 274 · 4.3 | 383 · 3.1 (2.8) |
+| Silver → L4 | 520 · 3.6 | 312 · 6.0 | 464 · 4.0 | 649 · 2.9 (2.6) |
+| Gold → L5 | 1,030 · 4.0 | 618 · 6.6 | 918 · 4.5 | 1,292 · 3.2 (2.7) |
+
+- **Gold tier damage cut ×0.73** for every line (Warrior 15 → 11, Guardian 9 → 6.6, Rogue 13.4 → 9.8): with the level bumps Gold one-shotted the table at ~2.9 hits. HP unchanged.
+- **Mage** multipliers = Warrior × 1.25 (2.5 / 5.6 / 8.1 / 13.8) so base DPS matches the Warrior at the slower interval; the % max-HP bonus is the upside (a levelled Iron Sorcerer hit a debug-spawned Demon Lord on L3, 7,222 HP, for 431 + 217 vs the Knight's 333).
+- **Rogue** keeps its ratio to the Warrior (0.9× per hit at 1.4× speed); crits add ×1.2 / 1.31 / 1.45 / 1.7 expected damage, so it is the single-target DPS line. **Guardian** keeps its HP and ~0.6× damage; the damage cut and aggro are its job.

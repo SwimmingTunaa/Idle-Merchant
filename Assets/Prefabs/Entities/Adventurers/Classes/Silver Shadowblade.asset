@@ -20,7 +20,7 @@ MonoBehaviour:
   shopSprite: {fileID: 0}
   id: Sharpshooter
   displayName: Shadowblade
-  description: Fast strikes, fragile
+  description: Crits and pursues
   hireCost: 1500
   rank: 4
   startingSkills: []
@@ -83,3 +83,13 @@ MonoBehaviour:
   basePromoteCost: 1500
   promoteCostGrowth: 2.5
   rankAttackSpeedMultiplier: 0.1
+  cleaveFraction: 0
+  cleaveRadius: 1.5
+  tauntRadius: 0
+  tauntInterval: 1
+  damageReduction: 0
+  critChance: 0.3
+  critMultiplier: 2.5
+  pursuitRange: 3
+  pursuitDashTime: 0.12
+  maxHpDamage: 0

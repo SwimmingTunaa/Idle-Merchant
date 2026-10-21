@@ -20,18 +20,17 @@ MonoBehaviour:
   shopSprite: {fileID: 0}
   id: Mage
   displayName: Mage
-  description: Splash damage, fragile
+  description: Heavy hits, % max-HP damage
   hireCost: 1500
   rank: 2
-  startingSkills:
-  - {fileID: 11400000, guid: 91a7ab1a564fa4bd381df09ce4e3d558, type: 2}
+  startingSkills: []
   sortingType: 2
   spawnWeight: 1
   moveSpeed: 2
   stopDistance: 0.05
   idleTimeRange: {x: 2, y: 4}
   attackDamage: 50
-  attackInterval: 1
+  attackInterval: 1.25
   attackRange: 2
   chaseBreakRange: 3
   scanRange: 10
@@ -58,7 +57,7 @@ MonoBehaviour:
   HairColourPalette: {fileID: 11400000, guid: 3f1982374d0784930aea64f7e170ad9c, type: 2}
   classLine: 4
   classIcon: {fileID: -6162387550749922106, guid: 98b2f1c9237cb4662958fb3b4cdf2261, type: 3}
-  damageMultiplier: 2.3
+  damageMultiplier: 2.5
   hpMultiplier: 1.1
   adventurerType: Mage
   baseHealth: 200
@@ -84,3 +83,13 @@ MonoBehaviour:
   basePromoteCost: 1500
   promoteCostGrowth: 2.5
   rankAttackSpeedMultiplier: 0.1
+  cleaveFraction: 0
+  cleaveRadius: 1.5
+  tauntRadius: 0
+  tauntInterval: 1
+  damageReduction: 0
+  critChance: 0
+  critMultiplier: 2
+  pursuitRange: 0
+  pursuitDashTime: 0.12
+  maxHpDamage: 0.02

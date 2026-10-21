@@ -315,7 +315,9 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         {
             string desc = agent.Identity?.description;
             if (string.IsNullOrEmpty(desc)) desc = "Ready for work. Probably.";
-            descLabel.text = desc;
+            // Class role line (its signature mechanic) leads the flavour text — runtime UITK has no tooltips
+            string role = agent.ClassDef != null ? agent.ClassDef.description : null;
+            descLabel.text = string.IsNullOrEmpty(role) ? desc : $"<b>{role}.</b> {desc}";
             descLabel.style.display = DisplayStyle.Flex;
             Debug.Log($"[RosterPanel] description label found. Identity={(agent.Identity != null ? "set" : "NULL")} desc=\"{desc}\"");
         }

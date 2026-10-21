@@ -194,6 +194,32 @@ public class ClickHitVFX : MonoBehaviour
         }
     }
 
+    /// <summary>Warrior cleave: a quick white slash arc sweeping across the primary target, opening toward facing (±1).</summary>
+    public void PlayCleave(Vector3 pos, float facing)
+    {
+        pos.z = 0f;
+        const int n = 11;
+        for (int i = 0; i < n; i++)
+        {
+            // arc over the top from back to front; later points live longer so it reads as a sweep
+            float a = Mathf.Lerp(2.6f, -0.5f, i / (n - 1f));
+            var dir = new Vector3(Mathf.Cos(a) * facing, Mathf.Sin(a), 0f);
+            Emit(sparks, pos + dir * 0.75f, dir * 0.9f, i % 3 == 0 ? sparkGold : sparkWhite, 0.12f + i * 0.012f, 0.24f);
+        }
+    }
+
+    /// <summary>Faint dust puff / dash after-image speck (Rogue pursuit). Small grey squares that drift up and fade.</summary>
+    public void PlayDust(Vector3 pos, int count = 5)
+    {
+        pos.z = 0f;
+        var dust = new Color(0.78f, 0.72f, 0.62f, 0.55f);
+        for (int i = 0; i < count; i++)
+        {
+            var v = new Vector3(Random.Range(-0.8f, 0.8f), Random.Range(0.2f, 0.9f), 0f);
+            Emit(sparks, pos + new Vector3(Random.Range(-0.15f, 0.15f), 0f, 0f), v, dust, Random.Range(0.22f, 0.32f), Random.Range(0.12f, 0.2f));
+        }
+    }
+
     private IEnumerator HitStop()
     {
         // Respect pause (timescale 0) and the 1/2/3 speed keys: restore whatever was set.

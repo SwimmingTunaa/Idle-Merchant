@@ -23,6 +23,10 @@ public class CombatBehavior : MonoBehaviour
     /// <summary>Fired when damage is dealt. Args: (target, damageDealt)</summary>
     public event Action<GameObject, float> OnDamageDealt;
 
+    /// <summary>Optional owner hook: lands one attack on the target (procs, styled number) and returns the damage
+    /// dealt. Unset = a plain AttackDamage hit with a normal number. Fired before OnDamageDealt.</summary>
+    public Func<Health, float> HitOverride;
+
     // ===== CONFIGURATION =====
     
     [Header("Combat Config")]
@@ -266,12 +270,18 @@ public class CombatBehavior : MonoBehaviour
         
         if (currentTarget.TryGetComponent<Health>(out var targetHealth))
         {
-            float damageDealt = targetHealth.OnDamage(stats.AttackDamage);
+            float damageDealt;
+            if (HitOverride != null)
+                damageDealt = HitOverride(targetHealth);
+            else
+            {
+                damageDealt = targetHealth.OnDamage(stats.AttackDamage);
+                if (damageDealt > 0f && DamageNumberManager.Instance != null)
+                    DamageNumberManager.Instance.ShowDamageAtEntity(damageDealt, currentTarget.transform);
+            }
 
+            // Last: a kill handler may retarget (Rogue pursuit)
             OnDamageDealt?.Invoke(currentTarget, damageDealt);
-
-            if (damageDealt > 0f && DamageNumberManager.Instance != null)
-                DamageNumberManager.Instance.ShowDamageAtEntity(damageDealt, currentTarget.transform);
 
             if (damageDealt <= 0f)
             {
@@ -306,7 +316,7 @@ public class CombatBehavior : MonoBehaviour
     /// <summary>
     /// Check if a GameObject is a valid target based on hostility rules.
     /// </summary>
-    private bool IsValidTarget(GameObject target)
+    public bool IsValidTarget(GameObject target)
     {
         if (target == null) return false;
         if (target == gameObject) return false;

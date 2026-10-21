@@ -20,7 +20,7 @@ MonoBehaviour:
   shopSprite: {fileID: 0}
   id: Juggernaut
   displayName: Juggernaut
-  description: High HP, low damage
+  description: Draws aggro, takes less damage
   hireCost: 1500
   rank: 5
   startingSkills: []
@@ -57,7 +57,7 @@ MonoBehaviour:
   HairColourPalette: {fileID: 11400000, guid: 3f1982374d0784930aea64f7e170ad9c, type: 2}
   classLine: 2
   classIcon: {fileID: 1656012810033643786, guid: 98b2f1c9237cb4662958fb3b4cdf2261, type: 3}
-  damageMultiplier: 9
+  damageMultiplier: 6.6
   hpMultiplier: 9
   adventurerType: Juggernaut
   baseHealth: 200
@@ -83,3 +83,13 @@ MonoBehaviour:
   basePromoteCost: 1500
   promoteCostGrowth: 2.5
   rankAttackSpeedMultiplier: 0.1
+  cleaveFraction: 0
+  cleaveRadius: 1.5
+  tauntRadius: 6
+  tauntInterval: 1
+  damageReduction: 0.3
+  critChance: 0
+  critMultiplier: 2
+  pursuitRange: 0
+  pursuitDashTime: 0.12
+  maxHpDamage: 0

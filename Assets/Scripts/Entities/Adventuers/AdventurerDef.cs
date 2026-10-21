@@ -79,6 +79,33 @@ public class AdventurerDef : EntityDef
     [Tooltip("Attack-interval reduction (faster attacks) applied on each promote / rank-up (0.10 = 10% faster).")]
     public float rankAttackSpeedMultiplier = 0.10f;
 
+    // Class signature mechanics (CLASSES_DESIGN phase 2). Data-driven: a mechanic is on iff its number is > 0,
+    // so the line is just whichever fields its tier defs fill in.
+    [Header("Signature: Warrior cleave")]
+    [Tooltip("Each hit also deals this fraction of the hit to every other mob within Cleave Radius of the primary target (never chains). 0 = off.")]
+    public float cleaveFraction;
+    public float cleaveRadius = 1.5f;
+
+    [Header("Signature: Guardian hold the line")]
+    [Tooltip("Mobs within this radius that are attacking another adventurer switch to this unit. 0 = off.")]
+    public float tauntRadius;
+    [Tooltip("Seconds between taunt re-checks.")]
+    public float tauntInterval = 1f;
+    [Tooltip("Fraction of incoming damage ignored (0.15 = takes 15% less).")]
+    [Range(0f, 0.9f)] public float damageReduction;
+
+    [Header("Signature: Rogue crits + pursuit")]
+    [Tooltip("Chance per hit to crit. 0 = off.")]
+    [Range(0f, 1f)] public float critChance;
+    public float critMultiplier = 2f;
+    [Tooltip("After a kill, dash to the nearest live mob within this range; the next hit is a guaranteed crit. 0 = off.")]
+    public float pursuitRange;
+    public float pursuitDashTime = 0.12f;
+
+    [Header("Signature: Mage arcane weight")]
+    [Tooltip("Bonus damage per hit as a fraction of the target's max HP (0.02 = 2%). 0 = off.")]
+    public float maxHpDamage;
+
     /// <summary>XP required to go from the given global level (1-based) to the next — exponential.</summary>
     public float XPForLevel(int totalLevel) => baseXP * Mathf.Pow(xpGrowth, Mathf.Max(0, totalLevel - 1));
 

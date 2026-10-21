@@ -36,6 +36,7 @@ public class MobAgent : EntityStateMachine<MobState>, IEntity
     // IEntity implementation
     public  EntityType EntityType => EntityType.Mob;
     public  bool IsAlive => health != null && health.IsAlive;
+    public CombatBehavior Combat => combat;
 
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;

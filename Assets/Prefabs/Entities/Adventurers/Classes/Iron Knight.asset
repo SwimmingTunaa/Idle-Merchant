@@ -20,7 +20,7 @@ MonoBehaviour:
   shopSprite: {fileID: 0}
   id: Knight
   displayName: Knight
-  description: Balanced melee
+  description: Cleaves nearby mobs
   hireCost: 1500
   rank: 3
   startingSkills: []
@@ -83,3 +83,13 @@ MonoBehaviour:
   basePromoteCost: 1500
   promoteCostGrowth: 2.5
   rankAttackSpeedMultiplier: 0.1
+  cleaveFraction: 0.45
+  cleaveRadius: 1.5
+  tauntRadius: 0
+  tauntInterval: 1
+  damageReduction: 0
+  critChance: 0
+  critMultiplier: 2
+  pursuitRange: 0
+  pursuitDashTime: 0.12
+  maxHpDamage: 0
