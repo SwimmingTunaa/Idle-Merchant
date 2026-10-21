@@ -1033,6 +1033,11 @@ public class GameDebugger : EditorWindow
 
     static void OnPlayModeStateChanged(PlayModeStateChange state)
     {
+        // A mid-play domain reload ("Recompile And Continue Playing") nulls every singleton and non-serialized
+        // field (Stats' mediator, Health's flash timer) → NRE flood. Defer script reloads until play stops.
+        if (state == PlayModeStateChange.EnteredPlayMode) EditorApplication.LockReloadAssemblies();
+        else if (state == PlayModeStateChange.ExitingPlayMode) EditorApplication.UnlockReloadAssemblies();
+
         if (state == PlayModeStateChange.EnteredEditMode && SessionState.GetBool(ReenterPlayKey, false))
         {
             SessionState.EraseBool(ReenterPlayKey);

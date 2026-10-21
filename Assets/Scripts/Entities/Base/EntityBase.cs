@@ -63,6 +63,8 @@ public class EntityBase : MonoBehaviour
     public virtual void Init(EntityDef entityDef, int layer, Spawner spawner, Collider2D playArea)
     {
         def = entityDef;
+        // Every spawn path routes here; the prefab's appearance manager has no def until this (its Start reads it).
+        if (appearanceManager != null) appearanceManager.SetEntityDef(entityDef);
         layerIndex = layer;
         spawnedFrom = spawner;
         wanderArea = playArea;

@@ -43,10 +43,10 @@ Ordered roughly by intended sequence. Pull from the top.
 - [ ] **Elevator/Teleporter transport upgrades** — don't exist; ElevatorNow + WizardsOnPayroll milestones were re-typed to porter hires as placeholders, restore to UpgradePurchased when built.
 - [ ] **Orphaned Guild UXMLs** — GuildUpgradePanel.uxml, Guild_Left.uxml, Guild_Right.uxml look unreferenced; confirm and delete.
 - [ ] **"3 Stars" milestone filenames** — named Milestone_2Star_* (data is correct, names lie).
-- [ ] **Mob "Hit" flinch** — MobAgent fires the Hit trigger but mob controllers lack the param (console warning per non-lethal hit); add flinch states or guard the call.
+- [x] **Mob "Hit" flinch** — `Mob Controller` has no `Hit` param; `MobAgent` now caches `hasHitParam` in Init and skips the trigger (no flinch states added).
 - [x] **Stray empty save write** — root cause: `SaveManager.OnApplicationPause(true)` saved, and the editor raises that pause whenever the Unity window loses focus with run-in-background off, so a save landed the moment focus left (reproduced 2026-10-20: a 16 s-old save written while the editor was unfocused). Pause-saves are now `#if !UNITY_EDITOR`; autosave + quit still save in the editor, so agents still back up and suspend.
 - [x] **Inventory "reserve" stepper** now sets the keep-N floor but still said "reserve" — relabelled KEEP (batch 3a). Contracts hand-ins deliberately ignore floors (explicit player action).
-- [ ] **First-play NREs** — Stats.cs:196 / Health.cs:91 throw on a fresh play session (seen repeatedly by agents; also CharacterAppearanceManager.Start entityDef null). Root-cause the init order.
+- [x] **First-play NREs** — not init order: Stats/Health NREs came from a mid-play domain reload ("Recompile And Continue Playing" pref) nulling non-serialized fields + singletons; `GameDebugger` now locks assembly reload during play. The `CharacterAppearanceManager.Start` NRE was the def-only `SpawnUnit(def)` path never assigning the appearance def; `EntityBase.Init` now sets it for every spawn.
 
 ## Older backlog
 

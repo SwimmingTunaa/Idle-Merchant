@@ -115,7 +115,6 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
          //apply appearance from candidate
         if (agent.appearanceManager != null && advDef.useModularCharacter)
         {
-            agent.appearanceManager.SetEntityDef(advDef);
             agent.appearanceManager.SetAppearanceIndices(candidate.appearanceIndices);
             agent.appearanceManager.ApplyAppearance();
         }

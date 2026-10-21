@@ -29,6 +29,7 @@ public class MobAgent : EntityStateMachine<MobState>, IEntity
     private CountdownTimer stunTimer;
     private CountdownTimer idleTimer;
     private CountdownTimer stateTimer; // For timed states like Seek
+    private bool hasHitParam;          // mob controllers have no Hit trigger; SetTrigger would warn every hit
     
     private const int STUN_MODIFIER_ID = -999;
     private List<AdventurerAgent> reservedBy = new List<AdventurerAgent>();
@@ -45,6 +46,10 @@ public class MobAgent : EntityStateMachine<MobState>, IEntity
     {
         base.Init(entityDef, layer, spawner, playArea);
         mobDef = (MobDef)entityDef;
+
+        hasHitParam = false;
+        foreach (var p in animator.parameters)
+            if (p.nameHash == AnimHash.Damage) { hasHitParam = true; break; }
         
         // Initialize health
         health = GetComponent<Health>();
@@ -90,7 +95,7 @@ public class MobAgent : EntityStateMachine<MobState>, IEntity
     
     private void OnHealthDamaged(float damageApplied, float currentHP, float maxHP)
     {
-        animator.SetTrigger(AnimHash.Damage);
+        if (hasHitParam) animator.SetTrigger(AnimHash.Damage);
         
         // Notify combat system (for defensive mobs)
         if (combat != null)

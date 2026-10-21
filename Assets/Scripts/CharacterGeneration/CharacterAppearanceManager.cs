@@ -156,6 +156,7 @@ public class CharacterAppearanceManager : MonoBehaviour
 
     public void ApplyAppearance()
     {
+        autoChangeOnStart = false; // an applied (saved/candidate) look must survive Start's randomise
         if (entityDef.shirtSpriteLibraries?.Length > 0)
             shirtReference.spriteLibraryAsset = entityDef.shirtSpriteLibraries[appearanceIndices.shirt];
         if (entityDef.pantsSpriteLibraries?.Length > 0)
