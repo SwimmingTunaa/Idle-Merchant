@@ -488,8 +488,14 @@ public class HireController : BasePanelController
             ? ProgressionManager.Instance.maxUnlockedLayer
             : 1;
 
+        // A rebuilt dungeon level leaves empty slots here; one empty slot used to NRE every pool's cost lambda
+        for (int i = 0; i < managers.Count; i++)
+            if (managers[i] == null)
+                Debug.LogError($"[HireController] {role} manager slot {i + 1} is empty — assign that layer's manager on the Hiring Menu");
+
         foreach (var m in managers)
         {
+            if (m == null) continue;
             foreach (var def in m.HireableDefs)
             {
                 if (def == null) continue;
@@ -504,7 +510,7 @@ public class HireController : BasePanelController
                 var pool = new CandidatePool(role, m.LayerIndex, def, refreshIntervalSeconds, traitChance, () =>
                 {
                     int owned = 0;
-                    foreach (var mgr in managers) owned += mgr.GetTotalCount();
+                    foreach (var mgr in managers) if (mgr != null) owned += mgr.GetTotalCount();
                     return owned;
                 });
                 candidatePools[key] = pool;
@@ -790,7 +796,7 @@ public class HireController : BasePanelController
         {
             foreach (var m in adventurerManagers)
             {
-                if (m.LayerIndex == selectedLayer)
+                if (m != null && m.LayerIndex == selectedLayer)
                     return m.HireUnit(c);
             }
         }
@@ -798,7 +804,7 @@ public class HireController : BasePanelController
         {
             foreach (var m in porterManagers)
             {
-                if (m.LayerIndex == selectedLayer)
+                if (m != null && m.LayerIndex == selectedLayer)
                     return m.HireUnit(c);
             }
         }
@@ -874,9 +880,9 @@ public class HireController : BasePanelController
 
         IUnitManager manager = null;
         if (currentTab == TabType.Adventurers)
-            manager = adventurerManagers.Find(m => m.LayerIndex == selectedLayer);
+            manager = adventurerManagers.Find(m => m != null && m.LayerIndex == selectedLayer);
         else
-            manager = porterManagers.Find(m => m.LayerIndex == selectedLayer);
+            manager = porterManagers.Find(m => m != null && m.LayerIndex == selectedLayer);
 
         if (manager == null)
         {
