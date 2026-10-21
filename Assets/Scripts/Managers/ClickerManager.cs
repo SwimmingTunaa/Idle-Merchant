@@ -80,6 +80,7 @@ public class ClickerManager : MonoBehaviour
     private bool isShockwaveActive = false;
 
     private AdventurerAgent hoveredAdv;
+    private WorkshopProp hoveredProp;
 
     /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
     public float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
@@ -247,6 +248,7 @@ public class ClickerManager : MonoBehaviour
     private void UpdateHover()
     {
         AdventurerAgent under = null;
+        WorkshopProp prop = null;
 
         // No world hover while the book is open (you're already inside it).
         if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
@@ -255,7 +257,16 @@ public class ClickerManager : MonoBehaviour
             foreach (var hit in hits)
             {
                 if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
+                if (prop == null) hit.TryGetComponent(out prop);
             }
+        }
+        if (under != null) prop = null;   // a hero standing in front of a workshop takes the outline
+
+        if (prop != hoveredProp)
+        {
+            if (hoveredProp != null) hoveredProp.SetHover(false);
+            hoveredProp = prop;
+            if (hoveredProp != null) hoveredProp.SetHover(true);
         }
 
         if (under == hoveredAdv) return;
@@ -324,6 +335,14 @@ public class ClickerManager : MonoBehaviour
             if (hit.TryGetComponent(out EntityBase entity) && entity.IsDying) continue;
 
             ClickAttackMob(enemy, hit.transform, world);
+            return;
+        }
+
+        // Priority 3: a workshop prop in the guild opens its panel
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out WorkshopProp prop)) continue;
+            FindAnyObjectByType<WorkshopPanelController>()?.OpenFor(prop);
             return;
         }
 

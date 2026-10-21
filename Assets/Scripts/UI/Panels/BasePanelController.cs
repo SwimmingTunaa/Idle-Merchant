@@ -270,7 +270,9 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
         overlayElement.style.bottom = 0;
         overlayElement.style.width = Length.Percent(100);
         overlayElement.style.height = Length.Percent(100);
-        overlayElement.style.backgroundColor = overlayColor;
+        // Opaque colour; the fade drives opacity up to overlayColor.a. Using the alpha here too squared it
+        // (0.7 → 0.49), which in linear colour space barely darkens the world.
+        overlayElement.style.backgroundColor = new Color(overlayColor.r, overlayColor.g, overlayColor.b, 1f);
         overlayElement.style.opacity = 0f;
         overlayElement.style.display = DisplayStyle.None;
         

@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Crafting%20Menu/CraftingPanelStyle.uss?fileID=7433441132597879392&amp;guid=1f55b20e0fbeb4ea98827c037085e89a&amp;type=3#CraftingPanelStyle" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Workshop/WorkshopPanel.uss" />
+    <!-- Workshop panel: filled + shown by WorkshopPanelController (click a station prop in the guild). -->
+    <ui:VisualElement name="workshop-panel" class="wp-host">
+        <ui:VisualElement name="wp-card" class="wp-card">
+            <ui:VisualElement picking-mode="Ignore" class="wp-beam" />
+            <ui:VisualElement class="wp-body">
+                <ui:VisualElement name="wp-hero" picking-mode="Ignore" class="wp-hero">
+                    <ui:VisualElement name="wp-hero-prop" picking-mode="Ignore" class="wp-hero-prop" />
+                </ui:VisualElement>
+                <ui:VisualElement class="wp-main">
+                    <ui:VisualElement class="wp-head">
+                        <ui:Label name="wp-title" text="Forging Station" class="wp-title" />
+                        <ui:Button name="wp-close" class="wp-close">
+                            <ui:Label text="X" picking-mode="Ignore" class="wp-close__x" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="wp-slots" class="wp-slots" />
+                    <ui:Label name="wp-locked" text="Buy the station in the Guild book to start crafting" class="wp-locked" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="wp-drop" class="wp-drop" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

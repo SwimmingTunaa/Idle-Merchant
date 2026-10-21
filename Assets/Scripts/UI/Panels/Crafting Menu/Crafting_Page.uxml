@@ -56,8 +56,7 @@
                 <ui:Label name="detail-time" text="5s" />
                 <ui:Label text="per craft" />
                 <ui:Label text="·" class="craft-prod__sep" />
-                <ui:Label text="priority" />
-                <ui:VisualElement name="priority-pips" class="craft-pips" />
+                <ui:Label name="detail-slot-info" text="Forging Station · not in a slot" />
             </ui:VisualElement>
             <ui:VisualElement name="stamp-slot" class="craft-stampslot">
                 <ui:VisualElement picking-mode="Ignore" class="craft-plank craft-foot-plank">

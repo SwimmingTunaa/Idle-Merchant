@@ -355,8 +355,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         inv.LoadFloors(d.economy.floors, items);
 
-        // Crafting chunk restores the player's own enabled set (+ caps, priorities, slots, running jobs);
-        // a save from before the chunk falls back to enabling every unlocked recipe with default settings.
+        // Crafting chunk restores slots (+ caps, running jobs; pre-3b "enabled" recipes migrate into free slots);
+        // a save from before the chunk falls back to pinning every unlocked recipe with default settings.
         var pm = ProgressionManager.Instance;
         if (d.crafting != null && CraftingManager.Instance != null) CraftingManager.Instance.LoadFrom(d.crafting);
         else if (pm != null) pm.EnableUnlockedRecipes();
@@ -614,19 +614,26 @@ public class EconomySave
 
 public class CraftingSave
 {
-    public Dictionary<string, RecipeSave> recipes = new Dictionary<string, RecipeSave>();   // RecipeDef asset name
-    public Dictionary<CraftingStation, int> stationSlots = new Dictionary<CraftingStation, int>();
+    public Dictionary<string, RecipeSave> recipes = new Dictionary<string, RecipeSave>();   // RecipeDef asset name → cap
+    // Per station, ordered slots: RecipeDef asset name or null (empty). Count = slots owned. Null in pre-3b saves.
+    public Dictionary<CraftingStation, List<string>> slots;
     public List<CraftJobSave> jobs = new List<CraftJobSave>();   // running jobs (ingredients already consumed)
+
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public Dictionary<CraftingStation, int> stationSlots;   // legacy (pre-3b) slot counts; read-only
 }
 
 public class RecipeSave
 {
-    public bool enabled;
-    public int cap = CraftingManager.DefaultCap, priority = CraftingManager.DefaultPriority;
+    public int cap = CraftingManager.DefaultCap;
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public bool enabled;   // legacy (pre-3b): migrated into free slots on load; never written
 }
 
 public class CraftJobSave
 {
+    public CraftingStation station;
+    public int slot = -1;     // -1 in pre-3b saves → first slot holding the recipe
     public string recipe;     // RecipeDef asset name
     public float remaining;   // seconds left
 }

@@ -465,26 +465,6 @@ Label {
     color: var(--color-text-muted);
 }
 
-.craft-pips {
-    flex-direction: row;
-    align-items: center;
-    margin-left: 6px;
-}
-
-.craft-pip {
-    width: 12px;
-    height: 12px;
-    margin-left: 4px;
-    border-width: 2px;
-    border-color: var(--primary-900);
-    background-color: var(--color-box-bg);
-    cursor: link;
-}
-
-.craft-pip--on {
-    background-color: var(--color-gold-hi);
-}
-
 /* foot stamp plank: "Craft" when off; the red CRAFTING badge is slammed over it when on */
 .craft-stampslot {
     align-self: stretch;
@@ -538,6 +518,12 @@ Label {
 .craft-stampslot--locked .craft-foot-text {
     font-size: 22px;
     color: rgb(181, 157, 126);
+}
+
+/* station full: the stamp is refused, the plank shakes (code) and reads "<Station> full" */
+.craft-stampslot--full .craft-foot-text {
+    font-size: var(--font-size-body);
+    color: var(--color-text-danger);
 }
 
 .craft-badge {

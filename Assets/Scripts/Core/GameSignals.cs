@@ -18,7 +18,7 @@ public static class GameSignals
     public static event Action<ResourceStack> OnLootCollected;        // from dungeon/porter/click
     public static event Action<ResourceStack> OnProductCrafted;       // artisan → shelf
     public static event Action<RecipeDef> OnCraftStarted;             // job started (ingredients consumed)
-    public static event Action OnCraftingConfigChanged;               // recipe enabled/cap/priority, item floor, station slots
+    public static event Action OnCraftingConfigChanged;               // slot assigned/cleared/bought, cap, item floor, crafting load
 
     // Combat
     public static event Action<GameObject, float, GameObject> OnDamageTaken;

@@ -31,7 +31,7 @@ One `SaveData` DTO, collected by a new `SaveManager` (PersistentSingleton). No p
 | Offline-rate stats | rolling gold/min and loot/min from the last session (see §3) | SaveManager |
 | Settings | game speed; Master / SFX / Music volumes | GameManager, SfxManager |
 | Contracts | seal balance + lifetime seals, rotation time left, the 3 offers (null = taken), active contract (kind, params, snapshot target, progress, rewards), unhired Recruitment Favor candidates | ContractManager, HireController |
-| Crafting | per recipe (RecipeDef name): enabled, cap, priority; slots per station; running jobs (recipe + seconds left — ingredients were already consumed, so jobs resume rather than refund) | CraftingManager |
+| Crafting | per recipe (RecipeDef name): cap; per station an ordered slot list of recipe names / null (count = slots owned); running jobs (station, slot, recipe, seconds left — ingredients were already consumed, so jobs resume rather than refund). Pre-3b saves (`enabled` flags + `stationSlots` counts) migrate into free slots on load | CraftingManager |
 
 The offline-rate meta also carries customers/min and kills/min per layer (contract sizing only — never offline income). Old saves without the contracts or crafting chunk load defaults (fresh offers rolled against the restored stock; every unlocked recipe enabled).
 

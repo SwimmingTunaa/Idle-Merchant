@@ -13,7 +13,13 @@ Ordered roughly by intended sequence. Pull from the top.
 
 - [x] **Batch 2 — engine**: output caps, unified keep-N floor (crafting + sales), priority, stations-as-slots (Forging / Smithy / Arcane Workshop ↔ the three chains), save all of it
 - [x] **Batch 3a — book page**: icon tiles on torn sheets grouped by layer, frame-carried status (Painter2D progress sweep / red / gold / grey), Craft→Crafting buttons, pixel stock badge, right-page recipe detail
-- [ ] **Batch 3b — world workshops**: inactive prop prefabs behind the guild activated on station purchase (ProgressionActivator), click → themed workshop panel owning slots + slot purchases
+- [x] **Batch 3b — world workshops + slot pinning** (spec agreed 2026-10-21; mock v31 workshop panel) — built 2026-10-21; props are scene objects under `Guild/Shop/Workshops` driven by `WorkshopProp` (not `ProgressionActivator`):
+  - **Props**: one prefab per station in the guild's back-corner bay (interior back wall, between the posts under the window). Cold frame while unowned, lit 5-frame loop (fire + smoke, ~6 fps) once bought; activated by `ProgressionActivator` on `OnUpgradePurchased`. Sprites at 8 PPU: `forging_station` 54×72 ×6 frames + `anvil` 22×14 (scratchpad `forge/out/`, script `draw_forge2.py`); Smithy + Arcane Workshop to follow in the same family. Clicking the prop opens its panel.
+  - **Model change — a recipe runs iff it is pinned in a station slot.** Jobs key by slot, not recipe; the same recipe may fill several slots (parallel crafting; caps count stock + jobs in flight). Priority is removed (slots are the priority); caps + keep floors unchanged. `IsRecipeEnabled` ≡ "has a slot".
+  - **Book Craft stamp** = put the recipe in the first free slot of its station; if the station is full the stamp doesn't land, the plank shakes and reads "<Station> full". Dither-off clears its slot. The time line shows "<Station> · slot N" / "not in a slot". Priority pips gone.
+  - **Workshop panel** (stone wall in the sprite's palette, timber beam, lit station sprite + side prop as hero, pixel-slip close): a row of iron-plate slots + "+ Slot <cost>" button. Click a slot → themed dropdown "Assign recipe": the station's recipes with icon in status frame · name · state ("also in slot N" when stacked), plus "Clear slot". Empty slots show "+" / "Empty slot". No recipe list, no subtitle.
+  - **Save**: crafting chunk becomes `slots:{station:[recipeName|null,...]}` + jobs `[{station, slot, recipe, remaining}]`; migrate old `enabled` recipes into free slots on load.
+  - **Guild upgrade card icons**: assigned on all three station defs.
 - [ ] **Book close button**: pixel slip "X" hanging off the book's top-right corner (BookPanel), per the crafting mock
 
 ## Shop depth

@@ -393,19 +393,30 @@ public class GameDebugger : EditorWindow
                 Debug.LogWarning($"[GameDebugger] Can't buy {def.upgradeName} (gold/stars)");
             if (GUILayout.Button("Give mats", GUILayout.Width(80))) GiveChainMaterials(recipes, st, chainMaterialQty);
             EditorGUILayout.EndHorizontal();
-            foreach (var job in cm.ActiveJobs)
-                if (job.recipe.Station == st)
-                    EditorGUILayout.LabelField($"    • {job.recipe.Output.displayName}", $"{job.timeRemaining:F1}s left");
+            // Slots: pick a recipe per slot (index 0 = empty); the same recipe may fill several
+            var stRecipes = recipes.Where(r => r.Station == st).ToList();
+            var options = new[] { "(empty)" }.Concat(stRecipes.Select(r => r.Output.displayName)).ToArray();
+            var slots = cm.GetSlots(st);
+            for (int i = 0; i < slots.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Label($"    slot {i + 1}", GUILayout.Width(60));
+                int cur = slots[i] != null ? stRecipes.IndexOf(slots[i]) + 1 : 0;
+                int pick = EditorGUILayout.Popup(cur, options, GUILayout.Width(160));
+                if (pick != cur) cm.AssignSlot(st, i, pick == 0 ? null : stRecipes[pick - 1]);
+                var state = cm.GetSlotState(st, i);
+                GUILayout.Label(state == CraftingManager.SlotState.Crafting ? $"crafting {cm.GetSlotProgress(st, i):P0}" : state.ToString());
+                EditorGUILayout.EndHorizontal();
+            }
         }
         chainMaterialQty = EditorGUILayout.IntField("Give mats qty (raw inputs):", Mathf.Max(1, chainMaterialQty));
 
-        // Recipes: enabled / cap / priority / live status
+        // Recipes: pinned / cap / live status (on = pinned in a slot; ticking it pins to the first free slot)
         EditorGUILayout.Space(10);
-        GUILayout.Label($"Recipes ({cm.GetEnabledRecipes().Count} enabled, {cm.GetActiveCraftCount()} running)", EditorStyles.boldLabel);
+        GUILayout.Label($"Recipes ({cm.GetActiveCraftCount()} jobs running)", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
-        GUILayout.Label("on  recipe", EditorStyles.miniLabel, GUILayout.Width(170));
+        GUILayout.Label("slot  recipe", EditorStyles.miniLabel, GUILayout.Width(170));
         GUILayout.Label("stock / cap", EditorStyles.miniLabel, GUILayout.Width(95));
-        GUILayout.Label("priority", EditorStyles.miniLabel, GUILayout.Width(125));
         GUILayout.Label("status", EditorStyles.miniLabel);
         EditorGUILayout.EndHorizontal();
         foreach (var r in recipes)
@@ -413,17 +424,19 @@ public class GameDebugger : EditorWindow
             EditorGUILayout.BeginHorizontal();
             bool on = cm.IsRecipeEnabled(r);
             bool newOn = EditorGUILayout.ToggleLeft($"{r.Output.displayName}", on, GUILayout.Width(170));
-            if (newOn != on) { if (newOn) cm.EnableRecipe(r); else cm.DisableRecipe(r); }
+            if (newOn != on)
+            {
+                if (!newOn) cm.ClearRecipeSlots(r);
+                else if (!cm.PinToFirstFreeSlot(r)) Debug.LogWarning($"[GameDebugger] {r.Station} has no free slot for {r.name}");
+            }
             GUILayout.Label(inv.Get(r.Output.itemCategory, r.Output).ToString(), GUILayout.Width(35));
             int cap = EditorGUILayout.DelayedIntField(cm.GetCap(r), GUILayout.Width(55));
             if (cap != cm.GetCap(r)) cm.SetCap(r, cap);
-            int pr = EditorGUILayout.IntSlider(cm.GetPriority(r), CraftingManager.MinPriority, CraftingManager.MaxPriority, GUILayout.Width(125));
-            if (pr != cm.GetPriority(r)) cm.SetPriority(r, pr);
             string reason = cm.GetBlockReason(r);
-            GUILayout.Label(cm.IsCrafting(r) ? $"running {cm.GetCraftingProgress(r):P0}" : !on ? "off" : reason ?? "ready");
+            GUILayout.Label(cm.IsCrafting(r) ? $"running {cm.GetCraftingProgress(r):P0}" : !on ? "not in a slot" : reason ?? "ready");
             EditorGUILayout.EndHorizontal();
         }
-        if (GUILayout.Button("Enable All Recipes"))
+        if (GUILayout.Button("Pin All Recipes (free slots)"))
             foreach (var r in recipes) cm.EnableRecipe(r);
 
         // Item floors ("keep at least N" — crafting and customer sales both stop here)

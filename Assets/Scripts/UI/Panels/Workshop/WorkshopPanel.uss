@@ -1,0 +1,281 @@
+/* Workshop panel — stonework + timber, the station sprite is the hero. Mock: scratchpad/crafting-mock/crafting.html (.wpanel).
+   Pixel art at 3× (stone tile 96×48 → 288×144, beam 32×8 → 96×24, iron plate 12px sliced at 2 → 6px).
+   UITK has no box-shadow / dashed border / radial glow: the hard shadow is a thicker right/bottom border,
+   the buy holder's dashed outline is solid, and the mock's ember glow is left out. */
+
+.wp-host {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    -unity-font-definition: var(--font-body);
+}
+
+.wp-card {
+    width: 860px;
+    padding-bottom: 18px;
+    background-image: url("project://database/Assets/Sprites/UI/Workshop/stone-tile.png");
+    background-repeat: repeat repeat;
+    background-size: 288px 144px;
+    background-position-x: left 0;
+    background-position-y: top 0;
+    border-color: rgb(30, 26, 26);
+    border-left-width: 6px;
+    border-top-width: 6px;
+    border-right-width: 12px;
+    border-bottom-width: 12px;
+}
+
+.wp-beam {
+    height: 24px;
+    flex-shrink: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Workshop/beam.png");
+    background-repeat: repeat no-repeat;
+    background-size: 96px 24px;
+    background-position-x: left 0;
+    background-position-y: top 0;
+}
+
+.wp-body {
+    flex-direction: row;
+    padding: 12px 22px 6px 22px;
+}
+
+/* sized in code from the prop's sprites (×3); frames swap in WorkshopPanelController.Tick */
+.wp-hero {
+    flex-shrink: 0;
+    align-self: flex-end;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.wp-hero-prop {
+    position: absolute;
+    bottom: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.wp-main {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.wp-head {
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+/* NotJam at 3× its 13px grid (the mock's 36px, snapped) */
+.wp-title {
+    flex-grow: 1;
+    font-size: 39px;
+    color: rgb(243, 220, 160);
+    white-space: nowrap;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+/* pixel-slip close: parchment chip, black rim (thicker right/bottom = the mock's 2px hard shadow), red X */
+.wp-close {
+    width: 38px;
+    height: 38px;
+    margin: 0 0 0 12px;
+    padding: 0 0 3px 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(233, 217, 184);
+    background-image: none;
+    border-color: rgb(30, 26, 26);
+    border-radius: 0;
+    border-left-width: 3px;
+    border-top-width: 3px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+}
+
+.wp-close:hover {
+    background-color: rgb(245, 232, 205);
+}
+
+.wp-close__x {
+    font-size: var(--font-size-body);
+    color: var(--color-text-danger);
+    -unity-text-align: middle-center;
+}
+
+/* wraps once plates hit their min width (3+ slots); the buy holder flows after the last plate */
+.wp-slots {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+/* iron plate: 9-slice, one per slot */
+.wp-slot {
+    flex-grow: 1;
+    flex-basis: 175px;
+    min-height: 74px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 14px 12px;
+    flex-direction: row;
+    align-items: center;
+    background-image: url("project://database/Assets/Sprites/UI/Workshop/iron-plate.png");
+    -unity-slice-left: 2;
+    -unity-slice-top: 2;
+    -unity-slice-right: 2;
+    -unity-slice-bottom: 2;
+    -unity-slice-scale: 3px;
+}
+
+.wp-slot:hover,
+.wp-slot--open {
+    -unity-background-image-tint-color: rgb(255, 236, 214);
+}
+
+.wp-slot__name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-left: 8px;
+    font-size: var(--font-size-body);
+    color: rgb(243, 220, 160);
+    white-space: normal;   /* 24px names wrap to two lines in a 175px plate rather than truncate */
+    overflow: hidden;
+}
+
+.wp-slot--empty .wp-slot__name {
+    color: rgb(143, 138, 128);
+}
+
+/* dark-iron status frames (StatusFrame + wp-frame): state colours re-declared so they beat the dark base */
+.wp-frame {
+    background-color: rgb(30, 26, 26);
+    border-radius: 0;
+}
+
+.wp-frame > .status-frame__in {
+    background-color: rgb(44, 42, 42);
+    border-radius: 0;
+}
+
+.wp-frame.status-frame--blocked {
+    background-color: var(--color-text-danger);
+}
+
+.wp-frame.status-frame--capped {
+    background-color: var(--color-gold-hi);
+}
+
+.wp-frame--empty > .status-frame__in {
+    background-color: rgb(36, 34, 34);
+}
+
+.wp-frame--empty Label {
+    font-size: 26px;
+    color: rgb(107, 107, 107);
+    -unity-text-align: middle-center;
+    flex-grow: 1;
+}
+
+.wp-buy {
+    flex-shrink: 0;
+    min-height: 74px;
+    margin-bottom: 10px;
+    padding: 0 8px;
+    justify-content: center;
+    align-items: center;
+    border-width: 3px;
+    border-color: rgb(107, 107, 107);
+    background-color: rgba(0, 0, 0, 0.18);
+}
+
+.wp-buy__btn {
+    font-size: var(--font-size-small);
+    padding: 7px 16px 11px 16px;
+    margin: 0;
+}
+
+.wp-buy__btn Label {
+    font-size: var(--font-size-small);
+    color: rgb(20, 38, 15);
+}
+
+.wp-buy__btn:disabled Label {
+    color: rgb(80, 80, 80);
+}
+
+.wp-buy__coin {
+    width: 20px;
+    height: 20px;
+    margin: 0 6px 0 8px;
+}
+
+.wp-locked {
+    margin-top: 14px;
+    font-size: var(--font-size-body);
+    color: rgb(185, 169, 143);
+    white-space: normal;
+}
+
+/* themed dropdown: iron-plated stone sheet hanging under the clicked slot (positioned in code) */
+.wp-drop {
+    position: absolute;
+    display: none;
+    background-image: url("project://database/Assets/Sprites/UI/Workshop/stone-tile.png");
+    background-repeat: repeat repeat;
+    background-size: 288px 144px;
+    background-position-x: left 0;
+    background-position-y: top 0;
+    border-color: rgb(84, 86, 92);
+    border-left-width: 6px;
+    border-top-width: 6px;
+    border-right-width: 6px;
+    border-bottom-width: 6px;
+}
+
+.wp-drop__head {
+    padding: 4px 10px 2px 10px;
+    font-size: var(--font-size-caption);
+    letter-spacing: 1px;
+    color: rgb(185, 169, 143);
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
+.wp-it {
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 10px;
+    border-top-width: 2px;
+    border-color: rgb(30, 26, 26);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.wp-it:hover {
+    background-color: rgba(255, 140, 40, 0.18);
+}
+
+.wp-it--cur {
+    background-color: rgba(240, 180, 41, 0.16);
+}
+
+.wp-it__name {
+    flex-grow: 1;
+    margin-left: 10px;
+    margin-right: 14px;
+    font-size: var(--font-size-body);
+    color: rgb(232, 213, 174);
+    white-space: nowrap;
+}
+
+.wp-it__state {
+    font-size: var(--font-size-small);
+    color: rgb(185, 169, 143);
+    white-space: nowrap;
+}
+
+.wp-it--rm .wp-it__name {
+    color: rgb(201, 138, 132);
+}

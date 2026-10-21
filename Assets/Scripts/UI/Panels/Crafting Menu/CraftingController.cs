@@ -4,8 +4,9 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Crafting book page (tab 3). Left: one torn sheet per dungeon layer, recipe tiles (select only) with a
-/// StatusFrame, stock slip and a red "on" corner. Right: inventory-style detail — cap stepper, ingredients,
-/// priority pips, and the foot stamp plank that toggles the recipe (slam on / dither off, BookStamp).
+/// StatusFrame, stock slip and a red "on" corner (= pinned in a station slot). Right: inventory-style detail — cap
+/// stepper, ingredients, "Station · slot N" line, and the foot stamp plank: slam on = pin to the station's first free
+/// slot (a full station shakes the plank instead), dither off = clear its slots (BookStamp).
 /// A recipe's layer = the deepest layer any raw ingredient first drops on (crafted ingredients inherit theirs).
 /// </summary>
 public class CraftingController : MonoBehaviour, IBookPage
@@ -26,6 +27,8 @@ public class CraftingController : MonoBehaviour, IBookPage
     private const float SlamPerPlankWidth = 2.8f;
     private const int TickMs = 100;          // sweep repaint cadence
     private const int SafetyRefreshTicks = 10; // full state refresh at least once a second (catches stock changes no signal reports)
+    private const int FullMs = 1500;           // "<Station> full" stays on the plank this long
+    private static readonly float[] ShakePx = { -6f, 6f, -5f, 5f, -3f, 3f, -1f, 0f }; // 40ms steps
 
     private class Tile
     {
@@ -58,8 +61,8 @@ public class CraftingController : MonoBehaviour, IBookPage
     private VisualElement wiredRoot;
     private ScrollView scroll;
     private StatusFrame detailFrame;
-    private Label dName, dStation, dValue, dCap, dDesc, dTime, stampText;
-    private VisualElement ingList, pips, stampSlot, stampBadge, stampBadgeText, slamOverlay;
+    private Label dName, dStation, dValue, dCap, dDesc, dTime, dSlot, stampText;
+    private VisualElement ingList, stampSlot, stampBadge, stampBadgeText, slamOverlay;
 
     void Awake() => hideFlags = HideFlags.HideInInspector;
 
@@ -123,7 +126,7 @@ public class CraftingController : MonoBehaviour, IBookPage
         dDesc = right.Q<Label>("detail-desc");
         dTime = right.Q<Label>("detail-time");
         ingList = right.Q<VisualElement>("ingredient-list");
-        pips = right.Q<VisualElement>("priority-pips");
+        dSlot = right.Q<Label>("detail-slot-info");
         stampSlot = right.Q<VisualElement>("stamp-slot");
         stampText = right.Q<Label>("stamp-text");
         stampBadge = right.Q<VisualElement>("stamp-badge");
@@ -137,15 +140,6 @@ public class CraftingController : MonoBehaviour, IBookPage
         // Clickable(delay, interval) = press-and-hold repeat, like the inventory floor stepper
         right.Q<VisualElement>("cap-up")?.AddManipulator(new Clickable(() => StepCap(+1), 350, 70));
         right.Q<VisualElement>("cap-down")?.AddManipulator(new Clickable(() => StepCap(-1), 350, 70));
-
-        for (int i = 0; i < CraftingManager.MaxPriority; i++)
-        {
-            int prio = i + 1;
-            var pip = new VisualElement();
-            pip.AddToClassList("craft-pip");
-            pip.RegisterCallback<ClickEvent>(_ => { if (selected != null) CraftingManager.Instance.SetPriority(selected, prio); });
-            pips.Add(pip);
-        }
 
         stampSlot?.RegisterCallback<ClickEvent>(_ => OnStampClicked());
     }
@@ -313,10 +307,10 @@ public class CraftingController : MonoBehaviour, IBookPage
         var cm = CraftingManager.Instance;
         if (!cm.IsStationOwned(r.Station)) return StatusFrame.State.Locked;
         if (cm.IsCrafting(r)) return StatusFrame.State.Crafting;
-        if (!cm.IsRecipeEnabled(r)) return StatusFrame.State.Idle;
+        if (!cm.IsRecipeEnabled(r)) return StatusFrame.State.Idle; // not in a slot
         // Not GetBlockReason: it reports "Station busy" before cap/materials, which would hide both
         if (Inventory.Instance.Get(r.Output.itemCategory, r.Output) >= cm.GetCap(r)) return StatusFrame.State.Capped;
-        return cm.CanCraft(r) ? StatusFrame.State.Idle : StatusFrame.State.Blocked; // idle = waiting for a slot
+        return cm.CanCraft(r) ? StatusFrame.State.Idle : StatusFrame.State.Blocked;
     }
 
     private void Tick()
@@ -363,14 +357,24 @@ public class CraftingController : MonoBehaviour, IBookPage
             row.have.EnableInClassList("craft-ing__have--short", usable < row.need);
         }
 
-        int prio = cm.GetPriority(selected);
-        for (int i = 0; i < pips.childCount; i++) pips[i].EnableInClassList("craft-pip--on", i < prio);
+        dSlot.text = SlotLine(cm, selected);
 
         if (!busy) RefreshStamp(state == StatusFrame.State.Locked, cm.IsRecipeEnabled(selected));
     }
 
+    // "Forging Station · slot 1" / "· slots 1, 2" when stacked / "· not in a slot"
+    private static string SlotLine(CraftingManager cm, RecipeDef r)
+    {
+        var slots = cm.GetSlots(r.Station);
+        var held = new List<int>();
+        for (int i = 0; i < slots.Count; i++) if (slots[i] == r) held.Add(i + 1);
+        string where = held.Count == 0 ? "not in a slot" : held.Count == 1 ? $"slot {held[0]}" : $"slots {string.Join(", ", held)}";
+        return $"{StationName(r.Station)} · {where}";
+    }
+
     private void RefreshStamp(bool locked, bool on)
     {
+        stampSlot.RemoveFromClassList("craft-stampslot--full");
         stampSlot.EnableInClassList("craft-stampslot--locked", locked);
         stampText.text = locked ? $"Needs {StationName(selected.Station)}" : "Craft";
         stampText.style.visibility = on && !locked ? Visibility.Hidden : Visibility.Visible;
@@ -396,12 +400,13 @@ public class CraftingController : MonoBehaviour, IBookPage
 
         if (!cm.IsRecipeEnabled(r))
         {
+            if (!cm.HasFreeSlot(r.Station)) { ShowStationFull(r); return; }
             BookStamp.AimAt(slamOverlay, stampSlot, stampSlot.resolvedStyle.width * SlamPerPlankWidth);
             BookStamp.SlamIn(stampSlamAnim, slamOverlay,
                 onImpact: () =>
                 {
-                    cm.EnableRecipe(r);
-                    if (selected == r) RefreshStamp(false, true);
+                    bool pinned = cm.PinToFirstFreeSlot(r);
+                    if (selected == r) RefreshStamp(false, pinned);
                 },
                 onComplete: () => { busy = false; dirty = true; });
         }
@@ -411,11 +416,23 @@ public class CraftingController : MonoBehaviour, IBookPage
             BookStamp.DitherOut(stampDitherAnim, stampBadge, stampBadgeText, () =>
             {
                 busy = false;
-                cm.DisableRecipe(r);
+                cm.ClearRecipeSlots(r);
                 Refresh();
             });
         }
         if (showDebugLogs) Debug.Log($"[CraftingController] Stamp toggled on {r.name}");
+    }
+
+    // The stamp doesn't land: the plank jitters sideways and reads "<Station> full" for FullMs.
+    private void ShowStationFull(RecipeDef r)
+    {
+        stampText.text = $"{StationName(r.Station)} full";
+        stampSlot.AddToClassList("craft-stampslot--full");
+        int step = 0;
+        stampSlot.schedule.Execute(() => stampSlot.style.translate = new Translate(ShakePx[Mathf.Min(step++, ShakePx.Length - 1)], 0))
+            .Every(40).Until(() => step >= ShakePx.Length);
+        stampSlot.schedule.Execute(() => { busy = false; dirty = true; }).StartingIn(FullMs);
+        if (showDebugLogs) Debug.Log($"[CraftingController] {r.Station} full — stamp refused for {r.name}");
     }
 
     // ═════════════════════════════════════════════
@@ -428,7 +445,7 @@ public class CraftingController : MonoBehaviour, IBookPage
     private void OnUpgradePurchased(GuildUpgradeDef _) => dirty = true;
 
     // Station display name comes from its GuildUpgradeDef (asset names don't match: "Potion Station" shows "Smithy").
-    private static string StationName(CraftingStation station)
+    public static string StationName(CraftingStation station)
     {
         if (stationNames.TryGetValue(station, out var n)) return n;
         var type = CraftingManager.StationUpgradeType(station);
