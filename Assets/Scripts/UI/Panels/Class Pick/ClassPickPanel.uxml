@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Class%20Pick/ClassPickPanel.uss" />
+    <!-- "Choose a Class" modal: filled + shown by ClassPickPanelController (Roster promote on a Novice / free path pick). The host is the dim backdrop. -->
+    <ui:VisualElement name="class-pick-panel" class="cp-host">
+        <ui:VisualElement name="cp-card" class="cp-card">
+            <ui:VisualElement picking-mode="Ignore" class="cp-ribbon">
+                <ui:Label text="Choose a Class" picking-mode="Ignore" class="cp-ribbon__text" />
+            </ui:VisualElement>
+            <ui:Button name="cp-close" class="cp-close">
+                <ui:Label text="X" picking-mode="Ignore" class="cp-close__x" />
+            </ui:Button>
+            <ui:Label name="cp-sub" text="Olwen is ready for their first promotion" class="cp-sub" />
+            <ui:VisualElement name="cp-cards" class="cp-cards" />
+            <ui:Button name="cp-confirm" class="btn-disabled cp-confirm">
+                <ui:Label name="cp-confirm-label" text="Pick a class" picking-mode="Ignore" class="btn-label" />
+                <ui:VisualElement name="cp-confirm-coin" picking-mode="Ignore" class="btn-coin cp-confirm__coin" />
+                <ui:Label name="cp-confirm-cost" text="1,500" picking-mode="Ignore" class="btn-label" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

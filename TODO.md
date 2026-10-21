@@ -25,7 +25,8 @@ Ordered roughly by intended sequence. Pull from the top.
 ## Adventurer classes
 
 - [x] **Classes phase 1** — lines, 17 defs + catalog, tier-gated odds, premium price, path picker, named promotions, save + free-pick migration (see CLASSES_DESIGN.md "Phase 1 as built")
-- [ ] **Classes phase 2 (feel)** — signature mechanics — Warrior cleave, Rogue crits + post-kill dash, Mage bonus vs high-HP mobs (replacing the aura), guardian aggro, class weapon/outfit sprites (all tiers still use the Novice look)
+- [x] **Classes phase 2 (feel)** — signature mechanics: Warrior cleave, Rogue crits + post-kill dash, Mage % max-HP bonus (aura removed), Guardian aggro + damage reduction
+- [ ] **Class weapon/outfit sprites** — Tuan is drawing these by hand; all tiers keep the Novice look as placeholders until then (don't generate them)
 - [ ] **Playtest the odds / unlock boost / power-curve numbers** (CLASSES_DESIGN "Open" 1)
 - [ ] **Healer + Monk lines** (healer needs targeting AI)
 

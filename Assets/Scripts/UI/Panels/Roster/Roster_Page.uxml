@@ -198,12 +198,6 @@
                     <ui:Button name="detail-dismiss-btn" text="Dismiss" class="btn-danger" style="width: 126px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="path-picker" class="path-picker" style="display: none;">
-                <ui:Label name="path-title" text="Choose a path" class="path-title" />
-                <ui:Label name="path-subtitle" text="Promote to Bronze for 1,500" class="path-subtitle" />
-                <ui:VisualElement name="path-cards" class="path-cards" />
-                <ui:Button name="path-cancel-btn" text="Not yet" class="btn-secondary" style="width: 126px;" />
-            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

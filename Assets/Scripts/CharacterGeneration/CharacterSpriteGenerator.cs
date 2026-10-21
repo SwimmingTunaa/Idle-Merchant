@@ -53,7 +53,26 @@ public static class CharacterSpriteGenerator
             return cachedSprite;
         return GenerateSpriteInternal(def, indices, configHash);
     }
-    
+
+    /// <summary>
+    /// Same, with the shirt (+ sleeves) and pants recoloured — skin and hair stay the entity's own.
+    /// Cached per colour pair.
+    /// </summary>
+    public static Sprite GenerateSprite(EntityDef def, CharacterAppearanceIndices indices, Color shirt, Color pants)
+    {
+        int configHash;
+        unchecked { configHash = (GetVisualConfigHash(def, indices) * 31 + shirt.GetHashCode()) * 31 + pants.GetHashCode(); }
+        if (_spriteCache.TryGetValue(configHash, out Sprite cachedSprite))
+            return cachedSprite;
+
+        EnsureRenderSetup();
+        ConfigurePreviewCharacter(def, indices);
+        _previewInstance.GetComponentInChildren<CharacterAppearanceManager>().SetAttireColours(shirt, pants);
+        Sprite sprite = CaptureSprite();
+        _spriteCache[configHash] = sprite;
+        return sprite;
+    }
+
     /// <summary>
     /// Clear sprite cache to free memory.
     /// Call when changing scenes or during memory pressure.

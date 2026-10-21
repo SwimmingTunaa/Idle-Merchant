@@ -1,0 +1,212 @@
+/* "Choose a Class" modal — torn-card parchment (card-torn 9-slice at 3px) on a dim backdrop, ribbon banner (ribbon.png
+   150×30 at 4×) hanging over the top edge, four chip cards (22.png at 3px) with the adventurer on the big diamond deco.
+   Mock: scratchpad/classmock/index.html. No box-shadow in UITK: the slips' 3px hard shadow is a thicker right/bottom border. */
+
+.cp-host {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 6, 4, 0.8);   /* --color-bg-overlay barely dims the book in linear colour space */
+    -unity-font-definition: var(--font-body);
+}
+
+.cp-card {
+    width: 900px;
+    margin-top: 40px;   /* room for the ribbon overhang */
+    padding: 102px 50px 54px 50px;
+    align-items: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&guid=e202a8ab367e41aead07308c65d8c8a8&type=3#card-torn");
+    -unity-slice-left: 8;
+    -unity-slice-top: 8;
+    -unity-slice-right: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 3px;
+}
+
+.cp-ribbon {
+    position: absolute;
+    left: 150px;
+    top: -28px;
+    width: 600px;
+    height: 120px;
+    padding-bottom: 18px;
+    align-items: center;
+    justify-content: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/ribbon.png?fileID=2800000&guid=349b01018420847d0926c1807c99b387&type=3#ribbon");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+/* NotJam at 3× its 13px grid, like the Workshop title */
+.cp-ribbon__text {
+    font-size: 39px;
+    color: rgb(246, 231, 200);
+    letter-spacing: 1px;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+/* pixel-slip close at the top-right corner */
+.cp-close {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 46px;
+    height: 46px;
+    margin: 0;
+    padding: 0 0 3px 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(233, 217, 184);
+    background-image: none;
+    border-color: var(--color-text-strong);
+    border-radius: 0;
+    border-left-width: 3px;
+    border-top-width: 3px;
+    border-right-width: 6px;
+    border-bottom-width: 6px;
+}
+
+.cp-close:hover {
+    background-color: rgb(245, 232, 205);
+}
+
+.cp-close__x {
+    font-size: 40px;   /* Ithaca's capital X is narrow; below ~40 it reads as a lowercase x */
+    color: var(--color-text-danger);
+    -unity-text-align: middle-center;
+}
+
+.cp-sub {
+    margin: -8px 0 18px 0;
+    font-size: var(--font-size-body);
+    color: var(--color-text-secondary);
+    -unity-text-align: middle-center;
+}
+
+.cp-cards {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.cp-class {
+    width: 182px;
+    margin: 0 8px;
+    padding: 24px 18px 26px 18px;
+    align-items: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/22.png?fileID=-7371509505491802261&guid=e7a8a10c7d9d84c87b2423fc792360b0&type=3#22_0");
+    -unity-slice-left: 4;
+    -unity-slice-top: 4;
+    -unity-slice-right: 4;
+    -unity-slice-bottom: 4;
+    -unity-slice-scale: 3px;
+    transition-property: translate;
+    transition-duration: 0.08s;
+}
+
+.cp-class:hover,
+.cp-class--sel {
+    translate: 0 -4px;
+}
+
+.cp-class--sel {
+    -unity-background-image-tint-color: rgb(255, 250, 240);
+}
+
+/* gold selection outline, inset inside the chip edge */
+.cp-class__ring {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-width: 3px;
+    border-color: var(--color-gold-hi);
+    display: none;
+}
+
+.cp-class--sel .cp-class__ring {
+    display: flex;
+}
+
+/* class icon slip pinned to the top-left corner; gold when selected */
+.cp-class__slip {
+    position: absolute;
+    left: -12px;
+    top: -14px;
+    width: 52px;
+    height: 52px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(233, 217, 184);
+    border-color: var(--color-text-strong);
+    border-left-width: 3px;
+    border-top-width: 3px;
+    border-right-width: 6px;
+    border-bottom-width: 6px;
+}
+
+.cp-class--sel .cp-class__slip {
+    background-color: var(--color-gold-hi);
+}
+
+.cp-class__icon {
+    width: 36px;
+    height: 36px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* the adventurer stands on the big diamond deco; figure sized in code at an integer scale */
+.cp-class__stage {
+    width: 150px;
+    height: 150px;
+    padding-bottom: 20px;
+    align-items: center;
+    justify-content: flex-end;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-diamond-big.png?fileID=2800000&guid=dc67f5857d1cc48f49c6bf8c91eedf54&type=3#deco-diamond-big");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.cp-class__figure {
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.cp-class__name {
+    margin-top: 8px;
+    font-size: 30px;
+    color: var(--color-text-strong);
+    -unity-text-align: middle-center;
+}
+
+.cp-class__role {
+    min-height: 42px;
+    margin-top: 4px;
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    -unity-text-align: upper-center;
+    white-space: normal;
+}
+
+.cp-confirm {
+    margin-top: 22px;
+    padding: 8px 26px 14px 26px;
+}
+
+.cp-confirm Label {
+    font-size: var(--font-size-body);
+    color: rgb(20, 38, 15);
+}
+
+.cp-confirm:disabled Label,
+.cp-confirm.btn-disabled Label {
+    color: rgb(80, 80, 80);
+}
+
+.cp-confirm__coin {
+    width: 22px;
+    height: 22px;
+    margin: 0 6px 0 10px;
+}

@@ -187,6 +187,14 @@ public class CharacterAppearanceManager : MonoBehaviour
             hairMaterials[i].SetColor("_New_Colour", hairColour);
     }
 
+    /// <summary>Recolour the shirt (+ sleeves) and pants layers, leaving skin and hair as they are.</summary>
+    public void SetAttireColours(Color shirt, Color pants)
+    {
+        for (int i = 0; i < shirtMaterials.Length; i++)
+            shirtMaterials[i].SetColor("_New_Colour", shirt);
+        pantsMaterial.SetColor("_New_Colour", pants);
+    }
+
     /// <summary>Show/hide the clothing layers (shirt, pants, hair, weapons), leaving the base
     /// body visible. Used by the character preview tool to compare dressed vs base body.</summary>
     public void SetClothingVisible(bool visible)
