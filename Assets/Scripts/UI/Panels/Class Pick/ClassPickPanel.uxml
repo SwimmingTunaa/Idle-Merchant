@@ -15,8 +15,8 @@
             <ui:VisualElement name="cp-cards" class="cp-cards" />
             <ui:Button name="cp-confirm" class="btn-disabled cp-confirm">
                 <ui:Label name="cp-confirm-label" text="Pick a class" picking-mode="Ignore" class="btn-label" />
-                <ui:VisualElement name="cp-confirm-coin" picking-mode="Ignore" class="btn-coin cp-confirm__coin" />
                 <ui:Label name="cp-confirm-cost" text="1,500" picking-mode="Ignore" class="btn-label" />
+                <ui:VisualElement name="cp-confirm-coin" picking-mode="Ignore" class="btn-coin cp-confirm__coin" />
             </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>

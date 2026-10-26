@@ -207,7 +207,7 @@ public class ClassPickPanelController : BasePanelController
         var paid = any && !free ? DisplayStyle.Flex : DisplayStyle.None;
         confirmCoin.style.display = paid;
         confirmCost.style.display = paid;
-        confirmCost.text = $"{agent.PromoteCost:N0}";
+        confirmCost.text = $" {agent.PromoteCost:N0}";
         confirm.SetEnabled(any && (free || (Inventory.Instance != null && Inventory.Instance.CanAfford(agent.PromoteCost))));
     }
 
