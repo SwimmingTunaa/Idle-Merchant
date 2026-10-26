@@ -60,10 +60,11 @@ Ordered roughly by intended sequence. Pull from the top.
 - [x] Doc sync through crafting batch 3a (2026-10-20)
 - [ ] Refresh `GAME_SPEC.md` + `KANBAN_BOARD.md` (parent folder) — last verified June 2026
 
-## Equipment (design next, after crafting)
+## Equipment — rejected (2026-10-27)
 
-- [ ] **Equipment loop design doc** — two slots (weapon/armor) to start, auto-assign armory pool with manual override later, stat modifiers via StatsMediator, gear outgrown via tiers
-- [ ] **Material-tier recipe variants** — one recipe family with a tier-selectable material slot (Iron Sword → Obsidian Sword: better stats, higher value, uses the eight material tints already in the weapon/armor packs). This is how the game does "choose your ingredient" — deliberately NOT AtS-style any-of substitutes (our materials are deterministic per layer, so substitutes solve a problem we don't have). Revisit any-of only for tier-1 common slots if surplus still feels unabsorbed after contracts phase 2.
+Tuan's call: an equipment system adds too much complexity for an idle game. Crafting's purpose is to be a value multiplier on loot (raw → crafted sells for more), not to feed a loadout. Don't re-propose.
+
+- [ ] **Material-tier recipe variants** — still worth it on its own as a sell-value ladder (Iron Sword → Obsidian Sword: higher value, uses the eight material tints already in the weapon/armor packs). Deliberately NOT AtS-style any-of substitutes.
 
 ## Someday / deliberate
 
