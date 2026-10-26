@@ -220,6 +220,7 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - `Tools/Game Signals/Print Subscriber Counts` — debug event leak detection
 - Excel importer for bulk data entry
 - ScriptableObject generator for batch asset creation
+- `Editor/SpriteImportDefaults.cs` — first import of any texture under `Sprites/` gets point filter / uncompressed / no mipmaps / Sprite type automatically; PPU is not set (varies per folder), and existing files are never touched
 
 ---
 
