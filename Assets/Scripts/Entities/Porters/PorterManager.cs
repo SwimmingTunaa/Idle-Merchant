@@ -14,6 +14,39 @@ public class PorterManager : UnitManager<PorterAgent>
     [Tooltip("Where porters deposit loot at shop")]
     public Transform depositPoint;
 
+    [Header("Porter Lodging")]
+    [Tooltip("Extra maxUnits per owned Porter Lodging rank (UpgradeType.PorterLodging), on every PorterManager")]
+    [SerializeField] private int capacityPerLodging = 2;
+
+    private int baseMaxUnits;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        baseMaxUnits = MaxUnits;
+        ProgressionManager.OnUpgradePurchased += OnUpgradePurchased;
+    }
+
+    // SaveManager restores owned upgrades before other Starts; purchases arrive through the signal
+    protected override void Start()
+    {
+        base.Start();
+        ApplyLodging();
+    }
+
+    void OnDestroy() => ProgressionManager.OnUpgradePurchased -= OnUpgradePurchased;
+
+    private void OnUpgradePurchased(GuildUpgradeDef upgrade)
+    {
+        if (upgrade != null && upgrade.upgradeType == UpgradeType.PorterLodging) ApplyLodging();
+    }
+
+    private void ApplyLodging()
+    {
+        if (ProgressionManager.Instance != null)
+            MaxUnits = baseMaxUnits + capacityPerLodging * ProgressionManager.Instance.CountUpgrades(UpgradeType.PorterLodging);
+    }
+
     // ===== VALIDATION =====
 
     protected override void ValidateSetup()

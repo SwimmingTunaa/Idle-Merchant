@@ -171,7 +171,11 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         targetPosition = ClampToBounds(targetPosition);
         
         // Smooth lerp to target
-        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * smoothSpeed);
+        Vector3 before = transform.position;
+        transform.position = Vector3.Lerp(before, targetPosition, Time.deltaTime * smoothSpeed);
+
+        // Guild-hall decor unlocked since the player last looked pops in once it's on screen
+        if ((transform.position - before).sqrMagnitude > 1e-8f) DecorSlot.CheckSeen(cam);
     }
 
     // ===== INPUT GATHERING =====

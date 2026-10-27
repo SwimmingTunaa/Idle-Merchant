@@ -235,6 +235,18 @@ public class CraftingManager : MonoBehaviour
     /// <summary>The station's slots in order (count = slots owned; null = empty).</summary>
     public IReadOnlyList<RecipeDef> GetSlots(CraftingStation station) => slots[(int)station];
 
+    /// <summary>Any slot at any station holds a recipe. Pure, alloc-free.</summary>
+    public bool AnyRecipePinned
+    {
+        get
+        {
+            foreach (var list in slots)
+                foreach (var r in list)
+                    if (r != null) return true;
+            return false;
+        }
+    }
+
     public int GetStationSlots(CraftingStation station) => slots[(int)station].Count;
 
     public bool HasFreeSlot(CraftingStation station) => slots[(int)station].Contains(null);

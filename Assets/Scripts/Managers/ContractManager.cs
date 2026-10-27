@@ -78,6 +78,7 @@ public class ContractManager : PersistentSingleton<ContractManager>
     public int Seals { get; private set; }
     public int LifetimeSeals { get; private set; }
     public Contract Active { get; private set; }
+    public int AcceptedCount { get; private set; }   // lifetime (guild-hall notice board)
     public float RotationLeft => rotationLeft;
     public int FavorCost => favorCost;
     public int RushCost => rushCost;
@@ -213,6 +214,7 @@ public class ContractManager : PersistentSingleton<ContractManager>
         if (Active != null || slot < 0 || slot >= OfferSlots || offers[slot] == null) return false;
         Active = offers[slot];
         offers[slot] = null;   // refilled on the next rotation
+        AcceptedCount++;
         Active.progress = 0;
         Active.complete = false;
         GameSignals.RaiseContractAccepted(Active);
@@ -328,6 +330,7 @@ public class ContractManager : PersistentSingleton<ContractManager>
         rotationLeft = rotationLeft,
         offers = offers.ToList(),
         active = Active,
+        accepted = AcceptedCount,
     };
 
     /// <summary>Cold-boot restore (SaveManager.ApplyLate, after stock). Re-raises the usual signals for the UI.</summary>
@@ -336,6 +339,7 @@ public class ContractManager : PersistentSingleton<ContractManager>
         Seals = s.seals;
         LifetimeSeals = s.lifetimeSeals;
         Active = Resolve(s.active, items);
+        AcceptedCount = Mathf.Max(s.accepted, Active != null ? 1 : 0);   // saves before the counter: an active one counts
         if (s.offers.Count == 0)
             Rotate();   // save predates contracts
         else

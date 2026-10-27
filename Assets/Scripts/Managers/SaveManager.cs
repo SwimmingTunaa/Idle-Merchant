@@ -64,12 +64,14 @@ public class SaveManager : PersistentSingleton<SaveManager>
     // not passive-guarded — they size contracts, never offline income.
     private const int RateLayers = 11;   // index = layer (1..10)
     private readonly float[] tickKills = new float[RateLayers], emaKills = new float[RateLayers];
+    private readonly int[] killsByDepth = new int[RateLayers];   // lifetime kills per depth (guild-hall trophies), saved in progression
     private float tickServed, emaServed;
 
     public float GoldPerMin => rateWeight > 0f ? emaGold / rateWeight : 0f;
     public float LootPerMin => rateWeight > 0f ? emaLoot / rateWeight : 0f;
     public float ServedPerMin => rateWeight > 0f ? emaServed / rateWeight : 0f;
     public float KillsPerMin(int layer) => rateWeight > 0f && layer > 0 && layer < RateLayers ? emaKills[layer] / rateWeight : 0f;
+    public int KillsAtDepth(int depth) => depth > 0 && depth < RateLayers ? killsByDepth[depth] : 0;
 
     protected override void Awake()
     {
@@ -100,6 +102,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
         emaServed = pending.meta.servedPerMin;
         if (pending.meta.killsPerMin != null)
             Array.Copy(pending.meta.killsPerMin, emaKills, Mathf.Min(RateLayers, pending.meta.killsPerMin.Length));
+        if (pending.progression.killsByDepth != null)
+            Array.Copy(pending.progression.killsByDepth, killsByDepth, Mathf.Min(RateLayers, pending.progression.killsByDepth.Length));
         rateWeight = emaGold + emaLoot + emaServed + emaKills.Sum() > 0f ? 1f : 0f;
         ApplyEarly(pending);
         StartCoroutine(ApplyLate(pending));
@@ -186,6 +190,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
         foreach (var loot in FindObjectsByType<Loot>()) Bank(d, loot.GetItemDef(), loot.GetQuantity());
 
         d.progression = pm.ToSave();
+        d.progression.killsByDepth = (int[])killsByDepth.Clone();
+        d.decor.pending = DecorSlot.PendingIds();
         d.guild.ownedUpgrades = pm.OwnedUpgradeNames();
 
         var clicker = FindAnyObjectByType<ClickerManager>();
@@ -335,6 +341,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
             sfx.SfxVolume = d.settings.sfxVolume;
             sfx.MusicVolume = d.settings.musicVolume;
         }
+
+        DecorSlot.LoadPending(d.decor.pending);   // before the activators' Start: these unlock pending, the rest silently
     }
 
     // One frame later: every Start has run, so saved layers are active, CraftingManager has its inventory
@@ -397,7 +405,10 @@ public class SaveManager : PersistentSingleton<SaveManager>
     private void OnEntityDeath(GameObject dead)
     {
         if (dead != null && dead.TryGetComponent<MobAgent>(out var mob) && mob.layerIndex > 0 && mob.layerIndex < RateLayers)
+        {
             tickKills[mob.layerIndex]++;
+            killsByDepth[mob.layerIndex]++;
+        }
     }
 
     // Game time, so pause doesn't dilute the rate and a 3x session doesn't claim 3x offline (offline runs at 1x).
@@ -602,6 +613,7 @@ public class SaveData
     public List<UnitSave> roster = new List<UnitSave>();
     public ContractSave contracts = new ContractSave();
     public CraftingSave crafting;   // null in saves from before crafting batch 2 → defaults
+    public DecorSave decor = new DecorSave();
     public SettingsSave settings = new SettingsSave();
 }
 
@@ -659,6 +671,7 @@ public class ProgressionSave
     public List<string> reachedMilestones = new List<string>();  // StarMilestoneDef names
     public List<string> claimedMilestones = new List<string>();
     public int unseenStar;   // star fanfare trace still on the tracker (0 = none) — rebuilt on load, no replay
+    public int[] killsByDepth;   // lifetime kills by depth index (guild-hall trophies); null in older saves
 }
 
 public class ClickerSave
@@ -672,6 +685,7 @@ public class ContractSave
     public float rotationLeft;                     // seconds until the offers rotate
     public List<Contract> offers = new List<Contract>();   // 3 slots, null = accepted/empty; empty list = never rolled
     public Contract active;                        // kind + params + progress + snapshot target/rewards
+    public int accepted;                           // contracts ever accepted
     public List<FavorSave> favors = new List<FavorSave>(); // unhired Recruitment Favor candidates (pools aren't saved)
 }
 
@@ -684,6 +698,11 @@ public class FavorSave
     public CharacterAppearanceIndices appearance;
     public int startRank, hireCost;
     public string cursedCombo;     // CursedComboDef asset name, null if none
+}
+
+public class DecorSave
+{
+    public List<string> pending = new List<string>();   // DecorSlot ids unlocked but not yet seen (pop in on next look)
 }
 
 public class GuildSave

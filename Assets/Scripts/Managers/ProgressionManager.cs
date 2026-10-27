@@ -756,6 +756,15 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         return false;
     }
 
+    /// <summary>Owned upgrades of this type (ranked upgrades such as Porter Lodging I–III). No-alloc.</summary>
+    public int CountUpgrades(UpgradeType type)
+    {
+        int n = 0;
+        foreach (var u in ownedUpgrades)
+            if (u != null && u.upgradeType == type) n++;
+        return n;
+    }
+
     /// <summary>
     /// Check if a layer-specific upgrade is owned (e.g., Elevator on Layer 2).
     /// </summary>
