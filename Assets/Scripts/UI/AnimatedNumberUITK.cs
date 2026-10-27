@@ -83,8 +83,9 @@ public class AnimatedNumberUITK : MonoBehaviour
     // Public so other HUD code (e.g. the click upgrade cost label) abbreviates identically.
     public static string Abbrev(int n)
     {
-        if (n >= 1_000_000_000) return (n / 1_000_000_000f).ToString("0.#") + "B";
-        if (n >= 1_000_000)     return (n / 1_000_000f).ToString("0.#") + "M";
+        // Two fixed decimals from millions up so the label keeps ticking (one decimal only moved every 100K)
+        if (n >= 1_000_000_000) return (n / 1_000_000_000f).ToString("0.00") + "B";
+        if (n >= 1_000_000)     return (n / 1_000_000f).ToString("0.00") + "M";
         if (n >= 1_000)         return (n / 1_000f).ToString("0.#") + "K";
         return n.ToString("N0");
     }
