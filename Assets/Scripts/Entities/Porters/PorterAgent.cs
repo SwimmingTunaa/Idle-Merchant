@@ -56,6 +56,12 @@ public class PorterAgent : EntityStateMachine<PorterState>
     // Transport
     private TransportPoint transport;
     private Vector3 depositPoint; // Where to deposit at shop (set by PorterManager)
+
+    // Deposit: walk to the bin, bank everything at once, then toss one icon per AI tick (VFX only)
+    private const int MaxTosses = 6;
+    private readonly List<ItemDef> tosses = new();
+    private bool atBin;
+    private bool climbingDown;    // ReturnToLayer: false while walking back to the ladder top
     
     // State timing
     private CountdownTimer stateTimer;
@@ -200,35 +206,20 @@ public class PorterAgent : EntityStateMachine<PorterState>
                 break;
 
             case PorterState.Deposit:
-                targetPos = null;
-                
+                // Walk from the ladder top to the bin — only when this ladder lets out on the bin's floor
+                // (deeper ladders exit on the layer above, so those porters deposit right at the ladder top)
+                if (transport != null && Mathf.Abs(depositPoint.y - transport.GetExitPosition().y) < 1f) SetTarget(depositPoint);
+                else targetPos = null;
+                atBin = false;
+
                 stateTargetTime = Stats.DepositTime;
-                stateTimer = new CountdownTimer(stateTargetTime);
-                stateTimer.Start();
-                
-                // Trigger deposit animation
-                if (animator != null)
-                {
-                    animator.SetTrigger(AnimHash.Deposit);
-                }
+                stateTimer = new CountdownTimer(stateTargetTime);   // started on arrival (UpdateDeposit)
                 break;
 
             case PorterState.ReturnToLayer:
-                // Set climb bool to true for climbing DOWN
-                if (animator != null)
-                {
-                    animator.SetBool(AnimHash.Climb, true);
-                }
-                
-                // Climb back down: set target to entry point (bottom of ladder)
-                if (transport != null)
-                {
-                    Vector3 entryPos = transport.GetEntryPosition();
-                    SetTarget(entryPos);
-                    
-                    if (showDebugLogs)
-                        Debug.Log($"[{name}] Returning to layer - Climbing from {transform.position} to {entryPos}");
-                }
+                // Walk back to the ladder top first; UpdateReturnToLayer starts the climb down on arrival
+                climbingDown = false;
+                if (transport != null) SetTarget(transport.GetExitPosition());
                 break;
         }
     }
@@ -430,25 +421,28 @@ public class PorterAgent : EntityStateMachine<PorterState>
             if (showDebugLogs)
                 Debug.Log($"[{name}] Reached top of ladder! Moving to deposit point");
             
-            // Now move to deposit point
-            SetTarget(depositPoint);
-            ChangeState(PorterState.Deposit);
+            ChangeState(PorterState.Deposit);   // walks to the deposit point
         }
     }
 
     private void UpdateDeposit()
     {
-        stateTimer.Tick(TickDelta);
-
-        // Wait for deposit animation time
-        if (stateTimer.IsFinished)
+        if (!atBin)
         {
-            // Deposit all carried loot into inventory
+            if (targetPos.HasValue) return;   // still walking to the bin
+            atBin = true;
+
+            // Face the bin and bank all carried loot at once; the tosses below are VFX only
+            if (LootPile.Instance != null) FaceDirection(LootPile.Instance.transform.position.x - transform.position.x);
+            if (animator != null) animator.SetTrigger(AnimHash.Deposit);   // single pose: it can't retrigger itself at toss rate
+            stateTimer.Start();
+
+            tosses.Clear();
             foreach (var stack in carriedLoot)
             {
                 var inventory = Inventory.Instance.GetInventoryType(stack.itemDef.itemCategory);
                 Inventory.Instance.Add(inventory, stack);
-                if (LootPile.Instance != null) LootPile.Instance.FlyIn(stack.itemDef, transform.position + Vector3.up * 0.5f);
+                for (int i = 0; i < stack.qty && tosses.Count < MaxTosses; i++) tosses.Add(stack.itemDef);
                 if (SaveManager.Instance != null) SaveManager.Instance.RecordPorterDelivery(stack.qty);   // offline loot rate
 
                 if (showDebugLogs)
@@ -458,10 +452,21 @@ public class PorterAgent : EntityStateMachine<PorterState>
             // Clear carried loot
             carriedLoot.Clear();
             if (carryDisplay) carryDisplay.Refresh(carriedLoot);
-
-            // Now walk back down the ladder
-            ChangeState(PorterState.ReturnToLayer);
         }
+
+        stateTimer.Tick(TickDelta);
+
+        // One toss per AI tick (~0.1s apart) from hand height, arcing into the heap
+        if (tosses.Count > 0)
+        {
+            int last = tosses.Count - 1;
+            if (LootPile.Instance != null) LootPile.Instance.FlyIn(tosses[last], transform.position + Vector3.up * 0.5f, toss: true);
+            tosses.RemoveAt(last);
+        }
+
+        // Deposit time up and every toss thrown: walk back to the ladder
+        if (stateTimer.IsFinished && tosses.Count == 0)
+            ChangeState(PorterState.ReturnToLayer);
     }
 
     private void UpdateReturnToLayer()
@@ -474,6 +479,19 @@ public class PorterAgent : EntityStateMachine<PorterState>
         }
 
         Vector3 entryPos = transport.GetEntryPosition();
+
+        if (!climbingDown)
+        {
+            if (targetPos.HasValue) return;   // still walking back to the ladder top
+            climbingDown = true;
+            if (animator != null) animator.SetBool(AnimHash.Climb, true);   // climbing DOWN
+            SetTarget(entryPos);
+
+            if (showDebugLogs)
+                Debug.Log($"[{name}] Returning to layer - Climbing from {transform.position} to {entryPos}");
+            return;
+        }
+
         float distance = Vector3.Distance(transform.position, entryPos);
         
         if (showDebugLogs)

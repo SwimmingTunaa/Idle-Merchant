@@ -27,6 +27,8 @@ public class WorkshopProp : MonoBehaviour
     [SerializeField] private Animator worker;
 
     private static readonly int WorkingHash = Animator.StringToHash("Working");
+    private const int MaxTosses = 5;
+    private static readonly WaitForSeconds TossGap = new(0.1f);
     private const float WorkerPollInterval = 0.25f;
     private float workerTimer;
 
@@ -64,7 +66,33 @@ public class WorkshopProp : MonoBehaviour
         GameSignals.OnCraftingConfigChanged -= Refresh;
     }
 
+    // Enabled props only: a hidden/disabled station throws nothing (the item is already banked either way)
+    void OnEnable() => GameSignals.OnProductCrafted += OnProductCrafted;
+    void OnDisable() => GameSignals.OnProductCrafted -= OnProductCrafted;
+
     private void OnUpgradePurchased(GuildUpgradeDef _) => Refresh();
+
+    // A finished job's recipe is always pinned in one of its station's slots, so that's how a craft finds its prop
+    private void OnProductCrafted(ResourceStack stack)
+    {
+        if (!lit || worker == null || LootPile.Instance == null || CraftingManager.Instance == null) return;
+        foreach (var recipe in CraftingManager.Instance.GetSlots(station))
+            if (recipe != null && recipe.Output == stack.itemDef)
+            {
+                StartCoroutine(TossToPile(stack.itemDef, Mathf.Min(stack.qty, MaxTosses)));
+                return;
+            }
+    }
+
+    // VFX only: the worker throws one icon per output item, from hand height, into the shop heap
+    private System.Collections.IEnumerator TossToPile(ItemDef item, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (i > 0) yield return TossGap;
+            if (LootPile.Instance != null) LootPile.Instance.FlyIn(item, worker.transform.position + Vector3.up * 0.5f, toss: true);
+        }
+    }
 
     private void Refresh()
     {

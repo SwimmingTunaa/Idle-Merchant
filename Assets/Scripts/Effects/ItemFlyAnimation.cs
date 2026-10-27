@@ -32,6 +32,7 @@ public class ItemFlyAnimation : MonoBehaviour
     private Vector3? worldTarget;   // set → world→world flight, re-projected every frame (camera may pan)
     private Transform homing;       // set → worldTarget follows this each frame (moving target, e.g. a walking customer)
     private float speed = 1f;       // phase-time multiplier; >1 = snappier hop
+    private float arc = 1f;         // arc-height multiplier; >1 = loftier toss
     private Vector3 explosionVelocity;
     private System.Action onArrivalCallback;
     
@@ -59,16 +60,17 @@ public class ItemFlyAnimation : MonoBehaviour
     /// <summary>Fly to a world point (e.g. the shop loot pile) instead of a UI screen point.
     /// With <paramref name="homingTarget"/>, the point tracks that transform until it deactivates (then freezes).</summary>
     public void StartFlightToWorld(Vector3 target, Vector3 explosionDir, System.Action onComplete = null,
-        Transform homingTarget = null, float speedMultiplier = 1f)
-        => Begin(WorldToScreen(target), target, explosionDir, onComplete, homingTarget, speedMultiplier);
+        Transform homingTarget = null, float speedMultiplier = 1f, float arcScale = 1f)
+        => Begin(WorldToScreen(target), target, explosionDir, onComplete, homingTarget, speedMultiplier, arcScale);
 
     private void Begin(Vector2 screenTarget, Vector3? world, Vector3 randomExplosionDir, System.Action onComplete,
-        Transform homingTarget = null, float speedMultiplier = 1f)
+        Transform homingTarget = null, float speedMultiplier = 1f, float arcScale = 1f)
     {
         targetScreenPosition = screenTarget;
         worldTarget = world;
         homing = homingTarget;
         speed = Mathf.Max(0.01f, speedMultiplier);
+        arc = arcScale;
         explosionVelocity = randomExplosionDir * explosionForce;
         onArrivalCallback = onComplete;
         
@@ -127,7 +129,7 @@ public class ItemFlyAnimation : MonoBehaviour
             float arcBase = worldTarget.HasValue
                 ? Vector2.Distance(startScreenPos, targetScreenPosition) * 0.25f
                 : Screen.height * 0.1f;
-            float arcOffset = Mathf.Sin(easedT * Mathf.PI) * arcHeight * arcBase;
+            float arcOffset = Mathf.Sin(easedT * Mathf.PI) * arcHeight * arc * arcBase;
             currentScreenPos.y += arcOffset;
             
             transform.position = ScreenToWorld(currentScreenPos);

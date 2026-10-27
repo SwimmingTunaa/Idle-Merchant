@@ -9644,7 +9644,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
   showDebugLogs: 0
   transport: {fileID: 1642071349}
-  depositPoint: {fileID: 1446923805}
+  depositPoint: {fileID: 1426513257}
   capacityPerLodging: 2
 --- !u!4 &311339225
 Transform:
@@ -41410,7 +41410,7 @@ Transform:
   m_GameObject: {fileID: 1426513256}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 37.33, y: 0.573, z: 0}
+  m_LocalPosition: {x: 24.6, y: 0, z: 0}
   m_LocalScale: {x: 1.8663938, y: 1.469125, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42136,6 +42136,7 @@ MonoBehaviour:
   saleTarget: {fileID: 0}
   saleHopSpeed: 2
   shopkeeper: {fileID: 1941216135}
+  tossArcScale: 1.25
 --- !u!1 &1447619900
 GameObject:
   m_ObjectHideFlags: 0

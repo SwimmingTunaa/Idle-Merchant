@@ -31,6 +31,8 @@ public class LootPile : PersistentSingleton<LootPile>
     [SerializeField] private float saleHopSpeed = 2f;
     [Tooltip("Shopkeeper sprite: turns to face the pile (flipX inverted from rest) while any sale's pile→counter leg is in flight. Optional.")]
     [SerializeField] private SpriteRenderer shopkeeper;
+    [Tooltip("Arc multiplier for tossed fly-ins (porter deposits, station workers) — a touch loftier than the default hop (the arc already grows with distance: 1.25 keeps the forge→bin throw under the hall beams).")]
+    [SerializeField] private float tossArcScale = 1.25f;
 
     private SpriteRenderer[] slots;
     private int visibleCount;
@@ -116,11 +118,12 @@ public class LootPile : PersistentSingleton<LootPile>
         if (shopkeeper != null) shopkeeper.flipX = summoning > 0 ? !shopkeeperRestFlip : shopkeeperRestFlip;
     }
 
-    /// <summary>Fly one item icon from a world point into the pile (VFX only — the item is already banked).</summary>
-    public void FlyIn(ItemDef item, Vector3 from)
+    /// <summary>Fly one item icon from a world point into the pile (VFX only — the item is already banked).
+    /// <paramref name="toss"/> = thrown by hand (porter, station worker): a loftier arc.</summary>
+    public void FlyIn(ItemDef item, Vector3 from, bool toss = false)
     {
         if (item == null || ItemExplosionVFX.Instance == null) return;
-        ItemExplosionVFX.Instance.FlyToWorld(Icon(item), from, TopOfHeap);
+        ItemExplosionVFX.Instance.FlyToWorld(Icon(item), from, TopOfHeap, arcScale: toss ? tossArcScale : 1f);
     }
 
     private void Rebuild()
