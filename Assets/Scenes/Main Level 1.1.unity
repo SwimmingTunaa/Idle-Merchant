@@ -605,6 +605,7 @@ GameObject:
   - component: {fileID: 24607663}
   - component: {fileID: 24607662}
   - component: {fileID: 24607661}
+  - component: {fileID: 24607664}
   m_Layer: 0
   m_Name: banner_l
   m_TagString: Untagged
@@ -661,6 +662,9 @@ MonoBehaviour:
   slotId: banner_l
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: 7b6ae337628a54b0aa7fe28a597d2c37, type: 2}
+  displayName: Guild Banner
+  hoverOutlineLayer: 2
 --- !u!212 &24607663
 SpriteRenderer:
   serializedVersion: 3
@@ -721,6 +725,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &24607664
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24607659}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.625, y: 3.5}
+    newSize: {x: 1.625, y: 3.5}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.625, y: 3.5}
+  m_EdgeRadius: 0
 --- !u!1 &26767901
 GameObject:
   m_ObjectHideFlags: 0
@@ -3012,6 +3062,9 @@ MonoBehaviour:
   slotId: trophy_5
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &177876802
 SpriteRenderer:
   serializedVersion: 3
@@ -13549,6 +13602,7 @@ GameObject:
   - component: {fileID: 448590318}
   - component: {fileID: 448590317}
   - component: {fileID: 448590316}
+  - component: {fileID: 448590319}
   m_Layer: 0
   m_Name: banner_r
   m_TagString: Untagged
@@ -13605,6 +13659,9 @@ MonoBehaviour:
   slotId: banner_r
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: 7b6ae337628a54b0aa7fe28a597d2c37, type: 2}
+  displayName: Guild Banner
+  hoverOutlineLayer: 2
 --- !u!212 &448590318
 SpriteRenderer:
   serializedVersion: 3
@@ -13665,6 +13722,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &448590319
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448590314}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.625, y: 3.5}
+    newSize: {x: 1.625, y: 3.5}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.625, y: 3.5}
+  m_EdgeRadius: 0
 --- !u!1 &453232515
 GameObject:
   m_ObjectHideFlags: 0
@@ -13677,6 +13780,7 @@ GameObject:
   - component: {fileID: 453232519}
   - component: {fileID: 453232518}
   - component: {fileID: 453232517}
+  - component: {fileID: 453232520}
   m_Layer: 0
   m_Name: chandelier_l
   m_TagString: Untagged
@@ -13733,6 +13837,9 @@ MonoBehaviour:
   slotId: chandelier_l
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: c08c4b34f0aa947bb9099a5b2612ead5, type: 2}
+  displayName: Chandelier
+  hoverOutlineLayer: 2
 --- !u!212 &453232519
 SpriteRenderer:
   serializedVersion: 3
@@ -13793,6 +13900,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &453232520
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453232515}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.875, y: 2.75}
+    newSize: {x: 1.875, y: 2.75}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.875, y: 2.75}
+  m_EdgeRadius: 0
 --- !u!1 &455401621
 GameObject:
   m_ObjectHideFlags: 0
@@ -23915,7 +24068,7 @@ MonoBehaviour:
   requiredValue: 1
   requiredUpgrade: {fileID: 0}
   targetObject: {fileID: 0}
-  displayName: 
+  displayName: Crest
   deactivateOnStart: 1
   showDebugLogs: 0
 --- !u!114 &836117278
@@ -23938,6 +24091,9 @@ MonoBehaviour:
   - {r: 0.78431374, g: 0.8039216, b: 0.84313726, a: 1}
   - {r: 0.9411765, g: 0.7058824, b: 0.16078432, a: 1}
   - {r: 0.9411765, g: 0.7058824, b: 0.16078432, a: 1}
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &836117279
 SpriteRenderer:
   serializedVersion: 3
@@ -24066,6 +24222,9 @@ MonoBehaviour:
   slotId: trophy_2
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &837163782
 SpriteRenderer:
   serializedVersion: 3
@@ -35876,6 +36035,9 @@ MonoBehaviour:
   slotId: trophy_3
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &1198683988
 SpriteRenderer:
   serializedVersion: 3
@@ -39881,6 +40043,7 @@ GameObject:
   - component: {fileID: 1335882203}
   - component: {fileID: 1335882202}
   - component: {fileID: 1335882201}
+  - component: {fileID: 1335882204}
   m_Layer: 0
   m_Name: chandelier_r
   m_TagString: Untagged
@@ -39937,6 +40100,9 @@ MonoBehaviour:
   slotId: chandelier_r
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: c08c4b34f0aa947bb9099a5b2612ead5, type: 2}
+  displayName: Chandelier
+  hoverOutlineLayer: 2
 --- !u!212 &1335882203
 SpriteRenderer:
   serializedVersion: 3
@@ -39997,6 +40163,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &1335882204
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335882199}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.875, y: 2.75}
+    newSize: {x: 1.875, y: 2.75}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.875, y: 2.75}
+  m_EdgeRadius: 0
 --- !u!1 &1348341556
 GameObject:
   m_ObjectHideFlags: 0
@@ -44490,6 +44702,7 @@ GameObject:
   - component: {fileID: 1574510323}
   - component: {fileID: 1574510322}
   - component: {fileID: 1574510321}
+  - component: {fileID: 1574510324}
   m_Layer: 0
   m_Name: bunk_3
   m_TagString: Untagged
@@ -44546,6 +44759,9 @@ MonoBehaviour:
   slotId: bunk_3
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: 47b7385fb9b57405cb2028757d1cec13, type: 2}
+  displayName: Porter Bunk
+  hoverOutlineLayer: 2
 --- !u!212 &1574510323
 SpriteRenderer:
   serializedVersion: 3
@@ -44595,9 +44811,9 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 369723966, guid: 5409788010edd41089f857bac79e912a, type: 3}
+  m_Sprite: {fileID: 1363802092, guid: 5409788010edd41089f857bac79e912a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 3.75, y: 1.75}
@@ -44606,6 +44822,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &1574510324
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574510319}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.75, y: 1.75}
+    newSize: {x: 3.75, y: 1.75}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3.75, y: 1.75}
+  m_EdgeRadius: 0
 --- !u!1 &1575823969
 GameObject:
   m_ObjectHideFlags: 0
@@ -47024,6 +47286,9 @@ MonoBehaviour:
   slotId: notice
   lockedSprite: {fileID: -1675428016, guid: 5409788010edd41089f857bac79e912a, type: 3}
   starTints: []
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &1758709294
 SpriteRenderer:
   serializedVersion: 3
@@ -47532,6 +47797,9 @@ MonoBehaviour:
   slotId: trophy_1
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &1792946659
 SpriteRenderer:
   serializedVersion: 3
@@ -47815,6 +48083,7 @@ GameObject:
   - component: {fileID: 1813108565}
   - component: {fileID: 1813108564}
   - component: {fileID: 1813108563}
+  - component: {fileID: 1813108566}
   m_Layer: 0
   m_Name: bunk_2
   m_TagString: Untagged
@@ -47871,6 +48140,9 @@ MonoBehaviour:
   slotId: bunk_2
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: 36f451940b7e443f5af17c5fab22e34c, type: 2}
+  displayName: Porter Bunk
+  hoverOutlineLayer: 2
 --- !u!212 &1813108565
 SpriteRenderer:
   serializedVersion: 3
@@ -47931,6 +48203,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &1813108566
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813108561}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.75, y: 1.75}
+    newSize: {x: 3.75, y: 1.75}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3.75, y: 1.75}
+  m_EdgeRadius: 0
 --- !u!1 &1815461331
 GameObject:
   m_ObjectHideFlags: 0
@@ -50326,6 +50644,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1837106733}
   - component: {fileID: 1837106734}
+  - component: {fileID: 1837106735}
   m_Layer: 0
   m_Name: Workshop Panel
   m_TagString: Untagged
@@ -50360,6 +50679,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: addcd5e8937d44db89b4cbc578174a8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorkshopPanelController
+  uiDocument: {fileID: 1433364562}
+  panelAsset: {fileID: 0}
+  blocksWorldInput: 1
+  isModal: 1
+  openCloseDuration: 0.3
+  hasOverlay: 1
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
+--- !u!114 &1837106735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1837106732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d36f25deac2cb44f0b1d43578d591af8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DecoratePanelController
   uiDocument: {fileID: 1433364562}
   panelAsset: {fileID: 0}
   blocksWorldInput: 1
@@ -59304,6 +59643,7 @@ GameObject:
   - component: {fileID: 2106669705}
   - component: {fileID: 2106669704}
   - component: {fileID: 2106669703}
+  - component: {fileID: 2106669706}
   m_Layer: 0
   m_Name: bunk_1
   m_TagString: Untagged
@@ -59360,6 +59700,9 @@ MonoBehaviour:
   slotId: bunk_1
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: 47b7385fb9b57405cb2028757d1cec13, type: 2}
+  displayName: Porter Bunk
+  hoverOutlineLayer: 2
 --- !u!212 &2106669705
 SpriteRenderer:
   serializedVersion: 3
@@ -59420,6 +59763,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &2106669706
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106669701}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.75, y: 1.75}
+    newSize: {x: 3.75, y: 1.75}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3.75, y: 1.75}
+  m_EdgeRadius: 0
 --- !u!1 &2110482945
 GameObject:
   m_ObjectHideFlags: 0
@@ -59524,6 +59913,7 @@ GameObject:
   - component: {fileID: 2112393506}
   - component: {fileID: 2112393505}
   - component: {fileID: 2112393504}
+  - component: {fileID: 2112393507}
   m_Layer: 0
   m_Name: bookcase
   m_TagString: Untagged
@@ -59580,6 +59970,9 @@ MonoBehaviour:
   slotId: bookcase
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 11400000, guid: c2c0f1b3e9af84b51bddfe199e11646c, type: 2}
+  displayName: Bookcase
+  hoverOutlineLayer: 2
 --- !u!212 &2112393506
 SpriteRenderer:
   serializedVersion: 3
@@ -59640,6 +60033,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!61 &2112393507
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112393502}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.125, y: 3.75}
+    newSize: {x: 3.125, y: 3.75}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3.125, y: 3.75}
+  m_EdgeRadius: 0
 --- !u!1 &2118321983
 GameObject:
   m_ObjectHideFlags: 0
@@ -62318,6 +62757,9 @@ MonoBehaviour:
   slotId: trophy_4
   lockedSprite: {fileID: 0}
   starTints: []
+  defaultVariant: {fileID: 0}
+  displayName: 
+  hoverOutlineLayer: 2
 --- !u!212 &2125167102
 SpriteRenderer:
   serializedVersion: 3

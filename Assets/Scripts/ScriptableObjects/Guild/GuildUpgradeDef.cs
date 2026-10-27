@@ -26,6 +26,9 @@ public class GuildUpgradeDef : ScriptableObject
     [Range(0, 5)]
     public int starRequirement = 1;
 
+    [Tooltip("Upgrade that must be owned first (ranked upgrades: Porter Lodging II needs I). Empty = none")]
+    public GuildUpgradeDef requiredUpgrade;
+
     [Header("Upgrade Type")]
     [Tooltip("What type of upgrade is this?")]
     public UpgradeType upgradeType = UpgradeType.ForgingStation;

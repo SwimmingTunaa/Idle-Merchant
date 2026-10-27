@@ -689,6 +689,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         if (upgrade == null) return false;
         if (ownedUpgrades.Contains(upgrade)) return false; // Already owned
         if (currentStars < upgrade.starRequirement) return false; // Insufficient stars
+        if (upgrade.requiredUpgrade != null && !ownedUpgrades.Contains(upgrade.requiredUpgrade)) return false; // Previous rank first
         if (!Inventory.Instance.CanAfford(upgrade.goldCost)) return false; // Insufficient gold
 
         return true;

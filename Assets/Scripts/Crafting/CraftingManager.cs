@@ -235,17 +235,8 @@ public class CraftingManager : MonoBehaviour
     /// <summary>The station's slots in order (count = slots owned; null = empty).</summary>
     public IReadOnlyList<RecipeDef> GetSlots(CraftingStation station) => slots[(int)station];
 
-    /// <summary>Any slot at any station holds a recipe. Pure, alloc-free.</summary>
-    public bool AnyRecipePinned
-    {
-        get
-        {
-            foreach (var list in slots)
-                foreach (var r in list)
-                    if (r != null) return true;
-            return false;
-        }
-    }
+    /// <summary>A recipe has ever been pinned (latched; saved). Guild-hall bookcase.</summary>
+    public bool EverPinned { get; private set; }
 
     public int GetStationSlots(CraftingStation station) => slots[(int)station].Count;
 
@@ -259,6 +250,7 @@ public class CraftingManager : MonoBehaviour
         if (index < 0 || index >= list.Count || list[index] == recipe || (recipe != null && recipe.Station != station)) return;
         CancelJob(station, index);
         list[index] = recipe;
+        if (recipe != null) EverPinned = true;
         if (showDebugLogs) Debug.Log($"[CraftingManager] {station} slot {index + 1} = {(recipe != null ? recipe.name : "empty")}");
         GameSignals.RaiseCraftingConfigChanged();
     }
@@ -362,7 +354,7 @@ public class CraftingManager : MonoBehaviour
 
     public CraftingSave ToSave()
     {
-        var s = new CraftingSave { slots = new Dictionary<CraftingStation, List<string>>() };
+        var s = new CraftingSave { slots = new Dictionary<CraftingStation, List<string>>(), everPinned = EverPinned };
         foreach (var r in craftingRecipes)
             s.recipes[r.name] = new RecipeSave { cap = GetCap(r) };
         for (int i = 0; i < slots.Length; i++)
@@ -430,6 +422,7 @@ public class CraftingManager : MonoBehaviour
             if (slot < 0) { Refund(r); continue; }
             activeCrafts.Add(new CraftingJob { recipe = r, station = r.Station, slot = slot, timeRemaining = Mathf.Clamp(j.remaining, 0f, r.CraftSeconds) });
         }
+        EverPinned = s.everPinned || slots.Any(list => list.Any(r => r != null));   // saves before the flag: pinned now counts
         GameSignals.RaiseCraftingConfigChanged();
     }
 

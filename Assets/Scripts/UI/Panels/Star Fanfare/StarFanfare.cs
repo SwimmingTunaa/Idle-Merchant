@@ -129,7 +129,7 @@ public class StarFanfare : MonoBehaviour
 
     public struct Unlock { public string tag, title, brief, iconClass; public Sprite icon; }
 
-    /// <summary>What a star opened, in card order; an entry is skipped when its source is empty. Phase 1: no GUILD HALL.</summary>
+    /// <summary>What a star opened, in card order; an entry is skipped when its source is empty.</summary>
     public static List<Unlock> Unlocks(int s)
     {
         var list = new List<Unlock>();
@@ -160,6 +160,21 @@ public class StarFanfare : MonoBehaviour
             && (reward.upgradesGranted?.Length > 0 || reward.upgradesAvailableForPurchase?.Length > 0 || reward.recipesUnlocked?.Length > 0))
             list.Add(new Unlock { tag = "REWARD", title = reward.rewardTitle, brief = reward.rewardTitle,
                                   icon = reward.rewardIcon, iconClass = reward.rewardIcon == null ? "btn-coin" : null });
+
+        // Guild-hall decor this star unlocks (or re-tints, the crest), by its activator's displayName, scene order
+        var hall = new List<string>();
+        var activators = FindObjectsByType<ProgressionActivator>(FindObjectsInactive.Include);
+        System.Array.Sort(activators, (a, b) => a.transform.GetSiblingIndex().CompareTo(b.transform.GetSiblingIndex()));
+        foreach (var a in activators)
+        {
+            if (a.Trigger != ActivationTrigger.StarEarned || string.IsNullOrEmpty(a.DisplayName) || hall.Contains(a.DisplayName)) continue;
+            if (a.RequiredValue == s || (a.TryGetComponent(out DecorSlot slot) && slot.TintChangesAt(s))) hall.Add(a.DisplayName);
+        }
+        if (hall.Count > 0)
+        {
+            string names = string.Join(" & ", hall);
+            list.Add(new Unlock { tag = "GUILD HALL", title = names, brief = names, iconClass = "sf-ic--hall" });
+        }
         return list;
     }
 
@@ -188,9 +203,11 @@ public class StarFanfare : MonoBehaviour
 
         cardRow.Clear();
         cards.Clear();
-        foreach (var u in Unlocks(s))
+        var unlocks = Unlocks(s);
+        if (unlocks.Count > 4) unlocks.RemoveAll(u => u.tag == "REWARD");   // max 4 cards: REWARD rides the tracker summary only
+        foreach (var u in unlocks)
         {
-            if (cards.Count == 4) break;   // phase 1 has at most 4 (GUILD HALL lands in phase 2)
+            if (cards.Count == 4) break;
             var card = new VisualElement { pickingMode = PickingMode.Ignore };   // picks once stamped
             card.AddToClassList("sf-card");
             var icon = new VisualElement { pickingMode = PickingMode.Ignore };

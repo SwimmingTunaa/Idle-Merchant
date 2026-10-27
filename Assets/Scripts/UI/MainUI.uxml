@@ -5,6 +5,7 @@
     <ui:Template name="PausePanel" src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/Pause_Panel.uxml?fileID=9197481963319205126&amp;guid=d86de3818b09844edb6036a25b22e634&amp;type=3#Pause_Panel"/>
     <ui:Template name="WorkshopPanel" src="project://database/Assets/Scripts/UI/Panels/Workshop/WorkshopPanel.uxml"/>
     <ui:Template name="ClassPickPanel" src="project://database/Assets/Scripts/UI/Panels/Class%20Pick/ClassPickPanel.uxml"/>
+    <ui:Template name="DecoratePanel" src="project://database/Assets/Scripts/UI/Panels/Decorate/DecoratePanel.uxml"/>
     <ui:Template name="StarFanfare" src="project://database/Assets/Scripts/UI/Panels/Star%20Fanfare/StarFanfare.uxml"/>
     <ui:Template name="WelcomeBack" src="project://database/Assets/Scripts/UI/Panels/Welcome%20Back/WelcomeBack.uxml"/>
     <ui:Template name="TopNavigation" src="project://database/Assets/Scripts/UI/TopNavigation.uxml?fileID=9197481963319205126&amp;guid=ea5112a68ff84455992e270c7a46c49f&amp;type=3#TopNavigation"/>
@@ -24,6 +25,8 @@
         <ui:Instance template="WelcomeBack" name="WelcomeBack" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
         <!-- last child of main-root, so its dim backdrop covers the top nav and milestone tracker too -->
         <ui:Instance template="ClassPickPanel" name="ClassPickPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
+        <!-- guild-hall Decorate modal (click a decor slot); before StarFanfare so the fanfare draws on top -->
+        <ui:Instance template="DecoratePanel" name="DecoratePanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         <!-- star fanfare draws over everything (book, HUD, tracker); never picks except its ribbon and cards -->
         <ui:Instance template="StarFanfare" name="StarFanfare" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
     </ui:VisualElement>

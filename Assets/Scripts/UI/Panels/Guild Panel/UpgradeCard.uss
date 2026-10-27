@@ -69,6 +69,16 @@
     -unity-background-scale-mode: scale-to-fit;
 }
 
+/* "Needs <previous rank>" (requiredUpgrade): longer than "Requires N★", so smaller and allowed two lines */
+.guild-card-lock--prev .btn-label {
+    font-size: var(--font-size-small);
+    white-space: normal;
+}
+
+.guild-card-lock--prev .guild-card-lock-star {
+    display: none;
+}
+
 .guild-card--locked {
     opacity: 0.85;
 }

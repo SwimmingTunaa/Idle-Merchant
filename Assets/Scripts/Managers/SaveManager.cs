@@ -191,7 +191,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         d.progression = pm.ToSave();
         d.progression.killsByDepth = (int[])killsByDepth.Clone();
-        d.decor.pending = DecorSlot.PendingIds();
+        d.decor = DecorSlot.ToSave();
         d.guild.ownedUpgrades = pm.OwnedUpgradeNames();
 
         var clicker = FindAnyObjectByType<ClickerManager>();
@@ -342,7 +342,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
             sfx.MusicVolume = d.settings.musicVolume;
         }
 
-        DecorSlot.LoadPending(d.decor.pending);   // before the activators' Start: these unlock pending, the rest silently
+        DecorSlot.LoadFrom(d.decor);   // before the slots'/activators' Start: pending ids pop on next look, placed variants resolve
     }
 
     // One frame later: every Start has run, so saved layers are active, CraftingManager has its inventory
@@ -641,6 +641,7 @@ public class CraftingSave
     // Per station, ordered slots: RecipeDef asset name or null (empty). Count = slots owned. Null in pre-3b saves.
     public Dictionary<CraftingStation, List<string>> slots;
     public List<CraftJobSave> jobs = new List<CraftJobSave>();   // running jobs (ingredients already consumed)
+    public bool everPinned;   // a recipe was ever pinned (guild-hall bookcase stays after unpinning)
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public Dictionary<CraftingStation, int> stationSlots;   // legacy (pre-3b) slot counts; read-only
@@ -703,6 +704,8 @@ public class FavorSave
 public class DecorSave
 {
     public List<string> pending = new List<string>();   // DecorSlot ids unlocked but not yet seen (pop in on next look)
+    public Dictionary<string, string> placed = new Dictionary<string, string>();   // slotId → DecorVariantDef name (defaults omitted)
+    public List<string> owned = new List<string>();     // DecorVariantDef names bought with seals
 }
 
 public class GuildSave

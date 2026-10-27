@@ -81,6 +81,7 @@ public class ClickerManager : MonoBehaviour
 
     private AdventurerAgent hoveredAdv;
     private WorkshopProp hoveredProp;
+    private DecorSlot hoveredDecor;
 
     /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
     public float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
@@ -249,6 +250,7 @@ public class ClickerManager : MonoBehaviour
     {
         AdventurerAgent under = null;
         WorkshopProp prop = null;
+        DecorSlot decor = null;
 
         // No world hover while the book is open (you're already inside it).
         if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
@@ -258,9 +260,18 @@ public class ClickerManager : MonoBehaviour
             {
                 if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
                 if (prop == null) hit.TryGetComponent(out prop);
+                if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
             }
         }
         if (under != null) prop = null;   // a hero standing in front of a workshop takes the outline
+        if (under != null || prop != null) decor = null;   // click priority: workshops before decor
+
+        if (decor != hoveredDecor)
+        {
+            if (hoveredDecor != null) hoveredDecor.SetHover(false);
+            hoveredDecor = decor;
+            if (hoveredDecor != null) hoveredDecor.SetHover(true);
+        }
 
         if (prop != hoveredProp)
         {
@@ -343,6 +354,14 @@ public class ClickerManager : MonoBehaviour
         {
             if (!hit.TryGetComponent(out WorkshopProp prop)) continue;
             FindAnyObjectByType<WorkshopPanelController>()?.OpenFor(prop);
+            return;
+        }
+
+        // Priority 4: a swappable guild-hall decor slot opens Decorate (locked / pending slots and trophies don't)
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out DecorSlot decor) || !decor.CanDecorate) continue;
+            FindAnyObjectByType<DecoratePanelController>()?.OpenFor(decor);
             return;
         }
 

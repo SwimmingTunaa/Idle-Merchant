@@ -223,18 +223,23 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         card.Q<Label>("upgrade-name").text = upgrade.upgradeName;
         card.Q<Label>("upgrade-description").text = upgrade.description;
         card.Q<Label>("purchase-label").text = AnimatedNumberUITK.Abbrev(upgrade.goldCost);
-        card.Q<Label>("lock-label").text = $"Requires {upgrade.starRequirement}";
         card.Q<Button>("purchase-button").clicked += () => OnPurchaseClicked(upgrade);
 
         UpdateCardState(card, upgrade);
         return card;
     }
 
-    // Exactly one bottom slot: Owned pill / "Requires N★" lock pill / buy button (disabled while unaffordable).
+    // Exactly one bottom slot: Owned pill / "Requires N★" or "Needs <previous rank>" lock pill / buy button (disabled while unaffordable).
     private void UpdateCardState(VisualElement card, GuildUpgradeDef upgrade)
     {
-        bool owned = ProgressionManager.Instance.IsUpgradeOwned(upgrade);
-        bool locked = !owned && ProgressionManager.Instance.GetCurrentStars() < upgrade.starRequirement;
+        var pm = ProgressionManager.Instance;
+        bool owned = pm.IsUpgradeOwned(upgrade);
+        bool starLocked = !owned && pm.GetCurrentStars() < upgrade.starRequirement;
+        var prev = upgrade.requiredUpgrade;
+        bool prevLocked = !owned && !starLocked && prev != null && !pm.IsUpgradeOwned(prev);
+        bool locked = starLocked || prevLocked;
+        card.Q<Label>("lock-label").text = prevLocked ? $"Needs {prev.upgradeName}" : $"Requires {upgrade.starRequirement}";
+        card.Q<VisualElement>("lock-pill").EnableInClassList("guild-card-lock--prev", prevLocked);   // small, wrapping label, no star
 
         card.Q<VisualElement>("card-root").EnableInClassList("guild-card--locked", locked);
         card.Q<VisualElement>("owned-pill").style.display = owned ? DisplayStyle.Flex : DisplayStyle.None;

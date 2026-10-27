@@ -1,0 +1,74 @@
+/* Decorate modal — the Workshop panel's stone wall + beam, title and pixel-slip close (WorkshopPanel.uss wp-*),
+   one iron-plate row per variant: whole-pixel preview, name, Placed / Place / Buy n seals. */
+
+.dp-host {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    -unity-font-definition: var(--font-body);
+}
+
+.dp-card {
+    width: 600px;
+}
+
+.dp-body {
+    padding: 12px 22px 0 22px;
+}
+
+.dp-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px 14px;
+    background-image: url("project://database/Assets/Sprites/UI/Workshop/iron-plate.png");
+    -unity-slice-left: 2;
+    -unity-slice-top: 2;
+    -unity-slice-right: 2;
+    -unity-slice-bottom: 2;
+    -unity-slice-scale: 3px;
+}
+
+/* sprite sized in code at the largest whole scale that fits 96px */
+.dp-preview {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    margin-right: 14px;
+    align-items: center;
+    justify-content: center;
+}
+
+.dp-row__name {
+    flex-grow: 1;
+    font-size: var(--font-size-body);
+    color: rgb(243, 220, 160);
+}
+
+.dp-btn {
+    min-width: 128px;
+    margin: 0;
+    padding: 7px 16px 11px 16px;
+}
+
+.dp-btn Label {
+    font-size: var(--font-size-small);
+}
+
+.dp-btn.btn-success Label {
+    color: rgb(20, 38, 15);
+}
+
+.dp-btn:disabled Label {
+    color: rgb(80, 80, 80);
+}
+
+.dp-btn__seal {
+    width: 20px;
+    height: 20px;
+    margin: 0 0 0 6px;
+}

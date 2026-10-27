@@ -39,6 +39,8 @@ public class ProgressionActivator : MonoBehaviour
     public const int KillsAtDepthThreshold = 100;
 
     public string DisplayName => displayName;
+    public ActivationTrigger Trigger => trigger;
+    public int RequiredValue => requiredValue;
 
     private DecorSlot decor;
 
@@ -176,7 +178,7 @@ public class ProgressionActivator : MonoBehaviour
                 return ContractManager.Instance != null && ContractManager.Instance.AcceptedCount > 0;
 
             case ActivationTrigger.RecipePinned:
-                return CraftingManager.Instance != null && CraftingManager.Instance.AnyRecipePinned;
+                return CraftingManager.Instance != null && CraftingManager.Instance.EverPinned;
             
             default:
                 return false;
@@ -260,5 +262,5 @@ public enum ActivationTrigger
     UpgradePurchased,   // Activate when specific upgrade purchased (e.g., Forging Station)
     KillsAtDepth,       // Lifetime kills at depth requiredValue reach KillsAtDepthThreshold (serialized ints: append only)
     ContractAccepted,   // First contract ever accepted
-    RecipePinned,       // Any recipe pinned in a station slot
+    RecipePinned,       // A recipe ever pinned in a station slot (latched: CraftingManager.EverPinned)
 }
