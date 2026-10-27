@@ -19,6 +19,23 @@ public class PorterManager : UnitManager<PorterAgent>
     [SerializeField] private int capacityPerLodging = 2;
 
     private int baseMaxUnits;
+    private TransportPoint[] route;   // ladder chain up to the hall, built on first spawn
+
+    // This depth's ladder, then each depth above's, ending with depth 1's (which lets out in the hall).
+    // A missing depth ends the chain early; porters then bank at that ladder's top.
+    private TransportPoint[] Route()
+    {
+        if (route != null) return route;
+        var managers = FindObjectsByType<PorterManager>(FindObjectsInactive.Include);
+        var chain = new List<TransportPoint>();
+        for (int depth = LayerIndex; depth >= 1; depth--)
+        {
+            var m = System.Array.Find(managers, x => x.LayerIndex == depth);
+            if (m == null || m.transport == null) break;
+            chain.Add(m.transport);
+        }
+        return route = chain.ToArray();
+    }
 
     protected override void Awake()
     {
@@ -115,7 +132,7 @@ public class PorterManager : UnitManager<PorterAgent>
         porter.Init(porterDef, LayerIndex, spawner: null, operationArea);
         
         // Set transport and deposit point
-        porter.SetTransport(transport, depositPoint.position);
+        porter.SetTransport(Route(), depositPoint.position);
 
         return porter;
     }
@@ -275,7 +292,7 @@ public class PorterManager : UnitManager<PorterAgent>
         }
           
         // Set transport and deposit point
-        agent.SetTransport(transport, depositPoint.position);
+        agent.SetTransport(Route(), depositPoint.position);
         return agent;
     }
 

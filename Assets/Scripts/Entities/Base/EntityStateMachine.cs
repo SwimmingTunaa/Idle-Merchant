@@ -89,7 +89,9 @@ public abstract class EntityStateMachine<TState> : EntityBase where TState : Enu
         FaceDirection(delta.x);
         // Use Stats.MoveSpeed for modified speed value
         float currentSpeed = Stats != null ? Stats.MoveSpeed : 1f;
-        transform.position += currentSpeed * Time.deltaTime * delta.normalized;
+        // MoveTowards: a long frame can't step past the target (an unclamped step overshot the 0.05 stop distance and bounced)
+        var goal = targetPos.Value; goal.z = pos.z;
+        transform.position = Vector3.MoveTowards(pos, goal, currentSpeed * Time.deltaTime);
     }
 
     /// <summary>

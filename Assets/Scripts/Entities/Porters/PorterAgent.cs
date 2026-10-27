@@ -54,7 +54,9 @@ public class PorterAgent : EntityStateMachine<PorterState>
     private PorterCarryDisplay carryDisplay;
     
     // Transport
-    private TransportPoint transport;
+    private TransportPoint transport;     // ladder currently walked to / climbed (= route[leg])
+    private TransportPoint[] route;       // ladder chain: [0] = home depth's ladder … last = depth 1's (lets out in the hall)
+    private int leg;                      // index into route; 0 = home
     private Vector3 depositPoint; // Where to deposit at shop (set by PorterManager)
 
     // Deposit: walk to the bin, bank everything at once, then toss one icon per AI tick (VFX only)
@@ -106,15 +108,17 @@ public class PorterAgent : EntityStateMachine<PorterState>
     }
 
     /// <summary>
-    /// Set transport point and deposit location. Called by PorterManager.
+    /// Set the ladder chain (home depth's ladder first, depth 1's last) and deposit location. Called by PorterManager.
     /// </summary>
-    public void SetTransport(TransportPoint transportPoint, Vector3 depositLocation)
+    public void SetTransport(TransportPoint[] ladders, Vector3 depositLocation)
     {
-        transport = transportPoint;
+        route = ladders;
+        leg = 0;
+        transport = route.Length > 0 ? route[0] : null;   // empty when this depth has no ladder
         depositPoint = depositLocation;
         
         if (showDebugLogs)
-            Debug.Log($"[{name}] Transport set to {transportPoint.name}, deposit at {depositLocation}");
+            Debug.Log($"[{name}] Transport set to {transport.name} ({route.Length} ladders), deposit at {depositLocation}");
     }
 
     // ===== STATE MACHINE =====
@@ -207,7 +211,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
 
             case PorterState.Deposit:
                 // Walk from the ladder top to the bin — only when this ladder lets out on the bin's floor
-                // (deeper ladders exit on the layer above, so those porters deposit right at the ladder top)
+                // (a broken chain ends on a dungeon floor, so that porter deposits right at the ladder top)
                 if (transport != null && Mathf.Abs(depositPoint.y - transport.GetExitPosition().y) < 1f) SetTarget(depositPoint);
                 else targetPos = null;
                 atBin = false;
@@ -419,9 +423,15 @@ public class PorterAgent : EntityStateMachine<PorterState>
         if (!targetPos.HasValue || distance < 0.2f)
         {
             if (showDebugLogs)
-                Debug.Log($"[{name}] Reached top of ladder! Moving to deposit point");
-            
-            ChangeState(PorterState.Deposit);   // walks to the deposit point
+                Debug.Log($"[{name}] Reached top of ladder {leg + 1}/{route.Length}");
+
+            // More ladders above: walk this floor to the next one (Return), else on to the bin
+            if (leg < route.Length - 1)
+            {
+                transport = route[++leg];
+                ChangeState(PorterState.Return);
+            }
+            else ChangeState(PorterState.Deposit);   // walks to the deposit point
         }
     }
 
@@ -503,9 +513,15 @@ public class PorterAgent : EntityStateMachine<PorterState>
         if (!targetPos.HasValue || distance < 0.02f)
         {
             if (showDebugLogs)
-                Debug.Log($"[{name}] Reached bottom of ladder! Returning to Idle");
-            
-            ChangeState(PorterState.Idle);
+                Debug.Log($"[{name}] Reached bottom of ladder {leg + 1}/{route.Length}");
+
+            // Not home yet: re-enter to walk this floor to the next ladder down's top
+            if (leg > 0)
+            {
+                transport = route[--leg];
+                ChangeState(PorterState.ReturnToLayer);
+            }
+            else ChangeState(PorterState.Idle);
         }
     }
 
