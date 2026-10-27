@@ -658,6 +658,7 @@ public class ProgressionSave
     public List<string> craftedItemTypes = new List<string>();   // ItemDef names (CraftedItemsSold tracking)
     public List<string> reachedMilestones = new List<string>();  // StarMilestoneDef names
     public List<string> claimedMilestones = new List<string>();
+    public int unseenStar;   // star fanfare trace still on the tracker (0 = none) — rebuilt on load, no replay
 }
 
 public class ClickerSave

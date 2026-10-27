@@ -1,0 +1,156 @@
+/* Guild Star fanfare overlay. Mock: scratchpad/starmock/index.html. Every animated property (opacity, scale, rotate,
+   translate) is written inline by StarFanfare.cs from unscaled time, so nothing here transitions.
+   No radial gradient in UITK: the edge vignette is four overlapping edge rings at 26% black (stepped, ~70% at the edge). */
+
+.sf-host {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    -unity-font-definition: var(--font-body);
+}
+
+.sf-vig {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-color: rgba(0, 0, 0, 0.26);
+}
+
+.sf-vig--1 {
+    border-width: 48px;
+}
+
+.sf-vig--2 {
+    border-width: 112px;
+}
+
+.sf-vig--3 {
+    border-width: 200px;
+}
+
+.sf-vig--4 {
+    border-width: 320px;
+}
+
+.sf-stack {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 17%;
+    align-items: center;
+}
+
+/* Star_active at 3× its 32px slot; spins in, then flies to the pennant */
+.sf-bigstar {
+    width: 96px;
+    height: 96px;
+    margin-bottom: -14px;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/Star.png?fileID=-930353575&guid=391cae39f2cc64ebca5e7d6893d13427&type=3#Star_active");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* ribbon.png 150×30 at 5× */
+.sf-ribbon {
+    width: 750px;
+    height: 150px;
+    padding-bottom: 22px;
+    align-items: center;
+    justify-content: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/ribbon.png?fileID=2800000&guid=349b01018420847d0926c1807c99b387&type=3#ribbon");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.sf-ribbon__title {
+    margin: 0;
+    padding: 0;
+    font-size: 46px;
+    color: rgb(246, 231, 200);
+    letter-spacing: 1px;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+}
+
+.sf-ribbon__sub {
+    margin: 4px 0 0 0;
+    padding: 0;
+    font-size: var(--font-size-body);
+    color: rgb(243, 220, 160);
+    -unity-text-align: middle-center;
+}
+
+.sf-cards {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 22px;
+}
+
+/* torn parchment (card-torn 9-slice at 3px, like the Class Pick card) */
+.sf-card {
+    width: 230px;
+    margin: 0 9px;
+    padding: 26px 16px 28px 16px;
+    align-items: center;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/card-torn.png?fileID=21300000&guid=e202a8ab367e41aead07308c65d8c8a8&type=3#card-torn");
+    -unity-slice-left: 8;
+    -unity-slice-top: 8;
+    -unity-slice-right: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 3px;
+}
+
+/* gold slip pinned over the top-left corner; the hard shadow is a thicker right/bottom border */
+.sf-card__tag {
+    position: absolute;
+    left: -12px;
+    top: -14px;
+    margin: 0;
+    padding: 0 6px 2px 6px;
+    font-size: var(--font-size-caption);
+    color: rgb(58, 42, 16);
+    background-color: var(--color-gold-hi);
+    border-color: var(--color-text-strong);
+    border-left-width: 3px;
+    border-top-width: 3px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+}
+
+/* two classes, so it beats .btn-coin / .btn-seal sizing when those supply the sprite */
+.sf-card .sf-card__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 0 6px 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.sf-ic--depth {
+    background-image: url("project://database/Assets/Sprites/Dungeon/Transport/Ladder.png?fileID=21300000&guid=5a43640e9fd834ed884fe81d6f00aa0b&type=3#Ladder");
+}
+
+.sf-card__title {
+    margin: 0;
+    padding: 0;
+    font-size: var(--font-size-body);
+    color: var(--color-text-strong);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.sf-hint {
+    margin-top: 26px;
+    font-size: var(--font-size-small);
+    color: rgb(243, 220, 160);
+    -unity-text-align: middle-center;
+}
+
+.sf-spark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 10px;
+    height: 10px;
+}

@@ -282,6 +282,11 @@
     border-width: 0;
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Content/Boxes/Dark/Flag_banner.png?fileID=2800000&guid=cf623e95db98f4e29817d62d8ed382a5&type=3#Flag_banner");
     -unity-background-scale-mode: scale-to-fit;
+    /* rotate = star fanfare wiggle (UIManager.WiggleOnce), swinging from the pole */
+    transform-origin: 50% 0;
+    transition-property: rotate;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
 }
 
 .label-container {

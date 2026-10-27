@@ -465,7 +465,7 @@ public class HireController : BasePanelController
         selectedLayer = Mathf.Clamp(selectedLayer, 1, maxLayer);
 
         if (layerLabel != null)
-            layerLabel.text = $"Dungeon Level {selectedLayer}";
+            layerLabel.text = $"Depth {selectedLayer} · {RosterPanelController.GetLayerName(selectedLayer)}";
 
         // Disable arrows at bounds
         if (layerPrevButton != null)

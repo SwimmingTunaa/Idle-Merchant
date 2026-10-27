@@ -315,3 +315,26 @@
 .mt-card--claimed .mt-card-stamp {
     display: flex;
 }
+
+/* ── Star card: the fanfare's trace (MilestoneTracker.CreateStarRow) — rose-tinted paper, Seen always shown ── */
+
+.mt-card--star {
+    -unity-background-image-tint-color: rgb(246, 200, 186);
+    transition-property: opacity, translate;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
+}
+
+.mt-card--star .mt-card-name {
+    color: var(--color-text-danger);
+}
+
+.mt-card--star .mt-card-claim {
+    display: flex;
+}
+
+/* RevealStarRow adds this for one beat, then removes it so the card fades/slides into place */
+.mt-card--enter {
+    opacity: 0;
+    translate: 0 -8px;
+}

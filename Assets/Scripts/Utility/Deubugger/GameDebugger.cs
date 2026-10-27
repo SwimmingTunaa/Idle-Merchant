@@ -614,6 +614,13 @@ public class GameDebugger : EditorWindow
                     method.Invoke(pm, new object[] { 5 });
             }
             EditorGUILayout.EndHorizontal();
+
+            // Replays the visuals only (no award); sets the tracker's star card like a real fanfare
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Play star fanfare", GUILayout.Width(110));
+            for (int s = 1; s <= 5; s++)
+                if (GUILayout.Button($"{s}★")) StarFanfare.PlayDebug(s);
+            EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.Space(10);
             

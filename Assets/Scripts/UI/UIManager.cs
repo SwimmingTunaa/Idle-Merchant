@@ -404,6 +404,15 @@ public class UIManager : PersistentSingleton<UIManager>
         }
     }
 
+    /// <summary>One pass of the board wiggle's tilt angles at a custom step (the guild flag on a star: ~0.9 s at 220 ms).</summary>
+    public static void WiggleOnce(VisualElement button, long stepMs = WiggleStepMs)
+    {
+        if (button == null) return;
+        int step = 0;
+        button.schedule.Execute(() => button.style.rotate = new Rotate(Angle.Degrees(WiggleAngles[step++])))
+            .Every(stepMs).Until(() => step >= WiggleAngles.Length);
+    }
+
     // ═════════════════════════════════════════════
     // PANEL REGISTRATION
     // ═════════════════════════════════════════════

@@ -210,7 +210,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     public static string GetLayerName(int layerIndex) =>
         layerIndex >= 1 && layerIndex < LayerNames.Length
             ? LayerNames[layerIndex]
-            : $"Layer {layerIndex}";
+            : $"Depth {layerIndex}";
 
     // ═════════════════════════════════════════════
     // SELECTION

@@ -18,6 +18,9 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     [Tooltip("Current guild star rating (1-5)")]
     [SerializeField] private int currentStars = 1;
 
+    [Tooltip("Star whose fanfare trace still sits on the tracker (0 = none); cleared by its Seen button")]
+    public int unseenStar;
+
     [Header("Star Rewards")]
     [Tooltip("Rewards granted when each star is earned")]
     [SerializeField] private List<StarRewardDef> starRewards = new List<StarRewardDef>();
@@ -64,7 +67,7 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     
 
     // Guild Seals granted per star earned (1★–5★) — a fixed lifetime supply, see CONTRACTS_DESIGN.md
-    private static readonly int[] StarSeals = { 30, 50, 80, 120, 200 };
+    public static readonly int[] StarSeals = { 30, 50, 80, 120, 200 };
 
     // Events for decoupling
     public static event Action<int> OnStarEarned;
@@ -438,6 +441,9 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         if (showDebugLogs)
             Debug.Log($"[ProgressionManager] ★ Earned {star}★! Layer {layerToUnlock} unlocked.");
     }
+
+    /// <summary>The reward def for a star, or null (read by the star fanfare's unlock list).</summary>
+    public StarRewardDef GetStarReward(int star) => starRewards.Find(r => r != null && r.starLevel == star);
 
     private void GrantStarReward(int star)
     {
@@ -894,6 +900,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         craftedItemTypes = craftedItemDefs.Where(d => d != null).Select(d => d.name).ToList(),
         reachedMilestones = reachedMilestones.Where(m => m != null).Select(m => m.name).ToList(),
         claimedMilestones = claimedMilestones.Where(m => m != null).Select(m => m.name).ToList(),
+        unseenStar = unseenStar,
     };
 
     public List<string> OwnedUpgradeNames() => ownedUpgrades.Where(u => u != null).Select(u => u.name).ToList();
@@ -906,6 +913,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     {
         currentStars = p.stars;
         maxUnlockedLayer = p.maxUnlockedLayer;
+        unseenStar = p.unseenStar;
         totalGoldEarned = p.goldEarned;
         totalMobsKilled = p.mobsKilled;
         totalUnitsHired = p.unitsHired;
@@ -1053,6 +1061,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     {
         maxUnlockedLayer = 1;
         currentStars = 1;
+        unseenStar = 0;
         ownedUpgrades.Clear();
         reachedMilestones.Clear();
         claimedMilestones.Clear();

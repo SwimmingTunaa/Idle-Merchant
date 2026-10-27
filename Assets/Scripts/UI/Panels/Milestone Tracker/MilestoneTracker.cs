@@ -48,6 +48,8 @@ public class MilestoneTracker : MonoBehaviour
     private MilestoneProgressEvents progressEvents;
     private VisualElement contractRow;   // the active contract (or a board teaser), sorted with the milestones
     private Label contractSealLabel;
+    private VisualElement starRow;       // the last star's fanfare trace (ProgressionManager.unseenStar), sorted first until Seen
+    private int starRowBound;
 
     // Coin shower: UI elements over the whole HUD; each banks its share on landing
     private const float CoinSize = 26f;
@@ -91,6 +93,7 @@ public class MilestoneTracker : MonoBehaviour
         GameSignals.OnSealsChanged += OnSealsChanged;
 
         contractRow = CreateContractRow();
+        starRow = CreateStarRow();
         Refresh();
 
         isExpanded = startExpanded;
@@ -167,6 +170,7 @@ public class MilestoneTracker : MonoBehaviour
         list.Clear();
         rows.Clear();
         if (contractRow != null) list.Add(contractRow);   // RefreshProgress slots it in
+        if (starRow != null) list.Add(starRow);
 
         int currentStars = ProgressionManager.Instance.GetCurrentStars();
         int nextStar     = currentStars + 1;
@@ -205,6 +209,11 @@ public class MilestoneTracker : MonoBehaviour
         // The contract card leads its group (claimable when complete or ready to fulfil).
         int contractGroup = RefreshContractRow();
         int slot = 0;
+        if (RefreshStarRow())   // group −1: above everything
+        {
+            if (list.IndexOf(starRow) != 0) list.Insert(0, starRow);
+            slot = 1;
+        }
         for (int group = 0; group < 3; group++)
         {
             if (contractGroup == group)
@@ -313,6 +322,58 @@ public class MilestoneTracker : MonoBehaviour
         claim.Q<VisualElement>(className: "mt-card-claim-coin").style.display = a.complete ? DisplayStyle.Flex : DisplayStyle.None;
         claim.SetEnabled(true);
         return claimable ? 0 : 1;
+    }
+
+    // ═════════════════════════════════════════════
+    // STAR CARD (the fanfare's trace — same markup, Seen instead of Claim, no reward: AwardStar already paid)
+    // ═════════════════════════════════════════════
+
+    private VisualElement CreateStarRow()
+    {
+        var row = cardTemplate.CloneTree().Q<VisualElement>("card-root");
+        row.AddToClassList("mt-card--star");
+        row.Q<VisualElement>(className: "mt-card-bar").style.display = DisplayStyle.None;
+        row.Q<VisualElement>("card-reward").style.display = DisplayStyle.None;
+        row.Q<Label>("card-claim-amount").style.display = DisplayStyle.None;
+
+        var seen = row.Q<Button>("card-claim");
+        seen.RemoveFromClassList("btn-success");
+        seen.AddToClassList("btn-secondary");
+        seen.Q<Label>().text = "Seen";
+        seen.Q<VisualElement>(className: "mt-card-claim-coin").style.display = DisplayStyle.None;
+        seen.clicked += () =>
+        {
+            SfxManager.Instance?.Play(SfxId.UiTick);
+            if (ProgressionManager.Instance != null) ProgressionManager.Instance.unseenStar = 0;
+            RefreshProgress();
+        };
+        return row;
+    }
+
+    /// <summary>Shows the star card while a star is unseen and its fanfare has folded; true when shown.</summary>
+    private bool RefreshStarRow()
+    {
+        if (starRow == null) return false;
+        int star = ProgressionManager.Instance != null ? ProgressionManager.Instance.unseenStar : 0;
+        bool show = star > 0 && !StarFanfare.Playing;
+        starRow.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+        if (show && starRowBound != star)
+        {
+            starRowBound = star;
+            starRow.Q<Label>("card-name").text = StarFanfare.Headline(star);
+            starRow.Q<Label>("card-desc").text = StarFanfare.Summary(star);
+        }
+        return show;
+    }
+
+    /// <summary>The fanfare's fold: slot the star card in, then slide it down into place (USS transition).</summary>
+    public void RevealStarRow()
+    {
+        if (starRow == null) return;
+        starRowBound = 0;   // a replayed star rebinds
+        starRow.AddToClassList("mt-card--enter");
+        RefreshProgress();
+        starRow.schedule.Execute(() => starRow.RemoveFromClassList("mt-card--enter")).ExecuteLater(30);
     }
 
     private void UpdateCountLabel(int completed, int total)

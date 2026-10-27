@@ -161,7 +161,7 @@ public class ProgressionActivator : MonoBehaviour
         switch (trigger)
         {
             case ActivationTrigger.LayerUnlocked:
-                return $"Layer {requiredValue}";
+                return $"Depth {requiredValue}";
             case ActivationTrigger.StarEarned:
                 return $"{requiredValue}★";
             case ActivationTrigger.UpgradePurchased:

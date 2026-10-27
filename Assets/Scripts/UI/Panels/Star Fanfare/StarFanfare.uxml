@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Star%20Fanfare/StarFanfare.uss" />
+    <!-- Guild Star fanfare: driven by StarFanfare.cs. The host never picks; only the ribbon and stamped cards do (click = skip),
+         so world clicks keep landing during the ~5 s. Cards are built per star at fire time. -->
+    <ui:VisualElement name="star-fanfare" picking-mode="Ignore" class="sf-host">
+        <ui:VisualElement name="sf-vignette" picking-mode="Ignore" class="sf-vig">
+            <ui:VisualElement picking-mode="Ignore" class="sf-vig sf-vig--1" />
+            <ui:VisualElement picking-mode="Ignore" class="sf-vig sf-vig--2" />
+            <ui:VisualElement picking-mode="Ignore" class="sf-vig sf-vig--3" />
+            <ui:VisualElement picking-mode="Ignore" class="sf-vig sf-vig--4" />
+        </ui:VisualElement>
+        <ui:VisualElement picking-mode="Ignore" class="sf-stack">
+            <ui:VisualElement name="sf-bigstar" picking-mode="Ignore" class="sf-bigstar" />
+            <ui:VisualElement name="sf-ribbon" picking-mode="Ignore" class="sf-ribbon">
+                <ui:Label text="Guild Star Earned" picking-mode="Ignore" class="sf-ribbon__title" />
+                <ui:Label name="sf-sub" text="Third of five · the guild is Established" picking-mode="Ignore" class="sf-ribbon__sub" />
+            </ui:VisualElement>
+            <ui:VisualElement name="sf-cards" picking-mode="Ignore" class="sf-cards" />
+            <ui:Label name="sf-hint" text="click to continue" picking-mode="Ignore" class="sf-hint" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

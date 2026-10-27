@@ -22,7 +22,7 @@ public class Contract
     [JsonIgnore] public string Title => kind switch
     {
         ContractKind.Deliver => $"Deliver {target} {(itemDef != null ? itemDef.displayName : item)}",
-        ContractKind.Hunt => $"Cull {target} mobs on layer {layer}",
+        ContractKind.Hunt => $"Cull {target} mobs at Depth {layer}",
         _ => $"Serve {target} customers",
     };
 
