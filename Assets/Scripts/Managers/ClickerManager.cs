@@ -376,7 +376,7 @@ public class ClickerManager : MonoBehaviour
             return;
         }
 
-        // Priority 5: a dungeon ladder opens the Transport panel (Elevator / Teleport Circle)
+        // Priority 5: a dungeon ladder opens the Transport panel (this depth's Elevator / Teleporter)
         foreach (var hit in hits)
         {
             if (!hit.TryGetComponent(out TransportPoint tp)) continue;

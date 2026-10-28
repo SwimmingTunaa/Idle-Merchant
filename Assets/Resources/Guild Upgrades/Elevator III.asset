@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d104bfc79eea6439390eebc84fc7f607, type: 3}
   m_Name: Elevator III
   m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradeDef
-  upgradeName: Elevator III
-  description: Turns depth 3's ladder into a lift too. Every porter passing through rides it.
+  upgradeName: Depth 3 Elevator
+  description: Turns depth 3's ladder into a lift. Porters ride it in a second.
   icon: {fileID: 21300000, guid: 5a43640e9fd834ed884fe81d6f00aa0b, type: 3}
   goldCost: 150000
   starRequirement: 2
-  requiredUpgrade: {fileID: 11400000, guid: d6d1f4b4a29ec4821bd38b9dd6b7c6da, type: 2}
+  requiredUpgrade: {fileID: 0}
   upgradeType: 2
-  layerSpecific: 0
-  targetLayer: 1
+  layerSpecific: 1
+  targetLayer: 3
   requiresResearch: 0
   requiredResearchNodeID: 

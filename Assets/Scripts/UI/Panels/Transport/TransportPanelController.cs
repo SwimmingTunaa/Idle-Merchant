@@ -4,8 +4,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Transport modal (TransportPanel.uxml, instanced in MainUI.uxml after DecoratePanel) — opened by clicking a dungeon
-/// ladder (<see cref="TransportPoint"/>, ClickerManager priority 5). Decorate-panel look; this depth's Elevator rank
-/// (rank N serves depth N, goldCost order) then Teleport Circle, each Owned / locked / Buy n gold.
+/// ladder (<see cref="TransportPoint"/>, ClickerManager priority 5). Decorate-panel look; this depth's Elevator then its
+/// Teleporter (layerSpecific, targetLayer = depth), each Owned / locked / Buy n gold.
 /// </summary>
 public class TransportPanelController : BasePanelController
 {
@@ -84,20 +84,21 @@ public class TransportPanelController : BasePanelController
     {
         if (point == null) return;
         var pm = ProgressionManager.Instance;
-        bool teleport = pm.HasUpgrade(UpgradeType.Teleporter);
+        bool teleport = point.transportType == TransportType.Teleporter;
         bool lift = point.transportType == TransportType.Elevator;
         title.text = $"Depth {point.sourceLayer} {(teleport ? "waystone" : lift ? "lift" : "ladder")}";
-        sub.text = teleport ? "Porters blink through the waystone."
+        sub.text = teleport ? "Porters blink to the floor above."
                  : lift ? "Porters ride this lift in a second."
                  : "Porters climb this ladder at walking pace.";
 
         rows.Clear();
         var all = Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades");
-        var elevators = all.Where(u => u.upgradeType == UpgradeType.Elevator).OrderBy(u => u.goldCost).ToList();
-        // Only this depth's rank (rank N serves depth N) and the Teleport Circle — the Guild book lists every rank
-        if (point.sourceLayer >= 1 && point.sourceLayer <= elevators.Count) rows.Add(BuildRow(elevators[point.sourceLayer - 1]));
-        foreach (var u in all.Where(u => u.upgradeType == UpgradeType.Teleporter).OrderBy(u => u.goldCost))
-            rows.Add(BuildRow(u));
+        // Only this depth's elevator then teleporter — the Guild book lists every depth's
+        foreach (var type in new[] { UpgradeType.Elevator, UpgradeType.Teleporter })
+        {
+            var u = all.FirstOrDefault(d => d.upgradeType == type && d.layerSpecific && d.targetLayer == point.sourceLayer);
+            if (u != null) rows.Add(BuildRow(u));
+        }
     }
 
     // Same states as the Guild card (GuildUpgradePanel.UpdateCardState): Owned / Requires N stars / Needs <prev> / Buy

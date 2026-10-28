@@ -65,19 +65,17 @@ public class PorterAgent : EntityStateMachine<PorterState>
     private bool atBin;
     private bool climbingDown;    // ReturnToLayer: false while walking back to the ladder top
 
-    // Teleport Circle: Travel / ReturnToLayer become one hop each (home ladder bottom ⇄ hall drop-off), leg stays 0
+    // Teleporter legs: the climb up / down a teleporter-mode ladder is one hop (entry ⇄ exit); the mode is read as the
+    // leg starts, so a porter already on a ladder when it's upgraded finishes that climb
     private const float HopSeconds = 0.4f;
-    private bool teleport, pendingTeleport;   // pending = route change bought mid-trip, adopted back home (Idle)
     private float hopElapsed = -1f;           // < 0 = not hopping
     private bool hopped;                      // passed the midpoint: moved to hopTo, now growing back
     private Vector3 hopTo;
     private float hopFace = 1f;
 
-    // On a trip up/down the chain; a route change waits for the trip to end so nobody teleports mid-ladder
-    private bool InTransit => leg > 0 || State is PorterState.Travel or PorterState.Deposit or PorterState.ReturnToLayer;
-    // Ladder climb pose only on a real ladder (an elevator is a straight glide, a teleport a hop)
-    private bool Climbs => !teleport && transport != null && transport.transportType == TransportType.Ladder;
-    private bool Gliding => !teleport && transport != null && transport.transportType == TransportType.Elevator
+    // Ladder climb pose only on a real ladder (an elevator is a straight glide, a teleporter a hop)
+    private bool Climbs => transport != null && transport.transportType == TransportType.Ladder;
+    private bool Gliding => transport != null && transport.transportType == TransportType.Elevator
                             && (State == PorterState.Travel || (State == PorterState.ReturnToLayer && climbingDown));
     
     // State timing
@@ -129,15 +127,11 @@ public class PorterAgent : EntityStateMachine<PorterState>
     }
 
     /// <summary>
-    /// Set the ladder chain (home depth's ladder first, depth 1's last) and deposit location. Called by PorterManager.
-    /// teleportRoute (Teleport Circle): hop from the home ladder's bottom straight to the drop-off and back.
-    /// Mid-trip, only the teleport flag is stashed and adopted once the porter is home (the chain itself never changes).
+    /// Set the ladder chain (home depth's ladder first, depth 1's last) and deposit location. Called by PorterManager on spawn;
+    /// each ladder's Ladder / Elevator / Teleporter mode is read per leg, so upgrades never re-send it.
     /// </summary>
-    public void SetTransport(TransportPoint[] ladders, Vector3 depositLocation, bool teleportRoute = false)
+    public void SetTransport(TransportPoint[] ladders, Vector3 depositLocation)
     {
-        pendingTeleport = teleportRoute;
-        if (InTransit) return;
-        teleport = teleportRoute;
         route = ladders;
         leg = 0;
         transport = route.Length > 0 ? route[0] : null;   // empty when this depth has no ladder
@@ -156,7 +150,6 @@ public class PorterAgent : EntityStateMachine<PorterState>
             case PorterState.Idle:
                 ReleaseCurrentTarget();
                 targetPos = null;
-                teleport = pendingTeleport;   // home: a route bought mid-trip applies from here
                 
                 stateTargetTime = Random.Range(idleTimeMin, idleTimeMax);
                 stateTimer = new CountdownTimer(stateTargetTime);
@@ -221,7 +214,11 @@ public class PorterAgent : EntityStateMachine<PorterState>
                 break;
 
             case PorterState.Travel:
-                if (teleport) { StartHop(depositPoint); break; }
+                if (transport != null && transport.transportType == TransportType.Teleporter)
+                {
+                    StartHop(transport.GetExitPosition());   // UpdateTravel continues from the top once landed
+                    break;
+                }
 
                 // Climb pose for climbing UP (an elevator glides)
                 if (animator != null)
@@ -252,7 +249,6 @@ public class PorterAgent : EntityStateMachine<PorterState>
             case PorterState.ReturnToLayer:
                 // Walk back to the ladder top first; UpdateReturnToLayer starts the climb down on arrival
                 climbingDown = false;
-                if (teleport) { if (transport != null) StartHop(transport.GetEntryPosition()); break; }
                 if (transport != null) SetTarget(transport.GetExitPosition());
                 break;
         }
@@ -441,11 +437,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
             return;
         }
 
-        if (teleport)
-        {
-            if (hopElapsed < 0f) ChangeState(PorterState.Deposit);   // landed at the drop-off
-            return;
-        }
+        if (hopElapsed >= 0f) return;   // teleporter leg: lands on the ladder top, then on as if climbed
 
         Vector3 exitPos = transport.GetExitPosition();
         float distance = Vector3.Distance(transform.position, exitPos);
@@ -524,18 +516,13 @@ public class PorterAgent : EntityStateMachine<PorterState>
             return;
         }
 
-        if (teleport)
-        {
-            if (hopElapsed < 0f) ChangeState(PorterState.Idle);   // back at the home ladder's bottom
-            return;
-        }
-
         Vector3 entryPos = transport.GetEntryPosition();
 
         if (!climbingDown)
         {
             if (targetPos.HasValue) return;   // still walking back to the ladder top
             climbingDown = true;
+            if (transport.transportType == TransportType.Teleporter) { StartHop(entryPos); return; }   // lands at the bottom
             if (animator != null) animator.SetBool(AnimHash.Climb, Climbs);   // climbing DOWN (an elevator glides)
             SetTarget(entryPos);
 
@@ -544,6 +531,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
             return;
         }
 
+        if (hopElapsed >= 0f) return;   // teleporter leg: wait for the landing
         float distance = Vector3.Distance(transform.position, entryPos);
         
         if (showDebugLogs)

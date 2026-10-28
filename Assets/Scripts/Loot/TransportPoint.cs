@@ -2,14 +2,14 @@ using UnityEngine;
 
 /// <summary>
 /// How a depth's transport point carries porters (serialized ints: append only).
-/// Ladder = climb at the porter's move speed; Elevator = a straight glide in elevatorSeconds (Elevator I–V ranks);
-/// Teleporter is unused here — Teleport Circle reroutes porters instead (PorterManager/PorterAgent).
+/// Per depth (PorterManager): Ladder = climb at the porter's move speed; Elevator (Depth N Elevator) = a straight
+/// glide in elevatorSeconds; Teleporter (Depth N Teleporter) = a hop from this ladder's base to its top (the floor above).
 /// </summary>
 public enum TransportType
 {
     Ladder,      // Slow, default
     Elevator,    // ~1 s ride
-    Teleporter   // unused (Teleport Circle is a route, not a mode)
+    Teleporter   // hop entry ⇄ exit
 }
 
 /// <summary>
@@ -31,8 +31,9 @@ public class TransportPoint : MonoBehaviour
     [Header("Elevator")]
     [Tooltip("Seconds per ride (either way) once this ladder is an elevator; the ladder climbs at the porter's move speed")]
     [SerializeField] private float elevatorSeconds = 1f;
-    [Tooltip("Ladder sprite tint while it's an elevator")]
-    [SerializeField] private Color elevatorTint = new Color(0.62f, 0.72f, 0.82f);   // PLACEHOLDER steel tint until the cage art lands
+    [Tooltip("Shaft sprite shown in place of the ladder once this depth's elevator is owned (tiles like the ladder)")]
+    [SerializeField] private Sprite elevatorSprite;
+    private Sprite ladderSprite;   // transportVisual's sprite at Awake
     
     [Header("Points")]
     [Tooltip("Where porter stands to enter transport")]
@@ -57,13 +58,14 @@ public class TransportPoint : MonoBehaviour
             box.size = transportVisual.size;
             box.offset = transform.InverseTransformPoint(transportVisual.bounds.center);   // sprite pivot isn't centred
         }
+        if (transportVisual != null) ladderSprite = transportVisual.sprite;
     }
 
     public void SetHover(bool on)
     {
-        if (transportVisual == null) return;
-        transportVisual.renderingLayerMask = on ? transportVisual.renderingLayerMask | hoverOutlineLayer
-                                                : transportVisual.renderingLayerMask & ~hoverOutlineLayer;
+        // Every child sprite: the ladder / shaft, and the scene "Waystone" + ring that stand in once it's a teleporter
+        foreach (var r in GetComponentsInChildren<SpriteRenderer>())
+            r.renderingLayerMask = on ? r.renderingLayerMask | hoverOutlineLayer : r.renderingLayerMask & ~hoverOutlineLayer;
     }
 
     private void ValidateSetup()
@@ -84,11 +86,14 @@ public class TransportPoint : MonoBehaviour
     }
 
  
-    /// <summary>Elevator I–V (PorterManager): steel-tinted ladder, porters glide it in elevatorSeconds.</summary>
+    /// <summary>PorterManager, per depth: ladder sprite / elevator shaft / hidden (the scene Waystone stands in; the collider keeps its Awake size).</summary>
     public void SetMode(TransportType mode)
     {
         transportType = mode;
-        if (transportVisual != null) transportVisual.color = mode == TransportType.Elevator ? elevatorTint : Color.white;
+        if (transportVisual == null) return;
+        transportVisual.enabled = mode != TransportType.Teleporter;
+        if (mode == TransportType.Elevator && elevatorSprite != null) transportVisual.sprite = elevatorSprite;
+        else if (mode == TransportType.Ladder && ladderSprite != null) transportVisual.sprite = ladderSprite;
     }
 
     /// <summary>Climb speed between entry and exit: the porter's own on a ladder, a fixed-time glide on an elevator.</summary>

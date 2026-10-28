@@ -61,22 +61,18 @@ public class PorterManager : UnitManager<PorterAgent>
         if (upgrade.upgradeType is UpgradeType.Elevator or UpgradeType.Teleporter) ApplyTransport();
     }
 
-    private static bool TeleportOwned =>
-        ProgressionManager.Instance != null && ProgressionManager.Instance.HasUpgrade(UpgradeType.Teleporter);
-
-    // PLACEHOLDER waystones (Teleport Circle): purple-tinted standing stone (Decoratives_47) on each Ladder's "Waystone"
-    // child (ProgressionActivator on the Ladder) and Guild/Shop/Decor/waystone_hall (DecorSlot pop-in) until the real art lands.
-    // Elevator I–V convert ladders top-down (rank N = depths 1..N; the ranks chain, so count == highest rank).
-    // Teleport Circle reroutes every porter; one mid-trip finishes it first (PorterAgent.SetTransport).
+    // Per depth: this depth's ladder → Depth N Elevator → Depth N Teleporter (layerSpecific, targetLayer = N; the teleporter
+    // needs the elevator). A teleporter hops porters from this ladder's base to its top — the floor above, or the hall for
+    // depth 1 — and the rest of the chain is walked as usual (PorterAgent reads the mode as each leg starts, so the
+    // chain set at spawn never needs re-sending).
+    // Waystones: each Ladder's "Waystone" child + ring and Guild/Shop/Decor/waystone_hall (Depth 1) are ProgressionActivators.
     private void ApplyTransport()
     {
-        if (ProgressionManager.Instance == null) return;
-        if (transport != null)
-            transport.SetMode(LayerIndex <= ProgressionManager.Instance.CountUpgrades(UpgradeType.Elevator)
-                ? TransportType.Elevator : TransportType.Ladder);
-        if (depositPoint == null) return;
-        foreach (var p in GetAllUnits())
-            if (p != null) p.SetTransport(Route(), depositPoint.position, TeleportOwned);
+        var pm = ProgressionManager.Instance;
+        if (pm == null || transport == null) return;
+        transport.SetMode(pm.IsUpgradeOwned(UpgradeType.Teleporter, LayerIndex) ? TransportType.Teleporter
+                        : pm.IsUpgradeOwned(UpgradeType.Elevator, LayerIndex) ? TransportType.Elevator
+                        : TransportType.Ladder);
     }
 
     private void ApplyLodging()
@@ -153,7 +149,7 @@ public class PorterManager : UnitManager<PorterAgent>
         porter.Init(porterDef, LayerIndex, spawner: null, operationArea);
         
         // Set transport and deposit point
-        porter.SetTransport(Route(), depositPoint.position, TeleportOwned);
+        porter.SetTransport(Route(), depositPoint.position);
 
         return porter;
     }
@@ -289,7 +285,7 @@ public class PorterManager : UnitManager<PorterAgent>
         }
           
         // Set transport and deposit point
-        agent.SetTransport(Route(), depositPoint.position, TeleportOwned);
+        agent.SetTransport(Route(), depositPoint.position);
         return agent;
     }
 
