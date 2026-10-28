@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 4170936427891067786}
   - component: {fileID: 3006652510643543329}
   - component: {fileID: 7345689234170259301}
+  - component: {fileID: 7961961474340745445}
   m_Layer: 9
   m_Name: Adventuer Agent
   m_TagString: Untagged
@@ -406,3 +407,16 @@ MonoBehaviour:
   bobSpeed: 3
   badgeScale: 0.5
   arrowColor: {r: 0.45, g: 0.85, b: 0.3, a: 1}
+--- !u!210 &7961961474340745445
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440394158813992520}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
+  m_Sort3DAs2D: 0

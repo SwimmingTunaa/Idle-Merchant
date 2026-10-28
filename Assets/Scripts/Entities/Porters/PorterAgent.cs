@@ -64,6 +64,21 @@ public class PorterAgent : EntityStateMachine<PorterState>
     private readonly List<ItemDef> tosses = new();
     private bool atBin;
     private bool climbingDown;    // ReturnToLayer: false while walking back to the ladder top
+
+    // Teleport Circle: Travel / ReturnToLayer become one hop each (home ladder bottom ⇄ hall drop-off), leg stays 0
+    private const float HopSeconds = 0.4f;
+    private bool teleport, pendingTeleport;   // pending = route change bought mid-trip, adopted back home (Idle)
+    private float hopElapsed = -1f;           // < 0 = not hopping
+    private bool hopped;                      // passed the midpoint: moved to hopTo, now growing back
+    private Vector3 hopTo;
+    private float hopFace = 1f;
+
+    // On a trip up/down the chain; a route change waits for the trip to end so nobody teleports mid-ladder
+    private bool InTransit => leg > 0 || State is PorterState.Travel or PorterState.Deposit or PorterState.ReturnToLayer;
+    // Ladder climb pose only on a real ladder (an elevator is a straight glide, a teleport a hop)
+    private bool Climbs => !teleport && transport != null && transport.transportType == TransportType.Ladder;
+    private bool Gliding => !teleport && transport != null && transport.transportType == TransportType.Elevator
+                            && (State == PorterState.Travel || (State == PorterState.ReturnToLayer && climbingDown));
     
     // State timing
     private CountdownTimer stateTimer;
@@ -97,6 +112,9 @@ public class PorterAgent : EntityStateMachine<PorterState>
         stateTimer = null; // Will be created in OnEnterState
         currentTarget = null;
         carriedLoot.Clear();
+        leg = 0;                                   // pooled reuse: a despawn mid-trip / mid-hop leaves these behind
+        hopElapsed = -1f;
+        transform.localScale = Vector3.one;
 
         ChangeState(porterDef.startingState);
     }
@@ -104,14 +122,22 @@ public class PorterAgent : EntityStateMachine<PorterState>
     protected override void Update()
     {
         base.Update();
-        UpdateMovementSmooth();
+        bool glide = Gliding;
+        UpdateMovementSmooth(glide ? transport.TravelSpeed(Stats.MoveSpeed) : 0f);
+        if (glide || hopElapsed >= 0f) animator.SetFloat(AnimHash.Velocity, 0f);   // ride / hop standing still, no walk cycle
+        if (hopElapsed >= 0f) UpdateHop();
     }
 
     /// <summary>
     /// Set the ladder chain (home depth's ladder first, depth 1's last) and deposit location. Called by PorterManager.
+    /// teleportRoute (Teleport Circle): hop from the home ladder's bottom straight to the drop-off and back.
+    /// Mid-trip, only the teleport flag is stashed and adopted once the porter is home (the chain itself never changes).
     /// </summary>
-    public void SetTransport(TransportPoint[] ladders, Vector3 depositLocation)
+    public void SetTransport(TransportPoint[] ladders, Vector3 depositLocation, bool teleportRoute = false)
     {
+        pendingTeleport = teleportRoute;
+        if (InTransit) return;
+        teleport = teleportRoute;
         route = ladders;
         leg = 0;
         transport = route.Length > 0 ? route[0] : null;   // empty when this depth has no ladder
@@ -130,6 +156,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
             case PorterState.Idle:
                 ReleaseCurrentTarget();
                 targetPos = null;
+                teleport = pendingTeleport;   // home: a route bought mid-trip applies from here
                 
                 stateTargetTime = Random.Range(idleTimeMin, idleTimeMax);
                 stateTimer = new CountdownTimer(stateTargetTime);
@@ -194,10 +221,12 @@ public class PorterAgent : EntityStateMachine<PorterState>
                 break;
 
             case PorterState.Travel:
-                // Set climb bool to true for climbing UP
+                if (teleport) { StartHop(depositPoint); break; }
+
+                // Climb pose for climbing UP (an elevator glides)
                 if (animator != null)
                 {
-                    animator.SetBool(AnimHash.Climb, true);
+                    animator.SetBool(AnimHash.Climb, Climbs);
                 }
                 
                 if (transport != null)
@@ -223,6 +252,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
             case PorterState.ReturnToLayer:
                 // Walk back to the ladder top first; UpdateReturnToLayer starts the climb down on arrival
                 climbingDown = false;
+                if (teleport) { if (transport != null) StartHop(transport.GetEntryPosition()); break; }
                 if (transport != null) SetTarget(transport.GetExitPosition());
                 break;
         }
@@ -411,6 +441,12 @@ public class PorterAgent : EntityStateMachine<PorterState>
             return;
         }
 
+        if (teleport)
+        {
+            if (hopElapsed < 0f) ChangeState(PorterState.Deposit);   // landed at the drop-off
+            return;
+        }
+
         Vector3 exitPos = transport.GetExitPosition();
         float distance = Vector3.Distance(transform.position, exitPos);
         
@@ -488,13 +524,19 @@ public class PorterAgent : EntityStateMachine<PorterState>
             return;
         }
 
+        if (teleport)
+        {
+            if (hopElapsed < 0f) ChangeState(PorterState.Idle);   // back at the home ladder's bottom
+            return;
+        }
+
         Vector3 entryPos = transport.GetEntryPosition();
 
         if (!climbingDown)
         {
             if (targetPos.HasValue) return;   // still walking back to the ladder top
             climbingDown = true;
-            if (animator != null) animator.SetBool(AnimHash.Climb, true);   // climbing DOWN
+            if (animator != null) animator.SetBool(AnimHash.Climb, Climbs);   // climbing DOWN (an elevator glides)
             SetTarget(entryPos);
 
             if (showDebugLogs)
@@ -523,6 +565,46 @@ public class PorterAgent : EntityStateMachine<PorterState>
             }
             else ChangeState(PorterState.Idle);
         }
+    }
+
+    // ===== TELEPORT HOP =====
+
+    // Shrink to nothing, jump to `to` at the midpoint, grow back; frame-driven, the AI tick waits for hopElapsed < 0
+    private void StartHop(Vector3 to)
+    {
+        targetPos = null;
+        hopTo = to;
+        hopped = false;
+        hopFace = transform.localScale.x < 0f ? -1f : 1f;
+        hopElapsed = 0f;
+        HopFx();
+    }
+
+    private void UpdateHop()
+    {
+        hopElapsed += Time.deltaTime;
+        float k = Mathf.Clamp01(hopElapsed / HopSeconds);
+        if (!hopped && k >= 0.5f)
+        {
+            hopped = true;
+            transform.position = hopTo;
+            HopFx();
+        }
+        float s = k < 0.5f ? 1f - k * 2f : (k - 0.5f) * 2f;
+        transform.localScale = new Vector3(hopFace * s, s, 1f);
+        if (k >= 1f) hopElapsed = -1f;
+    }
+
+    // PLACEHOLDER teleport juice: the click shock ring + vacuum whoosh, only when the camera can see it
+    // (the ring is one-at-a-time and the sound would stack across a dozen off-screen porters)
+    private void HopFx()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+        Vector3 v = cam.WorldToViewportPoint(transform.position);
+        if (v.x < 0f || v.x > 1f || v.y < 0f || v.y > 1f) return;
+        ClickHitVFX.Instance?.PlayShockRing(transform.position + Vector3.up, 1.2f, 0.25f);
+        SfxManager.Instance?.Play(SfxId.Vacuum);
     }
 
     // ===== LOOT ACQUISITION =====

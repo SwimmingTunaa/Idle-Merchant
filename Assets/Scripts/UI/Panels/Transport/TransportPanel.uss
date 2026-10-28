@@ -1,0 +1,19 @@
+/* Transport modal — DecoratePanel.uss (dp-*) + WorkshopPanel.uss (wp-*) cover the card and rows; only the extras here. */
+
+.tp-sub {
+    font-size: var(--font-size-small);
+    color: rgba(243, 220, 160, 0.8);
+    margin-bottom: 12px;
+    white-space: normal;
+}
+
+/* the elevator rank that serves this ladder's depth */
+.tp-row--here {
+    -unity-background-image-tint-color: rgb(255, 222, 140);
+}
+
+.tp-btn__coin {
+    width: 20px;
+    height: 20px;
+    margin: 0 0 0 6px;
+}

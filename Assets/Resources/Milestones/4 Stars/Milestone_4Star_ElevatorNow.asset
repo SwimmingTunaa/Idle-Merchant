@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: Milestone_4Star_ElevatorNow
   m_EditorClassIdentifier: Assembly-CSharp::StarMilestoneDef
   displayName: We Have an Elevator Now
-  description: Hire 8 porters
+  description: Purchase Elevator IV
   flavorText: Your porters' knees thank you. Also, it looks way more professional.
   icon: {fileID: 0}
   starLevel: 4
-  milestoneType: 7
-  targetValue: 8
-  requiredUpgrade: {fileID: 0}
+  milestoneType: 14
+  targetValue: 1
+  requiredUpgrade: {fileID: 11400000, guid: 2371fee8960bc46cf9b6c9a2d95850b6, type: 2}
   reward: {fileID: 0}
   goldReward: 60000
+  sealReward: 0

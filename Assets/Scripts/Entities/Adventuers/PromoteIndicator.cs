@@ -38,6 +38,10 @@ public class PromoteIndicator : MonoBehaviour
 
         root = new GameObject("PromoteIndicator").transform;
         root.SetParent(transform, false);
+        // The adventurer's root SortingGroup would cap the marker at its own entity order: sort it at the root instead
+        var group = root.gameObject.AddComponent<UnityEngine.Rendering.SortingGroup>();
+        group.sortAtRoot = true;
+        group.sortingOrder = 32000;
 
         badgeRenderer = NewChildRenderer("Badge", Vector3.zero);
 

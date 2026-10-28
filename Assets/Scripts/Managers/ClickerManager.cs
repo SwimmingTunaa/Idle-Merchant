@@ -82,6 +82,7 @@ public class ClickerManager : MonoBehaviour
     private AdventurerAgent hoveredAdv;
     private WorkshopProp hoveredProp;
     private DecorSlot hoveredDecor;
+    private TransportPoint hoveredLadder;
 
     /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
     public float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
@@ -251,6 +252,7 @@ public class ClickerManager : MonoBehaviour
         AdventurerAgent under = null;
         WorkshopProp prop = null;
         DecorSlot decor = null;
+        TransportPoint ladder = null;
 
         // No world hover while the book is open (you're already inside it).
         if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
@@ -261,10 +263,19 @@ public class ClickerManager : MonoBehaviour
                 if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
                 if (prop == null) hit.TryGetComponent(out prop);
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
+                if (ladder == null) hit.TryGetComponent(out ladder);
             }
         }
         if (under != null) prop = null;   // a hero standing in front of a workshop takes the outline
         if (under != null || prop != null) decor = null;   // click priority: workshops before decor
+        if (under != null || prop != null || decor != null) ladder = null;   // ladders last
+
+        if (ladder != hoveredLadder)
+        {
+            if (hoveredLadder != null) hoveredLadder.SetHover(false);
+            hoveredLadder = ladder;
+            if (hoveredLadder != null) hoveredLadder.SetHover(true);
+        }
 
         if (decor != hoveredDecor)
         {
@@ -362,6 +373,14 @@ public class ClickerManager : MonoBehaviour
         {
             if (!hit.TryGetComponent(out DecorSlot decor) || !decor.CanDecorate) continue;
             FindAnyObjectByType<DecoratePanelController>()?.OpenFor(decor);
+            return;
+        }
+
+        // Priority 5: a dungeon ladder opens the Transport panel (Elevator / Teleport Circle)
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out TransportPoint tp)) continue;
+            FindAnyObjectByType<TransportPanelController>()?.OpenFor(tp);
             return;
         }
 

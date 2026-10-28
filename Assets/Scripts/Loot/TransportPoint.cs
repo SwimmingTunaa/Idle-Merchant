@@ -1,14 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Type of transport method between layers.
-/// Each has different travel time and upgrade cost.
+/// How a depth's transport point carries porters (serialized ints: append only).
+/// Ladder = climb at the porter's move speed; Elevator = a straight glide in elevatorSeconds (Elevator I–V ranks);
+/// Teleporter is unused here — Teleport Circle reroutes porters instead (PorterManager/PorterAgent).
 /// </summary>
 public enum TransportType
 {
     Ladder,      // Slow, default
-    Elevator,    // Medium speed
-    Teleporter   // Instant
+    Elevator,    // ~1 s ride
+    Teleporter   // unused (Teleport Circle is a route, not a mode)
 }
 
 /// <summary>
@@ -27,9 +28,11 @@ public class TransportPoint : MonoBehaviour
     [Tooltip("Where this transport goes (usually 0 = shop level)")]
     public int destinationLayer = 0;
     
-    [Header("Travel Times")]
-    [Tooltip("How long it takes to travel via this transport")]
-    public float travelTime = 3f; // Ladder = 3s, Elevator = 1.5s, Teleporter = 0.1s
+    [Header("Elevator")]
+    [Tooltip("Seconds per ride (either way) once this ladder is an elevator; the ladder climbs at the porter's move speed")]
+    [SerializeField] private float elevatorSeconds = 1f;
+    [Tooltip("Ladder sprite tint while it's an elevator")]
+    [SerializeField] private Color elevatorTint = new Color(0.62f, 0.72f, 0.82f);   // PLACEHOLDER steel tint until the cage art lands
     
     [Header("Points")]
     [Tooltip("Where porter stands to enter transport")]
@@ -42,9 +45,25 @@ public class TransportPoint : MonoBehaviour
     [Tooltip("Optional visual indicator for transport")]
     public SpriteRenderer transportVisual;
 
+    [Tooltip("Rendering-layer bit for the hover outline (HoverOutlineFeature, bit 2)")]
+    [SerializeField] private uint hoverOutlineLayer = 2;
+
     void Awake()
     {
         ValidateSetup();
+        // Click target for the Transport panel (ClickerManager): the whole ladder sprite is clickable
+        if (transportVisual != null && TryGetComponent(out BoxCollider2D box))
+        {
+            box.size = transportVisual.size;
+            box.offset = transform.InverseTransformPoint(transportVisual.bounds.center);   // sprite pivot isn't centred
+        }
+    }
+
+    public void SetHover(bool on)
+    {
+        if (transportVisual == null) return;
+        transportVisual.renderingLayerMask = on ? transportVisual.renderingLayerMask | hoverOutlineLayer
+                                                : transportVisual.renderingLayerMask & ~hoverOutlineLayer;
     }
 
     private void ValidateSetup()
@@ -65,10 +84,18 @@ public class TransportPoint : MonoBehaviour
     }
 
  
-    public float GetTravelTime()
+    /// <summary>Elevator I–V (PorterManager): steel-tinted ladder, porters glide it in elevatorSeconds.</summary>
+    public void SetMode(TransportType mode)
     {
-        return travelTime;
+        transportType = mode;
+        if (transportVisual != null) transportVisual.color = mode == TransportType.Elevator ? elevatorTint : Color.white;
     }
+
+    /// <summary>Climb speed between entry and exit: the porter's own on a ladder, a fixed-time glide on an elevator.</summary>
+    public float TravelSpeed(float ladderSpeed) =>
+        transportType == TransportType.Elevator
+            ? Vector3.Distance(GetEntryPosition(), GetExitPosition()) / Mathf.Max(0.1f, elevatorSeconds)
+            : ladderSpeed;
 
     /// <summary>
     /// Check if porter is close enough to use this transport
@@ -93,37 +120,6 @@ public class TransportPoint : MonoBehaviour
     public Vector3 GetEntryPosition()
     {
         return entryPoint != null ? entryPoint.position : transform.position;
-    }
-
-    // ===== UPGRADE SYSTEM (Future) =====
-
-    /// <summary>
-    /// Upgrade this transport to next tier.
-    /// Called by upgrade system (implement later).
-    /// </summary>
-    public bool TryUpgrade()
-    {
-        switch (transportType)
-        {
-            case TransportType.Ladder:
-                transportType = TransportType.Elevator;
-                travelTime = 1.5f;
-                Debug.Log($"[TransportPoint] Upgraded {name} to Elevator (1.5s travel)");
-                return true;
-            
-            case TransportType.Elevator:
-                transportType = TransportType.Teleporter;
-                travelTime = 0.1f;
-                Debug.Log($"[TransportPoint] Upgraded {name} to Teleporter (instant)");
-                return true;
-            
-            case TransportType.Teleporter:
-                Debug.LogWarning($"[TransportPoint] {name} is already max level (Teleporter)");
-                return false;
-            
-            default:
-                return false;
-        }
     }
 
     // ===== DEBUG GIZMOS =====
@@ -155,7 +151,7 @@ public class TransportPoint : MonoBehaviour
         }
 
         // Draw transport type label
-        string label = $"{transportType}\n{travelTime:F1}s";
+        string label = $"{transportType}";
         UnityEditor.Handles.Label(transform.position, label);
     }
 

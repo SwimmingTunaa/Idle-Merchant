@@ -49,13 +49,34 @@ public class PorterManager : UnitManager<PorterAgent>
     {
         base.Start();
         ApplyLodging();
+        ApplyTransport();
     }
 
     void OnDestroy() => ProgressionManager.OnUpgradePurchased -= OnUpgradePurchased;
 
     private void OnUpgradePurchased(GuildUpgradeDef upgrade)
     {
-        if (upgrade != null && upgrade.upgradeType == UpgradeType.PorterLodging) ApplyLodging();
+        if (upgrade == null) return;
+        if (upgrade.upgradeType == UpgradeType.PorterLodging) ApplyLodging();
+        if (upgrade.upgradeType is UpgradeType.Elevator or UpgradeType.Teleporter) ApplyTransport();
+    }
+
+    private static bool TeleportOwned =>
+        ProgressionManager.Instance != null && ProgressionManager.Instance.HasUpgrade(UpgradeType.Teleporter);
+
+    // PLACEHOLDER waystones (Teleport Circle): purple-tinted standing stone (Decoratives_47) on each Ladder's "Waystone"
+    // child (ProgressionActivator on the Ladder) and Guild/Shop/Decor/waystone_hall (DecorSlot pop-in) until the real art lands.
+    // Elevator I–V convert ladders top-down (rank N = depths 1..N; the ranks chain, so count == highest rank).
+    // Teleport Circle reroutes every porter; one mid-trip finishes it first (PorterAgent.SetTransport).
+    private void ApplyTransport()
+    {
+        if (ProgressionManager.Instance == null) return;
+        if (transport != null)
+            transport.SetMode(LayerIndex <= ProgressionManager.Instance.CountUpgrades(UpgradeType.Elevator)
+                ? TransportType.Elevator : TransportType.Ladder);
+        if (depositPoint == null) return;
+        foreach (var p in GetAllUnits())
+            if (p != null) p.SetTransport(Route(), depositPoint.position, TeleportOwned);
     }
 
     private void ApplyLodging()
@@ -132,7 +153,7 @@ public class PorterManager : UnitManager<PorterAgent>
         porter.Init(porterDef, LayerIndex, spawner: null, operationArea);
         
         // Set transport and deposit point
-        porter.SetTransport(Route(), depositPoint.position);
+        porter.SetTransport(Route(), depositPoint.position, TeleportOwned);
 
         return porter;
     }
@@ -144,30 +165,6 @@ public class PorterManager : UnitManager<PorterAgent>
 
         GameSignals.RaiseUnitHired(candidate.entityDef, HireRole.Porter);
         return true;
-    }
-
-    // ===== TRANSPORT UPGRADE =====
-
-    /// <summary>
-    /// Upgrade the transport for this layer (Ladder → Elevator → Teleporter).
-    /// Assumes gold has already been deducted by the UI.
-    /// </summary>
-    public bool UpgradeTransport()
-    {
-        if (transport == null)
-        {
-            Debug.LogWarning($"[PorterManager Layer {LayerIndex}] No transport assigned!");
-            return false;
-        }
-        
-        bool success = transport.TryUpgrade();
-        
-        if (success && showDebugLogs)
-        {
-            Debug.Log($"[PorterManager Layer {LayerIndex}] Upgraded transport to {transport.transportType}");
-        }
-        
-        return success;
     }
 
     // ===== LEGACY WRAPPERS (for backward compatibility) =====
@@ -292,7 +289,7 @@ public class PorterManager : UnitManager<PorterAgent>
         }
           
         // Set transport and deposit point
-        agent.SetTransport(Route(), depositPoint.position);
+        agent.SetTransport(Route(), depositPoint.position, TeleportOwned);
         return agent;
     }
 
@@ -319,16 +316,5 @@ public class PorterManager : UnitManager<PorterAgent>
     public int GetAvailableSlots()
     {
         return GetTotalCapacity() - GetTotalCount();
-    }
-
-    // ===== DEBUG =====
-
-    [ContextMenu("Debug: Upgrade Transport")]
-    private void DebugUpgradeTransport()
-    {
-        if (UpgradeTransport())
-        {
-            Debug.Log($"[PorterManager Layer {LayerIndex}] Transport upgraded to {transport.transportType}");
-        }
     }
 }

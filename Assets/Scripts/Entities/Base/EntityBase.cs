@@ -100,6 +100,8 @@ public class EntityBase : MonoBehaviour
         // Resize collider (uses cached size from EntityDef)
         ResizeCollider(entityDef.colliderSize);
 
+        // Root SortingGroup (porters, adventurers, customers): the per-type 2000–8000 entity order lands on it
+        if (sortingGroup == null) sortingGroup = GetComponent<SortingGroup>();
         if (sortingGroup != null)
         {
             int sortingOrder = EntitySortingManager.Instance.GetNextSortingOrder(def.sortingType);

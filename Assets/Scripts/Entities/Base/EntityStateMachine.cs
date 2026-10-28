@@ -70,8 +70,9 @@ public abstract class EntityStateMachine<TState> : EntityBase where TState : Enu
     /// <summary>
     /// Call this for movement that needs to happen every frame (smooth visuals).
     /// State logic runs at 10fps, but movement can still be smooth at 60fps.
+    /// speed &gt; 0 overrides Stats.MoveSpeed (porters gliding an elevator).
     /// </summary>
-    protected void UpdateMovementSmooth()
+    protected void UpdateMovementSmooth(float speed = 0f)
     {
         if (!targetPos.HasValue) return;
 
@@ -88,7 +89,7 @@ public abstract class EntityStateMachine<TState> : EntityBase where TState : Enu
 
         FaceDirection(delta.x);
         // Use Stats.MoveSpeed for modified speed value
-        float currentSpeed = Stats != null ? Stats.MoveSpeed : 1f;
+        float currentSpeed = speed > 0f ? speed : Stats != null ? Stats.MoveSpeed : 1f;
         // MoveTowards: a long frame can't step past the target (an unclamped step overshot the 0.05 stop distance and bounced)
         var goal = targetPos.Value; goal.z = pos.z;
         transform.position = Vector3.MoveTowards(pos, goal, currentSpeed * Time.deltaTime);
