@@ -86,7 +86,7 @@ public class TransportPanelController : BasePanelController
         var pm = ProgressionManager.Instance;
         bool teleport = point.transportType == TransportType.Teleporter;
         bool lift = point.transportType == TransportType.Elevator;
-        title.text = $"Depth {point.sourceLayer} {(teleport ? "waystone" : lift ? "lift" : "ladder")}";
+        title.text = $"Depth {point.sourceLayer} {(teleport ? "teleport pad" : lift ? "lift" : "ladder")}";
         sub.text = teleport ? "Porters blink to the floor above."
                  : lift ? "Porters ride this lift in a second."
                  : "Porters climb this ladder at walking pace.";

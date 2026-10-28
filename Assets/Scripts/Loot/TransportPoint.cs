@@ -63,7 +63,7 @@ public class TransportPoint : MonoBehaviour
 
     public void SetHover(bool on)
     {
-        // Every child sprite: the ladder / shaft, and the scene "Waystone" + ring that stand in once it's a teleporter
+        // Every child sprite: the ladder / shaft, and the scene "Teleport Pad" + "Teleport Exit" that stand in once it's a teleporter
         foreach (var r in GetComponentsInChildren<SpriteRenderer>())
             r.renderingLayerMask = on ? r.renderingLayerMask | hoverOutlineLayer : r.renderingLayerMask & ~hoverOutlineLayer;
     }
@@ -86,7 +86,7 @@ public class TransportPoint : MonoBehaviour
     }
 
  
-    /// <summary>PorterManager, per depth: ladder sprite / elevator shaft / hidden (the scene Waystone stands in; the collider keeps its Awake size).</summary>
+    /// <summary>PorterManager, per depth: ladder sprite / elevator shaft / hidden (the scene Teleport Pad stands in; the collider keeps its Awake size).</summary>
     public void SetMode(TransportType mode)
     {
         transportType = mode;

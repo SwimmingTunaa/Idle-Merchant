@@ -65,7 +65,7 @@ public class PorterManager : UnitManager<PorterAgent>
     // needs the elevator). A teleporter hops porters from this ladder's base to its top — the floor above, or the hall for
     // depth 1 — and the rest of the chain is walked as usual (PorterAgent reads the mode as each leg starts, so the
     // chain set at spawn never needs re-sending).
-    // Waystones: each Ladder's "Waystone" child + ring and Guild/Shop/Decor/waystone_hall (Depth 1) are ProgressionActivators.
+    // Pads: each Ladder's "Teleport Pad" child + its "Teleport Exit" and Guild/Shop/Decor/"Teleport Exit (hall)" (Depth 1) are ProgressionActivators.
     private void ApplyTransport()
     {
         var pm = ProgressionManager.Instance;

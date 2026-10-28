@@ -2203,7 +2203,7 @@ GameObject:
   - component: {fileID: 120522914}
   - component: {fileID: 120522915}
   m_Layer: 0
-  m_Name: Ring
+  m_Name: Teleport Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2218,7 +2218,7 @@ Transform:
   m_GameObject: {fileID: 120522913}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 15.83, z: 0}
+  m_LocalPosition: {x: 0, y: 16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2273,7 +2273,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2761599301120097786, guid: f24d4d06aeff149bc9dd0ee35618d1e9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 14c026235bd44f50a05d396f2536bb62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3579,7 +3579,7 @@ GameObject:
   - component: {fileID: 203830160}
   - component: {fileID: 203830161}
   m_Layer: 0
-  m_Name: Waystone
+  m_Name: Teleport Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3594,7 +3594,7 @@ Transform:
   m_GameObject: {fileID: 203830159}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -7.829998, z: 0}
+  m_LocalPosition: {x: 0, y: -8.799999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3650,7 +3650,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8314525737655419242, guid: a5d96af60a0c2407fad2caafbcc84f49, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b935bb91d784fc89e59508c63a86c82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -27323,7 +27323,7 @@ GameObject:
   - component: {fileID: 864585597}
   - component: {fileID: 864585596}
   m_Layer: 0
-  m_Name: waystone_hall
+  m_Name: Teleport Exit (hall)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27338,7 +27338,7 @@ Transform:
   m_GameObject: {fileID: 864585594}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 32.25, y: 0, z: 0}
+  m_LocalPosition: {x: 32.25, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27430,7 +27430,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8314525737655419242, guid: a5d96af60a0c2407fad2caafbcc84f49, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 14c026235bd44f50a05d396f2536bb62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -33239,7 +33239,7 @@ GameObject:
   - component: {fileID: 953072578}
   - component: {fileID: 953072579}
   m_Layer: 0
-  m_Name: Ring
+  m_Name: Teleport Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33254,7 +33254,7 @@ Transform:
   m_GameObject: {fileID: 953072577}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 15.829998, z: 0}
+  m_LocalPosition: {x: 0, y: 16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -33309,7 +33309,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2761599301120097786, guid: f24d4d06aeff149bc9dd0ee35618d1e9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 14c026235bd44f50a05d396f2536bb62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -33808,7 +33808,7 @@ GameObject:
   - component: {fileID: 1035541881}
   - component: {fileID: 1035541882}
   m_Layer: 0
-  m_Name: Waystone
+  m_Name: Teleport Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33823,7 +33823,7 @@ Transform:
   m_GameObject: {fileID: 1035541880}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -7.83, z: 0}
+  m_LocalPosition: {x: 0, y: -8.799999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -33879,7 +33879,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8314525737655419242, guid: a5d96af60a0c2407fad2caafbcc84f49, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b935bb91d784fc89e59508c63a86c82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -37200,7 +37200,7 @@ GameObject:
   - component: {fileID: 1258159843}
   - component: {fileID: 1258159844}
   m_Layer: 0
-  m_Name: Waystone
+  m_Name: Teleport Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37215,7 +37215,7 @@ Transform:
   m_GameObject: {fileID: 1258159842}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -7.83, z: 0}
+  m_LocalPosition: {x: 0, y: -8.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -37270,7 +37270,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8314525737655419242, guid: a5d96af60a0c2407fad2caafbcc84f49, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b935bb91d784fc89e59508c63a86c82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -42617,7 +42617,7 @@ GameObject:
   - component: {fileID: 1439514192}
   - component: {fileID: 1439514193}
   m_Layer: 0
-  m_Name: Ring
+  m_Name: Teleport Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -42632,7 +42632,7 @@ Transform:
   m_GameObject: {fileID: 1439514191}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 15.829998, z: 0}
+  m_LocalPosition: {x: 0, y: 16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42687,7 +42687,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2761599301120097786, guid: f24d4d06aeff149bc9dd0ee35618d1e9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 14c026235bd44f50a05d396f2536bb62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -43040,7 +43040,7 @@ GameObject:
   - component: {fileID: 1452413436}
   - component: {fileID: 1452413437}
   m_Layer: 0
-  m_Name: Waystone
+  m_Name: Teleport Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43055,7 +43055,7 @@ Transform:
   m_GameObject: {fileID: 1452413435}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -7.829998, z: 0}
+  m_LocalPosition: {x: 0, y: -8.799999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -43111,7 +43111,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8314525737655419242, guid: a5d96af60a0c2407fad2caafbcc84f49, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b935bb91d784fc89e59508c63a86c82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -47860,7 +47860,7 @@ GameObject:
   - component: {fileID: 1733692584}
   - component: {fileID: 1733692585}
   m_Layer: 0
-  m_Name: Waystone
+  m_Name: Teleport Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47875,7 +47875,7 @@ Transform:
   m_GameObject: {fileID: 1733692583}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -7.829998, z: 0}
+  m_LocalPosition: {x: 0, y: -8.799999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -47931,7 +47931,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8314525737655419242, guid: a5d96af60a0c2407fad2caafbcc84f49, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b935bb91d784fc89e59508c63a86c82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -53521,7 +53521,7 @@ GameObject:
   - component: {fileID: 1936857412}
   - component: {fileID: 1936857413}
   m_Layer: 0
-  m_Name: Ring
+  m_Name: Teleport Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53536,7 +53536,7 @@ Transform:
   m_GameObject: {fileID: 1936857411}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 15.829998, z: 0}
+  m_LocalPosition: {x: 0, y: 16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -53591,7 +53591,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2761599301120097786, guid: f24d4d06aeff149bc9dd0ee35618d1e9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 14c026235bd44f50a05d396f2536bb62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

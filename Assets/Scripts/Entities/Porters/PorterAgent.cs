@@ -71,6 +71,8 @@ public class PorterAgent : EntityStateMachine<PorterState>
     // Teleporter legs: the climb up / down a teleporter-mode ladder is one hop (entry ⇄ exit); the mode is read as the
     // leg starts, so a porter already on a ladder when it's upgraded finishes that climb
     private const float HopSeconds = 0.4f;
+    private const float HopDelay = 0.25f;     // stand on the pad before the shrink starts
+    private float hopWait;
     private float hopElapsed = -1f;           // < 0 = not hopping
     private bool hopped;                      // passed the midpoint: moved to hopTo, now growing back
     private Vector3 hopTo;
@@ -115,6 +117,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
         carriedLoot.Clear();
         leg = 0;                                   // pooled reuse: a despawn mid-trip / mid-hop leaves these behind
         hopElapsed = -1f;
+        hopWait = 0f;
         transform.localScale = Vector3.one;
         if (platform != null) platform.enabled = false;
 
@@ -570,11 +573,12 @@ public class PorterAgent : EntityStateMachine<PorterState>
         hopped = false;
         hopFace = transform.localScale.x < 0f ? -1f : 1f;
         hopElapsed = 0f;
-        HopFx();
+        hopWait = HopDelay;
     }
 
     private void UpdateHop()
     {
+        if (hopWait > 0f) { hopWait -= Time.deltaTime; if (hopWait <= 0f) HopFx(); return; }   // fx when the shrink begins
         hopElapsed += Time.deltaTime;
         float k = Mathf.Clamp01(hopElapsed / HopSeconds);
         if (!hopped && k >= 0.5f)
