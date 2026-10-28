@@ -4,8 +4,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Transport modal (TransportPanel.uxml, instanced in MainUI.uxml after DecoratePanel) — opened by clicking a dungeon
-/// ladder (<see cref="TransportPoint"/>, ClickerManager priority 5). Decorate-panel look; one row per Elevator rank
-/// (goldCost order, the rank serving this depth tinted) then Teleport Circle, each Owned / locked / Buy n gold.
+/// ladder (<see cref="TransportPoint"/>, ClickerManager priority 5). Decorate-panel look; this depth's Elevator rank
+/// (rank N serves depth N, goldCost order) then Teleport Circle, each Owned / locked / Buy n gold.
 /// </summary>
 public class TransportPanelController : BasePanelController
 {
@@ -94,19 +94,18 @@ public class TransportPanelController : BasePanelController
         rows.Clear();
         var all = Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades");
         var elevators = all.Where(u => u.upgradeType == UpgradeType.Elevator).OrderBy(u => u.goldCost).ToList();
-        for (int i = 0; i < elevators.Count; i++)
-            rows.Add(BuildRow(elevators[i], i + 1 == point.sourceLayer));
+        // Only this depth's rank (rank N serves depth N) and the Teleport Circle — the Guild book lists every rank
+        if (point.sourceLayer >= 1 && point.sourceLayer <= elevators.Count) rows.Add(BuildRow(elevators[point.sourceLayer - 1]));
         foreach (var u in all.Where(u => u.upgradeType == UpgradeType.Teleporter).OrderBy(u => u.goldCost))
-            rows.Add(BuildRow(u, false));
+            rows.Add(BuildRow(u));
     }
 
     // Same states as the Guild card (GuildUpgradePanel.UpdateCardState): Owned / Requires N stars / Needs <prev> / Buy
-    private VisualElement BuildRow(GuildUpgradeDef u, bool here)
+    private VisualElement BuildRow(GuildUpgradeDef u)
     {
         var pm = ProgressionManager.Instance;
         var row = new VisualElement();
         row.AddToClassList("dp-row");
-        row.EnableInClassList("tp-row--here", here);
 
         var name = new Label(u.upgradeName) { pickingMode = PickingMode.Ignore };
         name.AddToClassList("dp-row__name");
