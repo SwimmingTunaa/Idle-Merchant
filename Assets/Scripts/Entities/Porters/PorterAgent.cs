@@ -37,6 +37,9 @@ public class PorterAgent : EntityStateMachine<PorterState>
     
     [Tooltip("Offset above porter's head where loot appears during pickup")]
     [SerializeField] private Vector3 lootHoldOffset = new Vector3(0f, 1.5f, 0f);
+
+    [Tooltip("Brass plank under the feet, shown only while riding an elevator (disabled in the prefab)")]
+    [SerializeField] private SpriteRenderer platform;
     
     // Timing (not stats)
     private float idleTimeMin;
@@ -113,6 +116,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
         leg = 0;                                   // pooled reuse: a despawn mid-trip / mid-hop leaves these behind
         hopElapsed = -1f;
         transform.localScale = Vector3.one;
+        if (platform != null) platform.enabled = false;
 
         ChangeState(porterDef.startingState);
     }
@@ -121,6 +125,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
     {
         base.Update();
         bool glide = Gliding;
+        if (platform != null) platform.enabled = glide;
         UpdateMovementSmooth(glide ? transport.TravelSpeed(Stats.MoveSpeed) : 0f);
         if (glide || hopElapsed >= 0f) animator.SetFloat(AnimHash.Velocity, 0f);   // ride / hop standing still, no walk cycle
         if (hopElapsed >= 0f) UpdateHop();
