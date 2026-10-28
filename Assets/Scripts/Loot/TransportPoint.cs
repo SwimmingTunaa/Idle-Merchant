@@ -49,6 +49,11 @@ public class TransportPoint : MonoBehaviour
     [Tooltip("Rendering-layer bit for the hover outline (HoverOutlineFeature, bit 2)")]
     [SerializeField] private uint hoverOutlineLayer = 2;
 
+    [Tooltip("Scene Teleport Pad's Beam child (Tiled, disabled): stretched to the exit slab in Awake, lit per hop")]
+    [SerializeField] private SpriteRenderer beam;
+    private float beamUntil = -1f;
+    private const float BeamFade = 0.2f;
+
     void Awake()
     {
         ValidateSetup();
@@ -59,6 +64,18 @@ public class TransportPoint : MonoBehaviour
             box.offset = transform.InverseTransformPoint(transportVisual.bounds.center);   // sprite pivot isn't centred
         }
         if (transportVisual != null) ladderSprite = transportVisual.sprite;
+        if (beam != null) beam.size = new Vector2(beam.size.x, GetExitPosition().y - beam.transform.position.y);
+    }
+
+    /// Light the pad-to-exit beam for `seconds`, then fade it out over BeamFade. Repeated calls extend it.
+    public void Beam(float seconds) { if (beam == null) return; beam.enabled = true; var c = beam.color; c.a = 1f; beam.color = c; beamUntil = Mathf.Max(beamUntil, Time.time + seconds); }
+
+    void Update()
+    {
+        if (!beam || !beam.enabled) return;
+        float left = beamUntil - Time.time;
+        var c = beam.color; c.a = Mathf.Clamp01((left + BeamFade) / BeamFade); beam.color = c;
+        if (left <= -BeamFade) beam.enabled = false;
     }
 
     public void SetHover(bool on)

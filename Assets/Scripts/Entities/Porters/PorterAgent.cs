@@ -578,7 +578,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
 
     private void UpdateHop()
     {
-        if (hopWait > 0f) { hopWait -= Time.deltaTime; if (hopWait <= 0f) HopFx(); return; }   // fx when the shrink begins
+        if (hopWait > 0f) { hopWait -= Time.deltaTime; if (hopWait <= 0f) { HopFx(); if (transport != null) transport.Beam(HopSeconds); } return; }   // fx when the shrink begins
         hopElapsed += Time.deltaTime;
         float k = Mathf.Clamp01(hopElapsed / HopSeconds);
         if (!hopped && k >= 0.5f)
