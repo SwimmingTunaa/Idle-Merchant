@@ -215,6 +215,7 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 - **Class power lives on the tier def, not on promotion** — don't reintroduce per-rank damage/HP modifiers in `AdvanceRank`; tune `damageMultiplier` / `hpMultiplier` on the def (only attack speed still steps per rank)
 - **New adventurer classes/tiers go in `ClassCatalog.defs`** — not on a layer manager's `hireableDefs`
 - **Class signatures are data on the tier def** — cleave / taunt + damage reduction / crit + pursuit / % max-HP fields on `AdventurerDef` (on iff > 0); resolved in `AdventurerAgent.ResolveHit` via `CombatBehavior.HitOverride`. Splash and other secondary damage go straight to `Health.OnDamage` so procs never chain
+- **Hover nameplate lives on `ClickerManager`** — one world-space TMP (`nameplate`, sorting 10000, rendering layer 1) over `hoveredAdv`, positioned in `LateUpdate` above the `PromoteIndicator` badge; hidden when dead or `IsBlockingWorldInput`. The right-mouse glyph is a TMP sprite asset like `UpArrow` (`TextMesh Pro/Resources/Sprite Assets/RMB`, `<sprite="RMB" index=0>`); it drops after 3 successful inspects, counted in `ClickerManager.Inspects` and saved in `ClickerSave.inspects`
 - **`lastPlayedUtc` means "collected up to", not "last seen"** — while a welcome-back award is unclaimed it's saved as `now − pendingAway` and rates freeze, so quitting on the panel re-offers the identical award; don't "fix" it to `UtcNow`
 
 ---

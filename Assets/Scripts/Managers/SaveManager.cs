@@ -202,6 +202,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
             d.clicker.damageAOE = clicker.AOELevel;
             d.clicker.autoClick = clicker.AutoClickLevel;
             d.clicker.autoCollect = clicker.AutoCollectLevel;
+            d.clicker.inspects = clicker.Inspects;
         }
 
         foreach (var m in advManagers)
@@ -331,8 +332,11 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         var clicker = FindAnyObjectByType<ClickerManager>();
         if (clicker != null)
+        {
             clicker.RestoreLevels(d.clicker.clickDamage, d.clicker.pickupRadius, d.clicker.damageAOE,
                 d.clicker.autoClick, d.clicker.autoCollect);
+            clicker.Inspects = d.clicker.inspects;
+        }
 
         if (GameManager.Instance != null) GameManager.Instance.SetTimeScale(d.settings.gameSpeed);
         var sfx = SfxManager.Instance;
@@ -690,6 +694,7 @@ public class ProgressionSave
 public class ClickerSave
 {
     public int clickDamage, pickupRadius, damageAOE, autoClick, autoCollect;
+    public int inspects;   // successful right-click inspects; the hover nameplate's RMB hint hides at 3
 }
 
 public class ContractSave

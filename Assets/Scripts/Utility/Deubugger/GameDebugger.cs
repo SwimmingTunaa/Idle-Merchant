@@ -201,6 +201,7 @@ public class GameDebugger : EditorWindow
                 BumpClickerLevel(clicker, "autoClickLevel", 0, reset: true);
                 BumpClickerLevel(clicker, "autoCollectLevel", 0, reset: true);
             }
+            if (GUILayout.Button($"Reset inspect hint ({clicker.Inspects} inspects)")) clicker.Inspects = 0;
             GUI.enabled = true;
         }
     }

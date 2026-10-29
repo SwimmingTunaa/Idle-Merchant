@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -66,6 +67,14 @@ public class ClickerManager : MonoBehaviour
     [Tooltip("Speed at which loot moves to mouse position when clicked")]
     [SerializeField] private float lootVacuumSpeed = 10f;
     
+    [Header("Hover Nameplate")]
+    [Tooltip("Font of the nameplate over the hovered adventurer (same as the damage numbers).")]
+    [SerializeField] private TMP_FontAsset nameplateFont;
+    [Tooltip("Height above the collider top (unit-local) — clears the PromoteIndicator (clearance 0.45 + badge 0.45) plus a gap.")]
+    [SerializeField] private float nameplateOffset = 1f;
+    [SerializeField] private float nameplateFontSize = 8f;
+    [SerializeField] private Color nameplateColor = new Color(0.96f, 0.9f, 0.76f);
+
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = false;
 
@@ -84,6 +93,11 @@ public class ClickerManager : MonoBehaviour
     private DecorSlot hoveredDecor;
     private CaravanManager hoveredCaravan;
     private TransportPoint hoveredLadder;
+    private TextMeshPro nameplate;
+
+    /// <summary>Successful right-click inspects (saved). The nameplate's RMB glyph shows until this reaches InspectHintCount.</summary>
+    public int Inspects { get; set; }
+    private const int InspectHintCount = 3;
 
     /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
     public float EffectiveClickDamage => clickDamage * (1f + 0.1f * clickDamageLevel);
@@ -217,6 +231,36 @@ public class ClickerManager : MonoBehaviour
         return true;
     }
 
+    void Awake()
+    {
+        // One world-space nameplate for the hovered adventurer; not parented to units, so it never flips
+        // and PermanentOutline never flags it (rendering layer 1 = outline bits 2/4 clear).
+        nameplate = new GameObject("HoverNameplate").AddComponent<TextMeshPro>();
+        nameplate.transform.SetParent(transform, false);
+        if (nameplateFont != null) nameplate.font = nameplateFont;
+        nameplate.fontSize = nameplateFontSize;
+        nameplate.color = nameplateColor;
+        nameplate.alignment = TextAlignmentOptions.Bottom;
+        nameplate.textWrappingMode = TextWrappingModes.NoWrap;
+        nameplate.rectTransform.pivot = new Vector2(0.5f, 0f);
+        var mr = nameplate.GetComponent<MeshRenderer>();
+        mr.sortingOrder = 10000;
+        mr.renderingLayerMask = 1;
+        nameplate.gameObject.SetActive(false);
+    }
+
+    // Nameplate follows the hovered adventurer; hidden when dead or a world-blocking panel is open.
+    void LateUpdate()
+    {
+        bool show = hoveredAdv != null && hoveredAdv.IsAlive
+                    && (UIManager.Instance == null || !UIManager.Instance.IsBlockingWorldInput);
+        if (nameplate.gameObject.activeSelf != show) nameplate.gameObject.SetActive(show);
+        if (!show) return;
+
+        float top = hoveredAdv.TryGetComponent(out BoxCollider2D col) ? col.offset.y + col.size.y * 0.5f : 1f;
+        nameplate.transform.position = hoveredAdv.transform.TransformPoint(new Vector3(0f, top + nameplateOffset, 0f));
+    }
+
     void Update()
     {
         secondTimer += Time.deltaTime;
@@ -306,7 +350,10 @@ public class ClickerManager : MonoBehaviour
 
         if (hoveredAdv != null) hoveredAdv.SetHoverOutline(false);
         hoveredAdv = under;
-        if (hoveredAdv != null) hoveredAdv.SetHoverOutline(true);
+        if (hoveredAdv == null) return;
+        hoveredAdv.SetHoverOutline(true);
+        string label = hoveredAdv.TryGetComponent(out IdentityComponent ic) && ic.Identity != null ? ic.Identity.DisplayName : hoveredAdv.name;
+        nameplate.text = Inspects < InspectHintCount ? label + " <sprite=\"RMB\" index=0>" : label;
     }
 
     /// <summary>World-space position under the mouse cursor (raw camera z). Shared by
@@ -328,6 +375,7 @@ public class ClickerManager : MonoBehaviour
         {
             if (hit.TryGetComponent(out AdventurerAgent adv))
             {
+                Inspects++;
                 GameSignals.RaiseAdventurerFocusRequested(adv);
                 return;
             }
