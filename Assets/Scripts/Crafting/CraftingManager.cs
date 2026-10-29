@@ -13,7 +13,7 @@ public class CraftingManager : MonoBehaviour
 {
     public static CraftingManager Instance { get; private set; }
 
-    public const int DefaultCap = 10, MaxCap = 999;
+    public const int DefaultCap = 25, MaxCap = 999;
 
     // Indexed by CraftingStation. Forging starts with 2 slots (it's the first station bought).
     private static readonly UpgradeType[] StationUpgrade = { UpgradeType.ForgingStation, UpgradeType.Smithy, UpgradeType.ArcaneWorkshop };
