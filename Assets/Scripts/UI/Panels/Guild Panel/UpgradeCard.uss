@@ -87,3 +87,12 @@
 .btn-disabled.guild-card-owned {
     color: var(--color-success-active);
 }
+
+/* material cost row (built in code) sits just above the bottom slot; the slot drops its auto margin */
+.guild-card .mat-row {
+    margin: auto 0 6px 0;
+}
+
+.guild-card--mats .guild-card-slot {
+    margin-top: 0;
+}

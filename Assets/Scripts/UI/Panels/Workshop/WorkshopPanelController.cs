@@ -27,6 +27,7 @@ public class WorkshopPanelController : BasePanelController
     private Label title, lockedMsg;
     private Button buyButton;
     private Label buyCost;
+    private VisualElement buyMat;
     private readonly List<SlotView> slotViews = new();
     private readonly List<DropRow> dropRows = new();
     private IVisualElementScheduledItem tick;
@@ -200,6 +201,10 @@ public class WorkshopPanelController : BasePanelController
         buyCost = new Label { pickingMode = PickingMode.Ignore };
         buyButton.Add(buyCost);
         holder.Add(buyButton);
+        var cm = CraftingManager.Instance;
+        buyMat = GuildUpgradePanel.MaterialChip(cm.GetSlotMaterial(station), cm.GetSlotMaterialCost(station));
+        buyMat.AddToClassList("wp-buy__mat");
+        holder.Add(buyMat);   // rebuilt on OnCraftingConfigChanged, so qty stays current
         return holder;
     }
 
@@ -324,7 +329,9 @@ public class WorkshopPanelController : BasePanelController
         {
             int cost = cm.GetSlotCost(station);
             buyCost.text = $"{cost:N0}";
-            buyButton.SetEnabled(Inventory.Instance.Gold >= cost);
+            var (raw, rawQty) = (cm.GetSlotMaterial(station), cm.GetSlotMaterialCost(station));
+            GuildUpgradePanel.SetChipShort(buyMat, raw, rawQty);
+            buyButton.SetEnabled(Inventory.Instance.Gold >= cost && Inventory.Instance.Get(raw.itemCategory, raw) >= rawQty);
         }
         RefreshDrop();
     }

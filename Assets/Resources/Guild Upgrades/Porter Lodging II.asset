@@ -16,6 +16,11 @@ MonoBehaviour:
   description: Bunks upstairs for the porters. +2 porter capacity on every depth.
   icon: {fileID: 1363802092, guid: 5409788010edd41089f857bac79e912a, type: 3}
   goldCost: 12000
+  materials:
+  - item: {fileID: 11400000, guid: 55284c34a41b841e093a08f3d9a71534, type: 2}
+    qty: 200
+  - item: {fileID: 11400000, guid: e9e49d793f136462d8ecdc12ace37dbe, type: 2}
+    qty: 120
   starRequirement: 1
   requiredUpgrade: {fileID: 11400000, guid: 616720f9e42ad42e2a5a56aeeb25041b, type: 2}
   upgradeType: 4

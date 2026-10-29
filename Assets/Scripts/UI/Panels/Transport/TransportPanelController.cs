@@ -111,6 +111,7 @@ public class TransportPanelController : BasePanelController
         var name = new Label(u.upgradeName) { pickingMode = PickingMode.Ignore };
         name.AddToClassList("dp-row__name");
         row.Add(name);
+        if (u.materials.Count > 0 && !pm.IsUpgradeOwned(u)) row.Add(GuildUpgradePanel.MaterialRow(u.materials));
 
         bool owned = pm.IsUpgradeOwned(u);
         bool starLocked = !owned && pm.GetCurrentStars() < u.starRequirement;
@@ -132,7 +133,7 @@ public class TransportPanelController : BasePanelController
             coin.AddToClassList("tp-btn__coin");
             button.Add(coin);
         }
-        button.SetEnabled(buyable && Inventory.Instance != null && Inventory.Instance.CanAfford(u.goldCost));
+        button.SetEnabled(buyable && Inventory.Instance != null && pm.CanPurchaseUpgrade(u));
         row.Add(button);
         return row;
     }

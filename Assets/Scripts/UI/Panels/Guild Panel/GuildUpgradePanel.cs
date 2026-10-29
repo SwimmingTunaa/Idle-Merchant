@@ -224,6 +224,8 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         card.Q<Label>("upgrade-description").text = upgrade.description;
         card.Q<Label>("purchase-label").text = AnimatedNumberUITK.Abbrev(upgrade.goldCost);
         card.Q<Button>("purchase-button").clicked += () => OnPurchaseClicked(upgrade);
+        if (upgrade.materials.Count > 0)   // just above the bottom slot (UpgradeCard.uss .guild-card--mats)
+            card.Q("card-root").Insert(2, MaterialRow(upgrade.materials));
 
         UpdateCardState(card, upgrade);
         return card;
@@ -247,8 +249,44 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
 
         var button = card.Q<Button>("purchase-button");
         button.style.display = owned || locked ? DisplayStyle.None : DisplayStyle.Flex;
-        button.SetEnabled(Inventory.Instance != null && Inventory.Instance.CanAfford(upgrade.goldCost));
+        button.SetEnabled(Inventory.Instance != null && pm.CanPurchaseUpgrade(upgrade));
+        var mats = card.Q("mat-row");
+        if (mats == null) return;
+        mats.style.display = owned ? DisplayStyle.None : DisplayStyle.Flex;   // a spent cost, like the hidden gold button
+        card.Q("card-root").EnableInClassList("guild-card--mats", !owned);
+        for (int i = 0; i < upgrade.materials.Count; i++)
+            SetChipShort(mats[i], upgrade.materials[i].Item, upgrade.materials[i].Qty);
     }
+
+    // ═════════════════════════════════════════════
+    // MATERIAL COST CHIPS — shared with TransportPanelController / WorkshopPanelController
+    // ═════════════════════════════════════════════
+
+    /// <summary>Row of "icon x qty" chips (GlobalVariables.uss .mat-*), one per material.</summary>
+    public static VisualElement MaterialRow(IReadOnlyList<RecipeDef.Ingredient> mats)
+    {
+        var row = new VisualElement { name = "mat-row", pickingMode = PickingMode.Ignore };
+        row.AddToClassList("mat-row");
+        foreach (var m in mats) row.Add(MaterialChip(m.Item, m.Qty));
+        return row;
+    }
+
+    public static VisualElement MaterialChip(ItemDef item, int qty)
+    {
+        var chip = new VisualElement { pickingMode = PickingMode.Ignore };
+        chip.AddToClassList("mat-chip");
+        var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+        icon.AddToClassList("mat-chip__icon");
+        if (item.icon != null) icon.style.backgroundImage = new StyleBackground(item.icon);
+        chip.Add(icon);
+        chip.Add(new Label($"x{qty}") { pickingMode = PickingMode.Ignore });
+        SetChipShort(chip, item, qty);
+        return chip;
+    }
+
+    /// <summary>Red while stock (floors ignored, like the purchase) is below qty.</summary>
+    public static void SetChipShort(VisualElement chip, ItemDef item, int qty) =>
+        chip.EnableInClassList("mat-chip--short", Inventory.Instance == null || Inventory.Instance.Get(item.itemCategory, item) < qty);
 
     private void OnPurchaseClicked(GuildUpgradeDef upgrade)
     {

@@ -279,3 +279,16 @@
 .wp-it--rm .wp-it__name {
     color: rgb(201, 138, 132);
 }
+
+/* material cost chips on the dark iron/stone cards (Workshop "+ Slot", Transport rows) */
+.wp-card .mat-chip Label {
+    color: rgb(243, 220, 160);
+}
+
+.wp-card .mat-chip--short Label {
+    color: var(--color-destructive-hover);
+}
+
+.wp-buy__mat {
+    margin: 4px 0 0 0;
+}

@@ -297,3 +297,41 @@
     margin-left: var(--space-sm);
     margin-right: var(--space-sm);
 }
+
+/* ── Material cost chips (GuildUpgradePanel.MaterialRow/MaterialChip): "icon x qty", red while short ── */
+
+.mat-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.mat-chip {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.mat-chip__icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 2px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.mat-chip Label {
+    font-size: var(--font-size-caption);
+    -unity-font-definition: var(--font-body);
+    color: var(--color-text-secondary);
+    margin: 0;
+    padding: 0;
+}
+
+.mat-chip--short .mat-chip__icon {
+    opacity: 0.5;
+}
+
+.mat-chip--short Label {
+    color: var(--color-text-danger);
+}

@@ -16,6 +16,11 @@ MonoBehaviour:
   description: Opens the armor line - padded vests through abyssal armor.
   icon: {fileID: 21300000, guid: f7de0c602f7464e529c6b2ce93763a7a, type: 3}
   goldCost: 5000
+  materials:
+  - item: {fileID: 11400000, guid: 55284c34a41b841e093a08f3d9a71534, type: 2}
+    qty: 150
+  - item: {fileID: 11400000, guid: 45edbcd9f0af6440892e3c0a394ac652, type: 2}
+    qty: 100
   starRequirement: 1
   upgradeType: 7
   layerSpecific: 0

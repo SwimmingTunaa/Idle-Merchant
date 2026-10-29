@@ -16,6 +16,11 @@ MonoBehaviour:
   description: A waystone at depth 5's ladder. Porters blink to the floor above.
   icon: {fileID: 21300000, guid: b9a847102a75c8c429a8f749008df6c2, type: 3}
   goldCost: 3000000
+  materials:
+  - item: {fileID: 11400000, guid: ae2b7a96a0eee457daf336187b4304e5, type: 2}
+    qty: 300
+  - item: {fileID: 11400000, guid: c25b086a48308402b9b320e94c009ab5, type: 2}
+    qty: 80
   starRequirement: 5
   requiredUpgrade: {fileID: 11400000, guid: 70f350ebef2d94e0e8929bb4b60367c4, type: 2}
   upgradeType: 3

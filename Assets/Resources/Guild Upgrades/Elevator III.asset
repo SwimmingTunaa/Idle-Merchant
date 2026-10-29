@@ -16,6 +16,11 @@ MonoBehaviour:
   description: Turns depth 3's ladder into a lift. Porters ride it in a second.
   icon: {fileID: 21300000, guid: 5a43640e9fd834ed884fe81d6f00aa0b, type: 3}
   goldCost: 150000
+  materials:
+  - item: {fileID: 11400000, guid: 62677ba2dadd944cbb080f84503b6924, type: 2}
+    qty: 250
+  - item: {fileID: 11400000, guid: 329a89ca5855d4f4e9f06ac293fdbac9, type: 2}
+    qty: 150
   starRequirement: 2
   requiredUpgrade: {fileID: 0}
   upgradeType: 2

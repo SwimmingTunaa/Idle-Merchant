@@ -16,6 +16,11 @@ MonoBehaviour:
   description: Opens the charm and jewelry line - glow charms through infernal amulets.
   icon: {fileID: 21300000, guid: 85028dece456643b0bb8b4c53b360c54, type: 3}
   goldCost: 5000
+  materials:
+  - item: {fileID: 11400000, guid: 92fee048b433841b1a209cdc603ab314, type: 2}
+    qty: 100
+  - item: {fileID: 11400000, guid: ddf96bd2fa8954c309fc7c68ad5c7fd1, type: 2}
+    qty: 60
   starRequirement: 2
   upgradeType: 8
   layerSpecific: 0

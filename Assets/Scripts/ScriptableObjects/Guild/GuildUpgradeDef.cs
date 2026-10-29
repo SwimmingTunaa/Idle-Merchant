@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -21,6 +22,9 @@ public class GuildUpgradeDef : ScriptableObject
     [Header("Requirements")]
     [Tooltip("Gold cost to purchase this upgrade")]
     public int goldCost = 5000;
+
+    [Tooltip("Raw materials consumed on purchase, on top of the gold (stock floors ignored, like contract hand-ins). Empty = gold only")]
+    public List<RecipeDef.Ingredient> materials = new();
     
     [Tooltip("Minimum stars required to see/purchase this upgrade (0 = always available)")]
     [Range(0, 5)]

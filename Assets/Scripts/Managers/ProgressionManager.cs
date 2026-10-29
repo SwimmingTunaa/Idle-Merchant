@@ -682,7 +682,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     // ===== UPGRADE SYSTEM =====
 
     /// <summary>
-    /// Check if player can purchase an upgrade (gold + stars).
+    /// Check if player can purchase an upgrade (gold + materials + stars).
     /// </summary>
     public bool CanPurchaseUpgrade(GuildUpgradeDef upgrade)
     {
@@ -691,6 +691,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         if (currentStars < upgrade.starRequirement) return false; // Insufficient stars
         if (upgrade.requiredUpgrade != null && !ownedUpgrades.Contains(upgrade.requiredUpgrade)) return false; // Previous rank first
         if (!Inventory.Instance.CanAfford(upgrade.goldCost)) return false; // Insufficient gold
+        foreach (var m in upgrade.materials)
+            if (Inventory.Instance.Get(m.Item.itemCategory, m.Item) < m.Qty) return false; // Short on materials (floors ignored)
 
         return true;
     }
@@ -725,6 +727,9 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
                 Debug.LogWarning($"[ProgressionManager] Failed to spend gold for {upgrade.upgradeName}");
             return false;
         }
+        var inv = Inventory.Instance;
+        foreach (var m in upgrade.materials)
+            inv.TryRemove(inv.GetInventoryType(m.Item.itemCategory), m.Item, m.Qty);   // checked in CanPurchaseUpgrade
 
         // Add to owned
         ownedUpgrades.Add(upgrade);

@@ -20,6 +20,9 @@ public class CraftingManager : MonoBehaviour
     private static readonly int[] BaseSlots = { 2, 1, 1 };
     private const int SlotBaseCost = 2500;
     private const float SlotCostGrowth = 1.6f;
+    // Each bought slot also costs 100 × 1.5^k of the station's signature raw (Resources/Items/RawMaterials)
+    private static readonly string[] SlotRawNames = { "Item_StoneChunk", "Item_IronOre", "Item_CrystalShard" };
+    private ItemDef[] slotRaws;
 
     /// <summary>What a slot is doing right now (display). Pure.</summary>
     public enum SlotState { Empty, NoStation, Crafting, AtCap, MissingMaterials, Ready }
@@ -61,6 +64,7 @@ public class CraftingManager : MonoBehaviour
 
         for (int i = 0; i < slots.Length; i++) slots[i] = new List<RecipeDef>(new RecipeDef[BaseSlots[i]]);
         craftingRecipes = new List<RecipeDef>(Resources.LoadAll<RecipeDef>("Recipes"));
+        slotRaws = SlotRawNames.Select(n => Resources.Load<ItemDef>("Items/RawMaterials/" + n)).ToArray();
         // Chain then tier (craft time rises with tier): the UI's "Unlock Order" and the legacy-save migration order
         craftingRecipes.Sort((a, b) => a.Station != b.Station ? a.Station.CompareTo(b.Station) : a.CraftSeconds.CompareTo(b.CraftSeconds));
         if (showDebugLogs) Debug.Log($"[CraftingManager] Loaded {craftingRecipes.Count} recipes from Resources/Recipes");
@@ -340,10 +344,21 @@ public class CraftingManager : MonoBehaviour
     public int GetSlotCost(CraftingStation station) =>
         Mathf.RoundToInt(SlotBaseCost * Mathf.Pow(SlotCostGrowth, slots[(int)station].Count - BaseSlots[(int)station]));
 
-    /// <summary>Gold sink: appends an empty slot at an owned station. Raises OnCraftingConfigChanged.</summary>
+    /// <summary>The station's signature raw a slot costs on top of the gold.</summary>
+    public ItemDef GetSlotMaterial(CraftingStation station) => slotRaws[(int)station];
+
+    /// <summary>Next slot's raw: 100 × 1.5^(slots bought so far).</summary>
+    public int GetSlotMaterialCost(CraftingStation station) =>
+        Mathf.RoundToInt(100 * Mathf.Pow(1.5f, slots[(int)station].Count - BaseSlots[(int)station]));
+
+    /// <summary>Gold + raw sink: appends an empty slot at an owned station. Raises OnCraftingConfigChanged.</summary>
     public bool BuyStationSlot(CraftingStation station)
     {
-        if (!IsStationOwned(station) || !Inventory.Instance.TrySpendGold(GetSlotCost(station))) return false;
+        var inv = Inventory.Instance;
+        var raw = GetSlotMaterial(station);
+        int rawQty = GetSlotMaterialCost(station);
+        if (!IsStationOwned(station) || inv.Get(raw.itemCategory, raw) < rawQty || !inv.TrySpendGold(GetSlotCost(station))) return false;
+        inv.TryRemove(inv.GetInventoryType(raw.itemCategory), raw, rawQty);
         slots[(int)station].Add(null);
         if (showDebugLogs) Debug.Log($"[CraftingManager] {station} now has {slots[(int)station].Count} slots");
         GameSignals.RaiseCraftingConfigChanged();
