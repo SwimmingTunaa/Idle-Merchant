@@ -637,20 +637,22 @@ public class UIManager : PersistentSingleton<UIManager>
     // REQUEST QUEUE
     // ═════════════════════════════════════════════
 
+    /// <summary>Requests queued mid-transition wait at the head until the panel settles (a request dequeued while
+    /// the panel was still Opening/Closing used to be dropped); one that's become moot is discarded.</summary>
     private void ProcessRequestQueue()
     {
-        if (requestQueue.Count == 0)
-            return;
-
-        var request = requestQueue.Dequeue();
-
-        if (request.type == PanelRequestType.Open && request.panel.State == PanelState.Closed)
+        while (requestQueue.Count > 0)
         {
-            OpenPanel(request.panel);
-        }
-        else if (request.type == PanelRequestType.Close && request.panel.State == PanelState.Open)
-        {
-            ClosePanel(request.panel);
+            var request = requestQueue.Peek();
+            var state   = request.panel.State;
+            bool open   = request.type == PanelRequestType.Open;
+            bool ready  = open ? state == PanelState.Closed : state == PanelState.Open;
+            bool moot   = open ? state == PanelState.Open || state == PanelState.Opening
+                               : state == PanelState.Closed || state == PanelState.Closing;
+            if (!ready && !moot) return;
+            requestQueue.Dequeue();
+            if (moot) continue;
+            if (open) OpenPanel(request.panel); else ClosePanel(request.panel);
         }
     }
 

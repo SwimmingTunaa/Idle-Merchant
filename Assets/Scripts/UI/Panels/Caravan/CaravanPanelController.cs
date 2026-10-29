@@ -91,15 +91,10 @@ public class CaravanPanelController : BasePanelController
         Tick();
     }
 
-    // Also the close fallback: UIManager drops a close requested mid-fade-in (Decline / timeout during the 0.3 s open)
     private void Tick()
     {
         var c = CaravanManager.Instance;
-        if (c == null || !c.Present)
-        {
-            if (State == PanelState.Open) UIManager.Instance.ClosePanel(this);
-            return;
-        }
+        if (c == null || !c.Present) return;
         int s = Mathf.CeilToInt(c.LeaveIn);
         leaves.text = $"Leaves in {s / 60}:{s % 60:00}";
     }
