@@ -91,9 +91,9 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 ### Hiring Pipeline
 `CharacterGeneration/HiringCandidateGenerator.cs` → generates `HiringCandidate` structs (identity, traits, cost, `newspaperName`)
 `UI/Panels/Hiring/CandidatePool.cs` → timed pool per def; exposes `CandidateCount` / `MinHireCost` (no-alloc, pure) and `GetCandidates()` (allocating copy); base cost = `hireCost × 1.25^owned` (class defs: `ClassCatalog.HireCost` premium instead of `hireCost`), baked at generation (owned-count func injected by `HireController`, summed across layer managers)
-`UI/Panels/Hiring/HireController.cs` → stack UI, tab navigation, layer selector, hire animation; top-bar hiring sign (coin badge = cheapest candidate affordable + wiggle, "!" = restocked while closed; pocket-watch refresh countdown within `stopwatchShowSeconds`)
-`UI/Panels/Hiring/HireRoster.cs` → weighted selection by pool `LayerIndex` (adventurer pools: the def's tier), drawn without replacement
-`UI/Panels/Hiring/CandidateUIMapper.cs` → populates Candidate.uxml from `HiringCandidate` data
+`UI/Panels/Hiring/HireController.cs` → the hiring board (design: `HIRING_BOARD_DESIGN.md`): a cork board where each roster candidate is a `Poster.uxml` pinned in a cascade (poster i at left i×36, top 328 − i×82, front = last sibling, only the front shows its body). Tack on the front poster = next (`RotateTopToBottom`), a peeking strip = bring to front, Hire = tear-off transition (`.poster-card--torn`) leaving a scrap; restock note shows notice count + refresh countdown. Also tabs, depth selector, top-bar hiring sign (coin badge = cheapest candidate affordable + wiggle, "!" = restocked while closed; pocket-watch refresh countdown within `stopwatchShowSeconds`)
+`UI/Panels/Hiring/HireRoster.cs` → weighted selection by pool `LayerIndex` (adventurer pools: the def's tier), drawn without replacement, `maxRosterSize` (5) posters
+`UI/Panels/Hiring/CandidateUIMapper.cs` → populates a poster; stat bars = the candidate's trait-tier multipliers vs its class baseline (10 cells over 0.5–1.5, time stats inverted so longer = better), Damage/s = attackDamage × damageMultiplier × traits ÷ attack interval
 `HiringCandidate` struct holds all per-candidate state; `newspaperName` is assigned once at generation, stable across re-populates
 
 ### Adventurer Classes (`Entities/Adventuers/ClassCatalog.cs`, design in `CLASSES_DESIGN.md`)
@@ -141,7 +141,7 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Editor/EntityDefEditor.cs` | Custom inspector for EntityDef |
 | `Editor/ExcelImporter.cs` | Data import from Excel |
 | `Editor/scriptableobject_generator.cs` | SO batch generation tool |
-| `Scripts/UI/Panels/Hiring/HireController.cs` | Hire panel — stack UI, layer selector, animation, catalog pools + tier odds |
+| `Scripts/UI/Panels/Hiring/HireController.cs` | Hiring board — pinned-poster cascade, layer selector, tear-off hire, catalog pools + tier odds |
 | `Scripts/Entities/Adventuers/ClassCatalog.cs` | `ClassLine` + class def catalog (Resources), tier odds, premium price |
 | `Scripts/UI/Panels/Hiring/CandidatePool.cs` | Timed candidate pool per unit type |
 | `Scripts/CharacterGeneration/HiringCandidateGenerator.cs` | Generates `HiringCandidate` structs with identity/traits |

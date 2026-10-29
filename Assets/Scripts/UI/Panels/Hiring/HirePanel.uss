@@ -1,100 +1,224 @@
+/* Hiring board — cork notice board (spec: HIRING_BOARD_DESIGN.md). Poster internals: Poster.uss.
+   Also loaded by MainUI.uxml, so keep selectors scoped to the board. */
+
 #hire-panel {
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/Salmon%20Typewriter%209%20Regular.ttf?fileID=12800000&guid=2c162277ddf0d4f9fa96298d0a4c7a84&type=3#Salmon Typewriter 9 Regular");
-}
-
-#newspaper-stand {
-    border-radius: 8px;
-    border-width: 6px;
-    border-color: rgb(101, 67, 33);
-    padding: 24px;
-}
-
-#unit-type-tabs {
-    margin-bottom: 16px;
-    flex-grow: 1;
-    flex-direction: row;
-}
-
-#unit-type-tabs > #unity-tab-view__header-container {
-    background-color: rgba(101, 67, 33, 0.3);
-    border-bottom-width: 2px;
-    border-color: rgb(101, 67, 33);
-    padding: 4px;
-    flex-grow: 1;
-}
-
-#unit-type-tabs .unity-tab__header {
-    background-color: rgba(250, 240, 220, 0.5);
-    border-width: 2px;
-    border-color: rgb(139, 90, 60);
-    border-radius: 4px 4px 0 0;
-    padding: 8px 16px;
-    margin-right: 4px;
-    color: rgb(90, 60, 40);
-    font-size: 18px;
-    transition-property: background-color;
-    transition-duration: 0.1s;
-    flex-grow: 1;
-}
-
-#unit-type-tabs .unity-tab__header:hover {
-    background-color: rgba(250, 240, 220, 0.7);
-}
-
-#unit-type-tabs .unity-tab__header--checked {
-    background-color: rgb(250, 240, 220);
-    border-bottom-width: 0;
-    color: rgb(50, 30, 10);
-    flex-grow: 1;
-    flex-direction: row;
-}
-
-#unit-type-tabs .unity-tab-view__content-viewport {
-    flex-grow: 1;
-    flex-direction: row;
-}
-
-#unit-type-tabs .unity-tab-view__header-container {
-    flex-grow: 1;
-    flex-direction: row;
-}
-
-#count {
-    color: rgb(50, 30, 10);
-}
-
-#empty-label {
-    color: rgb(50, 30, 10);
-    font-size: 28px;
-    margin-bottom: 8px;
-}
-
-#empty-timer {
-    color: rgb(90, 60, 40);
-}
-
-.trait {
-    margin: 2px;
-    border-radius: 2px;
-    transition-property: scale;
-    transition-duration: 0.1s;
-    color: rgb(132, 102, 74);
     -unity-font-definition: var(--font-body);
 }
 
-.trait:hover {
-    scale: 1.05 1.05;
+/* 800x1000 root; every child is absolutely placed in root coordinates (the mock's numbers) */
+.hire-board {
+    width: 800px;
+    height: 1000px;
+    align-self: flex-start;
 }
 
-.trait-cursed {
-    -unity-background-image-tint-color: rgb(200, 100, 100);
-    color: rgb(100, 20, 20);
+.board-frame {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 760px;
+    height: 960px;
+    background-color: rgb(90, 58, 34);
+    border-width: 6px;
+    border-color: rgb(43, 26, 18);
 }
 
-#mods-container {
-    padding: 4px 8px;
+.cork {
+    position: absolute;
+    left: 50px;
+    top: 76px;
+    width: 700px;
+    height: 874px;
+    background-color: rgb(180, 136, 90);
+    border-width: 4px;
+    border-color: rgb(61, 38, 22);
 }
 
-.no-interact {
-    pointer-events: none;
+.poster-layer {
+    position: absolute;
+    left: 70px;
+    top: 96px;
+    width: 660px;
+    height: 840px;
+}
+
+/* Poster i (0 = front): left i×36, top 328 − i×82, set inline by HireController */
+.poster-card {
+    position: absolute;
+    width: 440px;
+    height: 520px;
+    transition-property: top, left, rotate;
+    transition-duration: 0.25s;
+}
+
+/* Hire = tear off: lift, tilt, fade (HireController waits the same 0.35 s, then removes it) */
+.poster-card--torn {
+    translate: 0 -140px;
+    opacity: 0;
+    transition-property: translate, rotate, opacity;
+    transition-duration: 0.35s;
+}
+
+.tack,
+.tack:hover,
+.tack:active {
+    position: absolute;
+    left: 50%;
+    top: -10px;
+    width: 22px;
+    height: 22px;
+    margin: 0 0 0 -11px;
+    padding: 0;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/Sprites/UI/Hire%20Menu/tack.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    transition-property: scale;
+    transition-duration: 0.1s;
+}
+
+.tack:hover {
+    scale: 1.15 1.15;
+}
+
+/* Left under the tack when a poster is hired; cleared on rebuild */
+.poster-scrap {
+    position: absolute;
+    top: 8px;
+    width: 46px;
+    height: 34px;
+    background-image: url("project://database/Assets/Sprites/UI/Hire%20Menu/poster_scrap.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.poster-scrap .tack {
+    top: -8px;
+}
+
+/* ── Tabs: the TabView headers as wooden signs ── */
+#unit-type-tabs {
+    position: absolute;
+    left: 60px;
+    top: 24px;
+}
+
+#unit-type-tabs .unity-tab-view__header-container {
+    flex-direction: row;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+#unit-type-tabs .unity-tab-view__content-container {
+    display: none;
+}
+
+#unit-type-tabs .unity-tab__header {
+    background-color: rgb(74, 50, 34);
+    border-width: 4px;
+    border-color: rgb(43, 26, 18);
+    border-radius: 0;
+    padding: 8px 22px;
+    margin: 0 14px 0 0;
+}
+
+#unit-type-tabs .unity-tab__header:checked {
+    background-color: rgb(107, 68, 38);
+}
+
+#unit-type-tabs .unity-tab__header-label {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+    font-size: 30px;
+    color: rgb(184, 155, 122);
+    margin: 0;
+    padding: 0;
+}
+
+#unit-type-tabs .unity-tab__header:checked .unity-tab__header-label {
+    color: rgb(243, 227, 195);
+}
+
+#unit-type-tabs .unity-tab__header-underline {
+    display: none;
+}
+
+.nail {
+    position: absolute;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: rgb(156, 156, 156);
+    border-width: 2px;
+    border-color: rgb(43, 26, 18);
+    border-radius: 4px;
+}
+
+.nail--left { left: 4px; }
+.nail--right { right: 4px; }
+
+/* ── Depth selector ── */
+.depth-box {
+    position: absolute;
+    right: 60px;
+    top: 26px;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 10px;
+    background-color: rgb(239, 227, 196);
+    border-width: 4px;
+    border-color: rgb(43, 26, 18);
+}
+
+.depth-arrow,
+.depth-arrow:hover,
+.depth-arrow:active {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    margin: 0;
+    padding: 0 6px;
+    font-size: 26px;
+    color: rgb(107, 61, 30);
+    -unity-font-definition: var(--font-body);
+}
+
+#layer-label {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    font-size: 28px;
+    color: rgb(43, 26, 18);
+    margin: 0 6px;
+    padding: 0;
+}
+
+/* ── Restock note (bottom-right of the cork, above the posters) ── */
+.restock-note {
+    position: absolute;
+    left: 530px;
+    top: 830px;
+    width: 200px;
+    padding: 30px 20px 18px 20px;
+    align-items: center;
+    background-color: rgb(239, 227, 196);
+    border-width: 3px;
+    border-color: rgb(169, 140, 92);
+    rotate: 2deg;
+}
+
+.restock-note Label {
+    font-size: 22px;
+    color: rgb(74, 50, 32);
+    -unity-text-align: middle-center;
+    margin: 0;
+    padding: 0;
+}
+
+.note-line {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.restock-note .note-time {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    font-size: 26px;
+    margin-left: 6px;
 }

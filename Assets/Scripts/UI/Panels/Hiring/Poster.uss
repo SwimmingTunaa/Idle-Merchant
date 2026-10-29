@@ -1,0 +1,343 @@
+/* Hiring-board poster (Poster.uxml, 440x520) — spec in HIRING_BOARD_DESIGN.md.
+   Board-level pieces (card position/transition, tack, scrap, note) live in HirePanel.uss. */
+
+.poster {
+    width: 440px;
+    height: 520px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Paper/1.png?fileID=21300000&guid=67b077c3e16c24cbba49d219cfacf6bf&type=3#1");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-font-definition: var(--font-body);
+    color: rgb(43, 26, 18);
+}
+
+.poster .unity-label {
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Header strip: name · class · cost (peeks on back posters) ── */
+.poster-strip {
+    flex-direction: row;
+    align-items: center;
+    height: 56px;
+    margin-top: 24px;
+    padding: 0 34px 0 60px;
+}
+
+.poster-strip:hover {
+    background-color: rgba(120, 80, 40, 0.12);
+}
+
+.poster .poster-name {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+    font-size: 26px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.poster-class-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-left: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.poster .poster-class {
+    font-size: 22px;
+    color: rgb(107, 68, 38);
+    min-width: 84px;              /* long porter names ("Lowley Porter") take room from the first name */
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.poster-cost-row {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.poster .poster-cost {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    font-size: var(--font-size-body);
+}
+
+.poster .poster-cost--short {
+    color: rgb(168, 50, 42);
+}
+
+.coin {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-left: 4px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&guid=16798bfa02f8d44348f9fffdaf153786&type=3#Copper Coin_0");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.coin--big {
+    width: 26px;
+    height: 26px;
+    margin-left: 10px;
+}
+
+/* Rank gem straddles the poster's left edge (same art as the Roster .slot-rank) */
+.poster-gem {
+    position: absolute;
+    left: -22px;
+    top: 16px;
+    width: 72px;
+    height: 72px;
+    align-items: center;
+    justify-content: center;
+    background-image: url("project://database/Assets/Sprites/Icons/ranks/Rank%201.png?fileID=2800000&guid=d825792e71a5342959a9c727f20b2749&type=3#Rank 1");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.poster .poster-gem-label {
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(43, 26, 18);
+    -unity-text-align: middle-center;
+    padding-top: 2px;
+}
+
+/* ── Body (front poster only) ── */
+.poster-body {
+    padding: 14px 36px 0 36px;
+}
+
+.poster-portrait-row {
+    flex-direction: row;
+}
+
+.poster-portrait {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    background-color: rgb(134, 199, 230);
+    border-width: 6px;
+    border-color: rgb(195, 137, 93);
+    overflow: hidden;
+}
+
+.poster-sprite {
+    position: absolute;
+    left: 9px;
+    bottom: 0;
+    width: 120px;
+    height: 120px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.poster-grass {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22px;
+    background-color: rgb(94, 156, 58);
+    border-top-width: 3px;
+    border-color: rgb(63, 111, 39);
+}
+
+.poster .poster-rank-warning {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: var(--font-size-caption);
+    -unity-text-align: middle-center;
+    color: rgb(250, 240, 220);
+    background-color: rgba(150, 45, 38, 0.85);
+    padding: 2px 0;
+}
+
+/* Epithet banner — same build as the Roster detail page (.epithet*), sized to its text */
+.poster-epithet {
+    position: absolute;
+    left: -4px;
+    top: -20px;
+    height: 40px;
+    flex-shrink: 0;
+    justify-content: center;
+    padding: 0 26px;
+    rotate: 2.6deg;
+}
+
+.epithet-shadow,
+.epithet-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/epithet.png?fileID=-7657284972936839921&guid=b52c24f2512b34c459b9c716530f0692&type=3#epithet_0");
+    -unity-slice-left: 12;
+    -unity-slice-right: 12;
+    -unity-slice-top: 2;
+    -unity-slice-bottom: 2;
+    -unity-slice-scale: 2px;
+}
+
+.epithet-shadow {
+    top: 4px;
+    bottom: -4px;
+    -unity-background-image-tint-color: var(--color-box-border);
+}
+
+.poster .poster-epithet-label {
+    font-size: 22px;
+    color: rgb(43, 26, 18);
+    -unity-text-align: middle-left;
+    white-space: nowrap;
+}
+
+.poster-stats {
+    flex-grow: 1;
+    flex-shrink: 1;
+    justify-content: center;
+    margin-left: 16px;
+}
+
+.poster .poster-flavour {
+    font-size: var(--font-size-small);
+    color: rgb(107, 68, 38);
+    -unity-font-style: italic;
+    white-space: normal;
+}
+
+.poster-big-row {
+    flex-direction: row;
+    align-items: flex-end;
+    margin-top: 6px;
+}
+
+.poster .poster-big-label {
+    font-size: 22px;
+    width: 84px;
+    padding-bottom: 6px;
+}
+
+.poster .poster-big {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    font-size: 40px;
+    margin-left: 8px;
+}
+
+.poster .poster-big-unit {
+    font-size: var(--font-size-caption);
+    color: rgb(107, 68, 38);
+    margin-left: 8px;
+    padding-bottom: 6px;
+}
+
+/* ── Trait chips ── */
+.poster-traits {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.poster .poster-trait {
+    font-size: 22px;
+    padding: 3px 12px;
+    margin-right: 8px;
+    border-width: 3px;
+    border-color: rgb(107, 68, 38);
+    color: rgb(74, 50, 32);
+    background-color: rgb(247, 238, 216);
+}
+
+.poster .poster-trait--cursed {
+    border-color: rgb(168, 50, 42);
+    color: rgb(168, 50, 42);
+}
+
+/* ── Stat bars: 10 cells over 0.5→1.5, tick at 1.0 (cells built by CandidateUIMapper) ── */
+.poster-bars {
+    margin-top: 12px;
+}
+
+.bar-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 9px;
+}
+
+.bar-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.stat-damage { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_damage.png"); }
+.stat-aspd   { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_aspd.png"); }
+.stat-reach  { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_reach.png"); }
+.stat-speed  { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_speed.png"); }
+.stat-carry  { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_carry.png"); }
+.stat-pickup { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_pickup.png"); }
+
+.bar {
+    flex-grow: 1;
+    flex-direction: row;
+    height: 20px;
+}
+
+.bar-cell {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 3px;
+    border-width: 2px;
+    border-color: rgb(74, 50, 32);
+    background-color: rgb(226, 210, 173);
+}
+
+.bar-cell--base { background-color: rgb(169, 140, 92); }
+.bar-cell--up   { background-color: rgb(79, 159, 63); }
+.bar-cell--down { background-color: rgb(178, 58, 46); }
+
+/* every cell carries a 3px right margin, so the 1.0 gap sits at 50% − 3px */
+.bar-tick {
+    position: absolute;
+    left: 50%;
+    margin-left: -3px;
+    top: -5px;
+    width: 3px;
+    height: 30px;
+    background-color: rgb(43, 26, 18);
+}
+
+/* ── Hire ── */
+.poster-hire-row {
+    align-items: center;
+    margin-top: 4px;
+}
+
+.poster .poster-hire {
+    padding: 6px 22px 10px 22px;
+}
+
+.poster .hire-label {
+    font-size: 30px;
+}
+
+.poster .poster-tag {
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/BrightLinger.ttf?fileID=12800000&guid=b42dfca3fffbe4c5e9a29a3cd1074f71&type=3#BrightLinger");
+    font-size: var(--font-size-small);
+    color: rgb(245, 234, 214);
+    background-color: rgb(168, 50, 42);
+    border-width: 3px;
+    border-color: rgb(43, 26, 18);
+    padding: 2px 10px;
+    margin-top: 6px;
+    rotate: -3deg;
+}

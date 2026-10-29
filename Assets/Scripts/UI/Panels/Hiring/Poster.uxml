@@ -1,0 +1,55 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/Poster.uss" />
+    <!-- One pinned notice on the hiring board. HireController positions the TemplateContainer; strip = always visible, body = front only. -->
+    <ui:VisualElement name="poster" class="poster">
+        <ui:VisualElement name="strip" class="poster-strip">
+            <ui:Label name="first-name" text="Lyra" class="poster-name" />
+            <ui:VisualElement name="class-icon" picking-mode="Ignore" class="poster-class-icon" />
+            <ui:Label name="class-name" text="Mage" class="poster-class" />
+            <ui:VisualElement class="poster-cost-row">
+                <ui:Label name="cost" text="4,200" class="poster-cost" />
+                <ui:VisualElement class="coin" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="poster-body" class="poster-body">
+            <ui:VisualElement class="poster-portrait-row">
+                <ui:VisualElement name="portrait" class="poster-portrait">
+                    <ui:VisualElement name="unit-icon" class="poster-sprite" />
+                    <ui:VisualElement class="poster-grass" />
+                    <ui:Label name="rank-warning" text="Below this depth&apos;s rank" class="poster-rank-warning" />
+                </ui:VisualElement>
+                <ui:VisualElement class="poster-stats">
+                    <ui:Label name="flavour" text="Picks a target and commits emotionally." class="poster-flavour" />
+                    <ui:VisualElement class="poster-big-row">
+                        <ui:Label name="big1-label" text="Damage" class="poster-big-label" />
+                        <ui:Label name="big1-value" text="132" class="poster-big" />
+                        <ui:Label name="big1-unit" text="/ s" class="poster-big-unit" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="poster-big-row">
+                        <ui:Label name="big2-label" text="Health" class="poster-big-label" />
+                        <ui:Label name="big2-value" text="220" class="poster-big" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="epithet" picking-mode="Ignore" class="poster-epithet">
+                    <ui:VisualElement class="epithet-shadow" />
+                    <ui:VisualElement class="epithet-fill" />
+                    <ui:Label name="epithet-label" text="the Fixated" class="poster-epithet-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="trait-container" class="poster-traits" />
+            <ui:VisualElement name="bars" class="poster-bars" />
+            <ui:VisualElement class="poster-hire-row">
+                <ui:Button name="hire-button" class="btn-success poster-hire">
+                    <ui:Label name="hire-label" text="Hire 4,200" class="hire-label" />
+                    <ui:VisualElement class="coin coin--big" />
+                </ui:Button>
+                <ui:Label name="hire-tag" text="NEED 200 MORE" class="poster-tag" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="rank-gem" picking-mode="Ignore" class="poster-gem">
+            <ui:Label name="rank-level" text="1" class="poster-gem-label" />
+        </ui:VisualElement>
+        <ui:Button name="tack" tooltip="Pull off to see the next" class="tack" />
+    </ui:VisualElement>
+</ui:UXML>

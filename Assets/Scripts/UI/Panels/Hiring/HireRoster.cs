@@ -61,7 +61,7 @@ public static class HireRoster
 
         // Weighted random selection without replacement; an exhausted layer leaves the roll.
         // (Re-rolling on a repeat used to leak a shallow layer's share to the others — e.g. 5 Novices vs 20 Bronze class candidates.)
-        while (roster.Count < maxCount + 1 && activeLayers.Count > 0 && totalWeight > 0f)
+        while (roster.Count < maxCount && activeLayers.Count > 0 && totalWeight > 0f)
         {
             // Pick a layer based on weights
             float roll = Random.Range(0f, totalWeight);

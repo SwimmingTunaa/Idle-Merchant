@@ -4,9 +4,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-// Hire panel controller - manages candidate hiring UI with stack-based navigation and animations.
+// Hire panel controller - the hiring board: a cork notice board with one pinned poster (Poster.uxml) per candidate.
+// Posters cascade; tack on the front poster = next, a peeking strip = bring to front, Hire = tear off (HIRING_BOARD_DESIGN.md).
 // Candidates have a rank (intrinsic quality), players choose which layer to deploy them to.
-// Inherits from BasePanelController, overrides Open() for roster rebuild and animations for card stack.
 public class HireController : BasePanelController
 {
     public override string PanelID => "HirePanel";
@@ -27,26 +27,22 @@ public class HireController : BasePanelController
     [Tooltip("Porter weight per pool layer (index 0 = layer 1). Adventurer tier odds live on Resources/ClassCatalog.")]
     [SerializeField] private float[] rankWeights = { 40f, 25f, 20f, 10f, 5f };
 
-    [Header("Stack Visual Settings")]
-    [SerializeField] private float stackRotationMax = 3f;
-    [SerializeField] private float stackScaleFactor = 0.025f;
-
-    [Header("Animation")]
-    [SerializeField] private float hireAnimationDuration = 0.5f;
-
     [Header("Top-Bar Sign")]
     [Tooltip("Stopwatch frames shown on the hiring sign before pools refresh (full → empty).")]
     [SerializeField] private Sprite[] stopwatchFrames;
     [Tooltip("Stopwatch appears when the next pool refresh is within this many seconds")]
     [SerializeField] private float stopwatchShowSeconds = 120f;
 
+    // Board cascade: poster i (0 = front) at left i×36, top 328 − i×82, persistent tilt in ±1.5°
+    private const float PosterStepX = 36f, PosterStepY = 82f, FrontTop = 328f, PosterTiltMax = 1.5f;
+    private const float TearSeconds = 0.35f; // matches .poster-card--torn in HirePanel.uss
+
     // UI Elements
     private VisualElement stackContainer;
-    private VisualElement emptyState;
-    private Button prevButton;
-    private Button nextButton;
-    private Label countLabel;
+    private VisualElement scrapLayer;
+    private Label noticeLabel;
     private Label emptyTimerLabel;
+    private int shownTimerSeconds = -1;
     private TabView tabView;
 
     // Layer selector UI
@@ -58,19 +54,6 @@ public class HireController : BasePanelController
     // Tabs
     private enum TabType { Adventurers = 0, Porters = 1 }
     private TabType currentTab = TabType.Adventurers;
-
-    private int adventurerViewIndex = 0;
-    private int porterViewIndex = 0;
-
-    private int CurrentViewIndex
-    {
-        get => currentTab == TabType.Adventurers ? adventurerViewIndex : porterViewIndex;
-        set
-        {
-            if (currentTab == TabType.Adventurers) adventurerViewIndex = value;
-            else porterViewIndex = value;
-        }
-    }
 
     // Pools
     private readonly Dictionary<(HireRole role, int rank, EntityDef def), CandidatePool> candidatePools = new();
@@ -98,14 +81,6 @@ public class HireController : BasePanelController
     private VisualElement hiringStopwatch;
     private bool hasNewStock;
     private bool affordPending = true;
-
-    private static readonly string[] ShadowClasses =
-    {
-        "card-shadow-0",
-        "card-shadow-1",
-        "card-shadow-2",
-        "card-shadow-3"
-    };
 
     private List<HiringCandidate> CurrentRoster =>
         currentTab == TabType.Adventurers ? adventurerRoster : porterRoster;
@@ -199,11 +174,9 @@ public class HireController : BasePanelController
 
         State = PanelState.Opening;
         RebuildRosters();
-        ClampViewIndexToRoster();
         BuildStack();
-        UpdateCount();
         UpdateLayerSelector();
-        
+
         OnOpenStart();
         StartCoroutine(OpenAnimation());
         return true;
@@ -387,30 +360,31 @@ public class HireController : BasePanelController
         }
 
         // Query elements
-        stackContainer = panel.Q<VisualElement>("newspaper-container");
-        emptyState = panel.Q<VisualElement>("text-container");
-        prevButton = panel.Q<Button>("previous-button");
-        nextButton = panel.Q<Button>("next-button");
-        countLabel = panel.Q<Label>("count");
+        stackContainer = panel.Q<VisualElement>("poster-stack");
+        scrapLayer = panel.Q<VisualElement>("poster-scraps");
+        noticeLabel = panel.Q<Label>("notice-count");
         emptyTimerLabel = panel.Q<Label>("empty-timer");
         tabView = panel.Q<TabView>("unit-type-tabs");
+
+        // Two nails on each wooden tab sign
+        foreach (var header in tabView.Query(className: "unity-tab__header").ToList())
+            foreach (var side in new[] { "nail--left", "nail--right" })
+            {
+                var nail = new VisualElement { pickingMode = PickingMode.Ignore };
+                nail.AddToClassList("nail");
+                nail.AddToClassList(side);
+                header.Add(nail);
+            }
 
         // Layer selector
         layerPrevButton = panel.Q<Button>("layer-prev-button");
         layerNextButton = panel.Q<Button>("layer-next-button");
         layerLabel = panel.Q<Label>("layer-label");
 
-        // Fallback: use template instance from UXML if no asset assigned
         if (candidateSlotAsset == null)
-        {
-            var templateInstance = stackContainer.Q<TemplateContainer>("TemplateCandidate");
-            if (templateInstance != null)
-                candidateSlotAsset = templateInstance.templateSource;
-        }
+            Debug.LogError("[HirePanel] Candidate Slot Asset (Poster.uxml) not assigned on the Hiring Menu");
 
         // Hook up callbacks
-        prevButton.clicked += Prev;
-        nextButton.clicked += Next;
         tabView.activeTabChanged += OnTabChanged;
 
         // Layer selector callbacks
@@ -465,7 +439,7 @@ public class HireController : BasePanelController
         selectedLayer = Mathf.Clamp(selectedLayer, 1, maxLayer);
 
         if (layerLabel != null)
-            layerLabel.text = $"Depth {selectedLayer} · {RosterPanelController.GetLayerName(selectedLayer)}";
+            layerLabel.text = $"Depth {selectedLayer}";
 
         // Disable arrows at bounds
         if (layerPrevButton != null)
@@ -665,9 +639,7 @@ public class HireController : BasePanelController
         }
         if (isHireAnimating) return;
         RebuildRosters();
-        ClampViewIndexToRoster();
         BuildStack();
-        UpdateCount();
     }
 
     // ═════════════════════════════════════════════
@@ -704,34 +676,29 @@ public class HireController : BasePanelController
     private void BuildStack()
     {
         stackContainer.Clear();
+        scrapLayer.Clear();
         rotationByCard.Clear();
         CurrentCards.Clear();
 
-        if (CurrentRoster.Count == 0)
-        {
-            emptyState.style.display = DisplayStyle.Flex;
-            UpdateCount();
-            return;
-        }
-
-        emptyState.style.display = DisplayStyle.None;
-
+        // Back to front, so the front poster is the last sibling (drawn on top)
         for (int i = CurrentRoster.Count - 1; i >= 0; i--)
         {
             var card = candidateSlotAsset.CloneTree();
-            rotationByCard[card] = UnityEngine.Random.Range(-stackRotationMax, stackRotationMax);
+            card.AddToClassList("poster-card");
+            rotationByCard[card] = UnityEngine.Random.Range(-PosterTiltMax, PosterTiltMax);
 
             CandidateUIMapper.PopulateUI(card, CurrentRoster[i]);
-            
-            var hireBtn = card.Q<Button>("hire-button");
-            if (hireBtn != null)
-                hireBtn.clicked += () => TryHire(card);
+
+            card.Q<Button>("hire-button").clicked += () => TryHire(card);
+            card.Q<Button>("tack").clicked += () => OnPosterClicked(card, true);
+            card.Q("strip").RegisterCallback<ClickEvent>(_ => OnPosterClicked(card, false));
 
             stackContainer.Add(card);
             CurrentCards.Insert(0, card);
         }
 
         UpdateStackVisuals();
+        UpdateCount();
     }
 
     private void UpdateStackVisuals()
@@ -739,53 +706,46 @@ public class HireController : BasePanelController
         for (int i = 0; i < CurrentCards.Count; i++)
         {
             var card = CurrentCards[i];
-            float scale = 1f - (i * stackScaleFactor);
-            card.style.scale = new Scale(new Vector3(scale, scale, 1f));
-            
-            // Darken card color based on index
-            float colorFactor = Mathf.Clamp(1f - (i * 0.1f), 0.3f, 1f);
-            card.Q<VisualElement>("newspaper").style.unityBackgroundImageTintColor = new Color(colorFactor, colorFactor, colorFactor);
-
-            card.pickingMode = i == 0 ? PickingMode.Position : PickingMode.Ignore;
+            bool front = i == 0;
+            card.style.left = i * PosterStepX;
+            card.style.top = FrontTop - i * PosterStepY;
             card.style.rotate = new Rotate(new Angle(rotationByCard[card], AngleUnit.Degree));
 
-            ApplyShadowClass(card, i);
+            // Back posters pick only on their strip and tack; only the front shows its body
+            var pick = front ? PickingMode.Position : PickingMode.Ignore;
+            card.pickingMode = pick;
+            card.Q("poster").pickingMode = pick;
+            card.Q("poster-body").style.display = front ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         UpdateHireButtonState();
-    }
-
-    private void ApplyShadowClass(VisualElement card, int index)
-    {
-        foreach (var cls in ShadowClasses)
-            card.RemoveFromClassList(cls);
-
-        int clamped = Mathf.Clamp(index, 0, ShadowClasses.Length - 1);
-        card.AddToClassList(ShadowClasses[clamped]);
     }
 
     // ═════════════════════════════════════════════
     // NAVIGATION
     // ═════════════════════════════════════════════
 
-    private void Prev()
+    // Tack on the front poster = pull it off (goes to the back). Tack or strip on a back poster = bring it to the front.
+    private void OnPosterClicked(VisualElement card, bool tack)
     {
-        if (CurrentRoster.Count <= 1) return;
+        if (isHireAnimating) return;
 
-        CurrentViewIndex--;
-        if (CurrentViewIndex < 0) CurrentViewIndex = CurrentRoster.Count - 1;
+        int i = CurrentCards.IndexOf(card);
+        if (i == 0)
+        {
+            if (tack && CurrentCards.Count > 1) RotateTopToBottom();
+            return;
+        }
+        if (i < 0) return;
 
-        RotateBottomToTop();
-    }
+        var c = CurrentRoster[i];
+        CurrentRoster.RemoveAt(i);
+        CurrentCards.RemoveAt(i);
+        CurrentRoster.Insert(0, c);
+        CurrentCards.Insert(0, card);
+        card.BringToFront();
 
-    private void Next()
-    {
-        if (CurrentRoster.Count <= 1) return;
-
-        CurrentViewIndex++;
-        if (CurrentViewIndex >= CurrentRoster.Count) CurrentViewIndex = 0;
-
-        RotateTopToBottom();
+        UpdateStackVisuals();
     }
 
     private void RotateTopToBottom()
@@ -802,24 +762,6 @@ public class HireController : BasePanelController
         firstCard.SendToBack();
 
         UpdateStackVisuals();
-        UpdateCount();
-    }
-
-    private void RotateBottomToTop()
-    {
-        var lastC = CurrentRoster[^1];
-        var lastCard = CurrentCards[^1];
-
-        CurrentRoster.RemoveAt(CurrentRoster.Count - 1);
-        CurrentCards.RemoveAt(CurrentCards.Count - 1);
-
-        CurrentRoster.Insert(0, lastC);
-        CurrentCards.Insert(0, lastCard);
-
-        lastCard.BringToFront();
-
-        UpdateStackVisuals();
-        UpdateCount();
     }
 
     // ═════════════════════════════════════════════
@@ -870,21 +812,14 @@ public class HireController : BasePanelController
         return false;
     }
 
+    // Tear the poster off the board (USS transition), then leave a scrap under its tack
     private IEnumerator AnimateHire(VisualElement card, HiringCandidate c)
     {
         isHireAnimating = true;
-        card.BringToFront();
+        card.AddToClassList("poster-card--torn");
+        card.style.rotate = new Rotate(new Angle(rotationByCard[card] - 12f, AngleUnit.Degree));
 
-        // Use the card's actual height so the animation scales with the layout
-        float flyDistance = card.resolvedStyle.height > 0f ? card.resolvedStyle.height : 750f;
-
-        float t = 0f;
-        while (t < hireAnimationDuration)
-        {
-            t += Time.deltaTime;
-            card.style.translate = new Translate(0, -flyDistance * (t / hireAnimationDuration));
-            yield return null;
-        }
+        yield return new WaitForSecondsRealtime(TearSeconds);
 
         if (showDebugLogs)
             Debug.Log($"[HirePanel] Hired {c.DisplayName} → Layer {selectedLayer}");
@@ -898,109 +833,84 @@ public class HireController : BasePanelController
 
         CurrentRoster.RemoveAt(0);
         CurrentCards.RemoveAt(0);
-        card.style.display = DisplayStyle.None;
+        rotationByCard.Remove(card);
+        card.RemoveFromHierarchy();
 
-        ClampViewIndexToRoster();
+        // One scrap per hire since the board was built (BuildStack clears them), alternating ±7°
+        int k = scrapLayer.childCount;
+        var scrap = new VisualElement { pickingMode = PickingMode.Ignore };
+        scrap.AddToClassList("poster-scrap");
+        scrap.style.left = 20 + k * 60;
+        scrap.style.rotate = new Rotate(new Angle(k % 2 == 0 ? 7f : -7f, AngleUnit.Degree));
+        var scrapTack = new VisualElement();
+        scrapTack.AddToClassList("tack");
+        scrap.Add(scrapTack);
+        scrapLayer.Add(scrap);
 
         isHireAnimating = false;
         UpdateStackVisuals();
         UpdateCount();
-        if (CurrentRoster.Count == 0)
-            emptyState.style.display = DisplayStyle.Flex;
     }
 
     // ═════════════════════════════════════════════
     // UI UPDATES
     // ═════════════════════════════════════════════
 
-    // Check hire button state against the candidate's pool layer.
-    // Disables the button if the player can't afford the hire cost or the target layer is full.
-    // Applies "cost--insufficient" USS class to the cost label when gold is the blocker.
+    // Strip costs go red when unaffordable; the front poster's Hire button is btn-success, or btn-disabled
+    // "Hire for N" with a NEED N MORE / DEPTH FULL tag when gold or the target layer blocks it.
     private void UpdateHireButtonState()
     {
         if (CurrentCards.Count == 0 || CurrentRoster.Count == 0)
             return;
 
+        int gold = Inventory.Instance != null ? Inventory.Instance.Gold : 0;
+        for (int i = 0; i < CurrentCards.Count; i++)
+            CurrentCards[i].Q<Label>("cost").EnableInClassList("poster-cost--short", CurrentRoster[i].hireCost > gold);
+
         var card = CurrentCards[0];
         var candidate = CurrentRoster[0];
-
         var hireButton = card.Q<Button>("hire-button");
-        if (hireButton == null)
-            return;
-
-        var costLabel = card.Q<Label>("cost");
 
         // Resolve manager via the selected layer in the UI
-        candidateToPool.TryGetValue(candidate, out var pool);
+        IUnitManager manager = currentTab == TabType.Adventurers
+            ? adventurerManagers.Find(m => m != null && m.LayerIndex == selectedLayer)
+            : porterManagers.Find(m => m != null && m.LayerIndex == selectedLayer);
 
-        IUnitManager manager = null;
-        if (currentTab == TabType.Adventurers)
-            manager = adventurerManagers.Find(m => m != null && m.LayerIndex == selectedLayer);
-        else
-            manager = porterManagers.Find(m => m != null && m.LayerIndex == selectedLayer);
-
-        if (manager == null)
-        {
-            hireButton.SetEnabled(false);
-            costLabel?.AddToClassList("cost--insufficient");
-            return;
-        }
-
-        // Check gold affordability
         bool canAfford = Inventory.Instance != null && Inventory.Instance.CanAfford(candidate.hireCost);
 
-        // Check total layer capacity
-        bool layerFull = manager.GetTotalCount() >= manager.MaxUnits;
+        // Total layer capacity, then the optional per-type limit
+        int typeLimit = manager != null ? manager.GetUnitLimit(candidate.entityDef) : -1;
+        bool full = manager == null
+            || manager.GetTotalCount() >= manager.MaxUnits
+            || (typeLimit >= 0 && manager.GetUnitCount(candidate.entityDef) >= typeLimit);
 
-        // Check optional per-type limit
-        int typeLimit = manager.GetUnitLimit(candidate.entityDef);
-        bool typeFull = typeLimit >= 0 && manager.GetUnitCount(candidate.entityDef) >= typeLimit;
-
-        bool canHire = canAfford && !layerFull && !typeFull;
+        bool canHire = canAfford && !full;
 
         // Warn when the destination layer is deeper than the recruit's rank (allowed — they'll just struggle)
-        var rankWarning = card.Q<Label>("rank-warning");
-        if (rankWarning != null)
-            rankWarning.style.display = currentTab == TabType.Adventurers
-                && Mathf.Max(candidate.startRank, candidate.entityDef.rank) < selectedLayer
-                ? DisplayStyle.Flex : DisplayStyle.None;
-        hireButton.SetEnabled(canHire);
+        card.Q<Label>("rank-warning").style.display = currentTab == TabType.Adventurers
+            && Mathf.Max(candidate.startRank, candidate.entityDef.rank) < selectedLayer
+            ? DisplayStyle.Flex : DisplayStyle.None;
 
-        if (costLabel != null)
-        {
-            if (canHire)
-                costLabel.RemoveFromClassList("cost--insufficient");
-            else
-                costLabel.AddToClassList("cost--insufficient");
-        }
+        hireButton.SetEnabled(canHire);
+        hireButton.EnableInClassList("btn-success", canHire);
+        hireButton.EnableInClassList("btn-disabled", !canHire);
+        card.Q<Label>("hire-label").text = canHire ? $"Hire {candidate.hireCost:N0}" : $"Hire for {candidate.hireCost:N0}";
+
+        var tag = card.Q<Label>("hire-tag");
+        tag.style.display = canHire ? DisplayStyle.None : DisplayStyle.Flex;
+        tag.text = full ? "DEPTH FULL" : $"NEED {candidate.hireCost - gold:N0} MORE";
     }
 
     private void UpdateCount()
     {
-        int current = CurrentViewIndex + 1;
-        int total = CurrentRoster.Count;
-        countLabel.text = total > 0 ? $"{current}/{total}" : "0/0";
+        int n = CurrentRoster.Count;
+        noticeLabel.text = n == 0 ? "Board empty" : $"{n} notice{(n == 1 ? "" : "s")} pinned";
     }
 
     private void OnTabChanged(Tab _, Tab newTab)
     {
         currentTab = (TabType)tabView.IndexOf(newTab);
-        ClampViewIndexToRoster();
         BuildStack();
-        UpdateCount();
-    }
-
-    private void ClampViewIndexToRoster()
-    {
-        int count = CurrentRoster.Count;
-        if (count <= 0)
-        {
-            CurrentViewIndex = 0;
-            return;
-        }
-
-        if (CurrentViewIndex < 0) CurrentViewIndex = 0;
-        if (CurrentViewIndex >= count) CurrentViewIndex = 0;
     }
 
     private void OnOpenButtonClicked()
@@ -1011,29 +921,26 @@ public class HireController : BasePanelController
             UIManager.Instance.ClosePanel(this);
     }
 
+    // Restock note countdown (every frame while open, text only on a new second); an empty board rebuilds once a pool restocks
     private void UpdateEmptyTimer()
     {
-        if (CurrentRoster.Count > 0)
+        int t = Mathf.Max(0, Mathf.FloorToInt(HireRoster.GetNextRefreshTime(CurrentPools)));
+        if (emptyTimerLabel != null && t != shownTimerSeconds)
+        {
+            shownTimerSeconds = t;
+            emptyTimerLabel.text = $"{t / 60}:{t % 60:00}";
+        }
+
+        if (CurrentRoster.Count > 0 || isHireAnimating)
             return;
 
-        float t = HireRoster.GetNextRefreshTime(CurrentPools);
-        if (t < 0f) t = 0f;
-
-        if (emptyTimerLabel != null)
-            emptyTimerLabel.text = $"{Mathf.FloorToInt(t / 60f)}:{Mathf.FloorToInt(t % 60f):00}";
-
-        // Check if any pool has candidates again
-        if (!isHireAnimating)
+        foreach (var pool in CurrentPools)
         {
-            foreach (var pool in CurrentPools)
+            if (pool.CandidateCount > 0)
             {
-                if (pool.CandidateCount > 0)
-                {
-                    RebuildRosters();
-                    ClampViewIndexToRoster();
-                    BuildStack();
-                    break;
-                }
+                RebuildRosters();
+                BuildStack();
+                break;
             }
         }
     }
