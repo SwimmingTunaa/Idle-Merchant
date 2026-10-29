@@ -11,7 +11,7 @@ using UnityEngine;
 public class CaravanManager : MonoBehaviour
 {
     public const float VisitEvery = 480f;   // game seconds between visits (and after a skipped visit)
-    public const float StayFor = 120f;      // the offer stays open this long (the exit can be off-screen)
+    public const float StayFor = 90f;       // the offer stays open this long (parked in the opening camera view)
     public const int SealReward = 5;
     public const int MinQty = 20;           // a smaller best lot = no visit this time
     private const float SlideDistance = 8f, SlideTime = 1.2f, WheelFps = 10f;
@@ -34,7 +34,7 @@ public class CaravanManager : MonoBehaviour
     private SpriteRenderer sr;
     private Collider2D col;
     private Vector3 park;
-    private float offset = SlideDistance;   // 0 = parked, SlideDistance = gone (off to the right)
+    private float offset = SlideDistance;   // 0 = parked, SlideDistance = gone (off to the left, the village side)
     private float frameTimer;
     private int frame;
 
@@ -74,7 +74,7 @@ public class CaravanManager : MonoBehaviour
 
     private void Place()
     {
-        transform.position = park + Vector3.right * offset;
+        transform.position = park + Vector3.left * offset;
         sr.sprite = frames[frame];
         sr.enabled = offset < SlideDistance;
         col.enabled = Present;
