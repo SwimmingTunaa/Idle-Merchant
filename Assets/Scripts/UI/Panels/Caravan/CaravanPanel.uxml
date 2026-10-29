@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Workshop/WorkshopPanel.uss" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Caravan/CaravanPanel.uss" />
+    <!-- Caravan offer: shown by CaravanPanelController (click the wagon at the guild door). Reuses the Workshop shell (wp-*). -->
+    <ui:VisualElement name="caravan-panel" class="wp-host">
+        <ui:VisualElement class="wp-card cv-card">
+            <ui:VisualElement picking-mode="Ignore" class="wp-beam" />
+            <ui:VisualElement class="wp-body">
+                <ui:VisualElement name="cv-hero" picking-mode="Ignore" class="wp-hero cv-hero" />
+                <ui:VisualElement class="wp-main">
+                    <ui:VisualElement class="wp-head">
+                        <ui:Label text="Caravan" class="wp-title" />
+                        <ui:Button name="cv-close" class="wp-close">
+                            <ui:Label text="X" picking-mode="Ignore" class="wp-close__x" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                    <ui:Label text="The caravan wants" class="cv-text" />
+                    <ui:VisualElement class="cv-row">
+                        <ui:VisualElement name="cv-icon" class="cv-icon" />
+                        <ui:Label name="cv-want" text="x20 Iron Ore" class="cv-text cv-want" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="cv-row">
+                        <ui:Label name="cv-seals" text="for 5 Guild Seals" class="cv-text" />
+                        <ui:VisualElement class="btn-seal cv-seal" />
+                    </ui:VisualElement>
+                    <ui:Label name="cv-leaves" text="Leaves in 2:00" class="cv-caption" />
+                    <ui:VisualElement class="cv-row cv-actions">
+                        <ui:Button name="cv-accept" class="btn-success cv-btn">
+                            <ui:Label text="Accept" picking-mode="Ignore" class="btn-label" />
+                        </ui:Button>
+                        <ui:Button name="cv-decline" class="btn-secondary cv-btn">
+                            <ui:Label text="Decline" picking-mode="Ignore" class="btn-label" />
+                        </ui:Button>
+                        <ui:Label name="cv-error" class="cv-error" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

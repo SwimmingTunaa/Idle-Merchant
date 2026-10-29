@@ -79,6 +79,7 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 ### Contracts & Seals
 `Managers/ContractManager.cs` → 3 offers rotating every 10 min, accept 1 (never expires); Deliver (raw items, fulfilled from stock) / Hunt (kills on a staffed layer) / Patronage (customers served). Target snapshotted at roll = max(rate × 5–10 min, stock × 30–40%, floor). Deliver gold = target × sellPrice × 1.6; counters pay 50% of passive gold/min over the work time. Seals: 10, or 20–30 for layer ≥3. Also owns the Guild Seal balance + seal shop (Recruitment Favor 50, Rush Order 20). Seals also come from star awards (30/50/80/120/200, `ProgressionManager`) and `StarMilestoneDef.sealReward`. Signals `OnContractAccepted/Completed`, `OnSealsChanged`. Design: `CONTRACTS_DESIGN.md`
 `UI/Panels/Contracts/ContractsPage.cs` → book Contracts tab; the active contract also rides the HUD milestone tracker
+`Shop/CaravanManager.cs` → the Caravan, a stock valve: every 8 min game time a wagon (scene singleton on `Guild/Shop/Caravan`, parked x 46.5 outside the right-end annex) offers 5 Guild Seals for 70% of the surplus above floor of the raw item with the highest (stock − floor) × sellPrice; no visit if that qty < 20; offer open 2 min, Accept = `TryRemove` + `GrantSeals` (no gold, no `OnItemSold` → not passive income). Click opens `UI/Panels/Caravan/CaravanPanelController` (reuses the Workshop `wp-*` shell). Signal `OnCaravanChanged`; saved as `SaveData.caravan`
 
 ### Audio
 `Managers/SfxManager.cs` → `PersistentSingleton`, 8-voice round-robin pool, per-`SfxId` volume / pitch jitter / unscaled throttle; `Play(SfxId)` from VFX/UI seams, signal-driven for sale/hire/milestone/star. Volumes Master/SFX/Music (`SfxGain = master × sfx`; music is an empty slot) saved in `SaveData.settings`. Clips are synthesized by `Tools/gen_sfx.py` (project root, deterministic) into `Assets/Audio/SFX`
@@ -166,6 +167,7 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/UI/BookStamp.cs` | Shared stamp slam/dither for book pages |
 | `Scripts/UI/Components/StatusFrame.cs` | State-carrying icon frame with Painter2D progress sweep |
 | `Scripts/Shop/LootPile.cs` | Stock heap; fly-in target and sale relay (`FlySale`) |
+| `Scripts/Shop/CaravanManager.cs` | Caravan wagon: visit timer, raw-lot offer for seals, slide/wheel frames, save chunk |
 
 ---
 

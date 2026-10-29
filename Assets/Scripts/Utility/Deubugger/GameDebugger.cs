@@ -157,6 +157,8 @@ public class GameDebugger : EditorWindow
         EditorGUILayout.Space(10);
 
         GUI.enabled = Application.isPlaying;
+        if (GUILayout.Button("Summon caravan now") && CaravanManager.Instance != null)
+            Debug.Log(CaravanManager.Instance.Arrive() ? "[GameDebugger] Caravan summoned" : "[GameDebugger] No caravan: already here, or no raw lot of 20+ above its floor");
         if (GUILayout.Button("Set Gold to 0", GUILayout.Height(30)))
         {
             if (Inventory.Instance != null)

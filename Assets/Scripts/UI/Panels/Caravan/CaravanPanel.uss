@@ -1,0 +1,63 @@
+/* Caravan offer — layout on top of the Workshop shell (WorkshopPanel.uss: wp-host / card / beam / hero / head / close). */
+
+.wp-card.cv-card {
+    width: 680px;
+}
+
+/* wagon frame 0 at 3× (48×30 → 144×90); sprite set in CaravanPanelController */
+.wp-hero.cv-hero {
+    width: 144px;
+    height: 90px;
+    margin-right: 22px;
+    align-self: center;
+}
+
+.cv-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.cv-text {
+    font-size: var(--font-size-body);
+    color: rgb(243, 220, 160);
+}
+
+.cv-want {
+    color: rgb(255, 236, 214);
+    margin-left: 8px;
+}
+
+.cv-icon {
+    width: 36px;
+    height: 36px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.cv-seal {
+    margin-left: 6px;
+}
+
+.cv-caption {
+    margin-top: 4px;
+    font-size: var(--font-size-caption);
+    color: rgb(185, 169, 143);
+}
+
+.cv-actions {
+    margin-top: 12px;
+}
+
+.cv-btn {
+    margin: 0 10px 0 0;
+    padding: 7px 18px 11px 18px;
+}
+
+.cv-btn Label {
+    font-size: var(--font-size-small);
+}
+
+.cv-error {
+    font-size: var(--font-size-small);
+    color: var(--color-destructive-hover);
+}

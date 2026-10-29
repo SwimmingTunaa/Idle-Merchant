@@ -4,6 +4,7 @@
     <ui:Template name="MilestoneTracker" src="project://database/Assets/Scripts/UI/Panels/Milestone%20Tracker/MilestoneTracker.uxml?fileID=9197481963319205126&amp;guid=c986dfdbce2d64a2a9ee5099f22caa9e&amp;type=3#MilestoneTracker"/>
     <ui:Template name="PausePanel" src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/Pause_Panel.uxml?fileID=9197481963319205126&amp;guid=d86de3818b09844edb6036a25b22e634&amp;type=3#Pause_Panel"/>
     <ui:Template name="WorkshopPanel" src="project://database/Assets/Scripts/UI/Panels/Workshop/WorkshopPanel.uxml"/>
+    <ui:Template name="CaravanPanel" src="project://database/Assets/Scripts/UI/Panels/Caravan/CaravanPanel.uxml"/>
     <ui:Template name="ClassPickPanel" src="project://database/Assets/Scripts/UI/Panels/Class%20Pick/ClassPickPanel.uxml"/>
     <ui:Template name="DecoratePanel" src="project://database/Assets/Scripts/UI/Panels/Decorate/DecoratePanel.uxml"/>
     <ui:Template name="TransportPanel" src="project://database/Assets/Scripts/UI/Panels/Transport/TransportPanel.uxml"/>
@@ -21,6 +22,7 @@
             <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1; display: none;"/>
             <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;"/>
             <ui:Instance template="WorkshopPanel" name="WorkshopPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
+            <ui:Instance template="CaravanPanel" name="CaravanPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         </ui:VisualElement>
         <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
         <ui:Instance template="WelcomeBack" name="WelcomeBack" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>

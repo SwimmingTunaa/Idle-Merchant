@@ -82,6 +82,7 @@ public class ClickerManager : MonoBehaviour
     private AdventurerAgent hoveredAdv;
     private WorkshopProp hoveredProp;
     private DecorSlot hoveredDecor;
+    private CaravanManager hoveredCaravan;
     private TransportPoint hoveredLadder;
 
     /// <summary>Click damage after the upgrade ladder: baseClickDamage * (1 + 0.1 * level).</summary>
@@ -252,6 +253,7 @@ public class ClickerManager : MonoBehaviour
         AdventurerAgent under = null;
         WorkshopProp prop = null;
         DecorSlot decor = null;
+        CaravanManager caravan = null;
         TransportPoint ladder = null;
 
         // No world hover while the book is open (you're already inside it).
@@ -262,13 +264,22 @@ public class ClickerManager : MonoBehaviour
             {
                 if (hit.TryGetComponent(out AdventurerAgent adv)) { under = adv; break; }
                 if (prop == null) hit.TryGetComponent(out prop);
+                if (caravan == null) hit.TryGetComponent(out caravan);
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
                 if (ladder == null) hit.TryGetComponent(out ladder);
             }
         }
         if (under != null) prop = null;   // a hero standing in front of a workshop takes the outline
-        if (under != null || prop != null) decor = null;   // click priority: workshops before decor
-        if (under != null || prop != null || decor != null) ladder = null;   // ladders last
+        if (under != null || prop != null) caravan = null;   // click priority: workshops, caravan, decor, ladders
+        if (under != null || prop != null || caravan != null) decor = null;
+        if (under != null || prop != null || caravan != null || decor != null) ladder = null;   // ladders last
+
+        if (caravan != hoveredCaravan)
+        {
+            if (hoveredCaravan != null) hoveredCaravan.SetHover(false);
+            hoveredCaravan = caravan;
+            if (hoveredCaravan != null) hoveredCaravan.SetHover(true);
+        }
 
         if (ladder != hoveredLadder)
         {
@@ -365,6 +376,15 @@ public class ClickerManager : MonoBehaviour
         {
             if (!hit.TryGetComponent(out WorkshopProp prop)) continue;
             FindAnyObjectByType<WorkshopPanelController>()?.OpenFor(prop);
+            return;
+        }
+
+        // Priority 3b: the caravan (its collider is only on while an offer is open) opens its offer
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out CaravanManager _)) continue;
+            var cp = FindAnyObjectByType<CaravanPanelController>();
+            if (cp != null) UIManager.Instance.OpenPanel(cp);
             return;
         }
 

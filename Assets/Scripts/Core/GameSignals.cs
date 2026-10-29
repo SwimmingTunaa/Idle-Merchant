@@ -52,6 +52,7 @@ public static class GameSignals
     public static event Action<Contract> OnContractAccepted;   // offer taken (also re-raised on load for the active one)
     public static event Action<Contract> OnContractCompleted;  // target met / goods handed over → claimable
     public static event Action<int> OnSealsChanged;            // new seal balance
+    public static event Action OnCaravanChanged;               // caravan arrived / left / offer taken
 
     // Public invoke methods
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
@@ -82,6 +83,7 @@ public static class GameSignals
     public static void RaiseContractAccepted(Contract c) => OnContractAccepted?.Invoke(c);
     public static void RaiseContractCompleted(Contract c) => OnContractCompleted?.Invoke(c);
     public static void RaiseSealsChanged(int balance) => OnSealsChanged?.Invoke(balance);
+    public static void RaiseCaravanChanged() => OnCaravanChanged?.Invoke();
 
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]
@@ -114,6 +116,7 @@ public static class GameSignals
         OnContractAccepted = null;
         OnContractCompleted = null;
         OnSealsChanged = null;
+        OnCaravanChanged = null;
 
         Debug.Log("[GameSignals] All listeners cleared");
     }
@@ -148,6 +151,7 @@ public static class GameSignals
         Debug.Log($"OnContractAccepted: {OnContractAccepted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnContractCompleted: {OnContractCompleted?.GetInvocationList().Length ?? 0}");
         Debug.Log($"OnSealsChanged: {OnSealsChanged?.GetInvocationList().Length ?? 0}");
+        Debug.Log($"OnCaravanChanged: {OnCaravanChanged?.GetInvocationList().Length ?? 0}");
     }
 #endif
 }

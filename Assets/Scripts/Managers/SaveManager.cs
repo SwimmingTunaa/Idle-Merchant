@@ -217,6 +217,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         if (ContractManager.Instance != null) d.contracts = ContractManager.Instance.ToSave();
         if (CraftingManager.Instance != null) d.crafting = CraftingManager.Instance.ToSave();
+        if (CaravanManager.Instance != null) d.caravan = CaravanManager.Instance.ToSave();
         var hire = FindAnyObjectByType<HireController>();
         if (hire != null) d.contracts.favors = hire.FavorsToSave();
 
@@ -375,6 +376,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         // After stock: an old save without the chunk rolls fresh offers against the restored stockpile
         if (ContractManager.Instance != null) ContractManager.Instance.LoadFrom(d.contracts, items);
+        if (CaravanManager.Instance != null) CaravanManager.Instance.LoadFrom(d.caravan, items);
 
         // Same signals live play raises, so camera bounds, hire pools and the Cursor page catch up
         if (pm != null)
@@ -614,6 +616,7 @@ public class SaveData
     public ContractSave contracts = new ContractSave();
     public CraftingSave crafting;   // null in saves from before crafting batch 2 → defaults
     public DecorSave decor = new DecorSave();
+    public CaravanSave caravan;   // null in saves from before the caravan → first visit in 8 min
     public SettingsSave settings = new SettingsSave();
 }
 
@@ -633,6 +636,15 @@ public class EconomySave
     public int gold;
     public Dictionary<string, int> stock = new Dictionary<string, int>(); // ItemDef asset name → qty
     public Dictionary<string, int> floors = new Dictionary<string, int>(); // ItemDef asset name → "keep at least N"
+}
+
+public class CaravanSave
+{
+    public float nextIn;     // game seconds to the next visit (counts only while the wagon is gone)
+    public bool present;
+    public string item;      // ItemDef asset name of the wanted lot
+    public int qty;
+    public float leaveIn;    // game seconds left on the open offer
 }
 
 public class CraftingSave
