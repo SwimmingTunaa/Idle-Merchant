@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 // Hire panel controller - the hiring board: a cork notice board with one pinned poster (Poster.uxml) per candidate.
-// Posters cascade; tack on the front poster = next, a peeking strip = bring to front, Hire = tear off (HIRING_BOARD_DESIGN.md).
+// Posters sit in one pile; ▶ / tack = slide the front off to the back, ◀ = back poster slides in, Hire = tear off (HIRING_BOARD_DESIGN.md).
 // Candidates have a rank (intrinsic quality), players choose which layer to deploy them to.
 public class HireController : BasePanelController
 {
@@ -33,8 +33,9 @@ public class HireController : BasePanelController
     [Tooltip("Stopwatch appears when the next pool refresh is within this many seconds")]
     [SerializeField] private float stopwatchShowSeconds = 120f;
 
-    // Board cascade: poster i (0 = front) at left i×36, top 328 − i×82, persistent tilt in ±1.5°
-    private const float PosterStepX = 36f, PosterStepY = 82f, FrontTop = 328f, PosterTiltMax = 1.5f;
+    // Board pile: poster i (0 = front) at left 60 + 4i, top 16 + 4i, persistent tilt in ±1.5°
+    private const float PileLeft = 60f, PileTop = 16f, PileStep = 4f, PosterTiltMax = 1.5f;
+    private const float SlideSeconds = 0.28f; // matches .poster-card in HirePanel.uss
     private const float TearSeconds = 0.35f; // matches .poster-card--torn in HirePanel.uss
 
     // UI Elements
@@ -70,6 +71,7 @@ public class HireController : BasePanelController
     private readonly Dictionary<VisualElement, float> rotationByCard = new();
 
     private bool isHireAnimating;
+    private bool isSliding;
 
     // Newest tier's odds boost after its layer unlocks (ClassCatalog.unlockBoost / unlockBoostSeconds).
     // ponytail: not saved — quitting inside the window drops the rest of the boost.
@@ -393,6 +395,9 @@ public class HireController : BasePanelController
         if (layerNextButton != null)
             layerNextButton.clicked += OnLayerNext;
 
+        panel.Q<Button>("pile-prev-button").clicked += OnPrevPoster;
+        panel.Q<Button>("pile-next-button").clicked += OnNextPoster;
+
         // Initial visibility — hide TC so it doesn't intercept events when closed
         panel.style.display = DisplayStyle.None;
         panel.style.opacity = 0f;
@@ -690,8 +695,7 @@ public class HireController : BasePanelController
             CandidateUIMapper.PopulateUI(card, CurrentRoster[i]);
 
             card.Q<Button>("hire-button").clicked += () => TryHire(card);
-            card.Q<Button>("tack").clicked += () => OnPosterClicked(card, true);
-            card.Q("strip").RegisterCallback<ClickEvent>(_ => OnPosterClicked(card, false));
+            card.Q<Button>("tack").clicked += OnNextPoster;
 
             stackContainer.Add(card);
             CurrentCards.Insert(0, card);
@@ -707,14 +711,15 @@ public class HireController : BasePanelController
         {
             var card = CurrentCards[i];
             bool front = i == 0;
-            card.style.left = i * PosterStepX;
-            card.style.top = FrontTop - i * PosterStepY;
+            card.style.left = PileLeft + i * PileStep;
+            card.style.top = PileTop + i * PileStep;
             card.style.rotate = new Rotate(new Angle(rotationByCard[card], AngleUnit.Degree));
 
-            // Back posters pick only on their strip and tack; only the front shows its body
+            // Only the front poster is pickable and shows its body
             var pick = front ? PickingMode.Position : PickingMode.Ignore;
             card.pickingMode = pick;
             card.Q("poster").pickingMode = pick;
+            card.Q("tack").pickingMode = pick;
             card.Q("poster-body").style.display = front ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
@@ -725,27 +730,60 @@ public class HireController : BasePanelController
     // NAVIGATION
     // ═════════════════════════════════════════════
 
-    // Tack on the front poster = pull it off (goes to the back). Tack or strip on a back poster = bring it to the front.
-    private void OnPosterClicked(VisualElement card, bool tack)
+    // ▶ / tack = slide the front poster off (.poster--pulled), then it goes to the back of the pile
+    private void OnNextPoster()
     {
-        if (isHireAnimating) return;
+        if (isHireAnimating || isSliding || CurrentCards.Count < 2) return;
+        StartCoroutine(PullFront(CurrentCards[0]));
+    }
 
-        int i = CurrentCards.IndexOf(card);
-        if (i == 0)
+    private IEnumerator PullFront(VisualElement card)
+    {
+        isSliding = true;
+        card.AddToClassList("poster--pulled");
+        card.style.rotate = new Rotate(new Angle(rotationByCard[card] + 12f, AngleUnit.Degree));
+        yield return new WaitForSecondsRealtime(SlideSeconds);
+
+        card.RemoveFromClassList("poster--pulled");
+        if (CurrentCards.Count > 0 && CurrentCards[0] == card) // not rebuilt mid-slide
         {
-            if (tack && CurrentCards.Count > 1) RotateTopToBottom();
-            return;
+            card.AddToClassList("poster--snap"); // back into the pile without flying back
+            RotateTopToBottom();
+            for (int f = 0; f < 10 && card.resolvedStyle.opacity < 0.99f; f++) yield return null; // reset resolved
+            card.RemoveFromClassList("poster--snap");
         }
-        if (i < 0) return;
+        isSliding = false;
+    }
 
-        var c = CurrentRoster[i];
-        CurrentRoster.RemoveAt(i);
-        CurrentCards.RemoveAt(i);
+    // ◀ = the back poster comes to the front, sliding in from the pulled-off offset (.poster--arriving)
+    private void OnPrevPoster()
+    {
+        if (isHireAnimating || isSliding || CurrentCards.Count < 2) return;
+        StartCoroutine(BringBackToFront());
+    }
+
+    private IEnumerator BringBackToFront()
+    {
+        isSliding = true;
+        int last = CurrentCards.Count - 1;
+        var c = CurrentRoster[last];
+        var card = CurrentCards[last];
+        CurrentRoster.RemoveAt(last);
+        CurrentCards.RemoveAt(last);
         CurrentRoster.Insert(0, c);
         CurrentCards.Insert(0, card);
         card.BringToFront();
 
+        card.AddToClassList("poster--arriving");
         UpdateStackVisuals();
+        float tilt = rotationByCard[card];
+        card.style.rotate = new Rotate(new Angle(tilt + 12f, AngleUnit.Degree));
+        for (int f = 0; f < 10 && card.resolvedStyle.opacity > 0.01f; f++) yield return null; // offset resolved
+
+        card.RemoveFromClassList("poster--arriving");
+        card.style.rotate = new Rotate(new Angle(tilt, AngleUnit.Degree));
+        yield return new WaitForSecondsRealtime(SlideSeconds);
+        isSliding = false;
     }
 
     private void RotateTopToBottom()
@@ -770,7 +808,7 @@ public class HireController : BasePanelController
 
     private void TryHire(VisualElement card)
     {
-        if (isHireAnimating || State != PanelState.Open)
+        if (isHireAnimating || isSliding || State != PanelState.Open)
             return;
 
         if (CurrentCards.Count == 0 || CurrentCards[0] != card)
@@ -812,7 +850,7 @@ public class HireController : BasePanelController
         return false;
     }
 
-    // Tear the poster off the board (USS transition), then leave a scrap under its tack
+    // Tear the poster off the board (USS transition), then leave a scrap under the pile
     private IEnumerator AnimateHire(VisualElement card, HiringCandidate c)
     {
         isHireAnimating = true;
@@ -836,11 +874,11 @@ public class HireController : BasePanelController
         rotationByCard.Remove(card);
         card.RemoveFromHierarchy();
 
-        // One scrap per hire since the board was built (BuildStack clears them), alternating ±7°
+        // One scrap per hire since the board was built (BuildStack clears them), under the pile, alternating ±7°
         int k = scrapLayer.childCount;
         var scrap = new VisualElement { pickingMode = PickingMode.Ignore };
         scrap.AddToClassList("poster-scrap");
-        scrap.style.left = 20 + k * 60;
+        scrap.style.left = 70 + k * 60;
         scrap.style.rotate = new Rotate(new Angle(k % 2 == 0 ? 7f : -7f, AngleUnit.Degree));
         var scrapTack = new VisualElement();
         scrapTack.AddToClassList("tack");

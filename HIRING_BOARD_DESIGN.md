@@ -1,6 +1,8 @@
 # Hiring board — pinned posters (build spec)
 
-Mock (approved 2026-10-29, version 40): https://claude.ai/artifact/9KCK7tHYgFzhRWQd8GMCd7
+Mock (approved 2026-10-29, version 40; **revision 2 "pile" approved 2026-10-30, version 43**): https://claude.ai/artifact/9KCK7tHYgFzhRWQd8GMCd7
+
+> **Revision 2 supersedes the cascade.** The section "Revision 2 — pile" at the end overrides anything above that it contradicts.
 Replaces the newspaper stack in `Scripts/UI/Panels/Hiring/` (`HirePanel.uxml/.uss`, `Candidate.uxml`, the stack code in
 `HireController`). Pools, rosters, hiring sign/badge/stopwatch, layer selector logic, `HireCandidate` routing, favours and
 save restore are untouched.
@@ -105,3 +107,29 @@ inside the paper's inner border.
   strip click brings forward; hire tears off and leaves a scrap; unaffordable shows the tag; epithet banner only when the
   candidate has one; bars match the trait multipliers (log one candidate's mods vs cells); no console errors.
 - Render the board to a PNG from a script (no super-sized `ScreenCapture`; the Game view is collapsed) and show it.
+
+## Revision 2 — pile (version 43, 2026-10-30)
+Play-testing showed the cascade confusing (five strips, two gestures). Posters now sit in **one pile**, browsed one at a time.
+
+- **Board 700×820** (artboard). Frame 660×780 at (20, 20); cork 600×694 at (50, 76). Tabs unchanged at (60, 24). The panel
+  goes back under the top nav at its old `top` (no −132 lift): 820 fits the 1200 reference; it must not cover the
+  guild-name banner.
+- **No depth selector on the title bar.** It becomes a pinned paper slip at the cork's bottom-left: `.note` look
+  (`#efe3c4`, 3px `#a98c5c` border, red tack on top, rotate −2°), 210 wide, artboard (125, 671), padding 26 10 14, row
+  centred: `◀` button · "Depth N" BrightLinger 28 · `▶` button (same handlers as today, Ithaca 26 arrows `#6b3d1e`).
+  **Restock note** moves beside it: artboard (375, 671), 200 wide, rotate +2°, padding-top 26, same two lines as before.
+- **Prev / next arrows**: two 44×64 wooden buttons on the cork at artboard `left 64` and `right 64`, `top 340`
+  (poster mid-height): bg `#6b4426`, 4px `#2b1a12` border, hover `#7d5230`, Ithaca 30 `◀` / `▶` in `#f3e3c3`,
+  inset sign bevel like the tabs. **▶ and the tack both = next**, **◀ = previous**.
+- **Pile geometry**: stack container 560×654 at (70, 96). Poster i (0 = front) at `left 60 + 4i`, `top 16 + 4i`, front
+  = last sibling, tilt per poster kept (`rotationByCard`). Back posters: body hidden as now **and the whole poster
+  `pickingMode = Ignore`** — no strip click, no strip hover tint, delete `OnPosterClicked`'s strip path.
+- **Next animation** (`.poster--pulled`): front poster translates (160, 60), rotates +12° on top of its tilt, opacity →
+  0 over 0.28 s ease-in (USS transition on translate/rotate/opacity); when it ends, `RotateTopToBottom` (poster to the
+  back, class removed, transitions suppressed for that frame so it doesn't fly back). **Previous** (`.poster--arriving`):
+  move the last poster to the front with the same offset/opacity and `transition-duration: 0` applied, then next frame
+  drop the class so it slides in over 0.28 s. Ignore arrow/tack clicks while a slide is running. Hire tear-off unchanged.
+- **Scraps**: `left 70 + 60k`, `top 0` of the stack container, *under* the pile (scraps layer stays below the stack).
+- **Stat bars are one colour**: cell k (covering 0.5+0.1k → +0.1) is filled `#6b4426` iff its upper edge ≤ m, else
+  `#e2d2ad`. Drop the green / red / tan states; the 1.0 tick stays. Time-stat inversion stays.
+- Everything else (poster content, banner, gem, hire button + tags, tabs, badge, stopwatch, roster size 5) unchanged.

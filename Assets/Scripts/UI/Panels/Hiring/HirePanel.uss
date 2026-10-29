@@ -5,10 +5,10 @@
     -unity-font-definition: var(--font-body);
 }
 
-/* 800x1000 root; every child is absolutely placed in root coordinates (the mock's numbers) */
+/* 700x820 root; every child is absolutely placed in root coordinates (the mock's numbers) */
 .hire-board {
-    width: 800px;
-    height: 1000px;
+    width: 700px;
+    height: 820px;
     align-self: flex-start;
 }
 
@@ -16,8 +16,8 @@
     position: absolute;
     left: 20px;
     top: 20px;
-    width: 760px;
-    height: 960px;
+    width: 660px;
+    height: 780px;
     background-color: rgb(90, 58, 34);
     border-width: 6px;
     border-color: rgb(43, 26, 18);
@@ -27,8 +27,8 @@
     position: absolute;
     left: 50px;
     top: 76px;
-    width: 700px;
-    height: 874px;
+    width: 600px;
+    height: 694px;
     background-color: rgb(180, 136, 90);
     border-width: 4px;
     border-color: rgb(61, 38, 22);
@@ -38,17 +38,31 @@
     position: absolute;
     left: 70px;
     top: 96px;
-    width: 660px;
-    height: 840px;
+    width: 560px;
+    height: 654px;
 }
 
-/* Poster i (0 = front): left i×36, top 328 − i×82, set inline by HireController */
+/* Poster i (0 = front): left 60 + 4i, top 16 + 4i, tilt set inline by HireController */
 .poster-card {
     position: absolute;
     width: 440px;
     height: 520px;
-    transition-property: top, left, rotate;
-    transition-duration: 0.25s;
+    transition-property: translate, rotate, opacity;
+    transition-duration: 0.28s;
+}
+
+/* Next = slide the front poster off (HireController adds +12° inline, waits 0.28 s, then sends it to the back);
+   Previous = the back poster starts here (no transition) and slides in when the class drops next frame */
+.poster--pulled,
+.poster--arriving {
+    translate: 160px 60px;
+    opacity: 0;
+    transition-timing-function: ease-in;
+}
+
+.poster--arriving,
+.poster--snap {
+    transition-duration: 0s;
 }
 
 /* Hire = tear off: lift, tilt, fade (HireController waits the same 0.35 s, then removes it) */
@@ -81,10 +95,10 @@
     scale: 1.15 1.15;
 }
 
-/* Left under the tack when a poster is hired; cleared on rebuild */
+/* Left under the pile when a poster is hired; cleared on rebuild */
 .poster-scrap {
     position: absolute;
-    top: 8px;
+    top: 0;
     width: 46px;
     height: 34px;
     background-image: url("project://database/Assets/Sprites/UI/Hire%20Menu/poster_scrap.png");
@@ -155,17 +169,50 @@
 .nail--left { left: 4px; }
 .nail--right { right: 4px; }
 
-/* ── Depth selector ── */
-.depth-box {
+/* ── Prev / next arrows: wooden buttons on the cork either side of the pile ── */
+.pile-arrow,
+.pile-arrow:hover,
+.pile-arrow:active {
     position: absolute;
-    right: 60px;
-    top: 26px;
-    flex-direction: row;
-    align-items: center;
-    padding: 4px 10px;
-    background-color: rgb(239, 227, 196);
+    top: 340px;
+    width: 44px;
+    height: 64px;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(107, 68, 38);
     border-width: 4px;
     border-color: rgb(43, 26, 18);
+    border-radius: 0;
+    font-size: 30px;
+    color: rgb(243, 227, 195);
+    -unity-font-definition: var(--font-body);
+    -unity-text-align: middle-center;
+}
+
+.pile-arrow:hover {
+    background-color: rgb(125, 82, 48);
+}
+
+.pile-arrow--prev { left: 64px; }
+.pile-arrow--next { right: 64px; }
+
+/* ── Pinned paper notes on the cork's bottom edge: depth slip + restock note ── */
+.note {
+    position: absolute;
+    top: 671px;
+    align-items: center;
+    background-color: rgb(239, 227, 196);
+    border-width: 3px;
+    border-color: rgb(169, 140, 92);
+}
+
+.depth-box {
+    left: 125px;
+    width: 210px;
+    flex-direction: row;
+    justify-content: center;
+    padding: 26px 10px 14px 10px;
+    rotate: -2deg;
 }
 
 .depth-arrow,
@@ -188,17 +235,10 @@
     padding: 0;
 }
 
-/* ── Restock note (bottom-right of the cork, above the posters) ── */
 .restock-note {
-    position: absolute;
-    left: 530px;
-    top: 830px;
+    left: 375px;
     width: 200px;
-    padding: 30px 20px 18px 20px;
-    align-items: center;
-    background-color: rgb(239, 227, 196);
-    border-width: 3px;
-    border-color: rgb(169, 140, 92);
+    padding: 26px 20px 18px 20px;
     rotate: 2deg;
 }
 

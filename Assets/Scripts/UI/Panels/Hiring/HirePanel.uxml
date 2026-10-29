@@ -1,9 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3" />
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3" />
-    <!-- Hiring board: cork notice board, posters (Poster.uxml) cascade in poster-stack. Spec: HIRING_BOARD_DESIGN.md.
-         top -132: the 1000px board starts just under the top-nav signs (hiring sign stays clickable) and fits a 1200px-tall panel -->
-    <ui:VisualElement name="hire-panel" style="flex-grow: 0; flex-direction: row; justify-content: center; width: 100%; align-items: center; position: absolute; top: -132px; left: -1px;">
+    <!-- Hiring board: cork notice board, posters (Poster.uxml) in one pile in poster-stack. Spec: HIRING_BOARD_DESIGN.md (Revision 2). -->
+    <ui:VisualElement name="hire-panel" style="flex-grow: 0; flex-direction: row; justify-content: center; width: 100%; align-items: center; position: absolute; top: 2px; left: -1px;">
         <ui:VisualElement name="hire-board" class="hire-board">
             <ui:VisualElement class="board-frame" picking-mode="Ignore" />
             <ui:VisualElement class="cork" picking-mode="Ignore" />
@@ -13,12 +12,15 @@
                 <ui:Tab label="Adventurers" name="adventurers-tab" />
                 <ui:Tab label="Porters" name="porters-tab" />
             </ui:TabView>
-            <ui:VisualElement name="layer-selector" class="depth-box">
+            <ui:Button text="◀" name="pile-prev-button" class="pile-arrow pile-arrow--prev" />
+            <ui:Button text="▶" name="pile-next-button" class="pile-arrow pile-arrow--next" />
+            <ui:VisualElement name="layer-selector" class="note depth-box">
+                <ui:VisualElement class="tack" picking-mode="Ignore" />
                 <ui:Button text="◀" name="layer-prev-button" class="depth-arrow" />
                 <ui:Label text="Depth 1" name="layer-label" />
                 <ui:Button text="▶" name="layer-next-button" class="depth-arrow" />
             </ui:VisualElement>
-            <ui:VisualElement name="restock-note" class="restock-note" picking-mode="Ignore">
+            <ui:VisualElement name="restock-note" class="note restock-note" picking-mode="Ignore">
                 <ui:VisualElement class="tack" />
                 <ui:Label name="notice-count" text="5 notices pinned" />
                 <ui:VisualElement class="note-line">

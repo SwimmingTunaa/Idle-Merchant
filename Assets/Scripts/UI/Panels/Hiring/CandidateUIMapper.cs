@@ -153,7 +153,7 @@ public static class CandidateUIMapper
         container.style.display = container.childCount > 0 ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
-    // 10 cells over 0.5→1.5 in 0.1 steps: [1, m] green when up, [m, 1] red when down, below min(m, 1) tan.
+    // 10 cells over 0.5→1.5 in 0.1 steps: a cell is filled iff its upper edge ≤ m; tick at 1.0.
     private static void PopulateBars(VisualElement root, HiringCandidate candidate, (StatType stat, string icon)[] rows, BaseStats baseStats)
     {
         var bars = root.Q("bars");
@@ -176,8 +176,7 @@ public static class CandidateUIMapper
             {
                 var cell = new VisualElement();
                 cell.AddToClassList("bar-cell");
-                string fill = CellFill(m, k);
-                if (fill != null) cell.AddToClassList(fill);
+                if (CellFilled(m, k)) cell.AddToClassList("bar-cell--on");
                 bar.Add(cell);
             }
             var tick = new VisualElement();
@@ -189,14 +188,6 @@ public static class CandidateUIMapper
         }
     }
 
-    /// <summary>USS fill class for bar cell k (covering [0.5 + k/10, 0.6 + k/10]) at multiplier m, or null for empty.</summary>
-    public static string CellFill(float m, int k)
-    {
-        const float eps = 0.001f;
-        float from = 0.5f + k * 0.1f, to = from + 0.1f;
-        if (m > 1f && from >= 1f - eps && to <= m + eps) return "bar-cell--up";
-        if (m < 1f && to <= 1f + eps && from >= m - eps) return "bar-cell--down";
-        if (to <= Mathf.Min(m, 1f) + eps) return "bar-cell--base";
-        return null;
-    }
+    /// <summary>Bar cell k (covering [0.5 + k/10, 0.6 + k/10]) is filled iff its upper edge ≤ m.</summary>
+    public static bool CellFilled(float m, int k) => 0.6f + k * 0.1f <= m + 0.001f;
 }
