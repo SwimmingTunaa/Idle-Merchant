@@ -11,6 +11,7 @@ public static class CharacterSpriteGenerator
     private static Camera _renderCamera;
     private static GameObject _previewInstance;
     private static GameObject _previewPrefab; // the prefab _previewInstance was made from — swapped when a def uses another
+    private static bool _bakeOutline = true;  // same rule as the world: outline only units whose PermanentOutline is enabled (art with a drawn outline turns it off)
     private static RenderTexture _renderTexture;
     private static Dictionary<int, Sprite> _spriteCache = new Dictionary<int, Sprite>();
     
@@ -152,6 +153,8 @@ public static class CharacterSpriteGenerator
         {
             if (_previewInstance != null) { _previewInstance.SetActive(false); Object.Destroy(_previewInstance); } // Destroy is deferred; hide it now or it's in this frame's capture
             _previewPrefab = def.prefab;
+            var outline = def.prefab.GetComponent<PermanentOutline>();
+            _bakeOutline = outline != null && outline.enabled;
             _previewInstance = Object.Instantiate(def.prefab, PREVIEW_POSITION, Quaternion.identity);
             _previewInstance.name = "CharacterPreview";
             Object.DontDestroyOnLoad(_previewInstance);
@@ -335,7 +338,8 @@ public static class CharacterSpriteGenerator
         RenderTexture.active = null;
 
         // Bake a black silhouette outline into the icon so it matches the world black outline.
-        AddSilhouetteOutline(full, IconOutlineTexels, IconOutlineColor, IconOutlineShape, IconCornerCut);
+        if (_bakeOutline)
+            AddSilhouetteOutline(full, IconOutlineTexels, IconOutlineColor, IconOutlineShape, IconCornerCut);
 
         // Crop to the character (incl. its outline) so the icon is a tight, native-resolution
         // sprite — captured at true scale, it'd otherwise sit small in a big transparent canvas.
