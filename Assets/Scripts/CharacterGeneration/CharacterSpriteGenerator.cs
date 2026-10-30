@@ -15,7 +15,7 @@ public static class CharacterSpriteGenerator
     private static Dictionary<int, Sprite> _spriteCache = new Dictionary<int, Sprite>();
     
     private const int RENDER_SIZE = 256;
-    private const int SPRITE_PIXELS_PER_UNIT = 100;
+    private const int SPRITE_PIXELS_PER_UNIT = 8; // == the art's PPU (Aseprite imports), so 1 captured texel = 1 art pixel
 
     // Baked outline settings come from a Resources-loaded ScriptableObject so they're tunable in
     // the inspector (Assets/Resources/CharacterIconSettings). Falls back to sane defaults if the
@@ -133,8 +133,9 @@ public static class CharacterSpriteGenerator
         
         _renderCamera = cameraObj.AddComponent<Camera>();
         _renderCamera.orthographic = true;
-        // Capture at the sprite's TRUE scale: pixels-per-world-unit == sprite PPU, so 1 texel = 1
-        // art-pixel. Outline widths are then real art-pixels and the icon is pixel-perfect.
+        // Capture at the art's TRUE scale: pixels-per-world-unit == art PPU (8), so 1 texel = 1
+        // art-pixel. Outline widths are then real art-pixels and the icon is pixel-perfect; the
+        // camera sits on an integer world position so texel edges align with the 1/8-unit pixel grid.
         _renderCamera.orthographicSize = RENDER_SIZE / (2f * SPRITE_PIXELS_PER_UNIT);
         _renderCamera.clearFlags = CameraClearFlags.SolidColor;
         _renderCamera.backgroundColor = new Color(0, 0, 0, 0); // Transparent
