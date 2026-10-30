@@ -319,6 +319,24 @@ public class GameDebugger : EditorWindow
                 Debug.LogWarning("[GameDebugger] Selected entity is not AdventurerDef or PorterDef");
             }
         }
+
+        EditorGUILayout.Space(5);
+        GUILayout.Label("Remove Units (every depth)", EditorStyles.boldLabel);
+        GUI.enabled = Application.isPlaying;
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Remove all adventurers", GUILayout.Height(26)))
+        {
+            int n = 0;
+            foreach (var m in FindObjectsByType<AdventurerManager>()) n += m.RemoveAllUnits();
+            Debug.Log($"[GameDebugger] Removed {n} adventurers");
+        }
+        if (GUILayout.Button("Remove all porters", GUILayout.Height(26)))
+        {
+            int n = 0;
+            foreach (var m in FindObjectsByType<PorterManager>()) n += m.RemoveAllUnits();
+            Debug.Log($"[GameDebugger] Removed {n} porters");
+        }
+        EditorGUILayout.EndHorizontal();
         GUI.enabled = true;
 
         EditorGUILayout.Space(10);

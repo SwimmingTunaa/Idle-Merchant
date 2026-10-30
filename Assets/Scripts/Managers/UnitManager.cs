@@ -394,8 +394,9 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
         }
     }
 
+    // Despawns and untracks every unit on this layer (Game Debugger → Spawning, inspector context menu).
     [ContextMenu("Debug: Remove All Units")]
-    protected virtual void DebugRemoveAll()
+    public virtual int RemoveAllUnits()
     {
         var allUnits = GetAllUnits();
         foreach (var unit in allUnits)
@@ -403,6 +404,7 @@ public abstract class UnitManager<T> : MonoBehaviour, IUnitManager where T : Ent
             RemoveUnit(unit);
         }
         Debug.Log($"[{GetType().Name}] Removed all units from layer {LayerIndex}");
+        return allUnits.Count;
     }
 
     [ContextMenu("Debug: Force Cleanup")]
