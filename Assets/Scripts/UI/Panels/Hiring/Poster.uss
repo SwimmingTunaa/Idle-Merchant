@@ -335,3 +335,32 @@
     margin-top: 6px;
     rotate: -3deg;
 }
+
+/* ═════ HIRED stamp: the book's red ink strip (for-sale-stamp-sheet frame 0) slammed across the poster on hire;
+   revealed on the stamp hand's impact frame (HireController.AnimateHire), torn off with the poster ═════ */
+.poster-hired {
+    position: absolute;
+    left: -24px;
+    right: -24px;
+    top: 200px;
+    height: 120px;
+    rotate: -14deg;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/for-sale-stamp-sheet.png?fileID=1729883773912937322&guid=019c67496337345b5b1654dbcc071b00&type=3#for-sale-stamp-sheet_0");
+}
+
+.poster-hired--on {
+    display: flex;
+}
+
+.poster-hired__text {
+    font-size: 84px;
+    letter-spacing: 8px;
+    padding-bottom: 4px;
+    color: var(--color-box-bg);
+    -unity-font-definition: var(--font-body);
+    -unity-text-align: middle-center;
+}

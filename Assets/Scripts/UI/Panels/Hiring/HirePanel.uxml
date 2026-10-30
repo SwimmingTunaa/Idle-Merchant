@@ -29,5 +29,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <!-- Stamp hand overlay (Stamp.png frames on HireController.stampSlamAnim): panel-root level so it isn't clipped; aimed by BookStamp.AimAt -->
+        <ui:VisualElement name="Stampanim" picking-mode="Ignore" class="hire-slam" />
     </ui:VisualElement>
 </ui:UXML>

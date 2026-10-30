@@ -47,8 +47,21 @@
     position: absolute;
     width: 440px;
     height: 520px;
-    transition-property: translate, rotate, opacity;
-    transition-duration: 0.28s;
+    transition-property: translate, rotate, opacity, scale;
+    transition-duration: 0.28s, 0.28s, 0.28s, 0.08s;
+}
+
+/* the stamp lands: a quick squash (HireController adds it on the impact frame, drops it 90 ms later) */
+.poster-card--punch {
+    scale: 0.96;
+}
+
+/* stamp hand slam overlay: sized/positioned in code (poster width × SlamPerPosterWidth, BookStamp.AimAt) */
+.hire-slam {
+    position: absolute;
+    display: none;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/Stamp.png?fileID=5564853175316236378&guid=6fdb63f54eb1349438d92a27ec084b83&type=3#Stamp_5");
 }
 
 /* Next = slide the front poster off (HireController adds +12° inline, waits 0.28 s, then sends it to the back);

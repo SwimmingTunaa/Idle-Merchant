@@ -51,5 +51,8 @@
             <ui:Label name="rank-level" text="1" class="poster-gem-label" />
         </ui:VisualElement>
         <ui:Button name="tack" tooltip="Pull off to see the next" class="tack" />
+        <ui:VisualElement name="hired-badge" picking-mode="Ignore" class="poster-hired">
+            <ui:Label text="HIRED" picking-mode="Ignore" class="poster-hired__text" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

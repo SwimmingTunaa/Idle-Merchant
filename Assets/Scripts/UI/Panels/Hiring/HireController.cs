@@ -33,14 +33,21 @@ public class HireController : BasePanelController
     [Tooltip("Stopwatch appears when the next pool refresh is within this many seconds")]
     [SerializeField] private float stopwatchShowSeconds = 120f;
 
+    [Header("Hire Stamp")]
+    [Tooltip("Stamp hand slam (Book UI Stamp.png frames, same as the Crafting page); the HIRED badge shows on its impact frame.")]
+    [SerializeField] private FrameAnim stampSlamAnim = new() { frameMs = 40, fadeMs = 150, end = UIFrameAnimator.EndBehaviour.HideAndReset };
+
     // Board pile: poster i (0 = front) at left 60 + 4i, top 16 + 4i, persistent tilt in ±1.5°
     private const float PileLeft = 60f, PileTop = 16f, PileStep = 4f, PosterTiltMax = 1.5f;
     private const float SlideSeconds = 0.28f; // matches .poster-card in HirePanel.uss
     private const float TearSeconds = 0.35f; // matches .poster-card--torn in HirePanel.uss
+    private const float SlamPerPosterWidth = 2.2f; // stamp overlay size vs poster width (face ≈ poster wide)
+    private const float StampHoldSeconds = 0.4f;   // HIRED stays readable before the tear-off
 
     // UI Elements
     private VisualElement stackContainer;
     private VisualElement scrapLayer;
+    private VisualElement slamOverlay;
     private Label noticeLabel;
     private Label emptyTimerLabel;
     private int shownTimerSeconds = -1;
@@ -370,6 +377,7 @@ public class HireController : BasePanelController
             Debug.LogError("[HirePanel] 'hire-panel' not found in UIDocument. Ensure it is present in MainUI.uxml.");
             return;
         }
+        slamOverlay = panel.Q<VisualElement>("Stampanim");
 
         // Query elements
         stackContainer = panel.Q<VisualElement>("poster-stack");
@@ -858,10 +866,25 @@ public class HireController : BasePanelController
         return false;
     }
 
-    // Tear the poster off the board (USS transition), then leave a scrap under the pile
+    // Stamp HIRED across the poster (BookStamp slam, badge on impact), hold, tear it off the board (USS
+    // transition), then leave a scrap under the pile
     private IEnumerator AnimateHire(VisualElement card, HiringCandidate c)
     {
         isHireAnimating = true;
+
+        bool landed = false;
+        var poster = card.Q("poster") ?? card;
+        BookStamp.AimAt(slamOverlay, poster, poster.worldBound.width * SlamPerPosterWidth);
+        BookStamp.SlamIn(stampSlamAnim, slamOverlay, onImpact: () =>
+        {
+            landed = true;
+            card.Q("hired-badge")?.AddToClassList("poster-hired--on");
+            card.AddToClassList("poster-card--punch");
+            card.schedule.Execute(() => card.RemoveFromClassList("poster-card--punch")).ExecuteLater(90);
+        });
+        while (!landed) yield return null;
+        yield return new WaitForSecondsRealtime(StampHoldSeconds);
+
         card.AddToClassList("poster-card--torn");
         card.style.rotate = new Rotate(new Angle(rotationByCard[card] - 12f, AngleUnit.Degree));
 
