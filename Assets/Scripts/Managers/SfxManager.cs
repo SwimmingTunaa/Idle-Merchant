@@ -92,7 +92,6 @@ public class SfxManager : PersistentSingleton<SfxManager>
         }
 
         GameSignals.OnItemSold += OnItemSold;
-        GameSignals.OnUnitHired += OnUnitHired;   // HireUnit only — SpawnFromData (save load) never raises it
         GameSignals.OnMilestoneReached += OnMilestoneReached;
         GameSignals.OnStarEarned += OnStarEarned;
     }
@@ -101,13 +100,11 @@ public class SfxManager : PersistentSingleton<SfxManager>
     {
         if (Instance != this) return;
         GameSignals.OnItemSold -= OnItemSold;
-        GameSignals.OnUnitHired -= OnUnitHired;
         GameSignals.OnMilestoneReached -= OnMilestoneReached;
         GameSignals.OnStarEarned -= OnStarEarned;
     }
 
     private void OnItemSold(ResourceStack _) => Play(SfxId.Kaching);
-    private void OnUnitHired(EntityDef _, HireRole __) => Play(SfxId.Hire);
     private void OnMilestoneReached(StarMilestoneDef _) => Play(SfxId.MilestoneDing);
     private void OnStarEarned(int _) => Play(SfxId.StarFanfare);
 
