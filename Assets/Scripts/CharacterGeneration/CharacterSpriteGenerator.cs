@@ -149,7 +149,7 @@ public static class CharacterSpriteGenerator
         // One preview per prefab: a porter (plain animated prefab) must not be posed on the adventurer rig
         if (_previewInstance == null || _previewPrefab != def.prefab)
         {
-            if (_previewInstance != null) Object.Destroy(_previewInstance);
+            if (_previewInstance != null) { _previewInstance.SetActive(false); Object.Destroy(_previewInstance); } // Destroy is deferred; hide it now or it's in this frame's capture
             _previewPrefab = def.prefab;
             _previewInstance = Object.Instantiate(def.prefab, PREVIEW_POSITION, Quaternion.identity);
             _previewInstance.name = "CharacterPreview";
