@@ -692,7 +692,7 @@ public class HireController : BasePanelController
             card.AddToClassList("poster-card");
             rotationByCard[card] = UnityEngine.Random.Range(-PosterTiltMax, PosterTiltMax);
 
-            CandidateUIMapper.PopulateUI(card, CurrentRoster[i]);
+            CandidateUIMapper.PopulateUI(card, Priced(CurrentRoster[i]));
 
             card.Q<Button>("hire-button").clicked += () => TryHire(card);
             card.Q<Button>("tack").clicked += OnNextPoster;
@@ -827,6 +827,7 @@ public class HireController : BasePanelController
         if (!candidateToPool.TryGetValue(c, out var pool) || pool == null)
             return false;
 
+        c.hireCost = pool.Price(c); // managers charge candidate.hireCost
         if (pool.Role == HireRole.Adventurer)
         {
             foreach (var m in adventurerManagers)
@@ -903,10 +904,15 @@ public class HireController : BasePanelController
 
         int gold = Inventory.Instance != null ? Inventory.Instance.Gold : 0;
         for (int i = 0; i < CurrentCards.Count; i++)
-            CurrentCards[i].Q<Label>("cost").EnableInClassList("poster-cost--short", CurrentRoster[i].hireCost > gold);
+        {
+            int p = Price(CurrentRoster[i]);
+            var costLabel = CurrentCards[i].Q<Label>("cost");
+            costLabel.text = p.ToString("N0");
+            costLabel.EnableInClassList("poster-cost--short", p > gold);
+        }
 
         var card = CurrentCards[0];
-        var candidate = CurrentRoster[0];
+        var candidate = Priced(CurrentRoster[0]);
         var hireButton = card.Q<Button>("hire-button");
 
         // Resolve manager via the selected layer in the UI
@@ -937,6 +943,17 @@ public class HireController : BasePanelController
         var tag = card.Q<Label>("hire-tag");
         tag.style.display = canHire ? DisplayStyle.None : DisplayStyle.Flex;
         tag.text = full ? "DEPTH FULL" : $"NEED {candidate.hireCost - gold:N0} MORE";
+    }
+
+    // Current price (×1.25 per owned unit of the role) — candidate.hireCost holds only the trait-adjusted base
+    private int Price(in HiringCandidate c) =>
+        candidateToPool.TryGetValue(c, out var pool) && pool != null ? pool.Price(c) : c.hireCost;
+
+    // Copy with hireCost = today's price, for display paths that read candidate.hireCost
+    private HiringCandidate Priced(HiringCandidate c)
+    {
+        c.hireCost = Price(c);
+        return c;
     }
 
     private void UpdateCount()

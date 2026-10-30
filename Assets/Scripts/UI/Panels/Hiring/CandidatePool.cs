@@ -70,7 +70,7 @@ public class CandidatePool
     public int CandidateCount => candidates.Count;
 
     /// <summary>
-    /// Cheapest baked hire cost in the pool (int.MaxValue when empty). No allocation.
+    /// Cheapest current hire price in the pool (int.MaxValue when empty). No allocation.
     /// </summary>
     public int MinHireCost
     {
@@ -78,10 +78,17 @@ public class CandidatePool
         {
             int min = int.MaxValue;
             foreach (var c in candidates)
-                if (c.hireCost < min) min = c.hireCost;
+            {
+                int p = Price(c);
+                if (p < min) min = p;
+            }
             return min;
         }
     }
+
+    /// <summary>Hire price right now: the candidate's trait-adjusted base × 1.25 per unit of this role owned.</summary>
+    public int Price(in HiringCandidate c) =>
+        Mathf.RoundToInt(c.hireCost * Mathf.Pow(COST_SCALE_PER_OWNED, ownedCount != null ? ownedCount() : 0));
 
     /// <summary>
     /// Get all available candidates (copy).
@@ -158,14 +165,11 @@ public class CandidatePool
         candidates.AddRange(newCandidates);
     }
 
-    // Cost scales x1.25 per unit of this role already owned; baked at generation (pool keeps pre-hire prices until refresh).
+    // Candidate.hireCost = this base × trait multipliers; the ×1.25-per-owned scaling is applied at read time (Price),
+    // so prices stay right across a cold-boot restore and straight after a hire.
     // Class hires start from the catalog's premium price (Novice cost + skipped promotions) × 1.4.
-    private int BaseCost()
-    {
-        int owned = ownedCount != null ? ownedCount() : 0;
-        int baseCost = EntityDef is AdventurerDef ad && ClassCatalog.Instance != null
+    private int BaseCost() =>
+        EntityDef is AdventurerDef ad && ClassCatalog.Instance != null
             ? ClassCatalog.Instance.HireCost(ad)
             : EntityDef.hireCost;
-        return Mathf.RoundToInt(baseCost * Mathf.Pow(COST_SCALE_PER_OWNED, owned));
-    }
 }
