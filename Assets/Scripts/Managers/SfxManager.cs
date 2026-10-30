@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum SfxId { ClickHit, Kill, Coin, Kaching, Hire, MilestoneDing, StarFanfare, Vacuum, UiTick, PageFlip }
+public enum SfxId { ClickHit, Kill, Coin, Kaching, Hire, MilestoneDing, StarFanfare, Vacuum, UiTick, PageFlip, Stamp, PaperTear, PaperSlide, Pin } // serialized ints: append only
 
 /// <summary>
 /// One-shot 2D SFX. A small round-robin AudioSource pool so each play gets its own pitch jitter
@@ -40,6 +40,11 @@ public class SfxManager : PersistentSingleton<SfxManager>
         new SfxEntry(SfxId.Vacuum,        0.6f, 0.05f, 0.08f),
         new SfxEntry(SfxId.UiTick,        0.6f, 0.04f, 0.03f),
         new SfxEntry(SfxId.PageFlip,      0.7f, 0.06f, 0.05f),
+        // Hiring board (ElevenLabs-generated, Audio/SFX/sfx_stamp / paper_tear / paper_slide / pin)
+        new SfxEntry(SfxId.Stamp,         0.9f, 0.03f, 0.10f),
+        new SfxEntry(SfxId.PaperTear,     0.8f, 0.05f, 0.10f),
+        new SfxEntry(SfxId.PaperSlide,    0.6f, 0.06f, 0.05f),
+        new SfxEntry(SfxId.Pin,           0.6f, 0.05f, 0.05f),
     };
 
     // ponytail: plain float multipliers, no AudioMixer — upgrade to an AudioMixer (exposed params) when music/ducking lands

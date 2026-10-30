@@ -755,6 +755,7 @@ public class HireController : BasePanelController
     private IEnumerator PullFront(VisualElement card)
     {
         isSliding = true;
+        SfxManager.Instance?.Play(SfxId.PaperSlide);
         card.AddToClassList("poster--pulled");
         card.style.rotate = new Rotate(new Angle(rotationByCard[card] + 12f, AngleUnit.Degree));
         yield return new WaitForSecondsRealtime(SlideSeconds);
@@ -764,6 +765,7 @@ public class HireController : BasePanelController
         {
             card.AddToClassList("poster--snap"); // back into the pile without flying back
             RotateTopToBottom();
+            SfxManager.Instance?.Play(SfxId.Pin);
             for (int f = 0; f < 10 && card.resolvedStyle.opacity < 0.99f; f++) yield return null; // reset resolved
             card.RemoveFromClassList("poster--snap");
         }
@@ -790,6 +792,7 @@ public class HireController : BasePanelController
         card.BringToFront();
 
         card.AddToClassList("poster--arriving");
+        SfxManager.Instance?.Play(SfxId.PaperSlide);
         UpdateStackVisuals();
         float tilt = rotationByCard[card];
         card.style.rotate = new Rotate(new Angle(tilt + 12f, AngleUnit.Degree));
@@ -798,6 +801,7 @@ public class HireController : BasePanelController
         card.RemoveFromClassList("poster--arriving");
         card.style.rotate = new Rotate(new Angle(tilt, AngleUnit.Degree));
         yield return new WaitForSecondsRealtime(SlideSeconds);
+        SfxManager.Instance?.Play(SfxId.Pin); // settles on its tack
         isSliding = false;
     }
 
@@ -878,6 +882,7 @@ public class HireController : BasePanelController
         BookStamp.SlamIn(stampSlamAnim, slamOverlay, onImpact: () =>
         {
             landed = true;
+            SfxManager.Instance?.Play(SfxId.Stamp);
             card.Q("hired-badge")?.AddToClassList("poster-hired--on");
             card.AddToClassList("poster-card--punch");
             card.schedule.Execute(() => card.RemoveFromClassList("poster-card--punch")).ExecuteLater(90);
@@ -885,6 +890,7 @@ public class HireController : BasePanelController
         while (!landed) yield return null;
         yield return new WaitForSecondsRealtime(StampHoldSeconds);
 
+        SfxManager.Instance?.Play(SfxId.PaperTear);
         card.AddToClassList("poster-card--torn");
         card.style.rotate = new Rotate(new Angle(rotationByCard[card] - 12f, AngleUnit.Degree));
 
