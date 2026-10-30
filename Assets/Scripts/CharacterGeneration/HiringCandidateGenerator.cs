@@ -7,10 +7,6 @@ public static class HiringCandidateGenerator
 {
     private static NamePoolDef namePool; // Cached reference
     private const float CURSED_CANDIDATE_CHANCE = 0.02f;
-    private const float POSITIVE_MODIFIER_PRICE_DELTA = 0.30f;
-    private const float NEGATIVE_MODIFIER_PRICE_DELTA = -0.10f;
-    private const float MAX_POSITIVE_TRAIT_DELTA = 0.30f;
-    private const float MAX_NEGATIVE_TRAIT_DELTA = -0.10f;
     private static readonly bool ENABLE_GENERATION_LOGS = false;
 
     private static readonly string[] NewspaperNames =
@@ -214,63 +210,19 @@ public static class HiringCandidateGenerator
         };
     }
 
+    // Price = base × each trait's designer-set TraitDef.hireCostMultiplier (bad traits < 1) × cursed-combo multiplier.
     private static int CalculateHireCost(int baseCost, TraitInstance[] traits, CursedComboDef cursedCombo)
     {
-        if (traits == null || traits.Length == 0)
-            return baseCost;
-
-        float finalMultiplier = 1f;
-
-        foreach (var traitInstance in traits)
-        {
-            var traitDef = TraitDatabase.GetTrait(traitInstance.traitId);
-            if (traitDef == null)
-                continue;
-
-            float traitDelta = GetTraitPriceDelta(traitDef, traitInstance.tier);
-            float clampedTraitDelta = Mathf.Clamp(traitDelta, MAX_NEGATIVE_TRAIT_DELTA, MAX_POSITIVE_TRAIT_DELTA);
-            finalMultiplier *= 1f + clampedTraitDelta;
-        }
-
+        float m = 1f;
+        if (traits != null)
+            foreach (var t in traits)
+            {
+                var traitDef = TraitDatabase.GetTrait(t.traitId);
+                if (traitDef != null) m *= traitDef.hireCostMultiplier;
+            }
         if (cursedCombo != null)
-        {
-            finalMultiplier *= cursedCombo.costMultiplier;
-        }
-
-        int cost = Mathf.RoundToInt(baseCost * finalMultiplier);
-        return Mathf.Max(1, cost);
-    }
-
-    private static float GetTraitPriceDelta(TraitDef traitDef, int tier)
-    {
-        if (traitDef == null || traitDef.tiers == null || traitDef.tiers.Length == 0)
-            return 0f;
-
-        int tierIndex = Mathf.Clamp(tier - 1, 0, traitDef.tiers.Length - 1);
-        var tierData = traitDef.tiers[tierIndex];
-        if (tierData.modifiers == null || tierData.modifiers.Length == 0)
-            return 0f;
-
-        float totalDelta = 0f;
-        foreach (var modifier in tierData.modifiers)
-            totalDelta += GetModifierPriceDelta(modifier);
-
-        return totalDelta;
-    }
-
-    private static float GetModifierPriceDelta(TraitStatModifier modifier)
-    {
-        float value = modifier.operation == ModifierOp.Mult
-            ? modifier.value - 1f
-            : modifier.value;
-
-        if (value > 0f)
-            return POSITIVE_MODIFIER_PRICE_DELTA;
-
-        if (value < 0f)
-            return NEGATIVE_MODIFIER_PRICE_DELTA;
-
-        return 0f;
+            m *= cursedCombo.costMultiplier;
+        return Mathf.Max(1, Mathf.RoundToInt(baseCost * m));
     }
 
     private static int RandomSpriteLibraryIndex(SpriteLibraryAsset[] spriteLibrary)

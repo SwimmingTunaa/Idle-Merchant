@@ -25,30 +25,30 @@ MonoBehaviour:
   - Built for load, not for haste.
   - Has opinions about proper lifting form. Ignores them.
   - If it fits, it ships.
-  hireCostMultiplier: 1.08
+  hireCostMultiplier: 1
   role: 1
   maxTier: 3
   tiers:
   - modifiers:
     - stat: 6
       operation: 0
-      value: 1
+      value: 2
     - stat: 0
       operation: 1
       value: 0.8
   - modifiers:
     - stat: 6
       operation: 0
-      value: 1
+      value: 3
     - stat: 0
       operation: 1
-      value: 0.65
+      value: 0.7
   - modifiers:
     - stat: 6
       operation: 0
-      value: 3
+      value: 4
     - stat: 0
-      operation: 0
-      value: 0.5
+      operation: 1
+      value: 0.6
   conflictsWith:
   - {fileID: 11400000, guid: 0a2e5557d5ee641ef8701187d13d6865, type: 2}
