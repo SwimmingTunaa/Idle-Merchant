@@ -64,6 +64,9 @@ public class HireController : BasePanelController
     // Roster + cards
     private List<HiringCandidate> adventurerRoster = new();
     private List<HiringCandidate> porterRoster = new();
+    // The dealt posters persist until the stock changes (pool restock, favour, rush order, new depth);
+    // hiring only removes. Flushed in Update while open, or on the next Open.
+    private bool rosterDirty = true;
     private List<VisualElement> adventurerCards = new();
     private List<VisualElement> porterCards = new();
 
@@ -138,10 +141,13 @@ public class HireController : BasePanelController
             poolRefreshed |= pool.Update(Time.deltaTime);
 
         if (poolRefreshed)
+            OnPoolsChanged();
+
+        if (rosterDirty && State == PanelState.Open && !isHireAnimating && !isSliding)
         {
-            affordPending = true;
-            if (State != PanelState.Open)
-                SetHiringBadge(true);
+            rosterDirty = false;
+            RebuildRosters();
+            BuildStack();
         }
 
         if (affordPending)
@@ -175,7 +181,11 @@ public class HireController : BasePanelController
             return false;
 
         State = PanelState.Opening;
-        RebuildRosters();
+        if (rosterDirty)
+        {
+            rosterDirty = false;
+            RebuildRosters();
+        }
         BuildStack();
         UpdateLayerSelector();
 
@@ -553,6 +563,7 @@ public class HireController : BasePanelController
         CreatePools(HireRole.Porter);
         UpdateLayerSelector();
         affordPending = true;
+        rosterDirty = true;
 
         // A real unlock (not the load-time replay) boosts that tier's odds for a while
         var catalog = ClassCatalog.Instance;
@@ -634,17 +645,13 @@ public class HireController : BasePanelController
         OnPoolsChanged();
     }
 
+    // Stock changed: redeal the board (Update flushes it while open; Open does it otherwise)
     private void OnPoolsChanged()
     {
         affordPending = true;
+        rosterDirty = true;
         if (State != PanelState.Open)
-        {
             SetHiringBadge(true);
-            return;
-        }
-        if (isHireAnimating) return;
-        RebuildRosters();
-        BuildStack();
     }
 
     // ═════════════════════════════════════════════
@@ -976,7 +983,8 @@ public class HireController : BasePanelController
             UIManager.Instance.ClosePanel(this);
     }
 
-    // Restock note countdown (every frame while open, text only on a new second); an empty board rebuilds once a pool restocks
+    // Restock note countdown (every frame while open, text only on a new second). An empty board stays empty
+    // until a pool restocks (rosterDirty) — the deeper pool stock is not dealt early.
     private void UpdateEmptyTimer()
     {
         int t = Mathf.Max(0, Mathf.FloorToInt(HireRoster.GetNextRefreshTime(CurrentPools)));
@@ -984,19 +992,6 @@ public class HireController : BasePanelController
         {
             shownTimerSeconds = t;
             emptyTimerLabel.text = $"{t / 60}:{t % 60:00}";
-        }
-
-        if (CurrentRoster.Count > 0 || isHireAnimating)
-            return;
-
-        foreach (var pool in CurrentPools)
-        {
-            if (pool.CandidateCount > 0)
-            {
-                RebuildRosters();
-                BuildStack();
-                break;
-            }
         }
     }
 }
