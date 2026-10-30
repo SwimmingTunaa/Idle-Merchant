@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public enum SfxId { ClickHit, Kill, Coin, Kaching, Hire, MilestoneDing, StarFanfare, Vacuum, UiTick, PageFlip, Stamp, PaperTear, PaperSlide, Pin } // serialized ints: append only
 
@@ -6,7 +7,8 @@ public enum SfxId { ClickHit, Kill, Coin, Kaching, Hire, MilestoneDing, StarFanf
 /// One-shot 2D SFX. A small round-robin AudioSource pool so each play gets its own pitch jitter
 /// (oldest voice is stolen when all are busy). Per-id throttle keeps bursts (auto-click + AOE,
 /// 36-coin showers) from machine-gunning. Signal-driven sounds subscribe here; VFX/UI seams call Play.
-/// Volumes (master / sfx / music) persist in SaveData.settings.
+/// Volumes (master / sfx / music) persist in SaveData.settings and drive the Main mixer's exposed
+/// params (MasterVol / SfxVol / MusicVol, dB); the pool routes to the SFX group, which sidechain-ducks Music.
 /// </summary>
 public class SfxManager : PersistentSingleton<SfxManager>
 {
@@ -47,8 +49,8 @@ public class SfxManager : PersistentSingleton<SfxManager>
         new SfxEntry(SfxId.Pin,           0.6f, 0.05f, 0.05f),
     };
 
-    // ponytail: plain float multipliers, no AudioMixer — upgrade to an AudioMixer (exposed params) when music/ducking lands
     [Header("Mix")]
+    [SerializeField] private AudioMixer mixer;
     [SerializeField, Range(0f, 1f)] private float masterVolume = 0.8f;
     [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float musicVolume = 1f;
@@ -64,12 +66,10 @@ public class SfxManager : PersistentSingleton<SfxManager>
     private AudioSource[] pool;
     private int nextVoice;
 
-    public float MasterVolume { get => masterVolume; set => masterVolume = Mathf.Clamp01(value); }
-    public float SfxVolume { get => sfxVolume; set => sfxVolume = Mathf.Clamp01(value); }
-    /// <summary>Ready slot: no music yet. A future BGM source sets its volume from MusicGain.</summary>
-    public float MusicVolume { get => musicVolume; set => musicVolume = Mathf.Clamp01(value); }
-    public float SfxGain => masterVolume * sfxVolume;
-    public float MusicGain => masterVolume * musicVolume;
+    private bool mixDirty = true;   // flushed in Update: AudioMixer.SetFloat is a no-op in Awake, and save restore may land before Start
+    public float MasterVolume { get => masterVolume; set { masterVolume = Mathf.Clamp01(value); mixDirty = true; } }
+    public float SfxVolume { get => sfxVolume; set { sfxVolume = Mathf.Clamp01(value); mixDirty = true; } }
+    public float MusicVolume { get => musicVolume; set { musicVolume = Mathf.Clamp01(value); mixDirty = true; } }
     /// <summary>Last id that actually played (after throttle) — for the debugger / play-mode checks.</summary>
     public SfxId? LastPlayed { get; private set; }
     public int PlayCount(SfxId id) => playCounts[(int)id];
@@ -82,12 +82,14 @@ public class SfxManager : PersistentSingleton<SfxManager>
         foreach (var e in sounds) byId[(int)e.id] = e;
         for (int i = 0; i < IdCount; i++) lastPlayTime[i] = float.NegativeInfinity;
 
+        var sfxGroup = mixer != null ? mixer.FindMatchingGroups("SFX") : null;
         pool = new AudioSource[Mathf.Max(1, voices)];
         for (int i = 0; i < pool.Length; i++)
         {
             var src = gameObject.AddComponent<AudioSource>();
             src.playOnAwake = false;
             src.spatialBlend = 0f;
+            if (sfxGroup != null && sfxGroup.Length > 0) src.outputAudioMixerGroup = sfxGroup[0];
             pool[i] = src;
         }
 
@@ -103,6 +105,17 @@ public class SfxManager : PersistentSingleton<SfxManager>
         GameSignals.OnMilestoneReached -= OnMilestoneReached;
         GameSignals.OnStarEarned -= OnStarEarned;
     }
+
+    void Update()
+    {
+        if (!mixDirty || mixer == null) return;
+        mixDirty = false;
+        mixer.SetFloat("MasterVol", ToDb(masterVolume));
+        mixer.SetFloat("SfxVol", ToDb(sfxVolume));
+        mixer.SetFloat("MusicVol", ToDb(musicVolume));
+    }
+
+    private static float ToDb(float v) => v <= 0.0001f ? -80f : 20f * Mathf.Log10(v);
 
     private void OnItemSold(ResourceStack _) => Play(SfxId.Kaching);
     private void OnMilestoneReached(StarMilestoneDef _) => Play(SfxId.MilestoneDing);
@@ -121,7 +134,7 @@ public class SfxManager : PersistentSingleton<SfxManager>
         var src = pool[nextVoice];
         nextVoice = (nextVoice + 1) % pool.Length;
         src.clip = e.clip;
-        src.volume = e.volume * SfxGain;
+        src.volume = e.volume;
         src.pitch = 1f + Random.Range(-e.pitchJitter, e.pitchJitter);
         src.Play();   // restarts the voice: round-robin steals the oldest when all are busy
 

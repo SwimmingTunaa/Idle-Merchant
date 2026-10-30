@@ -82,7 +82,9 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 `Shop/CaravanManager.cs` → the Caravan, a stock valve: every 8 min game time a wagon (scene singleton on `Guild/Shop/Caravan`, parked x 46.5 outside the right-end annex) offers 5 Guild Seals for 70% of the surplus above floor of the raw item with the highest (stock − floor) × sellPrice; no visit if that qty < 20; offer open 2 min, Accept = `TryRemove` + `GrantSeals` (no gold, no `OnItemSold` → not passive income). Click opens `UI/Panels/Caravan/CaravanPanelController` (reuses the Workshop `wp-*` shell). Signal `OnCaravanChanged`; saved as `SaveData.caravan`
 
 ### Audio
-`Managers/SfxManager.cs` → `PersistentSingleton`, 8-voice round-robin pool, per-`SfxId` volume / pitch jitter / unscaled throttle; `Play(SfxId)` from VFX/UI seams, signal-driven for sale/hire/milestone/star. Volumes Master/SFX/Music (`SfxGain = master × sfx`; music is an empty slot) saved in `SaveData.settings`. Clips are synthesized by `Tools/gen_sfx.py` (project root, deterministic) into `Assets/Audio/SFX`
+`Audio/Main.mixer` → Master → Music / SFX / Ambience; exposed `MasterVol` / `MusicVol` / `SfxVol` / `AmbienceVol` (dB); Duck Volume on Music fed by a Send on SFX (sidechain ducking under hits). Built via the editor's internal `AudioMixerController` reflection; edit in the Audio Mixer window from here on
+`Managers/SfxManager.cs` → `PersistentSingleton`, 8-voice round-robin pool on the SFX group, per-`SfxId` volume / pitch jitter / unscaled throttle; `Play(SfxId)` from VFX/UI seams, signal-driven for sale/milestone/star. Volumes Master/SFX/Music saved in `SaveData.settings`, written to the mixer as dB from a dirty flag in `Update` (`SetFloat` is a no-op in Awake). Clips are ElevenLabs sound-generation output in `Assets/Audio/SFX` (`Tools/gen_sfx.py` is the retired synth set)
+`Managers/MusicManager.cs` → scene object `System/MusicManager`: three phase-locked stems in `Audio/Music` (`bgm_bed` always on, `bgm_shop` vs `bgm_depths` smoothstepped by camera Y between `shopY` 1 and `depthsY` −10; the ortho camera is 17 half-height, so that's the first depth of scroll) + `amb_crowd` on Ambience, level = customers in shop ÷ `fullCrowd` 8, silent underground. Stems are ElevenLabs Music (`/v1/music`) 16 bars @ 90 BPM D minor, loop seam crossfaded with ffmpeg `acrossfade`
 
 ### Loot Pipeline
 `Loot/LootManager.cs` → spawns loot drops
@@ -157,7 +159,8 @@ Entities implement `IPoolable` (`OnSpawned`, `OnDespawned`)
 | `Scripts/UI/Panels/Cursor/CursorUpgradePage.cs` | Book Cursor page — clones `CursorUpgradeCard.uxml` per upgrade, binds via closures |
 | `Scripts/Managers/SaveManager.cs` | Single-slot save (`SaveData` DTO, Newtonsoft JSON, atomic .tmp/.bak writes, 30 s autosave), cold-boot restore, offline rates + award; design in `SAVE_DESIGN.md` |
 | `Scripts/UI/Panels/Welcome Back/WelcomeBackPanel.cs` | "While you were away" panel — display only, `SaveManager` banks on Collect |
-| `Scripts/Managers/SfxManager.cs` | One-shot SFX pool + Master/SFX/Music volumes |
+| `Scripts/Managers/SfxManager.cs` | One-shot SFX pool + Master/SFX/Music volumes → mixer |
+| `Scripts/Managers/MusicManager.cs` | Stem blend by camera Y + crowd loop by headcount |
 | `Scripts/Managers/ContractManager.cs` | Contract offers/active/claim, Guild Seals, seal shop |
 | `Scripts/Crafting/CraftingManager.cs` | Auto-crafting: station slots (pinning = running), caps, block reasons |
 | `Scripts/Crafting/WorkshopProp.cs` | Guild-interior station prop: cold/lit frames, hover outline, opens the Workshop panel |

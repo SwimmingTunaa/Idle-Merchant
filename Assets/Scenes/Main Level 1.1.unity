@@ -6994,6 +6994,7 @@ MonoBehaviour:
     volume: 0.6
     pitchJitter: 0.05
     minInterval: 0.05
+  mixer: {fileID: 24100000, guid: 9923af474376a4468bb9dd99e42d7ed9, type: 2}
   masterVolume: 0.8
   sfxVolume: 1
   musicVolume: 1
@@ -7198,6 +7199,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &291574148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 291574149}
+  - component: {fileID: 291574150}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &291574149
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291574148}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945178581}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &291574150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291574148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a58a38634c40e408c936601277a013da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MusicManager
+  bed: {fileID: 8300000, guid: 42edac22591334e50b1fe29867a096cd, type: 3}
+  shop: {fileID: 8300000, guid: c2f78de0b41fb4dce86604f269a95e35, type: 3}
+  depths: {fileID: 8300000, guid: 539792ecf08f843f1ae03aad2c3f7a80, type: 3}
+  crowd: {fileID: 8300000, guid: 6e5a089419ae446c7b387514e17b3d1c, type: 3}
+  mixer: {fileID: 24100000, guid: 9923af474376a4468bb9dd99e42d7ed9, type: 2}
+  shopY: 1
+  depthsY: -10
+  smoothing: 4
+  bedLevel: 0.8
+  shopLevel: 0.9
+  depthsLevel: 0.9
+  crowdLevel: 0.7
+  fullCrowd: 8
 --- !u!1 &294109008
 GameObject:
   m_ObjectHideFlags: 0
@@ -33373,6 +33431,7 @@ Transform:
   - {fileID: 1780078281}
   - {fileID: 2044110758}
   - {fileID: 788272035}
+  - {fileID: 291574149}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &945178582

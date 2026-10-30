@@ -751,7 +751,7 @@ public class GameDebugger : EditorWindow
         }
         sfx.MasterVolume = EditorGUILayout.Slider("Master Volume", sfx.MasterVolume, 0f, 1f);
         sfx.SfxVolume = EditorGUILayout.Slider("SFX Volume", sfx.SfxVolume, 0f, 1f);
-        sfx.MusicVolume = EditorGUILayout.Slider("Music Volume (no music yet)", sfx.MusicVolume, 0f, 1f);
+        sfx.MusicVolume = EditorGUILayout.Slider("Music Volume", sfx.MusicVolume, 0f, 1f);
         var ids = (SfxId[])System.Enum.GetValues(typeof(SfxId));
         for (int i = 0; i < ids.Length; i += 5)
         {
