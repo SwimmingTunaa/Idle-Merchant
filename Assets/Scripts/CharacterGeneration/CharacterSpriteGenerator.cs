@@ -10,6 +10,7 @@ public static class CharacterSpriteGenerator
 {
     private static Camera _renderCamera;
     private static GameObject _previewInstance;
+    private static GameObject _previewPrefab; // the prefab _previewInstance was made from — swapped when a def uses another
     private static RenderTexture _renderTexture;
     private static Dictionary<int, Sprite> _spriteCache = new Dictionary<int, Sprite>();
     
@@ -67,7 +68,7 @@ public static class CharacterSpriteGenerator
 
         EnsureRenderSetup();
         ConfigurePreviewCharacter(def, indices);
-        _previewInstance.GetComponentInChildren<CharacterAppearanceManager>().SetAttireColours(shirt, pants);
+        _previewInstance.GetComponentInChildren<CharacterAppearanceManager>()?.SetAttireColours(shirt, pants);
         Sprite sprite = CaptureSprite();
         _spriteCache[configHash] = sprite;
         return sprite;
@@ -106,6 +107,7 @@ public static class CharacterSpriteGenerator
         
         _renderCamera = null;
         _previewInstance = null;
+        _previewPrefab = null;
         _renderTexture = null;
     }
     
@@ -144,8 +146,11 @@ public static class CharacterSpriteGenerator
     
     private static void ConfigurePreviewCharacter(EntityDef def, CharacterAppearanceIndices indices, bool withClothes = true)
     {
-        if (_previewInstance == null)
+        // One preview per prefab: a porter (plain animated prefab) must not be posed on the adventurer rig
+        if (_previewInstance == null || _previewPrefab != def.prefab)
         {
+            if (_previewInstance != null) Object.Destroy(_previewInstance);
+            _previewPrefab = def.prefab;
             _previewInstance = Object.Instantiate(def.prefab, PREVIEW_POSITION, Quaternion.identity);
             _previewInstance.name = "CharacterPreview";
             Object.DontDestroyOnLoad(_previewInstance);
@@ -189,10 +194,13 @@ public static class CharacterSpriteGenerator
         var spriteLibraries = instance.GetComponentsInChildren<SpriteLibrary>(true);
         var spriteResolvers = instance.GetComponentsInChildren<SpriteResolver>(true);
         CharacterAppearanceManager appearanceManager = instance.GetComponentInChildren<CharacterAppearanceManager>();
-        appearanceManager.SetEntityDef(def);
-        appearanceManager.SetAppearanceIndices(indices);
-        appearanceManager.ApplyAppearance();
-        appearanceManager.SetClothingVisible(withClothes);   // false = base body only
+        if (appearanceManager != null) // non-modular prefabs (porters) have no rig: just pose their own sprite
+        {
+            appearanceManager.SetEntityDef(def);
+            appearanceManager.SetAppearanceIndices(indices);
+            appearanceManager.ApplyAppearance();
+            appearanceManager.SetClothingVisible(withClothes);   // false = base body only
+        }
 
         // Refresh sprite resolvers
         foreach (var resolver in spriteResolvers)
@@ -201,7 +209,7 @@ public static class CharacterSpriteGenerator
         }
                 
         // Force idle animation frame
-        var animator = instance.GetComponent<Animator>();
+        var animator = instance.GetComponentInChildren<Animator>();
         if (animator != null)
         {
             animator.Play("Idle", 0, 0f);
