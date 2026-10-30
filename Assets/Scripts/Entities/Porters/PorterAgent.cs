@@ -601,7 +601,6 @@ public class PorterAgent : EntityStateMachine<PorterState>
         Vector3 v = cam.WorldToViewportPoint(transform.position);
         if (v.x < 0f || v.x > 1f || v.y < 0f || v.y > 1f) return;
         ClickHitVFX.Instance?.PlayShockRing(transform.position + Vector3.up, 1.2f, 0.25f);
-        SfxManager.Instance?.Play(SfxId.Vacuum);
     }
 
     // ===== LOOT ACQUISITION =====

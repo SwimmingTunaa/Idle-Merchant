@@ -150,7 +150,6 @@ public class ClickHitVFX : MonoBehaviour
     {
         center.z = 0f;   // cursor world pos arrives at raw camera z — pin to the gameplay plane
         ring.Clear();
-        SfxManager.Instance?.Play(SfxId.Vacuum);
 
         const float duration = 0.18f;
         int count = Mathf.Clamp(Mathf.RoundToInt(radius * 40f), 20, 64);
