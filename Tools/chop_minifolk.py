@@ -29,6 +29,10 @@ USE_LAYERS = ("main", "hands")
 SKIN = {(248, 192, 144): (255, 255, 255), (200, 136, 80): (199, 199, 199)}
 INK = (43, 41, 40); OUR_INK = (16, 20, 31)
 STEEL = {(181, 214, 222), (140, 173, 198), (90, 123, 148), (255, 255, 255), (229, 233, 222), (174, 182, 161), (62, 59, 57), (78, 75, 73), (152, 216, 248)}   # steel, beard greys, staff crystal: fixed colour
+# Recoloured layers (shirt, hat) go through the Outfit shader: desaturate, then blend the palette colour in, so dark
+# source cloth comes out near-black whatever the roll. Packs with dark cloth lift those tones to light greys there
+# (pants / cloak / weapon keep the source colours).
+CLOTH_TONES = {"MiniThief": {(176, 112, 64): (235, 235, 235), (112, 80, 48): (165, 165, 165), (111, 47, 39): (200, 200, 200)}}
 DROP = {(144, 16, 0)}                                                           # the hurt-face red eye
 
 
@@ -72,8 +76,9 @@ def pad(sheet, meta):
 def load_ase(name):
     """Export the .aseprite per layer (cached) and return (frames: {(layer, index): 32x32 RGBA array}, tags: {name: (from, to)})."""
     os.makedirs(ASE_EXPORT, exist_ok=True)
+    src = name if name.endswith(".aseprite") else ASE_DIR + name + ".aseprite"   # a pack name, or any .aseprite path (Rogue = MiniThief from the Villagers pack)
+    name = os.path.basename(src)[:-len(".aseprite")]
     png, js = ASE_EXPORT + name + ".png", ASE_EXPORT + name + ".json"
-    src = ASE_DIR + name + ".aseprite"
     if not os.path.exists(js) or os.path.getmtime(js) < os.path.getmtime(src):
         subprocess.run([ASEPRITE, "-b", "--split-layers", "--all-layers", src, "--sheet", png, "--sheet-type", "packed", "--sheet-pack",
                         "--data", js, "--format", "json-array", "--list-tags", "--list-layers"], check=True, capture_output=True)
@@ -107,6 +112,7 @@ def composite(frames, idx):
 
 def chop(name, out):
     frames, tags = load_ase(name); fmap = frame_map(tags)
+    tones = CLOTH_TONES.get(os.path.basename(name).removesuffix(".aseprite"), {})
     L = lambda p: Image.open(ADV + p).convert("RGBA")
     ours = dict(af=L("Base/Arm Front/base arm front.png"), ab=L("Base/Arm Back/base arm back.png"), pants=L("Equipment/Pants/pants 1.png"))
     S = {k: Image.new("RGBA", (7 * C, 5 * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon")}
@@ -166,8 +172,10 @@ def chop(name, out):
             routed = skin_all | weapon | c_f | c_b | hat | legs | c_body | m_f | m_b | helmet | m_body
             lost = keep & ~routed
             if lost.any(): print(f"  {name} frame {oc}: {int(lost.sum())} kept pixels routed nowhere")
-            put(S["hat"], hat, f, row); put(S["helmet"], helmet, f, row); put(S["pants"], legs, f, row); put(S["weapon"], weapon, f, row)
-            put(S["shirt"], c_b, f, row * 3); put(S["shirt"], c_body, f, row * 3 + 1); put(S["shirt"], c_f, f, row * 3 + 2)
+            Tc = T.copy()
+            for (r, g, b), nc in tones.items(): Tc[(T[..., 0] == r) & (T[..., 1] == g) & (T[..., 2] == b), :3] = nc
+            put(S["hat"], hat, f, row, Tc); put(S["helmet"], helmet, f, row); put(S["pants"], legs, f, row); put(S["weapon"], weapon, f, row)
+            put(S["shirt"], c_b, f, row * 3, Tc); put(S["shirt"], c_body, f, row * 3 + 1, Tc); put(S["shirt"], c_f, f, row * 3 + 2, Tc)
             put(S["armour"], m_b, f, row * 3); put(S["armour"], m_body, f, row * 3 + 1); put(S["armour"], m_f, f, row * 3 + 2)
             # preview in the rig's draw order: back arm, back sleeve, body, pants, shirt, hat, weapon, front arm, front sleeve
             comp = Image.new("RGBA", (C, C))
