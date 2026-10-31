@@ -60,6 +60,9 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
     // Lock-on follow (Roster selection). While set, the camera tracks this transform each
     // frame; any manual scroll clears it so the player always regains control.
     private Transform followTarget;
+
+    // Scene minY at depth 1; unlocks set minY from it instead of accumulating
+    private float baseMinY;
     
     // Camera frustum dimensions (updated when orthographic size changes)
     private float cameraHalfHeight;
@@ -88,6 +91,7 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         }
         
         targetPosition = transform.position;
+        baseMinY = minY;
         UpdateCameraFrustum();
         
         // // Start camera at top of bounds
@@ -241,8 +245,8 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
 
     public void HandleExpandVeritcalBounds(int layer)
     {
-        float newY = layerAdd * (layer - 1);
-        minY += newY;
+        // Set, don't add: the save replays every unlock on load, so accumulating compounded the bound
+        minY = Mathf.Min(minY, baseMinY + layerAdd * (layer - 1));
     }
 
     /// Expand vertical bounds downward when unlocking new layers.
@@ -292,7 +296,11 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
     {
         if (Mouse.current == null) return false;
         
+        // Editor: with the pointer over another window the mouse reads exactly (0,0), which sits in
+        // the bottom AND left edge zones and scrolls the camera down-left on its own
+        if (!Application.isFocused) return false;
         Vector2 mousePos = Mouse.current.position.ReadValue();
+        if (mousePos == Vector2.zero) return false;
         return mousePos.x >= 0 && mousePos.x <= Screen.width &&
                mousePos.y >= 0 && mousePos.y <= Screen.height;
     }
