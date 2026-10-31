@@ -1,7 +1,8 @@
 """Chop a Minifolks Humans character into a full per-class rig: every layer of a class comes from the same pack
 frame, so the layers align by construction. Source = the pack's Aseprite files (`/Sprites/minifolks human`),
-exported per layer by the Aseprite CLI on first run: only `main` + `hands` are used (no outline — the game's
-render feature draws one — and no `slash` / `Layer 1` effect layers), frames picked by the file's tags.
+exported per layer by the Aseprite CLI on first run: `main` + `hands` are routed (no outline — the game's
+render feature draws one); every other layer (`slash` trails, the mage's `Layer 1` staff orb) is an effect, laid
+over the weapon sheet as-is (fixed colour, swings with the weapon). Frames picked by the file's tags.
 Routing is by the pack's shared palette:
   skin (2 tones) → base body / front arm / back arm (normalised to our base's white + grey, eyes to our ink)
   cloth (blues, browns, dark) → shirt body / sleeves (recoloured in-game), hat above the face, pants below the hips
@@ -26,6 +27,7 @@ C = 32
 ANIMS = [("Idle", 4), ("Walk", 6), ("Slash", 7), ("Hit", 3), ("Death", 5)]
 TAG_FOR = {"Idle": ("idle",), "Walk": ("walk",), "Slash": ("attack",), "Hit": ("damage", "hit"), "Death": ("death",)}
 USE_LAYERS = ("main", "hands")
+NOT_FX = USE_LAYERS + ("outline",)
 SKIN = {(248, 192, 144): (255, 255, 255), (200, 136, 80): (199, 199, 199)}
 INK = (43, 41, 40); OUR_INK = (16, 20, 31)
 STEEL = {(181, 214, 222), (140, 173, 198), (90, 123, 148), (255, 255, 255), (229, 233, 222), (174, 182, 161), (62, 59, 57), (78, 75, 73), (152, 216, 248)}   # steel, beard greys, staff crystal: fixed colour
@@ -175,6 +177,9 @@ def chop(name, out):
             Tc = T.copy()
             for (r, g, b), nc in tones.items(): Tc[(T[..., 0] == r) & (T[..., 1] == g) & (T[..., 2] == b), :3] = nc
             put(S["hat"], hat, f, row, Tc); put(S["helmet"], helmet, f, row); put(S["pants"], legs, f, row); put(S["weapon"], weapon, f, row)
+            for (layer, i), px in frames.items():   # effects ride on top of the weapon
+                if i == fmap[oc] and layer not in NOT_FX and px[..., 3].any():
+                    S["weapon"].alpha_composite(Image.fromarray(px), (f * C, row * C))
             put(S["shirt"], c_b, f, row * 3, Tc); put(S["shirt"], c_body, f, row * 3 + 1, Tc); put(S["shirt"], c_f, f, row * 3 + 2, Tc)
             put(S["armour"], m_b, f, row * 3); put(S["armour"], m_body, f, row * 3 + 1); put(S["armour"], m_f, f, row * 3 + 2)
             # preview in the rig's draw order: back arm, back sleeve, body, pants, shirt, hat, weapon, front arm, front sleeve
