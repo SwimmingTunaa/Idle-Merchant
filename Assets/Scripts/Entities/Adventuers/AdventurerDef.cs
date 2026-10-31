@@ -101,6 +101,8 @@ public class AdventurerDef : EntityDef
     [Tooltip("After a kill, dash to the nearest live mob within this range; the next hit is a guaranteed crit. 0 = off.")]
     public float pursuitRange;
     public float pursuitDashTime = 0.12f;
+    [Tooltip("Peak height of the pursuit dash's hop arc (plays the rig's Jump state when it has one). 0 = flat slide.")]
+    public float pursuitHopHeight;
 
     [Header("Signature: Mage arcane weight")]
     [Tooltip("Bonus damage per hit as a fraction of the target's max HP (0.02 = 2%). 0 = off.")]

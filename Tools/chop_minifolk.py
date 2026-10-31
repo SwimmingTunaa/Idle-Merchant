@@ -25,7 +25,8 @@ ASE_EXPORT = ASE_DIR + "export/"
 ASEPRITE = "/Applications/Aseprite.app/Contents/MacOS/aseprite"
 C = 32
 ANIMS = [("Idle", 4), ("Walk", 6), ("Slash", 7), ("Hit", 3), ("Death", 5)]
-TAG_FOR = {"Idle": ("idle",), "Walk": ("walk",), "Slash": ("attack",), "Hit": ("damage", "hit"), "Death": ("death",)}
+TAG_FOR = {"Idle": ("idle",), "Walk": ("walk",), "Slash": ("attack",), "Hit": ("damage", "hit"), "Death": ("death",), "Jump": ("jump",)}
+JUMP = ("Jump", 4)   # --jump: an extra row on TOP of every sheet (keeps the existing slices' bottom-up rects), used by the Rogue pursuit dash
 USE_LAYERS = ("main", "hands")
 NOT_FX = USE_LAYERS + ("outline",)
 SKIN = {(248, 192, 144): (255, 255, 255), (200, 136, 80): (199, 199, 199)}
@@ -95,10 +96,10 @@ def load_ase(name):
     return frames, tags
 
 
-def frame_map(tags):
+def frame_map(tags, anims=ANIMS):
     """our (col,row) → pack frame index, picking each tag's frames evenly when it has more than we need."""
     m = {}
-    for row, (anim, n) in enumerate(ANIMS):
+    for row, (anim, n) in enumerate(anims):
         tag = next(t for t in TAG_FOR[anim] if t in tags); a, b = tags[tag]; count = b - a + 1
         picks = [a + int(round(i * (count - 1) / max(n - 1, 1))) for i in range(n)] if count >= n else [a + min(i, count - 1) for i in range(n)]
         for f, idx in enumerate(picks): m[(f, row)] = idx
@@ -112,17 +113,19 @@ def composite(frames, idx):
     return T, hm
 
 
-def chop(name, out):
-    frames, tags = load_ase(name); fmap = frame_map(tags)
+def chop(name, out, jump=False):
+    anims = ANIMS + [JUMP] if jump else ANIMS; R = len(anims)
+    frames, tags = load_ase(name); fmap = frame_map(tags, anims)
     tones = CLOTH_TONES.get(os.path.basename(name).removesuffix(".aseprite"), {})
     L = lambda p: Image.open(ADV + p).convert("RGBA")
     ours = dict(af=L("Base/Arm Front/base arm front.png"), ab=L("Base/Arm Back/base arm back.png"), pants=L("Equipment/Pants/pants 1.png"))
-    S = {k: Image.new("RGBA", (7 * C, 5 * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon")}
-    S["shirt"] = Image.new("RGBA", (7 * C, 15 * C)); S["armour"] = Image.new("RGBA", (7 * C, 15 * C))
-    preview = Image.new("RGBA", (7 * C * 4, 5 * C * 4), (40, 40, 48, 255))
+    S = {k: Image.new("RGBA", (7 * C, R * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon")}
+    S["shirt"] = Image.new("RGBA", (7 * C, 3 * R * C)); S["armour"] = Image.new("RGBA", (7 * C, 3 * R * C))
+    preview = Image.new("RGBA", (7 * C * 4, R * C * 4), (40, 40, 48, 255))
     ys, xs = np.mgrid[0:C, 0:C]
-    for row, (anim, n) in enumerate(ANIMS):
+    for row, (anim, n) in enumerate(anims):
         for f in range(n):
+            ref = (f, 1) if anim == "Jump" else (f, row)   # our arm / pants masks have no jump row: borrow the walk pose
             oc = (f, row); T, hands = composite(frames, fmap[oc]); alpha = T[..., 3] > 0
             key = [[tuple(T[y, x, :3]) for x in range(C)] for y in range(C)]
             skin = np.array([[alpha[y, x] and key[y][x] in SKIN for x in range(C)] for y in range(C)])
@@ -140,8 +143,8 @@ def chop(name, out):
                 face = np.zeros((C, C), bool); ky, kx = np.nonzero(keep)
                 face_bot = -1; face_top = ky.min(); face_l, face_r = (kx.min() + kx.max()) // 2 - 6, (kx.min() + kx.max()) // 2 + 6
             shaft = alpha & (T[..., 0] == 98) & (T[..., 1] == 63) & (T[..., 2] == 42)   # pole / staff wood: only the halberd and the mage use it
-            pan = cell(ours["pants"], *oc)[..., 3] > 0; pan_top = ys[pan].min() if pan.any() else face_bot + 8
-            af = dilate(cell(ours["af"], *oc)[..., 3] > 0, 2); ab = dilate(cell(ours["ab"], *oc)[..., 3] > 0, 2)
+            pan = cell(ours["pants"], *ref)[..., 3] > 0; pan_top = ys[pan].min() if pan.any() else face_bot + 8
+            af = dilate(cell(ours["af"], *ref)[..., 3] > 0, 2); ab = dilate(cell(ours["ab"], *ref)[..., 3] > 0, 2)
             head = keep & (ys <= face_bot) & ~skin
             eyes = ink & dilate(face, 1) & (ys <= face_bot)
             # weapon = what sticks out past the body and the arms (shield, bow, staff, blade), plus pole wood anywhere
@@ -192,10 +195,17 @@ def chop(name, out):
                  pants="Equipment/Pants/pants 1.png.meta", hat="Hair/Hair Buzz.png.meta", helmet="Hair/Hair Buzz.png.meta",
                  weapon="Weapon/Basic Sword.png.meta", shirt="Equipment/Shirt/Tunic.png.meta", armour="Equipment/Shirt/Tunic.png.meta")
     for k, im in S.items():
+        if jump:   # move the jump row(s) from the bottom to the top; the 5 original rows keep their bottom-up rects
+            per = 3 if k in ("shirt", "armour") else 1; W = im.width; base = (R - 1) * per * C
+            moved = Image.new("RGBA", im.size); moved.paste(im.crop((0, base, W, im.height)), (0, 0)); moved.paste(im.crop((0, 0, W, base)), (0, per * C))
+            im = moved; px = im.load()
+            for r in range(per):
+                for f in range(JUMP[1]):
+                    if not np.array(im.crop((f * C, r * C, f * C + C, r * C + C)))[..., 3].any(): px[f * C, r * C + C - 1] = (0, 0, 0, 1)
         pad(im, ADV + metas[k]); im.save(os.path.join(out, k + ".png"))
     preview.save(os.path.join(out, "preview.png"))
     print(f"{name}: tags {dict((a, tags[a]) for a in tags)} → frames {sorted(set(fmap.values()))}")
 
 
 if __name__ == "__main__":
-    chop(sys.argv[1], sys.argv[2])
+    chop(sys.argv[1], sys.argv[2], "--jump" in sys.argv[3:])

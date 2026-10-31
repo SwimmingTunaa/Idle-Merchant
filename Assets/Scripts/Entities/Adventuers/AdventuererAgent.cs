@@ -45,6 +45,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     // Class signature state (see the Signature fields on AdventurerDef)
     private bool pursuitCrit;        // Rogue: next hit after a pursuit dash is a guaranteed crit
     private Coroutine dashCoroutine; // Rogue pursuit lerp; AI tick + walking pause while it runs
+    private float dashGroundY;       // the hop's floor height, so a cancelled (died mid-air) hop doesn't leave the body floating
     private float tauntTimer;        // Guardian: seconds until the next hold-the-line check
 
     // XP, rank & level
@@ -847,6 +848,9 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         if (State != AdventurerState.Attack && State != AdventurerState.Hit) ChangeState(AdventurerState.Attack);
     }
 
+    private static readonly int JumpState = Animator.StringToHash("Jump");
+    private static readonly int IdleState = Animator.StringToHash("Idle");
+
     // Short lerp to just inside attack range of the mob, clamped to this unit's wander area (its layer floor).
     private IEnumerator PursuitDash(Vector3 mobPos)
     {
@@ -868,14 +872,22 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         FaceDirection(dir.x);
         ClickHitVFX.Instance?.PlayDust(from);
 
+        dashGroundY = end.y;
+        float hop = adventurerDef.pursuitHopHeight;
+        bool jumpAnim = hop > 0f && animator != null && animator.HasState(0, JumpState);
+        if (jumpAnim) animator.Play(JumpState, 0, 0f);
+
         float dur = Mathf.Max(0.01f, adventurerDef.pursuitDashTime);
         for (float t = 0f; t < dur; t += Time.deltaTime)
         {
-            transform.position = Vector3.Lerp(from, end, t / dur);
+            float k = t / dur;
+            transform.position = Vector3.Lerp(from, end, k) + Vector3.up * (hop * 4f * k * (1f - k));   // parabola peaking at hop
             ClickHitVFX.Instance?.PlayDust(transform.position, 1);   // faint after-image trail
             yield return null;
         }
         transform.position = end;
+        if (jumpAnim) animator.Play(IdleState, 0, 0f);
+        ClickHitVFX.Instance?.PlayDust(end);   // landing puff
         dashCoroutine = null;
     }
 
@@ -884,6 +896,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         if (dashCoroutine == null) return;
         StopCoroutine(dashCoroutine);
         dashCoroutine = null;
+        var p = transform.position; p.y = dashGroundY; transform.position = p;
     }
 
     private static Vector3 CenterOf(Transform t) =>
