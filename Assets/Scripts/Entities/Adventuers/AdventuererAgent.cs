@@ -205,6 +205,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
             combat.OnTargetLost += OnCombatTargetLost;
             combat.OnDamageDealt += OnCombatDamageDealt;
             combat.HitOverride = ResolveHit;
+            combat.Launch = FireProjectile;
         }
         pursuitCrit = false;
         tauntTimer = 0f;
@@ -568,7 +569,8 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         Vector3 directionToTarget = combat.CurrentTarget.transform.position - transform.position;
         FaceDirection(directionToTarget.x);
 
-        combat.UpdateAttack(TickDelta, attackAnimDelay: 0.2f);
+        var shot = adventurerDef.projectilePrefab;
+        combat.UpdateAttack(TickDelta, attackAnimDelay: shot != null ? shot.releaseDelay : 0.2f);
     }
 
     // ═════════════════════════════════════════════
@@ -760,6 +762,17 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
         if (d.cleaveFraction > 0f) Cleave(target, dmg * d.cleaveFraction, d.cleaveRadius);
         return dealt;
+    }
+
+    // Mage: combat.Launch — reads the live def, so a promotion or path pick into / out of a ranged tier just works.
+    private bool FireProjectile(GameObject target)
+    {
+        var prefab = adventurerDef.projectilePrefab;
+        if (prefab == null || ObjectPoolManager.Instance == null) return false;
+        var shot = ObjectPoolManager.Instance.SpawnObject<Projectile>(prefab.gameObject, transform.position, Quaternion.identity);
+        if (shot == null) return false;
+        shot.Fire(combat, target, target.transform.position.x >= transform.position.x ? 1f : -1f);
+        return true;
     }
 
     // Warrior: splash every other live mob near the primary target. Plain Health damage, so it never chains.

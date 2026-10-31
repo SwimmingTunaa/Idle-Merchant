@@ -27,6 +27,10 @@ public class CombatBehavior : MonoBehaviour
     /// dealt. Unset = a plain AttackDamage hit with a normal number. Fired before OnDamageDealt.</summary>
     public Func<Health, float> HitOverride;
 
+    /// <summary>Optional owner hook for ranged attacks: fires a shot at the target at the release moment and returns
+    /// true; the shot calls LandHit when it connects. Returns false (melee this swing) when the owner has no shot.</summary>
+    public Func<GameObject, bool> Launch;
+
     // ===== CONFIGURATION =====
     
     [Header("Combat Config")]
@@ -267,27 +271,34 @@ public class CombatBehavior : MonoBehaviour
         yield return new WaitForSeconds(delay);
         
         if (currentTarget == null) yield break;
-        
+        if (Launch != null && Launch(currentTarget)) yield break;   // ranged: the shot lands the hit on arrival
+
         if (currentTarget.TryGetComponent<Health>(out var targetHealth))
+            LandHit(targetHealth);
+    }
+
+    /// <summary>One attack connecting with a target: melee at the swing's damage moment, or a shot on arrival (which may
+    /// be a different mob than currentTarget — whatever was first in its path).</summary>
+    public void LandHit(Health targetHealth)
+    {
+        if (targetHealth == null) return;
+        float damageDealt;
+        if (HitOverride != null)
+            damageDealt = HitOverride(targetHealth);
+        else
         {
-            float damageDealt;
-            if (HitOverride != null)
-                damageDealt = HitOverride(targetHealth);
-            else
-            {
-                damageDealt = targetHealth.OnDamage(stats.AttackDamage);
-                if (damageDealt > 0f && DamageNumberManager.Instance != null)
-                    DamageNumberManager.Instance.ShowDamageAtEntity(damageDealt, currentTarget.transform);
-            }
+            damageDealt = targetHealth.OnDamage(stats.AttackDamage);
+            if (damageDealt > 0f && DamageNumberManager.Instance != null)
+                DamageNumberManager.Instance.ShowDamageAtEntity(damageDealt, targetHealth.transform);
+        }
 
-            // Last: a kill handler may retarget (Rogue pursuit)
-            OnDamageDealt?.Invoke(currentTarget, damageDealt);
+        // Last: a kill handler may retarget (Rogue pursuit)
+        OnDamageDealt?.Invoke(targetHealth.gameObject, damageDealt);
 
-            if (damageDealt <= 0f)
-            {
-                // Target died
-                ReleaseTarget();
-            }
+        if (damageDealt <= 0f && targetHealth.gameObject == currentTarget)
+        {
+            // Target died
+            ReleaseTarget();
         }
     }
 

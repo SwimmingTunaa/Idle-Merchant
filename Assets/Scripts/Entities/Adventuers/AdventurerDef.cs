@@ -105,6 +105,8 @@ public class AdventurerDef : EntityDef
     [Header("Signature: Mage arcane weight")]
     [Tooltip("Bonus damage per hit as a fraction of the target's max HP (0.02 = 2%). 0 = off.")]
     public float maxHpDamage;
+    [Tooltip("Ranged: fires this pooled shot instead of a melee hit (homes on the target, lands on the first hostile in its path). Empty = melee.")]
+    public Projectile projectilePrefab;
 
     /// <summary>XP required to go from the given global level (1-based) to the next — exponential.</summary>
     public float XPForLevel(int totalLevel) => baseXP * Mathf.Pow(xpGrowth, Mathf.Max(0, totalLevel - 1));
