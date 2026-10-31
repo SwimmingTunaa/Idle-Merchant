@@ -72,7 +72,7 @@ def shade_columns(rects, P, img, alpha, base_y=FLOOR, seed=81, depth_order=None)
 
 
 # ───────────────────────── FAR: sky, haze, lava sea, distant columns, embers ─────────────────────────
-def far(frame=0, nframes=6, fall=True):
+def far(frame=0, nframes=12, fall=True):
     """frame/nframes: the fall's streaks scroll down, the spray shifts and the embers drift up and flicker.
     fall=False renders the same sheet without the lavafall (the outer copies; only the middle copy has it)."""
     img = np.zeros((H, W, 3))
@@ -117,15 +117,16 @@ def far(frame=0, nframes=6, fall=True):
             img[HORIZON - h:HORIZON + 1, X] = (36, 14, 12); img[HORIZON - h, X] = (90, 36, 22)
     # a lavafall: pours from a lip of rock at the hidden ceiling down into the sea, in front of the horizon ranks
     fx, fw = 130, 6
-    fl = value_noise(104, 3)
+    PER = nframes * 2                                                           # scroll period: 2 px per frame, loops exactly
+    sr_ = random.Random(104)
+    sph = [sr_.randrange(PER) for _ in range(W)]; sln = [sr_.randint(2, 6) if sr_.random() < 0.55 else 0 for _ in range(W)]
     for y in (range(HIDDEN - 8, HORIZON + 1) if fall else ()):
         wob = 1 if (y // 26) % 2 else 0                                          # a single gentle one-pixel step, not a wiggle
         for x in range(fx - fw + wob, fx + fw + 1 + wob):
             X = x % W; f = abs(x - fx - wob) / float(fw)
             c = LAVA["hot"] if f < 0.4 else (LAVA["bright"] if f < 0.8 else LAVA["mid"])
-            ya = (y - frame * (H // nframes) // 4) % H                             # streaks scroll down with the frame
-            if fl[ya, X] > 0.7 and f > 0.3: c = LAVA["bright"] if c == LAVA["hot"] else LAVA["dim"]   # flow streaks
-            if ((y - frame * 2 + x * 3) % 11 == 0) and f < 0.5: c = LAVA["hot"]
+            if sln[X] and ((y - frame * 2 + sph[X]) % PER) < sln[X] and f > 0.3: c = LAVA["bright"] if c == LAVA["hot"] else LAVA["dim"]   # flow streaks
+            if ((y - frame * 2 + sph[(X + 7) % W]) % PER) < 2 and f < 0.5: c = LAVA["hot"]
             img[y, X] = c
         img[y, (fx - fw - 1 + wob) % W] = LAVA["crust_l"]; img[y, (fx + fw + 1 + wob) % W] = LAVA["crust"]   # crusted edges
     # glow on the wall either side, stepped by distance
@@ -187,14 +188,18 @@ def far(frame=0, nframes=6, fall=True):
     img[shore & (YS >= FLOOR - 2)] = LAVA["crust"]
     # embers: single bright pixels drifting up with the frame, each flickering on its own phase
     er = random.Random(105)
-    embers = [(er.randrange(W), er.randrange(HIDDEN, HORIZON), er.randrange(3), er.random() < 0.4) for _ in range(70)]
-    for i, (x, y0, ph, hot) in enumerate(embers):
-        y = HIDDEN + (y0 - HIDDEN - frame * 2 + ((i % 3) - 1) * 0) % (HORIZON - HIDDEN)
-        x = (x + (1 if (frame + i) % 4 == 0 else 0)) % W
-        if (fr | nr)[y, x]: continue
-        if (ph + frame) % 3 == 2: img[y, x] = LAVA["dim"]; continue             # dim phase
-        img[y, x] = LAVA["hot"] if hot else LAVA["bright"]
-        if (ph + frame) % 3 == 0 and y + 1 < H and not (fr | nr)[y + 1, x]: img[y + 1, x] = LAVA["dim"]
+    cols = [(er.randrange(W), er.randrange(PER), er.random() < 0.4, er.randrange(3)) for _ in range(22)]
+    for ci, (x0, y0, hot, ph0) in enumerate(cols):                              # each column repeats every PER px → seamless
+        k = 0
+        for base in range(HIDDEN - PER, HORIZON, PER):
+            y = base + (y0 - frame * 2) % PER; k += 1
+            if y < HIDDEN or y >= HORIZON: continue
+            x = (x0 + (k % 2) + (1 if (frame // 3 + k) % 2 == 0 else 0)) % W     # a little sideways waver per instance
+            if (fr | nr)[y, x]: continue
+            ph = (ph0 + k + frame // 2) % 3
+            if ph == 2: img[y, x] = LAVA["dim"]; continue                        # dim phase of the flicker
+            img[y, x] = LAVA["hot"] if hot else LAVA["bright"]
+            if ph == 0 and y + 1 < H and not (fr | nr)[y + 1, x]: img[y + 1, x] = LAVA["dim"]
     # heat shimmer: a few single pixels lifted a step in the haze bands
     sh = value_noise(95, 2)
     hz = (YS > HORIZON - 30) & (YS < HORIZON) & (sh > 0.86) & ~(fr | nr)
@@ -261,7 +266,7 @@ def near():
 
 def main(out):
     os.makedirs(out, exist_ok=True)
-    NF = 6
+    NF = 12
     frames = [far(f, NF) for f in range(NF)]
     plain = [far(f, NF, fall=False) for f in range(NF)]
     layers = {"background1-sheet": frames[0], "background2-sheet": mid(), "background3-sheet": near()}
@@ -273,7 +278,7 @@ def main(out):
     for f in range(NF): strip.alpha_composite(frames[f].crop((0, HIDDEN, W, H)), (f * W, 0))
     strip.resize((strip.width * 2, strip.height * 2), Image.NEAREST).save(os.path.join(out, "shore_frames.png"))
     gif = [fr_.crop((100, HIDDEN, 220, H)).resize((480, (H - HIDDEN) * 4), Image.NEAREST).convert("P") for fr_ in frames]
-    gif[0].save(os.path.join(out, "shore_fall.gif"), save_all=True, append_images=gif[1:], duration=160, loop=0)
+    gif[0].save(os.path.join(out, "shore_fall.gif"), save_all=True, append_images=gif[1:], duration=83, loop=0)
     comp = Image.new("RGBA", (W * 2, H))
     for im in layers.values():
         for i in range(2): comp.alpha_composite(im, (i * W, 0))
