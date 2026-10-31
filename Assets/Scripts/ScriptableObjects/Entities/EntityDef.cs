@@ -71,6 +71,10 @@ public class EntityDef : ScriptableObject
     public SpriteLibraryAsset[] hairBackSpriteLibraries;
     public SpriteLibraryAsset[] frontWeaponSpriteLibraries;
     public SpriteLibraryAsset[] backWeaponSpriteLibraries;
+    [Tooltip("Fixed-colour metal over the shirt (same categories/labels as the shirt library); picked with the shirt index. Empty = none")]
+    public SpriteLibraryAsset[] armourSpriteLibraries;
+    [Tooltip("Fixed-colour metal over the hat/hair top (same categories/labels); picked with the hair-top index. Empty = none")]
+    public SpriteLibraryAsset[] helmetSpriteLibraries;
 
     [Header("Colour palettes")]
     public ColourPalette skinColourPalette;

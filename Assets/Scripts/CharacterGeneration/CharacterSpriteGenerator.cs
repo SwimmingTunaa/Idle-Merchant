@@ -219,6 +219,11 @@ public static class CharacterSpriteGenerator
             animator.Play("Idle", 0, 0f);
             animator.Update(0f);
         }
+
+        // Mirrored layers (class armour / helmet) follow their source resolver in LateUpdate, which never
+        // runs before this capture — push them now that the animator has posed the sources.
+        foreach (var mirror in instance.GetComponentsInChildren<ResolverMirror>(true))
+            mirror.Sync(true);
     }
     
     private static Sprite GenerateSpriteInternal(EntityDef def, CharacterAppearanceIndices indices, int configHash)
@@ -260,6 +265,8 @@ public static class CharacterSpriteGenerator
             // SampleAnimation sets the SpriteResolver keys; push them to the renderers before capture.
             foreach (var resolver in resolvers)
                 resolver.ResolveSpriteToSpriteRenderer();
+            foreach (var mirror in _previewInstance.GetComponentsInChildren<ResolverMirror>(true))
+                mirror.Sync(true);
 
             frames[f] = CaptureSprite();
         }

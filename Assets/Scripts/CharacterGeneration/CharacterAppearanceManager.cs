@@ -36,6 +36,9 @@ public class CharacterAppearanceManager : MonoBehaviour
     [SerializeField] private SpriteLibrary hairBackReference;
     [SerializeField] private SpriteLibrary frontWeaponReference;
     [SerializeField] private SpriteLibrary backWeaponReference;
+    [Tooltip("Optional: fixed-colour armour / helmet layers mirrored off the shirt and hair-top resolvers")]
+    [SerializeField] private SpriteLibrary armourReference;
+    [SerializeField] private SpriteLibrary helmetReference;
 
     [Header("Material References")]
     private Material[] skinMaterials;
@@ -67,6 +70,7 @@ public class CharacterAppearanceManager : MonoBehaviour
         if (entityDef.shirtSpriteLibraries.Length == 0) return;
         int randomIndex = UnityEngine.Random.Range(0, entityDef.shirtSpriteLibraries.Length);
         shirtReference.spriteLibraryAsset = entityDef.shirtSpriteLibraries[randomIndex];
+        SetOptional(armourReference, entityDef.armourSpriteLibraries, randomIndex);
 
         if (shirtMaterials.Length == 0) return;
         Color randomColour = entityDef.ShirtColourPalette.GetRandomPaletteColour();
@@ -91,6 +95,7 @@ public class CharacterAppearanceManager : MonoBehaviour
         {
             int randomIndexTop = UnityEngine.Random.Range(0, entityDef.hairTopSpriteLibraries.Length);
             hairTopReference.spriteLibraryAsset = entityDef.hairTopSpriteLibraries[randomIndexTop];
+            SetOptional(helmetReference, entityDef.helmetSpriteLibraries, randomIndexTop);
         }
 
         if (entityDef.hairBackSpriteLibraries.Length != 0)
@@ -137,8 +142,23 @@ public class CharacterAppearanceManager : MonoBehaviour
         backWeaponReference.spriteLibraryAsset = entityDef.backWeaponSpriteLibraries[randomIndex];
     }
 
+    /// <summary>Class base body (skin sheets chopped per class); the shared base stays when the def has none.</summary>
+    public void ApplyBaseBody()
+    {
+        if (entityDef.baseBodySpriteLibraries != null && entityDef.baseBodySpriteLibraries.Length > 0 && entityDef.baseBodySpriteLibraries[0] != null)
+            baseReference.spriteLibraryAsset = entityDef.baseBodySpriteLibraries[0];
+    }
+
+    /// <summary>Optional layer: set the library when the def has one at that index, else clear it so nothing draws.</summary>
+    private static void SetOptional(SpriteLibrary reference, SpriteLibraryAsset[] libs, int index)
+    {
+        if (reference == null) return;
+        reference.spriteLibraryAsset = libs != null && libs.Length > 0 ? libs[Mathf.Clamp(index, 0, libs.Length - 1)] : null;
+    }
+
     public void ChangeAllRandom()
     {
+        ApplyBaseBody();
         ChangeRandomShirt();
         ChangeRandomPants();
         ChangeRandomHair();
@@ -157,18 +177,24 @@ public class CharacterAppearanceManager : MonoBehaviour
     public void ApplyAppearance()
     {
         autoChangeOnStart = false; // an applied (saved/candidate) look must survive Start's randomise
+        ApplyBaseBody();
+        // Indices were rolled against the def the unit was hired with; a promotion or a class swap can hand
+        // us a def with fewer libraries (e.g. 2 hair styles → 1 class hat), so clamp rather than throw.
+        static int Idx(int i, SpriteLibraryAsset[] libs) => Mathf.Clamp(i, 0, libs.Length - 1);
         if (entityDef.shirtSpriteLibraries?.Length > 0)
-            shirtReference.spriteLibraryAsset = entityDef.shirtSpriteLibraries[appearanceIndices.shirt];
+            shirtReference.spriteLibraryAsset = entityDef.shirtSpriteLibraries[Idx(appearanceIndices.shirt, entityDef.shirtSpriteLibraries)];
+        SetOptional(armourReference, entityDef.armourSpriteLibraries, appearanceIndices.shirt);
+        SetOptional(helmetReference, entityDef.helmetSpriteLibraries, appearanceIndices.hairTop);
         if (entityDef.pantsSpriteLibraries?.Length > 0)
-            pantsReference.spriteLibraryAsset = entityDef.pantsSpriteLibraries[appearanceIndices.pants];
+            pantsReference.spriteLibraryAsset = entityDef.pantsSpriteLibraries[Idx(appearanceIndices.pants, entityDef.pantsSpriteLibraries)];
         if (entityDef.hairTopSpriteLibraries?.Length > 0)
-            hairTopReference.spriteLibraryAsset = entityDef.hairTopSpriteLibraries[appearanceIndices.hairTop];
+            hairTopReference.spriteLibraryAsset = entityDef.hairTopSpriteLibraries[Idx(appearanceIndices.hairTop, entityDef.hairTopSpriteLibraries)];
         if (entityDef.hairBackSpriteLibraries?.Length > 0)
-            hairBackReference.spriteLibraryAsset = entityDef.hairBackSpriteLibraries[appearanceIndices.hairBack];
+            hairBackReference.spriteLibraryAsset = entityDef.hairBackSpriteLibraries[Idx(appearanceIndices.hairBack, entityDef.hairBackSpriteLibraries)];
         if (entityDef.frontWeaponSpriteLibraries?.Length > 0)
-            frontWeaponReference.spriteLibraryAsset = entityDef.frontWeaponSpriteLibraries[appearanceIndices.frontWeapon];
+            frontWeaponReference.spriteLibraryAsset = entityDef.frontWeaponSpriteLibraries[Idx(appearanceIndices.frontWeapon, entityDef.frontWeaponSpriteLibraries)];
         if (entityDef.backWeaponSpriteLibraries?.Length > 0)
-            backWeaponReference.spriteLibraryAsset = entityDef.backWeaponSpriteLibraries[appearanceIndices.backWeapon];
+            backWeaponReference.spriteLibraryAsset = entityDef.backWeaponSpriteLibraries[Idx(appearanceIndices.backWeapon, entityDef.backWeaponSpriteLibraries)];
 
         Color skinColour = entityDef.skinColourPalette != null ? entityDef.skinColourPalette.GetGradientColour(appearanceIndices.skinColour) : Color.white;
         Color shirtColour = entityDef.ShirtColourPalette != null ? entityDef.ShirtColourPalette.GetPaletteColour(appearanceIndices.shirtColour) : Color.white;
@@ -206,6 +232,8 @@ public class CharacterAppearanceManager : MonoBehaviour
         SetReferenceVisible(hairBackReference, visible);
         SetReferenceVisible(frontWeaponReference, visible);
         SetReferenceVisible(backWeaponReference, visible);
+        SetReferenceVisible(armourReference, visible);
+        SetReferenceVisible(helmetReference, visible);
     }
 
     private static void SetReferenceVisible(SpriteLibrary reference, bool visible)
