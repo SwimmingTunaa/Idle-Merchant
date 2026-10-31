@@ -15,7 +15,7 @@ using UnityEngine.U2D.Animation;
 ///
 /// Controls (in Play Mode):
 ///   SPACE  re-roll appearance       C  toggle clothes / base body
-///   [  ]   previous / next animation
+///   [  ]   previous / next animation   ←  →  previous / next def
 /// Or use the inspector fields + the "Rebuild" context-menu button.
 /// </summary>
 public class CharacterGeneratorTester : MonoBehaviour
@@ -23,6 +23,9 @@ public class CharacterGeneratorTester : MonoBehaviour
     [Header("Source")]
     [Tooltip("Modular EntityDef to preview (e.g. an AdventurerDef like 'Lvl 1 Novice').")]
     [SerializeField] private EntityDef entityDef;
+    [Tooltip("Line-up cycled with ← →. Empty = every def in the ClassCatalog (all classes and tiers).")]
+    [SerializeField] private EntityDef[] entityDefs;
+    [SerializeField] private int defIndex;
 
     [Header("Options")]
     [Tooltip("Show clothing/hair/weapons. Off = base body only.")]
@@ -78,6 +81,8 @@ public class CharacterGeneratorTester : MonoBehaviour
         else if (kb.cKey.wasPressedThisFrame) { withClothes = !withClothes; Rebuild(rerollAppearance: false); }
         else if (kb.rightBracketKey.wasPressedThisFrame) CycleAnimation(+1);
         else if (kb.leftBracketKey.wasPressedThisFrame) CycleAnimation(-1);
+        else if (kb.rightArrowKey.wasPressedThisFrame) CycleDef(+1);
+        else if (kb.leftArrowKey.wasPressedThisFrame) CycleDef(-1);
     }
 
     private void DriveLivePlayback()
@@ -116,8 +121,20 @@ public class CharacterGeneratorTester : MonoBehaviour
     [ContextMenu("Rebuild")]
     public void RebuildContextMenu() => Rebuild(rerollAppearance: true);
 
+    private void CycleDef(int dir)
+    {
+        var defs = LineUp(); if (defs.Length == 0) return;
+        defIndex = ((defIndex + dir) % defs.Length + defs.Length) % defs.Length;
+        Rebuild(rerollAppearance: true);
+    }
+
+    private EntityDef[] LineUp() => entityDefs != null && entityDefs.Length > 0 ? entityDefs
+        : ClassCatalog.Instance != null ? ClassCatalog.Instance.defs.ToArray() : System.Array.Empty<EntityDef>();
+
     private void Rebuild(bool rerollAppearance)
     {
+        var lineUp = LineUp();
+        if (lineUp.Length > 0) entityDef = lineUp[Mathf.Clamp(defIndex, 0, lineUp.Length - 1)];
         if (entityDef == null) { Debug.LogError("[CharacterGeneratorTester] No EntityDef assigned."); return; }
         if (!entityDef.useModularCharacter) { Debug.LogError($"[CharacterGeneratorTester] '{entityDef.name}' is not a modular character."); return; }
 
@@ -277,8 +294,8 @@ public class CharacterGeneratorTester : MonoBehaviour
         var style = new GUIStyle(GUI.skin.label) { fontSize = 14, normal = { textColor = Color.white } };
         string clip = currentClip != null ? currentClip.name : "(none)";
         GUI.Label(new Rect(10, 10, 900, 24),
-            $"Anim [{animationIndex + 1}/{Mathf.Max(clips.Length, 1)}]: {clip}    Clothes: {(withClothes ? "ON" : "base only")}", style);
+            $"[{defIndex + 1}/{LineUp().Length}] {(entityDef != null ? entityDef.name : "(no def)")}    Anim [{animationIndex + 1}/{Mathf.Max(clips.Length, 1)}]: {clip}    Clothes: {(withClothes ? "ON" : "base only")}", style);
         GUI.Label(new Rect(10, 32, 900, 24),
-            "SPACE re-roll appearance   C toggle clothes   [ ] change animation", style);
+            "SPACE re-roll appearance   C toggle clothes   [ ] change animation   ← → change def", style);
     }
 }
