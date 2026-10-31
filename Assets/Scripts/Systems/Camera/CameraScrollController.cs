@@ -29,6 +29,9 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
     [Tooltip("amount to add to miny when layers are unlock")]
     public float layerAdd;
 
+    [Tooltip("Deepest depth that exists in the scene; unlock signals above it (the 5th star raises layer 6) don't expand the camera")]
+    public int deepestDepth = 5;
+
     [Header("Scroll Settings")]
     [Tooltip("Camera movement speed in units per second")]
     public float scrollSpeed = 10f;
@@ -245,7 +248,9 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
 
     public void HandleExpandVeritcalBounds(int layer)
     {
-        // Set, don't add: the save replays every unlock on load, so accumulating compounded the bound
+        // Set, don't add: the save replays every unlock on load, so accumulating compounded the bound.
+        // Clamp to the depths that exist: the 5th star unlocks "layer 6" with nothing below depth 5.
+        layer = Mathf.Min(layer, deepestDepth);
         minY = Mathf.Min(minY, baseMinY + layerAdd * (layer - 1));
     }
 
