@@ -1,7 +1,8 @@
 """Lava Shore (dungeon level 5, "Infernal Depths") parallax backgrounds, 320x192 / 8 PPU, tileable.
 The first depth that isn't a wall: the cavern opens onto a lava sea. far = dark sky over a stepped orange haze,
 a lava surface with floating crust plates and hot cracks (plates shrink toward the horizon), distant basalt
-columns on the horizon, a lavafall pouring from the ceiling into the sea, embers in the air; mid = basalt column clusters on the shore, lit orange on the lava
+columns on the horizon, a lavafall pouring from the ceiling into the sea (middle copy only: the `-plain` set is the same sheet
+without it, for the outer copies), embers in the air; mid = basalt column clusters on the shore, lit orange on the lava
 side, near = black shore rocks with an orange rim, a cooled lava plate.
 Human scale (adventurer ≈ 24 px). Only the lower ~126 px of a sheet shows in the band.
 Run: uv run --with pillow --with numpy python3 draw_shore.py <out>"""
@@ -71,8 +72,9 @@ def shade_columns(rects, P, img, alpha, base_y=FLOOR, seed=81, depth_order=None)
 
 
 # ───────────────────────── FAR: sky, haze, lava sea, distant columns, embers ─────────────────────────
-def far(frame=0, nframes=6):
-    """frame/nframes: the fall's streaks scroll down, the spray shifts and the embers drift up and flicker."""
+def far(frame=0, nframes=6, fall=True):
+    """frame/nframes: the fall's streaks scroll down, the spray shifts and the embers drift up and flicker.
+    fall=False renders the same sheet without the lavafall (the outer copies; only the middle copy has it)."""
     img = np.zeros((H, W, 3))
     # the far cavern wall: rock texture (mottling + strata) stepping brighter toward the lava that lights it
     n = value_noise(91, 10); mot = value_noise(101, 9); fine = value_noise(102, 2)
@@ -116,7 +118,7 @@ def far(frame=0, nframes=6):
     # a lavafall: pours from a lip of rock at the hidden ceiling down into the sea, in front of the horizon ranks
     fx, fw = 130, 6
     fl = value_noise(104, 3)
-    for y in range(HIDDEN - 8, HORIZON + 1):
+    for y in (range(HIDDEN - 8, HORIZON + 1) if fall else ()):
         wob = 1 if (y // 26) % 2 else 0                                          # a single gentle one-pixel step, not a wiggle
         for x in range(fx - fw + wob, fx + fw + 1 + wob):
             X = x % W; f = abs(x - fx - wob) / float(fw)
@@ -127,22 +129,22 @@ def far(frame=0, nframes=6):
             img[y, X] = c
         img[y, (fx - fw - 1 + wob) % W] = LAVA["crust_l"]; img[y, (fx + fw + 1 + wob) % W] = LAVA["crust"]   # crusted edges
     # glow on the wall either side, stepped by distance
-    for dx, k in ((26, 0.2), (16, 0.45), (10, 0.8)):
+    for dx, k in (((26, 0.2), (16, 0.45), (10, 0.8)) if fall else ()):
         sel = (np.abs(wrapdx(XS, fx)) < dx) & (np.abs(wrapdx(XS, fx)) > fw + 1) & (YS > HIDDEN - 8) & (YS < HORIZON) & ~(fr | nr)
         img[sel] = np.clip(img[sel] * (1 + k) * np.array((1.0, 0.86, 0.7)), 0, 255)
     # the rock lip it pours over, dark, with a lit underside
     lip = canvas(); ld = ImageDraw.Draw(lip)
     ld.polygon([(fx - 18, HIDDEN - 12), (fx + 18, HIDDEN - 12), (fx + 14, HIDDEN - 2), (fx + fw + 2, HIDDEN + 2), (fx - fw - 2, HIDDEN + 2), (fx - 14, HIDDEN - 1)], fill=255)
-    lm = np.array(lip) > 0
+    lm = (np.array(lip) > 0) & fall
     img[lm] = (14, 6, 8); img[lm & ~np.roll(lm, -1, 0)] = (110, 44, 24)
     # splash where it hits: a bright pool and spray
-    for y in range(HORIZON, HORIZON + 7):
+    for y in (range(HORIZON, HORIZON + 7) if fall else ()):
         hw = 12 - (y - HORIZON)
         for x in range(fx - hw, fx + hw + 1): img[y, x % W] = LAVA["hot"] if abs(x - fx) < hw * 0.6 else LAVA["bright"]
     spray = [(-14, -3), (-10, -6), (-6, -9), (7, -8), (11, -5), (15, -2), (-17, -1), (18, -4), (0, -12), (4, -11), (-3, -14), (9, -11)]
     for i, (dx, dy) in enumerate(spray):                                        # spray rises and fades with the frame
         ph = (i + frame) % 4
-        if ph == 3: continue
+        if ph == 3 or not fall: continue
         img[HORIZON + dy - ph, (fx + dx + (ph if dx > 0 else -ph)) % W] = LAVA["hot"] if ph < 2 else LAVA["bright"]
     # the lava surface: liquid first — row-banded flow with thin bright streaks — then sparse rounded crust
     # islands with a glowing rim where they meet the melt, cooling to dark against the shore
@@ -158,7 +160,7 @@ def far(frame=0, nframes=6):
     for _ in range(90):                                                         # streaks: thin yellow lines along the flow
         x, y, ln = r.randrange(W), r.randrange(HORIZON + 1, H - 2), r.randint(4, 16)
         for k in range(ln): liquid[y, (x + k) % W] = LAVA["hot"] if depth[y, 0] < 0.6 else LAVA["bright"]
-    splash = rows & (YS < HORIZON + 7) & (np.abs(wrapdx(XS, fx)) <= 12 - (YS - HORIZON))
+    splash = rows & (YS < HORIZON + 7) & (np.abs(wrapdx(XS, fx)) <= 12 - (YS - HORIZON)) & fall
     img[rows & ~(fr | nr) & ~splash] = liquid[rows & ~(fr | nr) & ~splash]
     coarse = value_noise(93, 9)
     island = rows & (coarse > 0.6 + 0.08 * (1 - depth)) & ~(fr | nr) & (YS > HORIZON + 2) & ~splash
@@ -261,9 +263,12 @@ def main(out):
     os.makedirs(out, exist_ok=True)
     NF = 6
     frames = [far(f, NF) for f in range(NF)]
+    plain = [far(f, NF, fall=False) for f in range(NF)]
     layers = {"background1-sheet": frames[0], "background2-sheet": mid(), "background3-sheet": near()}
     for k, im in layers.items(): im.save(os.path.join(out, k + ".png"))
     for f in range(1, NF): frames[f].save(os.path.join(out, f"background1-sheet_f{f}.png"))
+    plain[0].save(os.path.join(out, "background1-sheet-plain.png"))
+    for f in range(1, NF): plain[f].save(os.path.join(out, f"background1-sheet-plain_f{f}.png"))
     strip = Image.new("RGBA", (W * NF, H - HIDDEN))
     for f in range(NF): strip.alpha_composite(frames[f].crop((0, HIDDEN, W, H)), (f * W, 0))
     strip.resize((strip.width * 2, strip.height * 2), Image.NEAREST).save(os.path.join(out, "shore_frames.png"))
