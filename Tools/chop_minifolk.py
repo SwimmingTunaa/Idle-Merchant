@@ -7,6 +7,8 @@ Routing is by the pack's shared palette:
   skin (2 tones) → base body / front arm / back arm (normalised to our base's white + grey, eyes to our ink)
   cloth (blues, browns, dark) → shirt body / sleeves (recoloured in-game), hat above the face, pants below the hips
   steel (3 tones, white, beard greys) → armour body / sleeves, helmet above the face (fixed colour, mirrored renderers)
+  BEARD packs (the mage): beard greys → a face sheet (body layout, lifted to hair tones, recoloured in-game); eyes → body only
+  ROBE packs (the mage): robe blues never go to the weapon (unless they rim the orb crystal / an effect) and never to pants
   what sticks out past the body box and the arms, plus pole wood, plus hands-layer blobs that reach past the body or
   are big (the held staff / bow / shield — the hands layer carries what the hands hold) → weapon; the hurt eye → dropped
 Frames: our 25-frame layout (idle 4, walk 6, slash 7, hit 3, death 5) ← tags idle / walk / attack / damage|hit /
@@ -35,7 +37,19 @@ STEEL = {(181, 214, 222), (140, 173, 198), (90, 123, 148), (255, 255, 255), (229
 # Recoloured layers (shirt, hat) go through the Outfit shader: desaturate, then blend the palette colour in, so dark
 # source cloth comes out near-black whatever the roll. Packs with dark cloth lift those tones to light greys there
 # (pants / cloak / weapon keep the source colours).
-CLOTH_TONES = {"MiniThief": {(176, 112, 64): (235, 235, 235), (112, 80, 48): (165, 165, 165), (111, 47, 39): (200, 200, 200)}}
+CLOTH_TONES = {"MiniThief": {(176, 112, 64): (235, 235, 235), (112, 80, 48): (165, 165, 165), (111, 47, 39): (200, 200, 200)},
+               "MiniMage": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
+               "MiniHalberdMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
+               "MiniShieldMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)}}   # robe + hat: the tint multiplies source grey, so the dark blues showed palette colours at ~half brightness
+# Robe classes: the robe is one garment. Its cloth never routes to the weapon (a swinging sleeve or the cuff at the
+# staff hand reaches past the body, and the weapon sheet never recolours), and the hem below the hips stays on the
+# shirt body instead of pants (pants roll their own palette, so a split robe came out two colours)
+ROBE = {"MiniMage": {(64, 88, 192), (96, 152, 232)}}
+CRYSTAL = {(152, 216, 248), (216, 248, 248), (223, 249, 249)}   # staff orb core: robe-blue touching it is the orb's rim (stays weapon)
+# Beard → its own face sheet, recoloured in-game with the def's FaceColourPalette (natural hair colours). The pack's
+# beard greys are dark, and the Outfit shader takes source lightness, so they're lifted onto our hair sheet's tones.
+# Opt-in per pack: the thief's cloak + hood share these exact greys
+BEARD = {"MiniMage": {(78, 75, 73): (199, 199, 199), (62, 59, 57): (131, 131, 131)}}
 DROP = {(144, 16, 0)}                                                           # the hurt-face red eye
 
 
@@ -117,9 +131,11 @@ def chop(name, out, jump=False):
     anims = ANIMS + [JUMP] if jump else ANIMS; R = len(anims)
     frames, tags = load_ase(name); fmap = frame_map(tags, anims)
     tones = CLOTH_TONES.get(os.path.basename(name).removesuffix(".aseprite"), {})
+    robe_tones = ROBE.get(os.path.basename(name).removesuffix(".aseprite"), set())
+    beard_tones = BEARD.get(os.path.basename(name).removesuffix(".aseprite"), {})
     L = lambda p: Image.open(ADV + p).convert("RGBA")
     ours = dict(af=L("Base/Arm Front/base arm front.png"), ab=L("Base/Arm Back/base arm back.png"), pants=L("Equipment/Pants/pants 1.png"))
-    S = {k: Image.new("RGBA", (7 * C, R * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon")}
+    S = {k: Image.new("RGBA", (7 * C, R * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon") + (("face",) if beard_tones else ())}
     S["shirt"] = Image.new("RGBA", (7 * C, 3 * R * C)); S["armour"] = Image.new("RGBA", (7 * C, 3 * R * C))
     preview = Image.new("RGBA", (7 * C * 4, R * C * 4), (40, 40, 48, 255))
     ys, xs = np.mgrid[0:C, 0:C]
@@ -132,6 +148,9 @@ def chop(name, out, jump=False):
             steel = np.array([[alpha[y, x] and key[y][x] in STEEL for x in range(C)] for y in range(C)])
             drop = np.array([[alpha[y, x] and key[y][x] in DROP for x in range(C)] for y in range(C)])
             ink = np.array([[alpha[y, x] and key[y][x] == INK for x in range(C)] for y in range(C)])
+            robe = np.array([[alpha[y, x] and key[y][x] in robe_tones for x in range(C)] for y in range(C)])
+            beard = np.array([[alpha[y, x] and key[y][x] in beard_tones for x in range(C)] for y in range(C)])
+            crystal = np.array([[alpha[y, x] and key[y][x] in CRYSTAL for x in range(C)] for y in range(C)])
             keep = alpha & ~drop
             # face = the topmost skin cluster that isn't a hand; its box anchors head / torso / legs and the body box
             fskin = skin & ~hands
@@ -154,9 +173,18 @@ def chop(name, out, jump=False):
             held = np.zeros((C, C), bool)
             for comp in components(hands):
                 if (comp & outside).any() or comp.sum() >= 12: held |= comp
-            weapon = (keep & ~skin & ~af & ~ab & ~hands & outside) | (shaft & keep) | (held & keep & ~skin)
-            cloth = keep & ~skin & ~steel & ~weapon
-            metal = keep & steel & ~weapon
+            weapon_all = (keep & ~skin & ~af & ~ab & ~hands & outside) | (shaft & keep) | (held & keep & ~skin)
+            fx = np.zeros((C, C), bool)                                  # effect layers (orb glow, spell burst) draw over the cloth in the pack
+            for (layer, i), px in frames.items():
+                if i == fmap[oc] and layer not in NOT_FX: fx |= px[..., 3] > 0
+            robe_held = np.zeros((C, C), bool)                           # robe cloth the weapon rule caught = the sleeve at the held hand / a swinging sleeve…
+            for comp in components(weapon_all & robe):
+                if not (dilate(comp, 1) & (crystal | fx)).any(): robe_held |= comp   # …unless it rims the orb (touches its crystal / glow)
+            weapon = weapon_all & ~robe_held
+            robe_held &= ~fx                                             # …so robe under an effect stays behind the weapon, not on the front sleeve over it
+            cloth = keep & ~skin & ~steel & ~weapon & ~eyes   # eyes belong to the body only (were also landing in the hat, tinted by its palette)
+            face_px = keep & beard & ~weapon                             # beard (opt-in packs) → face sheet, out of helmet / armour
+            metal = keep & steel & ~weapon & ~face_px
             # skin → body / arms, normalised to our base's tones; eyes to our ink. The pack's hands layer is the
             # authority for what's a hand: a hand off our arm masks still goes to the front arm.
             body_px = np.zeros((C, C, 4), np.uint8)
@@ -170,16 +198,20 @@ def chop(name, out, jump=False):
             put(S["body"], bod, f, row, body_px); put(S["armf"], armf, f, row, body_px); put(S["armb"], armb, f, row, body_px)
             # cloth / metal by priority so every kept pixel lands somewhere: arms → sleeves, head → hat / helmet,
             # legs → pants, else torso
-            c_f = cloth & af; c_b = cloth & ab & ~c_f; rest = cloth & ~c_f & ~c_b
-            hat = rest & head; legs = rest & ~head & (ys >= pan_top); c_body = rest & ~hat & ~legs
+            c_f = cloth & (af | (robe_held & ~ab)); c_b = cloth & ab & ~c_f; rest = cloth & ~c_f & ~c_b   # robe_held → a sleeve, never the hat
+            hat = rest & head; legs = rest & ~head & (ys >= pan_top) & ~robe; c_body = rest & ~hat & ~legs
             m_f = metal & af; m_b = metal & ab & ~m_f; mrest = metal & ~m_f & ~m_b
             helmet = mrest & head; m_body = mrest & ~helmet
-            routed = skin_all | weapon | c_f | c_b | hat | legs | c_body | m_f | m_b | helmet | m_body
+            routed = skin_all | weapon | c_f | c_b | hat | legs | c_body | m_f | m_b | helmet | m_body | face_px
             lost = keep & ~routed
             if lost.any(): print(f"  {name} frame {oc}: {int(lost.sum())} kept pixels routed nowhere")
             Tc = T.copy()
             for (r, g, b), nc in tones.items(): Tc[(T[..., 0] == r) & (T[..., 1] == g) & (T[..., 2] == b), :3] = nc
             put(S["hat"], hat, f, row, Tc); put(S["helmet"], helmet, f, row); put(S["pants"], legs, f, row); put(S["weapon"], weapon, f, row)
+            if beard_tones:
+                Tb = T.copy()
+                for (r, g, b), nc in beard_tones.items(): Tb[(T[..., 0] == r) & (T[..., 1] == g) & (T[..., 2] == b), :3] = nc
+                put(S["face"], face_px, f, row, Tb)
             for (layer, i), px in frames.items():   # effects ride on top of the weapon
                 if i == fmap[oc] and layer not in NOT_FX and px[..., 3].any():
                     S["weapon"].alpha_composite(Image.fromarray(px), (f * C, row * C))
@@ -193,7 +225,8 @@ def chop(name, out, jump=False):
     os.makedirs(out, exist_ok=True)
     metas = dict(body="Base/Body/base body.png.meta", armf="Base/Arm Front/base arm front.png.meta", armb="Base/Arm Back/base arm back.png.meta",
                  pants="Equipment/Pants/pants 1.png.meta", hat="Hair/Hair Buzz.png.meta", helmet="Hair/Hair Buzz.png.meta",
-                 weapon="Weapon/Basic Sword.png.meta", shirt="Equipment/Shirt/Tunic.png.meta", armour="Equipment/Shirt/Tunic.png.meta")
+                 weapon="Weapon/Basic Sword.png.meta", shirt="Equipment/Shirt/Tunic.png.meta", armour="Equipment/Shirt/Tunic.png.meta",
+                 face="Base/Body/base body.png.meta")
     for k, im in S.items():
         if jump:   # move the jump row(s) from the bottom to the top; the 5 original rows keep their bottom-up rects
             per = 3 if k in ("shirt", "armour") else 1; W = im.width; base = (R - 1) * per * C

@@ -14,7 +14,7 @@ public class EntityDefEditor : Editor
     private readonly string[] tabNames = { "Core", "Stats", "Visual", "Behaviour" };
     
     private int selectedLibraryTab = 0;
-    private readonly string[] libraryTabNames = { "Base Body", "Shirt", "Pants", "Hair Top", "Hair Back", "Front Weapon", "Back Weapon", "Armour", "Helmet" };
+    private readonly string[] libraryTabNames = { "Base Body", "Shirt", "Pants", "Hair Top", "Hair Back", "Front Weapon", "Back Weapon", "Armour", "Helmet", "Face" };
 
     // Core
     private SerializedProperty prefabProp;
@@ -461,6 +461,7 @@ public class EntityDefEditor : Editor
                 case 6: EditorGUILayout.PropertyField(backWeaponSpriteLibrariesProp, true); break;
                 case 7: EditorGUILayout.PropertyField(serializedObject.FindProperty("armourSpriteLibraries"), true); break;   // fixed-colour, mirrors the shirt
                 case 8: EditorGUILayout.PropertyField(serializedObject.FindProperty("helmetSpriteLibraries"), true); break;   // fixed-colour, mirrors the hair top
+                case 9: EditorGUILayout.PropertyField(serializedObject.FindProperty("faceSpriteLibraries"), true); break;     // beard, mirrors the base body
             }
             
             EditorGUILayout.EndVertical();
@@ -473,6 +474,8 @@ public class EntityDefEditor : Editor
             EditorGUILayout.PropertyField(shirtColourPaletteProp);
             EditorGUILayout.PropertyField(pantsColourPaletteProp);
             EditorGUILayout.PropertyField(hairColourPaletteProp);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("FaceColourPalette"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("hatMatchesShirt"));
             EditorGUILayout.EndVertical();
         }
     }

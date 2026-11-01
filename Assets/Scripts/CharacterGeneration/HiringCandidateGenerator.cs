@@ -138,7 +138,8 @@ public static class HiringCandidateGenerator
                     skinColour = entityDef.skinColourPalette?.GetRandomGradientValue() ?? 0f,
                     shirtColour = entityDef.ShirtColourPalette?.GetRandomPaletteIndex() ?? 0,
                     pantsColour = entityDef.PantsColourPalette?.GetRandomPaletteIndex() ?? 0,
-                    hairColour = entityDef.HairColourPalette?.GetRandomPaletteIndex() ?? 0
+                    hairColour = entityDef.HairColourPalette?.GetRandomPaletteIndex() ?? 0,
+                    faceColour = entityDef.FaceColourPalette?.GetRandomPaletteIndex() ?? 0
                 } : default,
             };
         }

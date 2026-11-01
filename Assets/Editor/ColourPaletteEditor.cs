@@ -8,6 +8,7 @@ public class ColourPaletteEditor : Editor
     private SerializedProperty colourSetProperty;
     private SerializedProperty defaultGradientValueProperty;
     private SerializedProperty gradientProperty;
+    private SerializedProperty brightnessRangeProperty;
 
     private void OnEnable()
     {
@@ -15,6 +16,7 @@ public class ColourPaletteEditor : Editor
         colourSetProperty = serializedObject.FindProperty("colourSet");
         defaultGradientValueProperty = serializedObject.FindProperty("defaultGradientValue");
         gradientProperty = serializedObject.FindProperty("gradient");
+        brightnessRangeProperty = serializedObject.FindProperty("brightnessRange");
     }
 
     public override void OnInspectorGUI()
@@ -55,6 +57,27 @@ public class ColourPaletteEditor : Editor
                 colourSetProperty.InsertArrayElementAtIndex(colourSetProperty.arraySize);
                 SerializedProperty newColorElement = colourSetProperty.GetArrayElementAtIndex(colourSetProperty.arraySize - 1);
                 newColorElement.colorValue = Color.white; // Set default color
+            }
+
+            // Brightness range: what the game actually hands out, previewed underneath
+            EditorGUILayout.Space();
+            Vector2 range = brightnessRangeProperty.vector2Value;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.MinMaxSlider(new GUIContent("Brightness Range", brightnessRangeProperty.tooltip), ref range.x, ref range.y, 0f, 1f);
+            range.x = EditorGUILayout.FloatField(range.x, GUILayout.Width(40));
+            range.y = EditorGUILayout.FloatField(range.y, GUILayout.Width(40));
+            EditorGUILayout.EndHorizontal();
+            range.x = Mathf.Clamp01(Mathf.Min(range.x, range.y)); range.y = Mathf.Clamp01(Mathf.Max(range.x, range.y));
+            brightnessRangeProperty.vector2Value = range;
+            Rect strip = EditorGUILayout.GetControlRect(false, 18f);
+            strip = EditorGUI.PrefixLabel(strip, new GUIContent("In game"));
+            int n = colourSetProperty.arraySize;
+            for (int i = 0; i < n; i++)
+            {
+                Color c = colourSetProperty.GetArrayElementAtIndex(i).colorValue;
+                Color.RGBToHSV(c, out float h, out float s, out float v);
+                Color shown = Color.HSVToRGB(h, s, Mathf.Lerp(range.x, range.y, v));
+                EditorGUI.DrawRect(new Rect(strip.x + strip.width * i / n, strip.y, strip.width / n - 2f, strip.height), shown);
             }
         }
         else

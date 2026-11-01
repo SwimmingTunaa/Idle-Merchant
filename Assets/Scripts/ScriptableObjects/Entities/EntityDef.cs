@@ -75,10 +75,16 @@ public class EntityDef : ScriptableObject
     public SpriteLibraryAsset[] armourSpriteLibraries;
     [Tooltip("Fixed-colour metal over the hat/hair top (same categories/labels); picked with the hair-top index. Empty = none")]
     public SpriteLibraryAsset[] helmetSpriteLibraries;
+    [Tooltip("Face layer (beard) mirrored off the base body (same Body categories/labels as the base library), recoloured with the Face Colour Palette. Empty = none")]
+    public SpriteLibraryAsset[] faceSpriteLibraries;
 
     [Header("Colour palettes")]
     public ColourPalette skinColourPalette;
     public ColourPalette ShirtColourPalette;
     public ColourPalette PantsColourPalette;
     public ColourPalette HairColourPalette;
+    [Tooltip("Face layer (beard) colours: natural hair tones. Separate from Hair, which class defs use for their hat")]
+    public ColourPalette FaceColourPalette;
+    [Tooltip("The hair-top layer is a hat: colour it with the shirt's roll so the outfit matches (class tiers). Off = real hair with its own Hair palette (Novice)")]
+    public bool hatMatchesShirt;
 }

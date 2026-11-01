@@ -283,6 +283,7 @@ public class CharacterGeneratorTester : MonoBehaviour
             shirtColour = def.ShirtColourPalette?.GetRandomPaletteIndex() ?? 0,
             pantsColour = def.PantsColourPalette?.GetRandomPaletteIndex() ?? 0,
             hairColour  = def.HairColourPalette?.GetRandomPaletteIndex() ?? 0,
+            faceColour  = def.FaceColourPalette?.GetRandomPaletteIndex() ?? 0,
         };
     }
 

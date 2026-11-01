@@ -502,6 +502,7 @@ public static class CharacterSpriteGenerator
             hash = hash * 31 + indices.shirtColour;
             hash = hash * 31 + indices.pantsColour;
             hash = hash * 31 + indices.hairColour;
+            hash = hash * 31 + indices.faceColour;
             return hash;
         }
     }

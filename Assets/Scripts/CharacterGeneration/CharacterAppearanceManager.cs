@@ -18,6 +18,7 @@ public struct CharacterAppearanceIndices
     public int shirtColour;
     public int pantsColour;
     public int hairColour;
+    public int faceColour;   // beard (FaceColourPalette); older saves read 0
 }
 
 
@@ -39,12 +40,16 @@ public class CharacterAppearanceManager : MonoBehaviour
     [Tooltip("Optional: fixed-colour armour / helmet layers mirrored off the shirt and hair-top resolvers")]
     [SerializeField] private SpriteLibrary armourReference;
     [SerializeField] private SpriteLibrary helmetReference;
+    [Tooltip("Optional: face layer (beard) mirrored off the base body resolver, coloured from the def's Face Colour Palette")]
+    [SerializeField] private SpriteLibrary faceReference;
 
     [Header("Material References")]
     private Material[] skinMaterials;
     private Material[] shirtMaterials;
     private Material pantsMaterial;
     private Material[] hairMaterials;
+    private Material[] faceMaterials;
+    private Color shirtColourRolled = Color.white;   // the random path's shirt roll, for a hat that matches it
 
     void Awake()
     {
@@ -52,6 +57,7 @@ public class CharacterAppearanceManager : MonoBehaviour
         shirtMaterials = shirtReference.GetComponentsInChildren<SpriteRenderer>().Select(x => x.material).ToArray();
         pantsMaterial = pantsReference.GetComponentInChildren<SpriteRenderer>().material;
         hairMaterials = hairTopReference.GetComponentsInChildren<SpriteRenderer>().Select(x => x.material).ToArray();
+        faceMaterials = faceReference != null ? faceReference.GetComponentsInChildren<SpriteRenderer>(true).Select(x => x.material).ToArray() : new Material[0];
     }
 
     void Start()
@@ -74,6 +80,7 @@ public class CharacterAppearanceManager : MonoBehaviour
 
         if (shirtMaterials.Length == 0) return;
         Color randomColour = entityDef.ShirtColourPalette.GetRandomPaletteColour();
+        shirtColourRolled = randomColour;
         for (int i = 0; i < shirtMaterials.Length; i++)
         {
             shirtMaterials[i].SetColor("_New_Colour", randomColour);
@@ -105,7 +112,7 @@ public class CharacterAppearanceManager : MonoBehaviour
         }
 
         if (hairMaterials.Length == 0) return;
-        Color randomColour = entityDef.HairColourPalette.GetRandomPaletteColour();
+        Color randomColour = entityDef.hatMatchesShirt ? shirtColourRolled : entityDef.HairColourPalette.GetRandomPaletteColour();
         for (int i = 0; i < hairMaterials.Length; i++)
         {
             hairMaterials[i].SetColor("_New_Colour", randomColour);
@@ -149,6 +156,17 @@ public class CharacterAppearanceManager : MonoBehaviour
             baseReference.spriteLibraryAsset = entityDef.baseBodySpriteLibraries[0];
     }
 
+    /// <summary>Face layer (beard): its library rides with the base body (one per def), its colour is the face palette's.</summary>
+    private void ApplyFace(Color colour)
+    {
+        SetOptional(faceReference, entityDef.faceSpriteLibraries, 0);
+        for (int i = 0; i < faceMaterials.Length; i++)
+            faceMaterials[i].SetColor("_New_Colour", colour);
+    }
+
+    public void ChangeRandomFace() =>
+        ApplyFace(entityDef.FaceColourPalette != null ? entityDef.FaceColourPalette.GetRandomPaletteColour() : Color.white);
+
     /// <summary>Optional layer: set the library when the def has one at that index, else clear it so nothing draws.</summary>
     private static void SetOptional(SpriteLibrary reference, SpriteLibraryAsset[] libs, int index)
     {
@@ -167,6 +185,7 @@ public class CharacterAppearanceManager : MonoBehaviour
         ChangeRandomShirt();
         ChangeRandomPants();
         ChangeRandomHair();
+        ChangeRandomFace();
         ChangeRandomSkin();
         ChangeRandomFrontWeapon();
         ChangeRandomBackWeapon();
@@ -204,7 +223,9 @@ public class CharacterAppearanceManager : MonoBehaviour
         Color skinColour = entityDef.skinColourPalette != null ? entityDef.skinColourPalette.GetGradientColour(appearanceIndices.skinColour) : Color.white;
         Color shirtColour = entityDef.ShirtColourPalette != null ? entityDef.ShirtColourPalette.GetPaletteColour(appearanceIndices.shirtColour) : Color.white;
         Color pantsColour = entityDef.PantsColourPalette != null ? entityDef.PantsColourPalette.GetPaletteColour(appearanceIndices.pantsColour) : Color.white;
-        Color hairColour = entityDef.HairColourPalette != null ? entityDef.HairColourPalette.GetPaletteColour(appearanceIndices.hairColour) : Color.white;
+        // A class hat wears the robe's colour; real hair (Novice) keeps its own palette
+        Color hairColour = entityDef.hatMatchesShirt ? shirtColour
+            : entityDef.HairColourPalette != null ? entityDef.HairColourPalette.GetPaletteColour(appearanceIndices.hairColour) : Color.white;
 
         for (int i = 0; i < skinMaterials.Length; i++)
             skinMaterials[i].SetColor("_New_Colour", skinColour);
@@ -217,6 +238,8 @@ public class CharacterAppearanceManager : MonoBehaviour
 
         for (int i = 0; i < hairMaterials.Length; i++)
             hairMaterials[i].SetColor("_New_Colour", hairColour);
+
+        ApplyFace(entityDef.FaceColourPalette != null ? entityDef.FaceColourPalette.GetPaletteColour(appearanceIndices.faceColour) : Color.white);
     }
 
     /// <summary>Recolour the shirt (+ sleeves) and pants layers, leaving skin and hair as they are.</summary>

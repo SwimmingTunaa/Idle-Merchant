@@ -53,10 +53,13 @@ MonoBehaviour:
   - {fileID: 7108339969198208228, guid: 74185ab5bdc54cb7b2600af05838cf84, type: 3}
   helmetSpriteLibraries:
   - {fileID: 7108339969198208228, guid: 2c0446da6bca4ad1bc5fbf7eb846fcf3, type: 3}
+  faceSpriteLibraries: []
   skinColourPalette: {fileID: 11400000, guid: beb744389751b4d87b6a71f4aaf24c6d, type: 2}
   ShirtColourPalette: {fileID: 11400000, guid: 71f2750041eec4053808fd47ea79b7c2, type: 2}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 11400000, guid: e88b568f8711f4f93aa952ca2bebe4af, type: 2}
+  FaceColourPalette: {fileID: 0}
+  hatMatchesShirt: 1
   classLine: 1
   classIcon: {fileID: 6171925371377520893, guid: 98b2f1c9237cb4662958fb3b4cdf2261, type: 3}
   damageMultiplier: 4.5
@@ -94,4 +97,6 @@ MonoBehaviour:
   critMultiplier: 2
   pursuitRange: 0
   pursuitDashTime: 0.12
+  pursuitHopHeight: 0
   maxHpDamage: 0
+  projectilePrefab: {fileID: 0}
