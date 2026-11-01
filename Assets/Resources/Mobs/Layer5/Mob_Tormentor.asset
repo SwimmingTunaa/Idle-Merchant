@@ -29,7 +29,7 @@ MonoBehaviour:
   moveSpeed: 1.5
   stopDistance: 0.05
   idleTimeRange: {x: 0, y: 0}
-  attackDamage: 200
+  attackDamage: 450
   attackInterval: 1.5
   attackRange: 1.5
   chaseBreakRange: 2.5
@@ -44,13 +44,18 @@ MonoBehaviour:
   hairBackSpriteLibraries: []
   frontWeaponSpriteLibraries: []
   backWeaponSpriteLibraries: []
+  armourSpriteLibraries: []
+  helmetSpriteLibraries: []
+  faceSpriteLibraries: []
   skinColourPalette: {fileID: 0}
   ShirtColourPalette: {fileID: 0}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 0}
+  FaceColourPalette: {fileID: 0}
+  hatMatchesShirt: 0
   startingState: 0
   isBoss: 0
-  baseHealth: 2500
+  baseHealth: 3750
   hpMultiplierByLayer:
     serializedVersion: 2
     m_Curve:
