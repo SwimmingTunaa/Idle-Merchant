@@ -882,6 +882,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         {
             float k = t / dur;
             transform.position = Vector3.Lerp(from, end, k) + Vector3.up * (hop * 4f * k * (1f - k));   // parabola peaking at hop
+            if (jumpAnim) animator.Play(JumpState, 0, k);   // scrub the clip by dash progress: all frames play at any dash time
             ClickHitVFX.Instance?.PlayDust(transform.position, 1);   // faint after-image trail
             yield return null;
         }
