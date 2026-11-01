@@ -153,7 +153,12 @@ public class CharacterAppearanceManager : MonoBehaviour
     private static void SetOptional(SpriteLibrary reference, SpriteLibraryAsset[] libs, int index)
     {
         if (reference == null) return;
-        reference.spriteLibraryAsset = libs != null && libs.Length > 0 ? libs[Mathf.Clamp(index, 0, libs.Length - 1)] : null;
+        bool has = libs != null && libs.Length > 0;
+        reference.spriteLibraryAsset = has ? libs[Mathf.Clamp(index, 0, libs.Length - 1)] : null;
+        // No library resolves nothing, so the renderers would keep the last sprite — a reused instance (the icon
+        // baker's preview, a pooled unit) re-dressed as a def without armour would wear the previous class's.
+        if (!has)
+            foreach (var sr in reference.GetComponentsInChildren<SpriteRenderer>(true)) sr.sprite = null;
     }
 
     public void ChangeAllRandom()

@@ -364,9 +364,10 @@ public static class CharacterSpriteGenerator
         return sprite;
     }
 
-    /// <summary>Returns a new texture cropped to the non-transparent content (plus `padding` px of
+    /// <summary>Returns a new texture cropped to the visible content (plus `padding` px of
     /// transparent border), point-filtered for crisp pixel-art upscaling. Returns the input
-    /// unchanged if it's fully transparent.</summary>
+    /// unchanged if it's fully transparent. Near-transparent texels don't count: the class sheets
+    /// carry one alpha-1 pad pixel per empty cell, which would stretch the crop and off-centre the icon.</summary>
     private static Texture2D CropToContent(Texture2D tex, int padding)
     {
         int w = tex.width, h = tex.height;
@@ -378,7 +379,7 @@ public static class CharacterSpriteGenerator
             int row = y * w;
             for (int x = 0; x < w; x++)
             {
-                if (px[row + x].a == 0) continue;
+                if (px[row + x].a <= 16) continue;   // same cut as the baked outline
                 if (x < minX) minX = x;
                 if (x > maxX) maxX = x;
                 if (y < minY) minY = y;
