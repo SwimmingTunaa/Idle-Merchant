@@ -2,6 +2,7 @@
     <ui:Template name="AdventurerSlot" src="project://database/Assets/Scripts/UI/Panels/Roster/AdventurerSlot.uxml?fileID=9197481963319205126&amp;guid=6eba097cdc81c406083b05c2e13f2368&amp;type=3#AdventurerSlot" />
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Roster/RosterPanel.uss?fileID=7433441132597879392&amp;guid=fcda90a85139941bea862f290df11926&amp;type=3#RosterPanel" />
+    <Style src="project://database/Assets/Scripts/UI/Components/StatBars.uss" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Inventory/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=74ac0a55dbd8b4dbc9772a233525715e&amp;type=3#InventoryPanel" />
     <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
     <ui:VisualElement name="page-root" style="flex-direction: row; flex-grow: 1;">
@@ -184,6 +185,7 @@
                                 <ui:Label name="hp-label-value" text="100/100" class="badge-value" />
                             </ui:VisualElement>
                         </ui:VisualElement>
+                        <ui:VisualElement name="detail-bars" class="detail-bars" />
                     </ui:VisualElement>
                     <ui:VisualElement name="traits-skills-section" class="section-group section-group--traits">
                         <ui:VisualElement name="heading" class="heading">

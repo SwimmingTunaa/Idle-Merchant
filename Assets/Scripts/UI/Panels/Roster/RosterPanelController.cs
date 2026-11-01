@@ -356,7 +356,8 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         {
             string ep = agent.Identity?.epithet;
             epithetLabel.text = ep ?? "";
-            epithetLabel.style.display = string.IsNullOrEmpty(ep) ? DisplayStyle.None : DisplayStyle.Flex;
+            var epithetBanner = rightContent.Q("epithet-wrapper") ?? epithetLabel;   // the plank too, not just its text
+            epithetBanner.style.display = string.IsNullOrEmpty(ep) ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
 
@@ -397,6 +398,13 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             if (dpsLabel != null)
                 dpsLabel.text = (agent.Stats.AttackDamage * aps).ToString("F1");
         }
+
+        // Trait bars, same reading as the hiring poster: this unit's traits vs its class baseline
+        var bars = rightContent.Q("detail-bars");
+        if (bars != null && agent.ClassDef != null)
+            CandidateUIMapper.PopulateBars(bars,
+                new HiringCandidate { entityDef = agent.ClassDef, traits = agent.traitComponent != null ? agent.traitComponent.GetTraitsForSave() : null },
+                true, BaseStats.FromEntityDef(agent.ClassDef));
 
         // XP bar
         RefreshDetailXP(agent);
@@ -496,8 +504,13 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             dragging = true;
             CloseMoveDrop();
             pressSlot.AddToClassList("drag-source");
+            // Inline styles: the panel root is outside the subtree RosterPanel.uss is attached to
             ghost = new VisualElement { pickingMode = PickingMode.Ignore };
-            ghost.AddToClassList("roster-ghost");
+            ghost.style.position = Position.Absolute;
+            ghost.style.width = 88f; ghost.style.height = 88f;
+            ghost.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            ghost.style.opacity = 0.9f;
+            ghost.style.scale = new Scale(new Vector2(1.1f, 1.1f));
             var icon = pressSlot.Q<VisualElement>("unit-icon");
             if (icon != null) ghost.style.backgroundImage = icon.style.backgroundImage;
             leftContent.panel.visualTree.Add(ghost);   // top level: not clipped by the scroll view

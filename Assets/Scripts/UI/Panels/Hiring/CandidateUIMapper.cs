@@ -79,7 +79,7 @@ public static class CandidateUIMapper
         }
 
         PopulateTraits(root, candidate);
-        PopulateBars(root, candidate, advDef != null ? AdventurerBars : PorterBars, baseStats);
+        PopulateBars(root.Q("bars"), candidate, advDef != null, baseStats);
     }
 
     private static void SetBig(VisualElement root, string label1, string value1, string label2, string value2, bool perSecond)
@@ -154,12 +154,12 @@ public static class CandidateUIMapper
     }
 
     // 10 cells over 0.5→1.5 in 0.1 steps: a cell is filled iff its upper edge ≤ m; tick at 1.0.
-    private static void PopulateBars(VisualElement root, HiringCandidate candidate, (StatType stat, string icon)[] rows, BaseStats baseStats)
+    // Also drives the roster detail page (a hired unit's traits wrapped in a candidate). Styles: Components/StatBars.uss
+    public static void PopulateBars(VisualElement bars, HiringCandidate candidate, bool adventurer, BaseStats baseStats)
     {
-        var bars = root.Q("bars");
         bars.Clear();
 
-        foreach (var (stat, icon) in rows)
+        foreach (var (stat, icon) in adventurer ? AdventurerBars : PorterBars)
         {
             float m = Mathf.Clamp(Mathf.Round(BarMult(candidate, stat, baseStats) * 10f) / 10f, 0.5f, 1.5f); // whole cells
 

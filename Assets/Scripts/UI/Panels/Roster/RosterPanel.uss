@@ -1036,15 +1036,6 @@
     opacity: 0.35;
 }
 
-.roster-ghost {                          /* follows the pointer at the panel root, so the scroll view can't clip it */
-    position: absolute;
-    width: 88px;
-    height: 88px;
-    -unity-background-scale-mode: scale-to-fit;
-    opacity: 0.9;
-    scale: 1.1 1.1;
-}
-
 .layer-section.drop-ok {
     background-color: rgba(100, 160, 80, 0.18);
 }
@@ -1134,4 +1125,37 @@
     font-size: var(--font-size-caption);
     color: var(--color-text-secondary);
     white-space: nowrap;
+}
+
+/* ── Trait bars under the Stats badges: the poster's bars (Components/StatBars.uss) shrunk to a 2×2 grid ── */
+.detail-bars {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.detail-bars .bar-row {
+    width: 50%;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-bottom: 6px;
+}
+
+.detail-bars .bar-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+}
+
+.detail-bars .bar { height: 14px; }
+
+.detail-bars .bar-cell {
+    margin-right: 2px;
+    border-width: 2px;
+}
+
+.detail-bars .bar-tick {
+    margin-left: -2px;
+    top: -4px;
+    height: 22px;
 }
