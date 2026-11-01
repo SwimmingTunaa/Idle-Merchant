@@ -86,7 +86,7 @@ MonoBehaviour:
   promoteCostGrowth: 2.5
   rankAttackSpeedMultiplier: 0.1
   cleaveFraction: 0.6
-  cleaveRadius: 2
+  cleaveRadius: 3
   tauntRadius: 0
   tauntInterval: 1
   damageReduction: 0
@@ -94,4 +94,6 @@ MonoBehaviour:
   critMultiplier: 2
   pursuitRange: 0
   pursuitDashTime: 0.12
+  pursuitHopHeight: 0
   maxHpDamage: 0
+  projectilePrefab: {fileID: 0}
