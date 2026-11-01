@@ -1024,11 +1024,13 @@
 /* ── Below-rank warning under the layer name ── */
 .detail-rank-warning {
     position: absolute;
-    top: 44px;                           /* under the "Move to depth" link */
+    top: 82px;                           /* under the rank-fit face */
     right: 4px;
+    max-width: 160px;                    /* the rank-fit line (RankFit.Describe) wraps instead of reaching the portrait */
+    white-space: normal;
     font-size: 16px;                     /* Body/SM */
     color: var(--color-text-danger);
-    -unity-text-align: middle-right;
+    -unity-text-align: upper-right;
 }
 
 /* ── Move / swap between depths: drag a portrait (RosterPanelController MOVE / SWAP) or the picker ── */
@@ -1158,4 +1160,23 @@
     margin-left: -2px;
     top: -4px;
     height: 22px;
+}
+
+/* ── Rank fit faces (RankFit.faces, drawn by Tools/draw_fit_faces.py): 16 px art at 2× ── */
+.detail-fit-face {
+    position: absolute;
+    top: 46px;                           /* under the "Move to depth" link; the fit line sits below it */
+    right: 4px;
+    width: 32px;
+    height: 32px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.slot-fit-badge {                        /* misfits only — top-left corner, the rank badge has the top-right */
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 32px;
+    height: 32px;
+    -unity-background-scale-mode: scale-to-fit;
 }

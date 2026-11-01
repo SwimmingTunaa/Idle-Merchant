@@ -44,6 +44,11 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
     // Class signature state (see the Signature fields on AdventurerDef)
     private bool pursuitCrit;        // Rogue: next hit after a pursuit dash is a guaranteed crit
+    private RankFit.Effect fit = RankFit.Effect.Neutral;   // rank vs depth (ApplyRankFit)
+    private StatModifier fitDamageMod;
+    private float slackTimer;        // > 0 = too-easy unit ignoring new targets after a kill
+    /// <summary>How this unit's rank fits its depth (damage / damage taken / XP / slacking).</summary>
+    public RankFit.Effect Fit => fit;
     private Coroutine dashCoroutine; // Rogue pursuit lerp; AI tick + walking pause while it runs
     private float dashGroundY;       // the hop's floor height, so a cancelled (died mid-air) hop doesn't leave the body floating
     private float tauntTimer;        // Guardian: seconds until the next hold-the-line check
@@ -134,6 +139,9 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     private bool selectOutline;
     private bool outlineApplied;
 
+    /// <summary>Hovered in the world or selected in the Roster (drives the outline; the fit bubble shows too).</summary>
+    public bool IsHighlighted => hoverOutline || selectOutline;
+
     /// <summary>Outline this hero while the cursor is over them in the world (set by ClickerManager).</summary>
     public void SetHoverOutline(bool on)
     {
@@ -214,7 +222,9 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         // Starting skills — Init made a fresh mediator, so the old list is already gone
         skillModifiers.Clear();
         ApplySkills();
-        if (health != null) health.DamageTakenMultiplier = 1f - adventurerDef.damageReduction;
+        fitDamageMod = null;   // belonged to the old mediator
+        slackTimer = 0f;
+        ApplyRankFit();
 
         ChangeState(adventurerDef.startingState);
     }
@@ -374,6 +384,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     protected override void OnUpdateState(AdventurerState currentState)
     {
         if (dashCoroutine != null) return;   // mid pursuit dash — the lerp owns the position
+        if (slackTimer > 0f) slackTimer -= TickDelta;
 
         if (adventurerDef.tauntRadius > 0f && currentState != AdventurerState.Dead)
         {
@@ -487,7 +498,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     {
         stateTimer.Tick(TickDelta);
         
-        if (combat != null)
+        if (combat != null && slackTimer <= 0f)
         {
             var target = combat.ScanForTarget(transform.position, Stats.ScanRange);
             if (target != null)
@@ -505,7 +516,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     {
         stateTimer.Tick(TickDelta);
         
-        if (combat != null)
+        if (combat != null && slackTimer <= 0f)
         {
             var target = combat.ScanForTarget(transform.position, Stats.ScanRange);
             if (target != null)
@@ -646,6 +657,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         string prevClass = ClassName;
         AdvanceRank();
         SetClassDef(next);
+        ApplyRankFit();
         GameSignals.RaiseAdventurerPromoted(this, prevClass, ClassName);
         return true;
     }
@@ -673,7 +685,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         foreach (var mod in skillModifiers) mod.Dispose();
         skillModifiers.Clear();
         ApplySkills();
-        if (health != null) health.DamageTakenMultiplier = 1f - next.damageReduction;
+        RefreshDamageTaken();
     }
 
     /// <summary>
@@ -694,6 +706,29 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         }
         while (currentLevel < level) { currentLevel++; ApplyLevelBonus(); }
         currentXP = xp;
+        ApplyRankFit();
+    }
+
+    /// <summary>Re-evaluate how the rank fits the depth (rank − depth) — on spawn, restore and promotion; a move
+    /// between depths respawns the unit. Damage is a mediator modifier, damage taken stacks with the class's reduction.</summary>
+    private void ApplyRankFit()
+    {
+        fitDamageMod?.Dispose();
+        fitDamageMod = null;
+        var rules = RankFit.Instance;
+        fit = rules != null && layerIndex > 0 ? rules.Evaluate(currentRank - layerIndex) : RankFit.Effect.Neutral;
+        if (!Mathf.Approximately(fit.damage, 1f))
+        {
+            float m = fit.damage;
+            fitDamageMod = new BasicStatModifier(StatType.AttackDamage, 5000, -1f, v => v * m);
+            Stats.Mediator.AddModifier(fitDamageMod);
+        }
+        RefreshDamageTaken();
+    }
+
+    private void RefreshDamageTaken()
+    {
+        if (health != null) health.DamageTakenMultiplier = (1f - adventurerDef.damageReduction) * fit.damageTaken;
     }
 
     // Rank transition (shared by Promote and RestoreProgress): attack-speed step + reset to level 1.
@@ -721,6 +756,14 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         if (targetHealth.IsAlive) return; // not a kill
 
         AwardKillXP(target);
+        if (fit.slacks && RankFit.Instance != null)
+        {
+            var p = RankFit.Instance.slackPause;
+            slackTimer = Random.Range(p.x, p.y);   // too easy: takes a breather before the next one (no pursuit)
+            if (DamageNumberManager.Instance != null)
+                DamageNumberManager.Instance.ShowText("zzz", transform, new Color(0.75f, 0.8f, 0.9f));
+            return;
+        }
         if (adventurerDef.pursuitRange > 0f) TryPursuit(target);
     }
 
@@ -730,7 +773,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         if (!(entity.def is MobDef mobDef)) return;
 
         float xp = mobDef.baseXPReward * mobDef.hpMultiplierByLayer.Evaluate(layerIndex);
-        GainXP(xp);
+        GainXP(xp * fit.xp);   // rank vs depth: deeper learns faster, too easy learns less / nothing
     }
 
     // ═════════════════════════════════════════════

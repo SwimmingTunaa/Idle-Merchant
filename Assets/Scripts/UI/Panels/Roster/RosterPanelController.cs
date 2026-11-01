@@ -375,10 +375,26 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             layerLabel.text = GetLayerName(agent.layerIndex);
         CloseMoveDrop();
 
-        // Allowed, but a unit below the layer's rank struggles there (dies and revives)
+        // Rank vs depth (RankFit): outmatched below, too easy above; hidden on a good fit
         var rankWarning = rightContent.Q<Label>("detail-rank-warning");
         if (rankWarning != null)
-            rankWarning.style.display = agent.CurrentRank < agent.layerIndex ? DisplayStyle.Flex : DisplayStyle.None;
+        {
+            string fitText = RankFit.Describe(agent.Fit);
+            rankWarning.text = fitText;
+            rankWarning.style.display = fitText.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+
+            // The fit face above the line — every state, the content smile included
+            var fitFace = rankWarning.parent.Q("detail-fit-face");
+            if (fitFace == null)
+            {
+                fitFace = new VisualElement { name = "detail-fit-face", pickingMode = PickingMode.Ignore };
+                fitFace.AddToClassList("detail-fit-face");
+                rankWarning.parent.Add(fitFace);
+            }
+            var faceSprite = RankFit.Instance != null ? RankFit.Instance.Face(RankFit.MoodOf(agent.Fit)) : null;
+            fitFace.style.backgroundImage = faceSprite != null ? new StyleBackground(faceSprite) : StyleKeyword.None;
+            fitFace.style.display = faceSprite != null ? DisplayStyle.Flex : DisplayStyle.None;
+        }
 
         // Stats
         if (agent.Stats != null)
@@ -706,6 +722,23 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
     private void RefreshSlot(VisualElement slot, AdventurerAgent agent)
     {
+        // Rank-fit face on the portrait's corner — misfits only, so the badge means "move me"
+        var frame = slot.Q("slot-frame");
+        if (frame != null)
+        {
+            var badge = frame.Q("slot-fit-badge");
+            if (badge == null)
+            {
+                badge = new VisualElement { name = "slot-fit-badge", pickingMode = PickingMode.Ignore };
+                badge.AddToClassList("slot-fit-badge");
+                frame.Add(badge);
+            }
+            var mood = RankFit.MoodOf(agent.Fit);
+            var face = mood != RankFit.Mood.Fit && RankFit.Instance != null ? RankFit.Instance.Face(mood) : null;
+            badge.style.backgroundImage = face != null ? new StyleBackground(face) : StyleKeyword.None;
+            badge.style.display = face != null ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
         float xpRatio = agent.XPForNextLevel >= float.MaxValue
             ? 1f
             : Mathf.Clamp01(agent.CurrentXP / agent.XPForNextLevel);

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3816f2aba9794e1184242882d6dc43c, type: 3}
+  m_Name: RankFit
+  m_EditorClassIdentifier: Assembly-CSharp::RankFit
+  damageLossPerRank: 0.15
+  damageTakenPerRank: 0.2
+  xpBonusPerRank: 0.25
+  xpMultiplierAbove:
+  - 0.5
+  - 0
+  slackFromRanksAbove: 2
+  slackPause: {x: 1.5, y: 3}
+  faces:
+  - {fileID: 21300000, guid: c4ed979bb264d4f2fb9f5943559a7e59, type: 3}
+  - {fileID: 21300000, guid: c3bfa0bb51d824d67ba51f146956cd13, type: 3}
+  - {fileID: 21300000, guid: 816011ac476614053a8020caedd2779a, type: 3}
+  - {fileID: 21300000, guid: 61b832c8ae8c34eb79e07442c9529324, type: 3}
+  - {fileID: 21300000, guid: bcb87dbd987e14a668f50d0a4df9415f, type: 3}
+  bubbleFrames:
+  - {fileID: 3035309369274219449, guid: bd63197f289bfbf4a8ea82acaf001318, type: 3}
+  - {fileID: 2117397990, guid: bd63197f289bfbf4a8ea82acaf001318, type: 3}
+  - {fileID: -291478241, guid: bd63197f289bfbf4a8ea82acaf001318, type: 3}
+  mildShowSeconds: 4
