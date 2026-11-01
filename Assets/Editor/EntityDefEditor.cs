@@ -14,7 +14,7 @@ public class EntityDefEditor : Editor
     private readonly string[] tabNames = { "Core", "Stats", "Visual", "Behaviour" };
     
     private int selectedLibraryTab = 0;
-    private readonly string[] libraryTabNames = { "Base Body", "Shirt", "Pants", "Hair Top", "Hair Back", "Front Weapon", "Back Weapon" };
+    private readonly string[] libraryTabNames = { "Base Body", "Shirt", "Pants", "Hair Top", "Hair Back", "Front Weapon", "Back Weapon", "Armour", "Helmet" };
 
     // Core
     private SerializedProperty prefabProp;
@@ -459,6 +459,8 @@ public class EntityDefEditor : Editor
                 case 4: EditorGUILayout.PropertyField(hairBackSpriteLibrariesProp, true); break;
                 case 5: EditorGUILayout.PropertyField(frontWeaponSpriteLibrariesProp, true); break;
                 case 6: EditorGUILayout.PropertyField(backWeaponSpriteLibrariesProp, true); break;
+                case 7: EditorGUILayout.PropertyField(serializedObject.FindProperty("armourSpriteLibraries"), true); break;   // fixed-colour, mirrors the shirt
+                case 8: EditorGUILayout.PropertyField(serializedObject.FindProperty("helmetSpriteLibraries"), true); break;   // fixed-colour, mirrors the hair top
             }
             
             EditorGUILayout.EndVertical();
@@ -504,6 +506,9 @@ public class EntityDefEditor : Editor
 
     private void DrawAdventurerBehaviourTab()
     {
+        DrawClassSection();
+        EditorGUILayout.Space(5);
+
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("Adventurer Behavior", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(adventurerStartingStateProp, new GUIContent("Starting State"));
@@ -556,6 +561,52 @@ public class EntityDefEditor : Editor
                 MessageType.Info);
         }
         EditorGUILayout.EndVertical();
+    }
+
+    // Class identity + signature skills (AdventurerDef). The class line's own group always shows; another group shows
+    // only when its switch is on (the "0 = off" fields), so a signature set on the wrong class is never hidden.
+    private void DrawClassSection()
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Class", EditorStyles.boldLabel);
+        Field("classLine", "Class Line");
+        Field("classIcon", "Class Icon");
+        Field("damageMultiplier", "Damage ×");
+        Field("hpMultiplier", "Max HP ×");
+
+        var line = (ClassLine)serializedObject.FindProperty("classLine").enumValueIndex;
+        SignatureGroup(line == ClassLine.Warrior, "Warrior: Cleave", new[] { "cleaveFraction" },
+            ("cleaveFraction", "Splash Fraction"), ("cleaveRadius", "Splash Radius"));
+        SignatureGroup(line == ClassLine.Guardian, "Guardian: Hold the Line", new[] { "tauntRadius", "damageReduction" },
+            ("tauntRadius", "Taunt Radius"), ("tauntInterval", "Taunt Interval"), ("damageReduction", "Damage Reduction"));
+        SignatureGroup(line == ClassLine.Rogue, "Rogue: Crits + Pursuit", new[] { "critChance", "pursuitRange" },
+            ("critChance", "Crit Chance"), ("critMultiplier", "Crit ×"), ("pursuitRange", "Dash Range"), ("pursuitDashTime", "Dash Time (s)"), ("pursuitHopHeight", "Hop Height"));
+        SignatureGroup(line == ClassLine.Mage, "Mage: Arcane Weight + Fireball", new[] { "maxHpDamage", "projectilePrefab" },
+            ("maxHpDamage", "% Max-HP Damage"), ("projectilePrefab", "Projectile"));
+        EditorGUILayout.EndVertical();
+    }
+
+    private void SignatureGroup(bool own, string title, string[] switches, params (string name, string label)[] fields)
+    {
+        if (!own)
+        {
+            bool on = false;
+            foreach (var name in switches)
+            {
+                var p = serializedObject.FindProperty(name);
+                on |= p.propertyType == SerializedPropertyType.Float ? p.floatValue > 0f : p.objectReferenceValue != null;
+            }
+            if (!on) return;
+        }
+        EditorGUILayout.Space(3);
+        EditorGUILayout.LabelField(title, EditorStyles.miniBoldLabel);
+        foreach (var f in fields) Field(f.name, f.label);
+    }
+
+    private void Field(string name, string label)
+    {
+        var p = serializedObject.FindProperty(name);
+        if (p != null) EditorGUILayout.PropertyField(p, new GUIContent(label, p.tooltip));
     }
 
     private void DrawMobBehaviourTab()
