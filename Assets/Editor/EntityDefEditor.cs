@@ -79,9 +79,7 @@ public class EntityDefEditor : Editor
     private SerializedProperty maxRankProp;
     private SerializedProperty basePromoteCostProp;
     private SerializedProperty promoteCostGrowthProp;
-    private SerializedProperty rankDamageMultiplierProp;
     private SerializedProperty rankAttackSpeedMultiplierProp;
-    private SerializedProperty rankHPMultiplierProp;
 
     // Combat - MobDef specific
     private SerializedProperty mobStartingStateProp;
@@ -193,9 +191,7 @@ public class EntityDefEditor : Editor
             maxRankProp = serializedObject.FindProperty("maxRank");
             basePromoteCostProp = serializedObject.FindProperty("basePromoteCost");
             promoteCostGrowthProp = serializedObject.FindProperty("promoteCostGrowth");
-            rankDamageMultiplierProp = serializedObject.FindProperty("rankDamageMultiplier");
             rankAttackSpeedMultiplierProp = serializedObject.FindProperty("rankAttackSpeedMultiplier");
-            rankHPMultiplierProp = serializedObject.FindProperty("rankHPMultiplier");
         }
         
         // Combat (MobDef)
@@ -548,9 +544,7 @@ public class EntityDefEditor : Editor
         EditorGUILayout.PropertyField(maxRankProp, new GUIContent("Max Rank"));
         EditorGUILayout.PropertyField(basePromoteCostProp, new GUIContent("Base Promote Cost (gold)"));
         EditorGUILayout.PropertyField(promoteCostGrowthProp, new GUIContent("Promote Cost Growth (per rank)"));
-        EditorGUILayout.PropertyField(rankDamageMultiplierProp, new GUIContent("Per-Rank Damage +"));
         EditorGUILayout.PropertyField(rankAttackSpeedMultiplierProp, new GUIContent("Per-Rank Atk Speed +"));
-        EditorGUILayout.PropertyField(rankHPMultiplierProp, new GUIContent("Per-Rank Max HP +"));
 
         if (target is AdventurerDef advDef && advDef.levelsPerRank > 0 && advDef.maxRank > 0)
         {
