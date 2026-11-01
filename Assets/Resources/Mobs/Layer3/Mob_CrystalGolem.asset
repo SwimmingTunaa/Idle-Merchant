@@ -16,6 +16,7 @@ MonoBehaviour:
   useModularCharacter: 0
   animatorOverrideController:
   - {fileID: 22100000, guid: 59936ad91f5314aa2aa09a4e84c7cd15, type: 2}
+  - {fileID: 22100000, guid: 52f641f6c370b484ba8eb80f9ea20111, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_CrystalGolem
@@ -44,10 +45,15 @@ MonoBehaviour:
   hairBackSpriteLibraries: []
   frontWeaponSpriteLibraries: []
   backWeaponSpriteLibraries: []
+  armourSpriteLibraries: []
+  helmetSpriteLibraries: []
+  faceSpriteLibraries: []
   skinColourPalette: {fileID: 0}
   ShirtColourPalette: {fileID: 0}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 0}
+  FaceColourPalette: {fileID: 0}
+  hatMatchesShirt: 0
   startingState: 0
   isBoss: 0
   baseHealth: 600
