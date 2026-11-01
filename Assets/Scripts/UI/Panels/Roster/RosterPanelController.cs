@@ -34,6 +34,16 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     private VisualElement leftContent;
     private VisualElement rightContent;
 
+    // Drag a portrait onto another depth (move) or another adventurer (swap); see MOVE / SWAP below
+    private const float DragStartPx = 8f;
+    private const float AutoScrollEdge = 48f, AutoScrollStep = 14f;
+    private AdventurerAgent pressAgent;
+    private VisualElement pressSlot, ghost, hoverTarget;
+    private Vector2 pressPos;
+    private bool dragging;
+    private VisualElement moveDrop;    // "Move to depth" picker on the right page
+    private Label moveLink;
+
     private const int SlotsPerRow = 5;
     private const long PulseIntervalMs = 700;   // matches .slot-rank transition-duration
     private bool goldDirty;                      // GoldChanged → re-check promote affordability once per frame
@@ -65,6 +75,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             dismissBtn.clicked += OnDismissClicked;
         }
 
+        SetupMovePicker(rightPage);
         ShowDetail(null);
         ApplyPendingFocus();
     }
@@ -81,6 +92,8 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         // Roster page is gone (book closed or tab switched away) → drop the world outline
         // and release the camera lock; they only live while you're viewing the Roster.
         SetWorldFocus(null);
+        EndDrag();
+        CloseMoveDrop();
         agentSlots.Clear();
         selectedAgent = null;
         leftContent = null;
@@ -109,7 +122,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
     private VisualElement BuildLayerSection(AdventurerManager manager)
     {
-        var section = new VisualElement();
+        var section = new VisualElement { userData = manager };   // drop target: move onto this depth
         section.AddToClassList("layer-section");
 
         // Header: flourish line · centered layer name · mirrored flourish line
@@ -183,7 +196,23 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
         RefreshSlot(slot, agent);
 
-        slot.RegisterCallback<ClickEvent>(_ => SelectAgent(agent));
+        // Press + release without moving = select; press + move past DragStartPx = drag (move / swap)
+        slot.userData = agent;   // drop target: swap with this adventurer
+        slot.RegisterCallback<PointerDownEvent>(e =>
+        {
+            if (e.button != 0) return;
+            pressAgent = agent; pressSlot = slot; pressPos = e.position; dragging = false;
+            slot.CapturePointer(e.pointerId);
+        });
+        slot.RegisterCallback<PointerMoveEvent>(e => { if (pressSlot == slot && slot.HasPointerCapture(e.pointerId)) DragMove(e.position); });
+        slot.RegisterCallback<PointerUpEvent>(e =>
+        {
+            if (pressSlot != slot || !slot.HasPointerCapture(e.pointerId)) return;
+            slot.ReleasePointer(e.pointerId);
+            if (dragging) Drop(e.position); else SelectAgent(agent);
+            EndDrag();
+        });
+        slot.RegisterCallback<PointerCaptureOutEvent>(_ => { if (pressSlot == slot) EndDrag(); });
         return slot;
     }
 
@@ -343,6 +372,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         var layerLabel = rightContent.Q<Label>("detail-layer");
         if (layerLabel != null)
             layerLabel.text = GetLayerName(agent.layerIndex);
+        CloseMoveDrop();
 
         // Allowed, but a unit below the layer's rank struggles there (dies and revives)
         var rankWarning = rightContent.Q<Label>("detail-rank-warning");
@@ -451,6 +481,192 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         selectedAgent = null;
         SetWorldFocus(null);   // dismiss un-pins the world outline + camera lock
         ShowDetail(null);
+    }
+
+    // ═════════════════════════════════════════════
+    // MOVE / SWAP — drag on the left page, "Move to depth" picker on the right
+    // ═════════════════════════════════════════════
+
+    private void DragMove(Vector2 pos)
+    {
+        if (pressAgent == null) return;
+        if (!dragging)
+        {
+            if ((pos - pressPos).sqrMagnitude < DragStartPx * DragStartPx) return;
+            dragging = true;
+            CloseMoveDrop();
+            pressSlot.AddToClassList("drag-source");
+            ghost = new VisualElement { pickingMode = PickingMode.Ignore };
+            ghost.AddToClassList("roster-ghost");
+            var icon = pressSlot.Q<VisualElement>("unit-icon");
+            if (icon != null) ghost.style.backgroundImage = icon.style.backgroundImage;
+            leftContent.panel.visualTree.Add(ghost);   // top level: not clipped by the scroll view
+        }
+
+        ghost.style.left = pos.x - 44f;
+        ghost.style.top = pos.y - 44f;
+
+        // Long roster: hovering near the scroll view's top/bottom edge scrolls it
+        var scroll = leftContent.Q<ScrollView>("roster-scroll");
+        if (scroll != null)
+        {
+            var r = scroll.worldBound;
+            if (pos.y < r.yMin + AutoScrollEdge) scroll.scrollOffset -= new Vector2(0, AutoScrollStep);
+            else if (pos.y > r.yMax - AutoScrollEdge) scroll.scrollOffset += new Vector2(0, AutoScrollStep);
+        }
+
+        SetHover(TargetAt(pos, out var cls), cls);
+    }
+
+    // What's under the pointer: another adventurer (swap) wins over the depth section (move).
+    // cls = the highlight class: drop-ok / drop-bad, or null for no highlight (own depth, nothing there).
+    private VisualElement TargetAt(Vector2 pos, out string cls)
+    {
+        cls = null;
+        for (var e = leftContent.panel.Pick(pos); e != null; e = e.parent)
+        {
+            if (e.userData is AdventurerAgent other)
+            {
+                if (other == pressAgent || other.layerIndex == pressAgent.layerIndex) return null;
+                cls = AdventurerManager.SwapBlocker(pressAgent, other) == null ? "drop-ok" : "drop-bad";
+                return e;
+            }
+            if (e.userData is AdventurerManager m)
+            {
+                if (m.LayerIndex == pressAgent.layerIndex) return null;
+                cls = AdventurerManager.MoveBlocker(pressAgent, m) == null ? "drop-ok" : "drop-bad";
+                return e;
+            }
+        }
+        return null;
+    }
+
+    private void SetHover(VisualElement target, string cls)
+    {
+        if (hoverTarget != null) { hoverTarget.RemoveFromClassList("drop-ok"); hoverTarget.RemoveFromClassList("drop-bad"); }
+        hoverTarget = target;
+        if (hoverTarget != null && cls != null) hoverTarget.AddToClassList(cls);
+    }
+
+    private void Drop(Vector2 pos)
+    {
+        var target = TargetAt(pos, out var cls);
+        if (target == null || cls != "drop-ok") return;
+        var agent = pressAgent;
+
+        if (target.userData is AdventurerAgent other)
+        {
+            if (AdventurerManager.Swap(agent, other, out var movedA, out var movedB))
+                AfterMove(selectedAgent == other ? movedB : movedA);
+        }
+        else if (target.userData is AdventurerManager m)
+        {
+            var moved = AdventurerManager.Move(agent, m);
+            if (moved != null) AfterMove(moved);
+        }
+    }
+
+    private void EndDrag()
+    {
+        SetHover(null, null);
+        ghost?.RemoveFromHierarchy();
+        ghost = null;
+        pressSlot?.RemoveFromClassList("drag-source");
+        pressSlot = null;
+        pressAgent = null;
+        dragging = false;
+    }
+
+    // Moves respawn the unit: rebuild the roster (keeping its scroll) and select the new instance.
+    private void AfterMove(AdventurerAgent select)
+    {
+        if (leftContent == null) return;
+        var scroll = leftContent.Q<ScrollView>("roster-scroll");
+        var offset = scroll != null ? scroll.scrollOffset : Vector2.zero;
+        selectedAgent = null;
+        RebuildRoster(leftContent);
+        if (scroll != null) scroll.schedule.Execute(() => scroll.scrollOffset = offset);
+        if (select != null) SelectAgent(select);
+    }
+
+    // "Move to depth" link under the depth name + its dropdown, both built in code on the right page.
+    private void SetupMovePicker(VisualElement rightPage)
+    {
+        var layerLabel = rightPage.Q<Label>("detail-layer");
+        moveLink = rightPage.Q<Label>("detail-move");
+        if (moveLink == null && layerLabel != null)
+        {
+            moveLink = new Label("Move to depth") { name = "detail-move" };
+            moveLink.AddToClassList("detail-move");
+            layerLabel.parent.Add(moveLink);
+            moveLink.RegisterCallback<ClickEvent>(_ => ToggleMoveDrop());
+        }
+
+        moveDrop = rightPage.Q<VisualElement>("roster-move-drop");
+        if (moveDrop == null)
+        {
+            moveDrop = new VisualElement { name = "roster-move-drop" };
+            moveDrop.AddToClassList("roster-drop");
+            rightPage.Add(moveDrop);
+            // Any press outside the open picker (and not on the link, which toggles it) closes it
+            rightPage.RegisterCallback<PointerDownEvent>(e =>
+            {
+                if (moveDrop.style.display != DisplayStyle.Flex || e.target is not VisualElement t) return;
+                if (moveDrop.Contains(t) || (moveLink != null && moveLink.Contains(t))) return;
+                CloseMoveDrop();
+            }, TrickleDown.TrickleDown);
+        }
+        CloseMoveDrop();
+    }
+
+    private void ToggleMoveDrop()
+    {
+        if (moveDrop == null || selectedAgent == null) return;
+        if (moveDrop.style.display == DisplayStyle.Flex) { CloseMoveDrop(); return; }
+
+        moveDrop.Clear();
+        var head = new Label("MOVE TO");
+        head.AddToClassList("roster-drop__head");
+        moveDrop.Add(head);
+
+        var agent = selectedAgent;
+        foreach (var m in FindObjectsByType<AdventurerManager>().OrderBy(x => x.LayerIndex))
+        {
+            string blocker = AdventurerManager.MoveBlocker(agent, m);
+            if (blocker == "Locked") continue;   // locked depths aren't offered
+            var row = new VisualElement();
+            row.AddToClassList("roster-drop__row");
+            var name = new Label(GetLayerName(m.LayerIndex)) { pickingMode = PickingMode.Ignore };
+            name.AddToClassList("roster-drop__name");
+            var state = new Label(blocker == "Here" ? "here" : blocker == "Full" ? "full · drag to swap" : blocker == "Down" ? "down" : $"{m.GetTotalCount()}/{m.MaxUnits}")
+                { pickingMode = PickingMode.Ignore };
+            state.AddToClassList("roster-drop__state");
+            row.Add(name);
+            row.Add(state);
+            if (blocker == "Here") row.AddToClassList("roster-drop__row--cur");
+            else if (blocker != null) row.AddToClassList("roster-drop__row--off");
+            else
+            {
+                var target = m;
+                row.RegisterCallback<ClickEvent>(_ =>
+                {
+                    CloseMoveDrop();
+                    var moved = AdventurerManager.Move(agent, target);
+                    if (moved != null) AfterMove(moved);
+                });
+            }
+            moveDrop.Add(row);
+        }
+
+        // Hang it under the link, right-aligned to the page (right-content local coordinates)
+        var pos = moveLink.ChangeCoordinatesTo(rightContent, Vector2.zero);
+        moveDrop.style.top = pos.y + moveLink.layout.height + 4f;
+        moveDrop.style.display = DisplayStyle.Flex;
+    }
+
+    private void CloseMoveDrop()
+    {
+        if (moveDrop != null) moveDrop.style.display = DisplayStyle.None;
     }
 
     /// <summary>Box-splice badge (label on top, coloured value below) for the Stats / Traits rows.</summary>

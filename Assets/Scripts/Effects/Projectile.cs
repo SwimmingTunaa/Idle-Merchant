@@ -37,7 +37,7 @@ public class Projectile : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         sr.sortingOrder = 10000;     // over EntitySortingManager's 2000–8000
         sr.renderingLayerMask = 1;   // no outline bits
-        everything = new ContactFilter2D().NoFilter();
+        everything = ContactFilter2D.noFilter;
     }
 
     public void Fire(CombatBehavior from, GameObject at, float facing)

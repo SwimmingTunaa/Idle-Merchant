@@ -1024,9 +1024,114 @@
 /* ── Below-rank warning under the layer name ── */
 .detail-rank-warning {
     position: absolute;
-    top: 24px;
+    top: 44px;                           /* under the "Move to depth" link */
     right: 4px;
     font-size: 16px;                     /* Body/SM */
     color: var(--color-text-danger);
     -unity-text-align: middle-right;
+}
+
+/* ── Move / swap between depths: drag a portrait (RosterPanelController MOVE / SWAP) or the picker ── */
+.drag-source {
+    opacity: 0.35;
+}
+
+.roster-ghost {                          /* follows the pointer at the panel root, so the scroll view can't clip it */
+    position: absolute;
+    width: 88px;
+    height: 88px;
+    -unity-background-scale-mode: scale-to-fit;
+    opacity: 0.9;
+    scale: 1.1 1.1;
+}
+
+.layer-section.drop-ok {
+    background-color: rgba(100, 160, 80, 0.18);
+}
+
+.layer-section.drop-bad {
+    background-color: rgba(180, 60, 50, 0.15);
+}
+
+.adv-slot-container.drop-ok {            /* swap target */
+    scale: 1.12 1.12;
+}
+
+.adv-slot-container.drop-bad {
+    opacity: 0.5;
+}
+
+.detail-move {
+    position: absolute;
+    top: 24px;
+    right: 4px;
+    padding: 0;
+    font-size: 16px;                     /* Body/SM, like the depth name above it */
+    color: var(--color-text-link);
+    border-bottom-width: 1px;
+    border-color: var(--color-text-link);
+}
+
+.detail-move:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-text-primary);
+}
+
+.roster-drop {                           /* parchment sheet hanging under the link (top set in code) */
+    position: absolute;
+    display: none;
+    right: 4px;
+    min-width: 280px;
+    background-color: var(--color-bg-surface);
+    border-left-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-color: var(--color-box-border);
+}
+
+.roster-drop__head {
+    padding: 4px 10px 2px 10px;
+    font-size: var(--font-size-caption);
+    letter-spacing: 1px;
+    color: var(--color-text-secondary);
+    background-color: var(--color-box-bg);
+}
+
+.roster-drop__row {
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 10px;
+    border-top-width: 1px;
+    border-color: var(--color-box-border);
+}
+
+.roster-drop__row:hover {
+    background-color: var(--color-secondary-hover);
+}
+
+.roster-drop__row--cur {
+    background-color: var(--color-secondary-active);
+}
+
+.roster-drop__row--off:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.roster-drop__name {
+    flex-grow: 1;
+    margin-right: 14px;
+    font-size: var(--font-size-small);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+.roster-drop__row--off .roster-drop__name {
+    color: var(--color-text-muted);
+}
+
+.roster-drop__state {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
 }

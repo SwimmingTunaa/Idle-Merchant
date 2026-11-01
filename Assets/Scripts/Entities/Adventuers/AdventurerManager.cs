@@ -225,4 +225,72 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
                 if (a.PromoteCost <= gold) affordable = true;
             }
     }
+
+    // ===== MOVE / SWAP BETWEEN DEPTHS (Roster) =====
+    // A move is the save round trip: same def, identity, traits, looks, rank, level and XP respawned on the
+    // target depth (HP and position reset — it arrives at that floor's spawn). The new unit spawns before the
+    // old one is removed, so nothing is lost mid-way. Callers get the new instances back.
+
+    /// <summary>Why <paramref name="agent"/> can't move to <paramref name="to"/>, or null if it can.</summary>
+    public static string MoveBlocker(AdventurerAgent agent, AdventurerManager to)
+    {
+        if (agent == null || to == null) return "—";
+        if (to.LayerIndex == agent.layerIndex) return "Here";
+        if (ProgressionManager.Instance != null && to.LayerIndex > ProgressionManager.Instance.maxUnlockedLayer) return "Locked";
+        if (!agent.IsAlive) return "Down";
+        if (to.GetTotalCount() >= to.MaxUnits) return "Full";
+        return null;
+    }
+
+    public static AdventurerAgent Move(AdventurerAgent agent, AdventurerManager to)
+    {
+        var from = ManagerFor(agent);
+        if (from == null || MoveBlocker(agent, to) != null) return null;
+        var moved = Respawn(agent, to);
+        if (moved != null) from.RemoveUnit(agent);
+        return moved;
+    }
+
+    /// <summary>Why two adventurers can't trade depths, or null if they can (capacity is unchanged by a swap).</summary>
+    public static string SwapBlocker(AdventurerAgent a, AdventurerAgent b)
+    {
+        if (a == null || b == null || a == b || a.layerIndex == b.layerIndex) return "—";
+        if (!a.IsAlive || !b.IsAlive) return "Down";
+        return null;
+    }
+
+    public static bool Swap(AdventurerAgent a, AdventurerAgent b, out AdventurerAgent newA, out AdventurerAgent newB)
+    {
+        newA = newB = null;
+        var ma = ManagerFor(a); var mb = ManagerFor(b);
+        if (ma == null || mb == null || SwapBlocker(a, b) != null) return false;
+        newA = Respawn(a, mb);
+        newB = Respawn(b, ma);
+        if (newA != null) ma.RemoveUnit(a);
+        if (newB != null) mb.RemoveUnit(b);
+        return newA != null && newB != null;
+    }
+
+    public static AdventurerManager ManagerFor(AdventurerAgent agent)
+    {
+        if (agent == null) return null;
+        foreach (var m in FindObjectsByType<AdventurerManager>())
+            if (m.LayerIndex == agent.layerIndex) return m;
+        return null;
+    }
+
+    private static AdventurerAgent Respawn(AdventurerAgent a, AdventurerManager to)
+    {
+        var ic = a.GetComponent<IdentityComponent>();
+        var candidate = new HiringCandidate
+        {
+            entityDef = a.def,
+            identity = ic != null && ic.Identity != null ? ic.Identity : a.Identity,
+            traits = a.traitComponent != null ? a.traitComponent.GetTraitsForSave() : System.Array.Empty<TraitInstance>(),
+            appearanceIndices = a.appearanceManager != null ? a.appearanceManager.GetCurrentIndices() : default,
+        };
+        var moved = to.SpawnFromData(candidate);
+        if (moved != null) moved.RestoreProgress(a.CurrentRank, a.CurrentLevel, a.CurrentXP);
+        return moved;
+    }
 }
