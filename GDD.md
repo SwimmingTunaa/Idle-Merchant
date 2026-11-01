@@ -465,14 +465,16 @@ This is critical to the idle loop: loot production is a continuous flow, not a w
 | Deep Caverns | Red Slime | 25 | Territorial | Molten Gel (100%) | Mineral Dust (15%) |
 | Deep Caverns | Iron Golem | 50 | Aggressive | Iron Ore (100%) | Mineral Dust (30%) |
 | Crystal Hollows | Crystal Golem | 60 | Aggressive | Crystal Shard (100%) | Crystal Mote (15%) |
-| Crystal Hollows | Corrupted Dwarf | 90 | Aggressive | Cursed Ore (100%) | Crystal Mote (15%) |
-| Crystal Hollows | Deep Dwarf King | 120 | Aggressive | Runed Stone (100%) | Crystal Mote (30%) |
+| Crystal Hollows | Lizardman Warrior | 90 | Aggressive | Cursed Ore (100%) | Crystal Mote (15%) |
+| Crystal Hollows | Lizardman Warlord | 120 | Aggressive | Runed Stone (100%) | Crystal Mote (30%) |
 | Cursed Crypts | Skeleton | 100 | Aggressive | Bone Fragment (100%) | Spirit Essence (15%) |
 | Cursed Crypts | Ghost | 80 | Aggressive | Ectoplasm (100%) | Spirit Essence (15%) |
 | Cursed Crypts | Necromancer | 200 | Aggressive | Soul Shard (100%) | Spirit Essence (30%) |
 | Infernal Depths | Imp | 150 | Aggressive | Demon Horn (100%) | Brimstone Ash (15%) |
 | Infernal Depths | Tormentor | 250 | Aggressive | Infernal Hide (100%) | Brimstone Ash (15%) |
 | Infernal Depths | Demon Lord | 500 | Aggressive | Infernal Core (100%) | Brimstone Ash (30%) |
+
+**Sprites:** Minifolks packs (`Assets/Sprites/Mobs/<pack>/`, Aseprite, 8 PPU). Slimes and golems from the Slimes / Golem packs (the Red Slime is `Slime/MiniMutantSlimeRed`, a red recolour of the mutant slime matching the pack's red PNG variant), Crystal Hollows = Bronze Golem + Lizardmen pack (Warrior, Warlord), Cursed Crypts = undead, Infernal Depths = Demons pack (Imp, Demon Tormentor, Demon Lord). The Cave Bat is `Bat/MiniBat`, rebuilt from the pack's 2× preview GIF (labels and grey backdrop stripped, halved to native size, first play of each animation kept; its unused `spell` tag turns it into a vampire). The Giant Rat still shows a placeholder Forest treant until rat art exists. Names here are display names; the `MobDef` asset names (e.g. `Mob_CorruptedDwarf`, `Mob_DeepDwarfKing` for the two lizardmen) are save keys and never change.
 
 HP values shown are base (Layer 1/3/5/7/9 of each zone). Layer 2/4/6/8/10 variants use the layer difficulty multiplier from Section 5.1.
 
@@ -489,8 +491,8 @@ HP values shown are base (Layer 1/3/5/7/9 of each zone). Layer 2/4/6/8/10 varian
 | Deep Caverns | Iron Ore | Basic | 6g | Iron Golem |
 | Deep Caverns | Mineral Dust | Basic | 5g | All Zone 2 mobs (bonus) |
 | Crystal Hollows | Crystal Shard | Advanced | 10g | Crystal Golem |
-| Crystal Hollows | Cursed Ore | Advanced | 12g | Corrupted Dwarf |
-| Crystal Hollows | Runed Stone | Advanced | 18g | Deep Dwarf King |
+| Crystal Hollows | Cursed Ore | Advanced | 12g | Lizardman Warrior |
+| Crystal Hollows | Runed Stone | Advanced | 18g | Lizardman Warlord |
 | Crystal Hollows | Crystal Mote | Advanced | 8g | All Zone 3 mobs (bonus) |
 | Cursed Crypts | Bone Fragment | Advanced | 8g | Skeleton |
 | Cursed Crypts | Ectoplasm | Advanced | 12g | Ghost |
@@ -1130,7 +1132,7 @@ The table below is the original intent; loot pickup, promotion, mob hits by adve
 |---|---|---|---|---|
 | 1 | 1–2 | Abandoned Mines | Giant Rat, Blue Slime, Cave Bat | Rat Fang, Slime Gel, Bat Wing, Glowcap Spore |
 | 2 | 3–4 | Deep Caverns | Stone Golem, Red Slime, Iron Golem | Stone Chunk, Molten Gel, Iron Ore, Mineral Dust |
-| 3 | 5–6 | Crystal Hollows | Crystal Golem, Corrupted Dwarf, Deep Dwarf King | Crystal Shard, Cursed Ore, Runed Stone, Crystal Mote |
+| 3 | 5–6 | Crystal Hollows | Crystal Golem, Lizardman Warrior, Lizardman Warlord | Crystal Shard, Cursed Ore, Runed Stone, Crystal Mote |
 | 4 | 7–8 | Cursed Crypts | Skeleton, Ghost, Necromancer | Bone Fragment, Ectoplasm, Soul Shard, Spirit Essence |
 | 5 | 9–10 | Infernal Depths | Imp, Tormentor, Demon Lord | Demon Horn, Infernal Hide, Infernal Core, Brimstone Ash |
 

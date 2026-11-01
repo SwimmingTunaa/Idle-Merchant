@@ -15,12 +15,12 @@ MonoBehaviour:
   prefab: {fileID: 1251085265138332734, guid: 6cf2c3ce769454834a5bd0bcbd91751d, type: 3}
   useModularCharacter: 0
   animatorOverrideController:
-  - {fileID: 22100000, guid: 49e437d08c28147f5afaec9b3d2adba7, type: 2}
+  - {fileID: 22100000, guid: d12935616f8ed4ad4a88010689c9cc67, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Mob_DeepDwarfKing
-  displayName: Deep Dwarf King
-  description: '"The last foreman of the deep mines. His crown of living crystal has fused to his skull'
+  displayName: Lizardman Warlord
+  description: Rules the hollows from the biggest crystal it could find. Rarely seen, and never alone.
   hireCost: 500
   rank: 1
   startingSkills: []
@@ -44,6 +44,8 @@ MonoBehaviour:
   hairBackSpriteLibraries: []
   frontWeaponSpriteLibraries: []
   backWeaponSpriteLibraries: []
+  armourSpriteLibraries: []
+  helmetSpriteLibraries: []
   skinColourPalette: {fileID: 0}
   ShirtColourPalette: {fileID: 0}
   PantsColourPalette: {fileID: 0}
