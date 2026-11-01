@@ -54,6 +54,8 @@ public class DamageNumber : MonoBehaviour
     {
         textMesh = GetComponent<TextMeshPro>();
         baseColor = textMesh.color;
+        // The entity outline is composited after every sprite: this bit masks it out under the number (and its coin)
+        HoverOutlineFeature.MarkOverlay(gameObject);
     }
 
     /// <summary>

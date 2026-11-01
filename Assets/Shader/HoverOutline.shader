@@ -25,6 +25,9 @@ Shader "Hidden/HoverOutline"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
+            // Overlays above entities (damage numbers…) drawn by the feature's occluder pass: no outline under them
+            TEXTURE2D_X(_HoverOutlineOccluder);
+
             float4 _OutlineColor;
             float  _OutlineWidthPixels;
 
@@ -65,6 +68,7 @@ Shader "Hidden/HoverOutline"
                 }
 
                 float edge = step(0.1, n);             // a neighbour is filled → we're on the outline
+                edge *= 1.0 - step(0.1, SAMPLE_TEXTURE2D_X(_HoverOutlineOccluder, sampler_LinearClamp, uv).a);
                 return half4(_OutlineColor.rgb, _OutlineColor.a * edge);
             }
             ENDHLSL

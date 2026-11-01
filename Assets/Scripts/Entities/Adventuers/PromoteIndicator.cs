@@ -60,6 +60,7 @@ public class PromoteIndicator : MonoBehaviour
         var sr = go.AddComponent<SpriteRenderer>();
         // World-space marker: always on top of entities and scenery
         sr.sortingOrder = 32000;
+        sr.renderingLayerMask |= HoverOutlineFeature.OverlayRenderingLayer;   // and above the outlines
         return sr;
     }
 

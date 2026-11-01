@@ -23,6 +23,16 @@ using UnityEngine.Rendering.RenderGraphModule.Util;
 /// </summary>
 public class HoverOutlineFeature : ScriptableRendererFeature
 {
+    /// <summary>Rendering-layer bit for overlays drawn above entities (damage numbers…): the outline is
+    /// composited after every sprite, so it would land on top of them; renderers carrying this bit mask it out.</summary>
+    public const uint OverlayRenderingLayer = 8;
+
+    /// <summary>Mark every renderer under <paramref name="go"/> as an overlay: the outline is hidden beneath it.</summary>
+    public static void MarkOverlay(GameObject go)
+    {
+        foreach (var r in go.GetComponentsInChildren<Renderer>(true)) r.renderingLayerMask |= OverlayRenderingLayer;
+    }
+
     [System.Serializable]
     public class Settings
     {
@@ -44,6 +54,10 @@ public class HoverOutlineFeature : ScriptableRendererFeature
 
         [Tooltip("Material using the Hidden/HoverOutline shader.")]
         public Material outlineMaterial;
+
+        [Tooltip("Renderers with this rendering-layer bit hide the outline wherever they draw (overlays above entities, " +
+                 "e.g. damage numbers). 0 = nothing occludes.")]
+        public uint occluderRenderingLayer = OverlayRenderingLayer;
     }
 
     public Settings settings = new Settings();
@@ -74,11 +88,13 @@ public class HoverOutlineFeature : ScriptableRendererFeature
 
         private static readonly int OutlineColorID = Shader.PropertyToID("_OutlineColor");
         private static readonly int OutlineWidthID = Shader.PropertyToID("_OutlineWidthPixels");
+        private static readonly int OccluderID = Shader.PropertyToID("_HoverOutlineOccluder");
 
         private readonly Settings _s;
         public HoverOutlinePass(Settings s) { _s = s; }
 
         private class MaskData { public RendererListHandle list; }
+        private class CompositeData { public TextureHandle mask, occluder; public Material material; }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
@@ -121,6 +137,24 @@ public class HoverOutlineFeature : ScriptableRendererFeature
                 });
             }
 
+            // ── Pass 1b: overlays (damage numbers…) into an occluder mask: the composite skips their texels ──
+            TextureHandle occluder = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "_HoverOutlineOccluder", false);
+            using (var builder = renderGraph.AddRasterRenderPass<MaskData>("Hover Outline Occluders", out var data))
+            {
+                var draw = RenderingUtils.CreateDrawingSettings(
+                    s_SpriteTags, renderingData, cameraData, lightData, SortingCriteria.CommonTransparent);
+                var filter = new FilteringSettings(RenderQueueRange.all) { renderingLayerMask = _s.occluderRenderingLayer };
+                data.list = renderGraph.CreateRendererList(new RendererListParams(renderingData.cullResults, draw, filter));
+                builder.UseRendererList(data.list);
+                builder.SetRenderAttachment(occluder, 0);
+                builder.AllowPassCulling(false);
+                builder.SetRenderFunc((MaskData d, RasterGraphContext ctx) =>
+                {
+                    ctx.cmd.ClearRenderTarget(RTClearFlags.Color, Color.clear, 1f, 0);
+                    if (_s.occluderRenderingLayer != 0) ctx.cmd.DrawRendererList(d.list);
+                });
+            }
+
             // ── Pass 2: composite the outline over the camera colour (URP 6 material blit) ──
             // The mask is bound as _BlitTexture; the shader reads it and alpha-blends the
             // outline over the (loaded) camera colour via its Blend SrcAlpha OneMinusSrcAlpha.
@@ -133,8 +167,19 @@ public class HoverOutlineFeature : ScriptableRendererFeature
 
             _s.outlineMaterial.SetColor(OutlineColorID, _s.outlineColor);
             _s.outlineMaterial.SetFloat(OutlineWidthID, widthPixels);
-            var blit = new RenderGraphUtils.BlitMaterialParameters(mask, resource.activeColorTexture, _s.outlineMaterial, 0);
-            renderGraph.AddBlitPass(blit, "Hover Outline Composite");
+            // Own raster pass (not AddBlitPass) so the occluder mask is a declared input of the composite
+            using (var builder = renderGraph.AddRasterRenderPass<CompositeData>("Hover Outline Composite", out var cd))
+            {
+                cd.mask = mask; cd.occluder = occluder; cd.material = _s.outlineMaterial;
+                builder.UseTexture(mask);
+                builder.UseTexture(occluder);
+                builder.SetRenderAttachment(resource.activeColorTexture, 0, AccessFlags.ReadWrite);
+                builder.SetRenderFunc((CompositeData d, RasterGraphContext ctx) =>
+                {
+                    d.material.SetTexture(OccluderID, (RTHandle)d.occluder);
+                    Blitter.BlitTexture(ctx.cmd, d.mask, new Vector4(1f, 1f, 0f, 0f), d.material, 0);
+                });
+            }
         }
     }
 }

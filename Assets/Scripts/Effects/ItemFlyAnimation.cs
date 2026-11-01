@@ -40,6 +40,7 @@ public class ItemFlyAnimation : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         mainCamera = Camera.main;
+        HoverOutlineFeature.MarkOverlay(gameObject);   // flying loot passes over outlined entities
     }
     
     void OnDisable()

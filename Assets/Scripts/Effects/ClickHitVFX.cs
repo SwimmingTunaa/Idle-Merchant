@@ -80,6 +80,7 @@ public class ClickHitVFX : MonoBehaviour
         var psr = ps.GetComponent<ParticleSystemRenderer>();
         psr.material = new Material(Shader.Find("Sprites/Default")) { mainTexture = Texture2D.whiteTexture };
         psr.sortingOrder = 10000;   // above EntitySortingManager's ranges (2000-8000), under UI
+        psr.renderingLayerMask |= HoverOutlineFeature.OverlayRenderingLayer;   // and above the entity outline
 
         ps.Play();
         return ps;

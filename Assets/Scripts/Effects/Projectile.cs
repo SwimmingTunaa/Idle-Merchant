@@ -36,7 +36,7 @@ public class Projectile : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         sr.sortingOrder = 10000;     // over EntitySortingManager's 2000–8000
-        sr.renderingLayerMask = 1;   // no outline bits
+        sr.renderingLayerMask = 1 | HoverOutlineFeature.OverlayRenderingLayer;   // no outline bits; hides the outlines it flies over
         everything = ContactFilter2D.noFilter;
     }
 

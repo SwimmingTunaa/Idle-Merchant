@@ -245,7 +245,7 @@ public class ClickerManager : MonoBehaviour
         nameplate.rectTransform.pivot = new Vector2(0.5f, 0f);
         var mr = nameplate.GetComponent<MeshRenderer>();
         mr.sortingOrder = 10000;
-        mr.renderingLayerMask = 1;
+        mr.renderingLayerMask = 1 | HoverOutlineFeature.OverlayRenderingLayer;   // above the outline of what it names
         nameplate.gameObject.SetActive(false);
     }
 
