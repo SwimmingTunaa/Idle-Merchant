@@ -8,8 +8,16 @@ using UnityEngine;
 public class EntityBaseEditor : Editor
 {
     private bool showRuntimeStats = true;
-    private bool showBaseStats = true;
-    private bool showModifiedStats = true;
+    private int runtimeTab;
+    private static readonly string[] Tabs = { "Base", "Final" };
+    private static readonly string[] TabsWithClass = { "Base", "Final", "Class" };
+
+    private static readonly FieldInfo PursuitCritField = typeof(AdventurerAgent).GetField("pursuitCrit", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo DashField = typeof(AdventurerAgent).GetField("dashCoroutine", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo TauntTimerField = typeof(AdventurerAgent).GetField("tauntTimer", BindingFlags.Instance | BindingFlags.NonPublic);
+
+    // Live values (HP, dash, pending crit) change every frame — keep the panel current while playing.
+    public override bool RequiresConstantRepaint() => Application.isPlaying;
 
     public override void OnInspectorGUI()
     {
@@ -90,41 +98,93 @@ public class EntityBaseEditor : Editor
                 return;
             }
 
-            showBaseStats = EditorGUILayout.Foldout(showBaseStats, "Base Stats", true);
-            if (showBaseStats)
+            bool hasClass = entity is AdventurerAgent a && a.ClassDef != null;
+            var tabs = hasClass ? TabsWithClass : Tabs;
+            runtimeTab = GUILayout.Toolbar(Mathf.Min(runtimeTab, tabs.Length - 1), tabs);
+            EditorGUILayout.Space(4);
+
+            switch (runtimeTab)
             {
-                DrawKeyValueGrid(
-                    ("Move Speed", baseStats.moveSpeed),
-                    ("Stop Distance", baseStats.stopDistance),
+                case 0:
+                    DrawKeyValueGrid(
+                        ("Move Speed", baseStats.moveSpeed),
+                        ("Stop Distance", baseStats.stopDistance),
 
-                    ("Attack Damage", baseStats.attackDamage),
-                    ("Attack Interval", baseStats.attackSpeed),
-                    ("Attack Range", baseStats.attackRange),
-                    ("Chase Break Range", baseStats.chaseBreakRange),
-                    ("Scan Range", baseStats.scanRange),
+                        ("Attack Damage", baseStats.attackDamage),
+                        ("Attack Interval", baseStats.attackSpeed),
+                        ("Attack Range", baseStats.attackRange),
+                        ("Chase Break Range", baseStats.chaseBreakRange),
+                        ("Scan Range", baseStats.scanRange),
 
-                    ("Carry Capacity", baseStats.carryCapacity),
-                    ("Pickup Time", baseStats.pickupTime),
-                    ("Deposit Time", baseStats.depositTime)
-                );
+                        ("Carry Capacity", baseStats.carryCapacity),
+                        ("Pickup Time", baseStats.pickupTime),
+                        ("Deposit Time", baseStats.depositTime)
+                    );
+                    break;
+                case 1:
+                    DrawKeyValueGrid(
+                        ("Move Speed", stats.MoveSpeed),
+                        ("Attack Damage", stats.AttackDamage),
+                        ("Attack Interval", stats.AttackInterval),
+                        ("Attack Range", stats.AttackRange),
+                        ("Chase Break Range", stats.ChaseBreakRange),
+                        ("Scan Range", stats.ScanRange),
+                        ("Carry Capacity", stats.CarryCapacity),
+                        ("Pickup Time", stats.PickupTime),
+                        ("Deposit Time", stats.DepositTime)
+                    );
+                    break;
+                case 2:
+                    DrawClassStats((AdventurerAgent)entity);
+                    break;
             }
+        }
+    }
 
-            EditorGUILayout.Space(6);
+    // The tier def's class numbers plus each switched-on signature and its live state (AdventurerDef fields, read-only here).
+    private static void DrawClassStats(AdventurerAgent adv)
+    {
+        var d = adv.ClassDef;
+        var hp = adv.GetComponent<Health>();
+        DrawTextGrid(("Tier Def", d.name), ("Class", $"{adv.ClassName} ({d.classLine})"), ("Rank", adv.RankDisplay));
+        DrawKeyValueGrid(("Damage ×", d.damageMultiplier), ("Max HP ×", d.hpMultiplier),
+            ("HP", hp != null ? hp.CurrentHP : 0f), ("Max HP", hp != null ? hp.MaxHP : 0f));
 
-            showModifiedStats = EditorGUILayout.Foldout(showModifiedStats, "Modified Stats (Final)", true);
-            if (showModifiedStats)
+        if (d.cleaveFraction > 0f)
+        {
+            EditorGUILayout.LabelField("Cleave", EditorStyles.miniBoldLabel);
+            DrawKeyValueGrid(("Splash Fraction", d.cleaveFraction), ("Splash Radius", d.cleaveRadius));
+        }
+        if (d.tauntRadius > 0f || d.damageReduction > 0f)
+        {
+            EditorGUILayout.LabelField("Hold the Line", EditorStyles.miniBoldLabel);
+            DrawKeyValueGrid(("Taunt Radius", d.tauntRadius), ("Taunt Interval", d.tauntInterval),
+                ("Next Taunt In", (float)TauntTimerField.GetValue(adv)), ("Damage Reduction", d.damageReduction));
+        }
+        if (d.critChance > 0f || d.pursuitRange > 0f)
+        {
+            EditorGUILayout.LabelField("Crits + Pursuit", EditorStyles.miniBoldLabel);
+            DrawKeyValueGrid(("Crit Chance", d.critChance), ("Crit ×", d.critMultiplier),
+                ("Dash Range", d.pursuitRange), ("Dash Time", d.pursuitDashTime), ("Hop Height", d.pursuitHopHeight));
+            DrawTextGrid(("Next Hit Crit", (bool)PursuitCritField.GetValue(adv) ? "yes (pursuit)" : "no"),
+                ("Dashing", DashField.GetValue(adv) != null ? "yes" : "no"));
+        }
+        if (d.maxHpDamage > 0f || d.projectilePrefab != null)
+        {
+            EditorGUILayout.LabelField("Arcane Weight + Fireball", EditorStyles.miniBoldLabel);
+            DrawKeyValueGrid(("% Max-HP Damage", d.maxHpDamage));
+            DrawTextGrid(("Projectile", d.projectilePrefab != null ? d.projectilePrefab.name : "none (melee)"));
+        }
+    }
+
+    private static void DrawTextGrid(params (string label, string value)[] rows)
+    {
+        foreach (var (label, value) in rows)
+        {
+            using (new EditorGUILayout.HorizontalScope())
             {
-                DrawKeyValueGrid(
-                    ("Move Speed", stats.MoveSpeed),
-                    ("Attack Damage", stats.AttackDamage),
-                    ("Attack Interval", stats.AttackInterval),
-                    ("Attack Range", stats.AttackRange),
-                    ("Chase Break Range", stats.ChaseBreakRange),
-                    ("Scan Range", stats.ScanRange),
-                    ("Carry Capacity", stats.CarryCapacity),
-                    ("Pickup Time", stats.PickupTime),
-                    ("Deposit Time", stats.DepositTime)
-                );
+                EditorGUILayout.LabelField(label, GUILayout.MinWidth(160));
+                EditorGUILayout.SelectableLabel(value, GUILayout.Height(EditorGUIUtility.singleLineHeight));
             }
         }
     }
