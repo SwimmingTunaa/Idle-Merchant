@@ -52,6 +52,8 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     private Coroutine dashCoroutine; // Rogue pursuit lerp; AI tick + walking pause while it runs
     private float dashGroundY;       // the hop's floor height, so a cancelled (died mid-air) hop doesn't leave the body floating
     private float tauntTimer;        // Guardian: seconds until the next hold-the-line check
+    private bool carried;            // lifted by the player's in-world drag (AdventurerCarry): AI tick and walking pause
+    public bool IsCarried => carried;
 
     // XP, rank & level
     private float currentXP;
@@ -224,6 +226,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         ApplySkills();
         fitDamageMod = null;   // belonged to the old mediator
         slackTimer = 0f;
+        carried = false;
         ApplyRankFit();
 
         ChangeState(adventurerDef.startingState);
@@ -246,7 +249,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     {
         base.Update();
 
-        if (State != AdventurerState.Dead && State != AdventurerState.Hit && dashCoroutine == null)
+        if (State != AdventurerState.Dead && State != AdventurerState.Hit && dashCoroutine == null && !carried)
             UpdateMovementSmooth();
 
         // Tick hit stagger cooldown
@@ -383,7 +386,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
     protected override void OnUpdateState(AdventurerState currentState)
     {
-        if (dashCoroutine != null) return;   // mid pursuit dash — the lerp owns the position
+        if (dashCoroutine != null || carried) return;   // mid pursuit dash / carried — something else owns the position
         if (slackTimer > 0f) slackTimer -= TickDelta;
 
         if (adventurerDef.tauntRadius > 0f && currentState != AdventurerState.Dead)
@@ -686,6 +689,13 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         skillModifiers.Clear();
         ApplySkills();
         RefreshDamageTaken();
+
+        // Dress in the new tier's libraries / palettes now (same rolled indices), not on the next respawn
+        if (appearanceManager != null && next.useModularCharacter)
+        {
+            appearanceManager.SetEntityDef(next);
+            appearanceManager.ApplyAppearance();
+        }
     }
 
     /// <summary>
@@ -917,7 +927,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
 
         dashGroundY = end.y;
         float hop = adventurerDef.pursuitHopHeight;
-        bool jumpAnim = hop > 0f && animator != null && animator.HasState(0, JumpState);
+        bool jumpAnim = animator != null && animator.HasState(0, JumpState);   // a flat dash (hop 0, Gold Nightstalker's lightning streak) still plays it
         if (jumpAnim) animator.Play(JumpState, 0, 0f);
 
         float dur = Mathf.Max(0.01f, adventurerDef.pursuitDashTime);
@@ -933,6 +943,17 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         if (jumpAnim) animator.Play(IdleState, 0, 0f);
         ClickHitVFX.Instance?.PlayDust(end);   // landing puff
         dashCoroutine = null;
+    }
+
+    /// <summary>Lift / set down by the in-world drag: drops the target and any dash, then the carrier owns the position.</summary>
+    public void SetCarried(bool on)
+    {
+        carried = on;
+        targetPos = null;
+        if (!on) return;
+        StopDash();
+        if (combat != null) combat.ReleaseTarget();
+        if (State != AdventurerState.Dead) ChangeState(AdventurerState.Idle);
     }
 
     private void StopDash()

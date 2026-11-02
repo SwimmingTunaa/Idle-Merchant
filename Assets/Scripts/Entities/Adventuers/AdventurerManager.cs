@@ -271,12 +271,36 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
         return newA != null && newB != null;
     }
 
-    public static AdventurerManager ManagerFor(AdventurerAgent agent)
+    public static AdventurerManager ManagerFor(AdventurerAgent agent) => agent == null ? null : ManagerForLayer(agent.layerIndex);
+
+    public static AdventurerManager ManagerForLayer(int layer)
     {
-        if (agent == null) return null;
         foreach (var m in FindObjectsByType<AdventurerManager>())
-            if (m.LayerIndex == agent.layerIndex) return m;
+            if (m.LayerIndex == layer) return m;
         return null;
+    }
+
+    /// <summary>
+    /// Promote, then follow the fit: a unit that fitted its depth (depth == old rank) moves to the depth of its new
+    /// rank when that depth is unlocked and has room (otherwise it stays, bored — RankFit shows it). A unit placed
+    /// off its rank on purpose (training deeper, parked shallower) stays put. Returns false if the promotion failed;
+    /// <paramref name="result"/> is the unit to keep using — the respawned instance after a move.
+    /// </summary>
+    public static bool PromoteAndFollow(AdventurerAgent agent, ClassLine line, out AdventurerAgent result, out bool moved)
+    {
+        result = agent; moved = false;
+        if (agent == null) return false;
+        bool fitted = agent.layerIndex == agent.CurrentRank;
+        if (!agent.Promote(line)) return false;
+        if (!fitted) return true;
+        var to = ManagerForLayer(agent.CurrentRank);
+        if (to == null || MoveBlocker(agent, to) != null) return true;
+        var next = Move(agent, to);
+        if (next == null) return true;
+        result = next; moved = true;
+        if (DamageNumberManager.Instance != null)
+            DamageNumberManager.Instance.ShowText($"Off to Depth {to.LayerIndex}!", next.transform, new Color(0.45f, 0.85f, 0.3f));
+        return true;
     }
 
     private static AdventurerAgent Respawn(AdventurerAgent a, AdventurerManager to)
@@ -290,7 +314,11 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
             appearanceIndices = a.appearanceManager != null ? a.appearanceManager.GetCurrentIndices() : default,
         };
         var moved = to.SpawnFromData(candidate);
-        if (moved != null) moved.RestoreProgress(a.CurrentRank, a.CurrentLevel, a.CurrentXP);
+        if (moved != null)
+        {
+            moved.RestoreProgress(a.CurrentRank, a.CurrentLevel, a.CurrentXP);
+            a.despawnQuietly = true;   // the caller removes the old instance next: it left, it didn't die
+        }
         return moved;
     }
 }

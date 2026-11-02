@@ -1,0 +1,478 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.2D.Animation.Runtime::UnityEngine.U2D.Animation.SpriteLibrarySourceAsset
+  m_Library:
+  - m_Name: Body Idle
+    m_Hash: 283202548
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_4
+      m_Hash: 831367658
+      m_Sprite: {fileID: -275361105, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -275361105, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_5
+      m_Hash: 109746556
+      m_Sprite: {fileID: 77893955, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 77893955, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_6
+      m_Hash: 528730310
+      m_Sprite: {fileID: 317580438, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 317580438, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_7
+      m_Hash: 679802960
+      m_Sprite: {fileID: -630299733, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -630299733, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 4
+  - m_Name: Body Walk
+    m_Hash: 22322356
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_17
+      m_Hash: 392574984
+      m_Sprite: {fileID: 658427279, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 658427279, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: null
+      m_Hash: 634125391
+      m_Sprite: {fileID: 0}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 0}
+    - m_Name: Shirt_18
+      m_Hash: 131671449
+      m_Sprite: {fileID: 353129318, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 353129318, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_19
+      m_Hash: 819860751
+      m_Sprite: {fileID: 1361753905, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1361753905, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_20
+      m_Hash: 573570664
+      m_Sprite: {fileID: 663793976, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 663793976, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_21
+      m_Hash: 354995966
+      m_Sprite: {fileID: 310665571, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 310665571, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_22
+      m_Hash: 203530052
+      m_Sprite: {fileID: -88569995, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -88569995, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 7
+  - m_Name: Body Slash
+    m_Hash: 282022137
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_36
+      m_Hash: 307718684
+      m_Sprite: {fileID: 1793142439, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1793142439, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_37
+      m_Hash: 626023050
+      m_Sprite: {fileID: -182845605, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -182845605, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_38
+      m_Hash: 904873755
+      m_Sprite: {fileID: -1502729453, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1502729453, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_39
+      m_Hash: 48789389
+      m_Sprite: {fileID: -2043138424, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -2043138424, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_40
+      m_Hash: 880105966
+      m_Sprite: {fileID: -1345657695, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1345657695, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_41
+      m_Hash: 57829752
+      m_Sprite: {fileID: -2140315924, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -2140315924, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_42
+      m_Hash: 444283074
+      m_Sprite: {fileID: 332715144, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 332715144, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 7
+  - m_Name: Body Hit
+    m_Hash: 691011466
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_53
+      m_Hash: 879180053
+      m_Sprite: {fileID: -1000146565, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1000146565, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_54
+      m_Hash: 704883894
+      m_Sprite: {fileID: -1207192545, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1207192545, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_55
+      m_Hash: 486841376
+      m_Sprite: {fileID: -1271597037, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1271597037, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 3
+  - m_Name: Body Death
+    m_Hash: 809943590
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_62
+      m_Hash: 676158016
+      m_Sprite: {fileID: 2080809508, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 2080809508, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_63
+      m_Hash: 524970710
+      m_Sprite: {fileID: -5877717, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -5877717, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_64
+      m_Hash: 19857269
+      m_Sprite: {fileID: -1307341156, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1307341156, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_65
+      m_Hash: 908709859
+      m_Sprite: {fileID: -216246207, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -216246207, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_66
+      m_Hash: 790666841
+      m_Sprite: {fileID: 2130033846, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 2130033846, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 5
+  - m_Name: Front Arm Idle
+    m_Hash: 560337039
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_8
+      m_Hash: 943449537
+      m_Sprite: {fileID: -1245457684, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1245457684, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_9
+      m_Hash: 255645015
+      m_Sprite: {fileID: 534061152, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 534061152, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_10
+      m_Hash: 151170475
+      m_Sprite: {fileID: 192909088, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 192909088, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_11
+      m_Hash: 1040555325
+      m_Sprite: {fileID: 47124413, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 47124413, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 4
+  - m_Name: Front Arm Walk
+    m_Hash: 819191759
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_23
+      m_Hash: 992391122
+      m_Sprite: {fileID: -719027656, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -719027656, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_24
+      m_Hash: 625097329
+      m_Sprite: {fileID: 1625023964, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1625023964, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_25
+      m_Hash: 306514663
+      m_Sprite: {fileID: -89384650, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -89384650, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_26
+      m_Hash: 189553501
+      m_Sprite: {fileID: 1008264405, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1008264405, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_27
+      m_Hash: 1011575755
+      m_Sprite: {fileID: 459942845, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 459942845, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_28
+      m_Hash: 754218586
+      m_Sprite: {fileID: 262460781, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 262460781, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 6
+  - m_Name: Front Arm Slash
+    m_Hash: 401178382
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_43
+      m_Hash: 763103316
+      m_Sprite: {fileID: -1989975138, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1989975138, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_44
+      m_Hash: 857251319
+      m_Sprite: {fileID: 1968981568, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1968981568, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_45
+      m_Hash: 69184865
+      m_Sprite: {fileID: 1240915331, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1240915331, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_46
+      m_Hash: 488045787
+      m_Sprite: {fileID: 324785935, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 324785935, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_47
+      m_Hash: 705809485
+      m_Sprite: {fileID: -1455898407, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1455898407, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_48
+      m_Hash: 984535516
+      m_Sprite: {fileID: -19819851, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -19819851, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_49
+      m_Hash: 229237066
+      m_Sprite: {fileID: 326398836, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 326398836, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 7
+  - m_Name: Front Arm Hit
+    m_Hash: 982435419
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_56
+      m_Hash: 68013466
+      m_Sprite: {fileID: 1138553381, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1138553381, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_57
+      m_Hash: 856358156
+      m_Sprite: {fileID: 926978858, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 926978858, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_58
+      m_Hash: 599122077
+      m_Sprite: {fileID: -1957684760, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1957684760, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 3
+  - m_Name: Front Arm Death
+    m_Hash: 929099217
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_67
+      m_Hash: 405253839
+      m_Sprite: {fileID: -186089330, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -186089330, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_68
+      m_Hash: 144225118
+      m_Sprite: {fileID: 1915221411, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1915221411, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_69
+      m_Hash: 1067418568
+      m_Sprite: {fileID: -1640608111, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1640608111, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_70
+      m_Hash: 525863469
+      m_Sprite: {fileID: -1914341404, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1914341404, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_71
+      m_Hash: 677329595
+      m_Sprite: {fileID: 850990900, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 850990900, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 5
+  - m_Name: Back Arm Idle
+    m_Hash: 900414174
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_0
+      m_Hash: 920677875
+      m_Sprite: {fileID: -1420324247, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1420324247, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_1
+      m_Hash: 31939941
+      m_Sprite: {fileID: 449478477, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 449478477, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_2
+      m_Hash: 418254047
+      m_Sprite: {fileID: 1044203854, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1044203854, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_3
+      m_Hash: 803814473
+      m_Sprite: {fileID: -1279345709, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1279345709, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 4
+  - m_Name: Back Arm Walk
+    m_Hash: 606008734
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_12
+      m_Hash: 655150215
+      m_Sprite: {fileID: 1076122684, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1076122684, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_13
+      m_Hash: 269220881
+      m_Sprite: {fileID: -573071561, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -573071561, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_14
+      m_Hash: 242182578
+      m_Sprite: {fileID: -1469407270, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1469407270, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_15
+      m_Hash: 963139876
+      m_Sprite: {fileID: 593626825, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 593626825, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_16
+      m_Hash: 543230110
+      m_Sprite: {fileID: -944321418, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -944321418, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 5
+  - m_Name: Back Arm Slash
+    m_Hash: 185717574
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_29
+      m_Hash: 468928204
+      m_Sprite: {fileID: 411255762, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 411255762, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_30
+      m_Hash: 993316649
+      m_Sprite: {fileID: 94289645, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 94289645, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_31
+      m_Hash: 204734399
+      m_Sprite: {fileID: 1713084904, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1713084904, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_32
+      m_Hash: 356167173
+      m_Sprite: {fileID: -789221148, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -789221148, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_33
+      m_Hash: 574463635
+      m_Sprite: {fileID: -1541483583, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1541483583, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_34
+      m_Hash: 1012468528
+      m_Sprite: {fileID: 917934569, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 917934569, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_35
+      m_Hash: 190725030
+      m_Sprite: {fileID: 2089650621, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 2089650621, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 7
+  - m_Name: Back Arm Hit
+    m_Hash: 329192402
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_50
+      m_Hash: 762210479
+      m_Sprite: {fileID: 1112685926, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1112685926, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_51
+      m_Hash: 443111481
+      m_Sprite: {fileID: -711374850, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -711374850, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_52
+      m_Hash: 56625539
+      m_Sprite: {fileID: -2079226871, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -2079226871, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 3
+  - m_Name: Back Arm Death
+    m_Hash: 731398553
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: Shirt_59
+      m_Hash: 347262987
+      m_Sprite: {fileID: -18579326, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -18579326, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_60
+      m_Hash: 105069420
+      m_Sprite: {fileID: -1570654747, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1570654747, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: Shirt_61
+      m_Hash: 826543098
+      m_Sprite: {fileID: 1950385051, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1950385051, guid: ae398a4c51174053a8200dca1157d2e0, type: 3}
+    - m_Name: null
+      m_Hash: 634125391
+      m_Sprite: {fileID: 0}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 0}
+    m_FromMain: 0
+    m_EntryOverrideCount: 4
+  m_PrimaryLibraryGUID: 
+  m_ModificationHash: 639043487425093800
+  m_Version: 1

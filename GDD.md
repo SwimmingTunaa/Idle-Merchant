@@ -208,7 +208,7 @@ Wood is the classless **Novice**. The first promotion (Wood V → Bronze) opens 
 | Rogue | Rogue | Assassin | Shadowblade | Nightstalker | 1.4× attack speed, fragile |
 | Mage | Mage | Sorcerer | Wizard | Archmage | splash aura (Mage Splash skill), fragile |
 
-Damage / HP multipliers on the Novice base (50 / 200) per tier are the CLASSES_DESIGN power-curve table, e.g. Iron Knight 4.5× / 2.8× — target: a rank-N unit kills an average layer-N mob in ~4 hits. A weak unit in a deep layer is allowed; the Roster detail and the hire card say "Below this layer's rank". The Roster badge shows the class icon + name. Phase 1 keeps the Novice sprites; class weapons/outfits, archer projectiles and splash VFX are phase 2.
+Damage / HP multipliers on the Novice base (50 / 200) per tier are the CLASSES_DESIGN power-curve table, e.g. Iron Knight 4.5× / 2.8× — target: a rank-N unit kills an average layer-N mob in ~4 hits. A weak unit in a deep layer is allowed, but its rank fit applies (see 4.2a); the hire card still says "Below this layer's rank". The Roster badge shows the class icon + name. Phase 1 keeps the Novice sprites; class weapons/outfits, archer projectiles and splash VFX are phase 2.
 
 A Novice already above Wood (pre-classes saves, Recruitment Favor recruits) gets a **free one-time path pick**: the picker opens the first time their Roster detail opens, and the promote gem/indicator/badge light up until they pick.
 
@@ -237,6 +237,37 @@ Early levels arrive fast (frequent small wins); the rank gate at Level V is the 
 - The Promote button reads "Promote <cost>" with the copper coin, like the other buy buttons.
 - Layer rows in the Roster wrap at five slots.
 - Rank badge art exists for Rank 1 only — ranks 2–5 badges are pending art (the indicator clamps to the last available badge)
+
+### 4.2a Rank Fit (implemented)
+
+How an adventurer's rank fits the depth it works: **gap = rank − depth** (ranks 1–5 Wood → Gold, depths 1–5). Placing units is a real decision instead of "strongest everywhere".
+
+| Gap | Mood | Effect |
+|---|---|---|
+| ≤ −2 | Outmatched | −15% damage dealt, +20% damage taken, +25% XP **per rank short** |
+| −1 | Stretched | −15% damage, +20% damage taken, +25% XP |
+| 0 | Fit | none |
+| +1 | Easy | ½ XP |
+| ≥ +2 | Slacking | no XP, and a 1.5–3 s breather after each kill ("zzz", no Rogue pursuit) → fewer kills, less loot |
+
+- **Below = danger with an upside:** training a weak unit deep is risky but levels it faster — a deliberate choice, not just a mistake.
+- **Above = waste, not punishment:** an over-ranked unit learns nothing from trivial mobs (no safe promotion farming on depth 1) and slacks, so parking strong units on easy depths doesn't flood the economy with cheap loot.
+- Applied on spawn, save restore and promotion (moving depths respawns the unit); nothing extra is saved. All numbers on `Resources/RankFit` (`RankFit.cs`).
+- **Promotion follows the fit (implemented):** promoting a unit that fitted its depth (depth = its old rank) moves it to the depth of its new rank straight away — the first promotion (the class pick, Wood → Bronze) included — so a promotion never leaves it bored. It stays put if that depth is locked or full, or if it was placed off its rank on purpose (training deeper, parked shallower). The Roster keeps it selected and its depth line reads "Moved to <depth>" for a few seconds; in the world it floats "Off to Depth N!". A moved unit respawns at the new floor with full HP, like any depth move.
+
+**Feedback:** a mood face (16 px, thought-bubble palette, `Tools/draw_fit_faces.py`) on the Roster detail (every mood, with a one-line summary) and on Roster slot corners (misfits only — the badge means "move me"). In the world, misfits show the face in the customers' **thought bubble**: Outmatched / Slacking keep it up; the mild moods (Stretched / Easy) pop it for 4 s after a mood change and while the unit is hovered or selected in the Roster.
+
+### 4.2b Morale (planned — not implemented)
+
+A slower, cumulative layer on top of rank fit, so a misplaced unit becomes a growing problem rather than a flat tax. Design direction agreed; build later.
+
+- **Bar:** each adventurer has morale 0–100. It **drains** while the unit's rank fit isn't Fit (faster the bigger the gap) and **recovers** while it is. Shown on the Roster (detail + slot) next to the fit face.
+- **Low morale deepens the fit effects** (e.g. scales the damage / XP penalties, longer slack pauses) — the same levers, turned up over time.
+- **At 0 the unit goes on strike, never quits:** it stops working (no fighting, clear strike icon in the world and on the Roster) until moved to a fitting depth, then recovers. Permanent loss is out — a unit carries hire gold, promotion gold, levels and traits, and losing it to a timer reads as unfair.
+- **Paused offline.** Idle play happens away from the game; coming back to a striking guild breaks the idle contract ("progress while away, not punishment"). Drain only runs while the player can react.
+- **Forced misfits don't punish progress:** a fresh promotion (unit outgrows its depth) and newly unlocked depths (no unit of that rank exists yet) need a grace period or slower drain, so morale pressures *ignored* misfits, not progression.
+- **Possible carrot (optional):** an over-ranked unit "asks for a transfer" in its bubble; moving it to a fitting depth within a window grants a small reward (XP burst / a Guild Seal) — roster management as something wanted, not only a chore.
+- **Open:** drain / recovery rates, grace length, whether morale is saved (yes if it must persist across sessions; it would join the roster entry in `SaveData`), and whether hiring a unit straight into a misfit depth starts it lower.
 
 ---
 

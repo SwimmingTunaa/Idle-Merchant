@@ -490,7 +490,8 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             return;
         }
 
-        selectedAgent.Promote();
+        if (!AdventurerManager.PromoteAndFollow(selectedAgent, ClassLine.Novice, out var unit, out bool moved)) return;
+        if (moved) { AfterMove(unit); FlashMoved(unit); return; }
         ShowDetail(selectedAgent);
         if (agentSlots.TryGetValue(selectedAgent, out var slot))
             RefreshSlot(slot, selectedAgent);
@@ -607,6 +608,15 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     }
 
     // Moves respawn the unit: rebuild the roster (keeping its scroll) and select the new instance.
+    /// <summary>After a promotion moved the unit: the depth line reads "Moved to <depth>" for a few seconds.</summary>
+    private void FlashMoved(AdventurerAgent unit)
+    {
+        var layerLabel = rightContent?.Q<Label>("detail-layer");
+        if (layerLabel == null || unit != selectedAgent) return;
+        layerLabel.text = "Moved to " + GetLayerName(unit.layerIndex);
+        layerLabel.schedule.Execute(() => { if (selectedAgent == unit) layerLabel.text = GetLayerName(unit.layerIndex); }).StartingIn(3000);
+    }
+
     private void AfterMove(AdventurerAgent select)
     {
         if (leftContent == null) return;
@@ -856,12 +866,14 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     // ═════════════════════════════════════════════
 
     private void OpenClassPick(AdventurerAgent agent) =>
-        FindAnyObjectByType<ClassPickPanelController>()?.OpenFor(agent, () => OnClassPicked(agent));
+        FindAnyObjectByType<ClassPickPanelController>()?.OpenFor(agent, unit => OnClassPicked(agent, unit));
 
-    // Promote also raises OnAdventurerPromoted; ChoosePath doesn't, so refresh here either way
-    private void OnClassPicked(AdventurerAgent agent)
+    // Promote also raises OnAdventurerPromoted; ChoosePath doesn't, so refresh here either way.
+    // A first promotion that followed the fit to the next depth hands back the respawned unit.
+    private void OnClassPicked(AdventurerAgent agent, AdventurerAgent unit)
     {
         if (rightContent == null) return;   // Roster closed meanwhile
+        if (unit != null && unit != agent) { AfterMove(unit); FlashMoved(unit); return; }
         if (agent == selectedAgent) ShowDetail(agent);
         if (agentSlots.TryGetValue(agent, out var slot)) RefreshSlot(slot, agent);
     }

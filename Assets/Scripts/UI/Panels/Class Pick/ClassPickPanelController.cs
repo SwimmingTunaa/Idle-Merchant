@@ -27,7 +27,7 @@ public class ClassPickPanelController : BasePanelController
     };
 
     private AdventurerAgent agent;
-    private Action onPicked;
+    private Action<AdventurerAgent> onPicked;   // gets the unit to keep using (a promotion may move it to a new instance)
     private bool free;
     private int tier;
     private ClassLine picked;
@@ -50,7 +50,7 @@ public class ClassPickPanelController : BasePanelController
     }
 
     /// <summary>Open for this adventurer's class pick; <paramref name="picked"/> runs after a successful Promote / ChoosePath.</summary>
-    public void OpenFor(AdventurerAgent a, Action picked)
+    public void OpenFor(AdventurerAgent a, Action<AdventurerAgent> picked)
     {
         if (a == null || panel == null || ClassCatalog.Instance == null) return;
         agent = a;
@@ -214,10 +214,12 @@ public class ClassPickPanelController : BasePanelController
     private void OnConfirm()
     {
         if (agent == null || picked == ClassLine.Novice) return;
-        bool done = agent.NeedsPathPick ? agent.ChoosePath(picked) : agent.Promote(picked);
+        // A path pick keeps the rank (no move); a real promotion follows the fit to the next depth
+        AdventurerAgent result = agent;
+        bool done = agent.NeedsPathPick ? agent.ChoosePath(picked) : AdventurerManager.PromoteAndFollow(agent, picked, out result, out _);
         if (!done) return;
         var cb = onPicked;
         UIManager.Instance.ClosePanel(this);
-        cb?.Invoke();
+        cb?.Invoke(result);
     }
 }

@@ -28,9 +28,12 @@ ASEPRITE = "/Applications/Aseprite.app/Contents/MacOS/aseprite"
 C = 32
 ANIMS = [("Idle", 4), ("Walk", 6), ("Slash", 7), ("Hit", 3), ("Death", 5)]
 TAG_FOR = {"Idle": ("idle",), "Walk": ("walk",), "Slash": ("attack",), "Hit": ("damage", "hit"), "Death": ("death",), "Jump": ("jump",)}
-JUMP = ("Jump", 4)   # --jump: an extra row on TOP of every sheet (keeps the existing slices' bottom-up rects), used by the Rogue pursuit dash
+JUMP = ("Jump", 4)
+# Packs whose jump row comes from another tag, at picked offsets into it: the lightning warrior's Spell 2 teleport
+# (silhouette, streaks, bolt strike, re-form) plays across the Rogue pursuit dash
+JUMP_PICKS = {"MiniLightningWarrior": ("spell 2", (2, 4, 8, 11))}   # --jump: an extra row on TOP of every sheet (keeps the existing slices' bottom-up rects), used by the Rogue pursuit dash
 USE_LAYERS = ("main", "hands")
-NOT_FX = USE_LAYERS + ("outline",)
+NOT_FX = USE_LAYERS + ("outline", "bg")   # layer names are lower-cased on load; the Elements pack's "Weapon" layer loads as "hands" (hand + what it holds, like the Humans pack's)
 SKIN = {(248, 192, 144): (255, 255, 255), (200, 136, 80): (199, 199, 199)}
 INK = (43, 41, 40); OUR_INK = (16, 20, 31)
 STEEL = {(181, 214, 222), (140, 173, 198), (90, 123, 148), (255, 255, 255), (229, 233, 222), (174, 182, 161), (62, 59, 57), (78, 75, 73), (152, 216, 248)}   # steel, beard greys, staff crystal: fixed colour
@@ -39,17 +42,25 @@ STEEL = {(181, 214, 222), (140, 173, 198), (90, 123, 148), (255, 255, 255), (229
 # (pants / cloak / weapon keep the source colours).
 CLOTH_TONES = {"MiniThief": {(176, 112, 64): (235, 235, 235), (112, 80, 48): (165, 165, 165), (111, 47, 39): (200, 200, 200)},
                "MiniMage": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
+               "MiniArchMage": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
+               "MiniLightningWarrior": {(240, 213, 10): (235, 235, 235), (224, 145, 40): (165, 165, 165)},   # yellow vest + hair
                "MiniHalberdMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
                "MiniShieldMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)}}   # robe + hat: the tint multiplies source grey, so the dark blues showed palette colours at ~half brightness
 # Robe classes: the robe is one garment. Its cloth never routes to the weapon (a swinging sleeve or the cuff at the
 # staff hand reaches past the body, and the weapon sheet never recolours), and the hem below the hips stays on the
 # shirt body instead of pants (pants roll their own palette, so a split robe came out two colours)
-ROBE = {"MiniMage": {(64, 88, 192), (96, 152, 232)}}
+ROBE = {"MiniMage": {(64, 88, 192), (96, 152, 232)}, "MiniArchMage": {(64, 88, 192), (96, 152, 232)}}
+# Extra fixed-colour tones per pack (→ armour / helmet like steel): the arch mage's gold trim
+FIXED = {"MiniArchMage": {(247, 247, 87), (223, 199, 111)}, "MiniLightningWarrior": {(167, 71, 63), (111, 47, 39)}}   # + the lightning warrior's red scarf
 CRYSTAL = {(152, 216, 248), (216, 248, 248), (223, 249, 249)}   # staff orb core: robe-blue touching it is the orb's rim (stays weapon)
 # Beard → its own face sheet, recoloured in-game with the def's FaceColourPalette (natural hair colours). The pack's
 # beard greys are dark, and the Outfit shader takes source lightness, so they're lifted onto our hair sheet's tones.
 # Opt-in per pack: the thief's cloak + hood share these exact greys
-BEARD = {"MiniMage": {(78, 75, 73): (199, 199, 199), (62, 59, 57): (131, 131, 131)}}
+BEARD = {"MiniMage": {(78, 75, 73): (199, 199, 199), (62, 59, 57): (131, 131, 131)},
+         "MiniArchMage": {(229, 233, 222): (199, 199, 199), (174, 182, 161): (131, 131, 131)}}   # long hair + beard, same tones as the mage's beard → its colour roll carries over
+# Hair packs (the hair-top layer is real hair, recoloured by the hair palette): hair-tone cloth touching the head's hat
+# region joins it, so a lock hanging past the face line doesn't land on the shirt
+HAIR = {"MiniLightningWarrior": {(240, 213, 10), (224, 145, 40)}}
 DROP = {(144, 16, 0)}                                                           # the hurt-face red eye
 
 
@@ -102,18 +113,22 @@ def load_ase(name):
     d = json.load(open(js)); sheet = Image.open(png).convert("RGBA")
     frames = {}
     for fr in d["frames"]:
-        m = re.match(r".* \((.+)\) (\d+)\.aseprite$", fr["filename"]); layer, idx = m.group(1), int(m.group(2))
+        m = re.match(r".* \((.+)\) (\d+)\.aseprite$", fr["filename"]); layer, idx = m.group(1).lower(), int(m.group(2))
+        if layer == "weapon": layer = "hands"
         r = fr["frame"]; s = fr["spriteSourceSize"]
         canvas = Image.new("RGBA", (C, C)); canvas.paste(sheet.crop((r["x"], r["y"], r["x"] + r["w"], r["y"] + r["h"])), (s["x"], s["y"]))
         frames[(layer, idx)] = np.array(canvas)
-    tags = {t["name"]: (t["from"], t["to"]) for t in d["meta"]["frameTags"]}
+    tags = {t["name"].lower(): (t["from"], t["to"]) for t in d["meta"]["frameTags"]}
     return frames, tags
 
 
-def frame_map(tags, anims=ANIMS):
+def frame_map(tags, anims=ANIMS, jump_picks=None):
     """our (col,row) → pack frame index, picking each tag's frames evenly when it has more than we need."""
     m = {}
     for row, (anim, n) in enumerate(anims):
+        if anim == "Jump" and jump_picks:
+            for f, off in enumerate(jump_picks[1]): m[(f, row)] = tags[jump_picks[0]][0] + off
+            continue
         tag = next(t for t in TAG_FOR[anim] if t in tags); a, b = tags[tag]; count = b - a + 1
         picks = [a + int(round(i * (count - 1) / max(n - 1, 1))) for i in range(n)] if count >= n else [a + min(i, count - 1) for i in range(n)]
         for f, idx in enumerate(picks): m[(f, row)] = idx
@@ -122,17 +137,20 @@ def frame_map(tags, anims=ANIMS):
 
 def composite(frames, idx):
     """main + hands for one frame (hands on top), plus the hands mask."""
-    T = frames[("main", idx)].copy(); H = frames[("hands", idx)]
+    empty = np.zeros((C, C, 4), np.uint8)
+    T = frames.get(("main", idx), empty).copy(); H = frames.get(("hands", idx), empty)
     hm = H[..., 3] > 0; T[hm] = H[hm]
     return T, hm
 
 
 def chop(name, out, jump=False):
     anims = ANIMS + [JUMP] if jump else ANIMS; R = len(anims)
-    frames, tags = load_ase(name); fmap = frame_map(tags, anims)
+    frames, tags = load_ase(name); jump_picks = JUMP_PICKS.get(os.path.basename(name).removesuffix(".aseprite")); fmap = frame_map(tags, anims, jump_picks)
     tones = CLOTH_TONES.get(os.path.basename(name).removesuffix(".aseprite"), {})
     robe_tones = ROBE.get(os.path.basename(name).removesuffix(".aseprite"), set())
     beard_tones = BEARD.get(os.path.basename(name).removesuffix(".aseprite"), {})
+    hair_tones = HAIR.get(os.path.basename(name).removesuffix(".aseprite"), set())
+    fixed = STEEL | FIXED.get(os.path.basename(name).removesuffix(".aseprite"), set())
     L = lambda p: Image.open(ADV + p).convert("RGBA")
     ours = dict(af=L("Base/Arm Front/base arm front.png"), ab=L("Base/Arm Back/base arm back.png"), pants=L("Equipment/Pants/pants 1.png"))
     S = {k: Image.new("RGBA", (7 * C, R * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon") + (("face",) if beard_tones else ())}
@@ -143,9 +161,13 @@ def chop(name, out, jump=False):
         for f in range(n):
             ref = (f, 1) if anim == "Jump" else (f, row)   # our arm / pants masks have no jump row: borrow the walk pose
             oc = (f, row); T, hands = composite(frames, fmap[oc]); alpha = T[..., 3] > 0
+            if anim == "Jump" and jump_picks:   # a picked spell frame (lightning teleport) is one effect: the whole frame, fixed colour, on the weapon sheet
+                for layer in [l for (l, i) in frames if i == fmap[oc] and l not in ("outline", "bg")]:
+                    S["weapon"].alpha_composite(Image.fromarray(frames[(layer, fmap[oc])]), (f * C, row * C))
+                continue
             key = [[tuple(T[y, x, :3]) for x in range(C)] for y in range(C)]
             skin = np.array([[alpha[y, x] and key[y][x] in SKIN for x in range(C)] for y in range(C)])
-            steel = np.array([[alpha[y, x] and key[y][x] in STEEL for x in range(C)] for y in range(C)])
+            steel = np.array([[alpha[y, x] and key[y][x] in fixed for x in range(C)] for y in range(C)])
             drop = np.array([[alpha[y, x] and key[y][x] in DROP for x in range(C)] for y in range(C)])
             ink = np.array([[alpha[y, x] and key[y][x] == INK for x in range(C)] for y in range(C)])
             robe = np.array([[alpha[y, x] and key[y][x] in robe_tones for x in range(C)] for y in range(C)])
@@ -159,7 +181,7 @@ def chop(name, out, jump=False):
                 face = fskin & (ys <= sy.min() + 7)
                 fy, fx = np.nonzero(face); face_bot = fy.max(); face_top = fy.min(); face_l, face_r = fx.min(), fx.max()
             else:                                                               # face-down death frames: no skin showing → no head region, body box from the silhouette
-                face = np.zeros((C, C), bool); ky, kx = np.nonzero(keep)
+                face = np.zeros((C, C), bool); ky, kx = np.nonzero(keep | ~keep.any())   # (a frame that's all effect: whole cell)
                 face_bot = -1; face_top = ky.min(); face_l, face_r = (kx.min() + kx.max()) // 2 - 6, (kx.min() + kx.max()) // 2 + 6
             shaft = alpha & (T[..., 0] == 98) & (T[..., 1] == 63) & (T[..., 2] == 42)   # pole / staff wood: only the halberd and the mage use it
             pan = cell(ours["pants"], *ref)[..., 3] > 0; pan_top = ys[pan].min() if pan.any() else face_bot + 8
@@ -199,7 +221,10 @@ def chop(name, out, jump=False):
             # cloth / metal by priority so every kept pixel lands somewhere: arms → sleeves, head → hat / helmet,
             # legs → pants, else torso
             c_f = cloth & (af | (robe_held & ~ab)); c_b = cloth & ab & ~c_f; rest = cloth & ~c_f & ~c_b   # robe_held → a sleeve, never the hat
-            hat = rest & head; legs = rest & ~head & (ys >= pan_top) & ~robe; c_body = rest & ~hat & ~legs
+            hat = rest & head
+            hairish = rest & np.array([[key[y][x] in hair_tones for x in range(C)] for y in range(C)])
+            while hair_tones and (grow := dilate(hat, 1) & hairish & ~hat).any(): hat |= grow
+            legs = rest & ~hat & (ys >= pan_top) & ~robe; c_body = rest & ~hat & ~legs
             m_f = metal & af; m_b = metal & ab & ~m_f; mrest = metal & ~m_f & ~m_b
             helmet = mrest & head; m_body = mrest & ~helmet
             routed = skin_all | weapon | c_f | c_b | hat | legs | c_body | m_f | m_b | helmet | m_body | face_px

@@ -181,13 +181,16 @@ public class EntityBase : MonoBehaviour
     /// Despawn with optional death animation.
     /// Override this in derived classes for custom death behavior.
     /// </summary>
+    /// <summary>Set before Despawn to pool at once, no death animation (a unit moved between depths, not killed).</summary>
+    [System.NonSerialized] public bool despawnQuietly;
+
     public virtual void Despawn()
     {
         // Prevent double-despawn
         if (isDying) return;
 
         // If entity has death animation, play it first
-        if (def != null && def.deathAnimationDuration > 0f && animator != null)
+        if (!despawnQuietly && def != null && def.deathAnimationDuration > 0f && animator != null)
         {
             deathCoroutine = StartCoroutine(DespawnWithDeathAnimation(def.deathAnimationDuration));
         }
@@ -234,6 +237,7 @@ public class EntityBase : MonoBehaviour
     protected virtual void DespawnImmediate()
     {
         isDying = false;
+        despawnQuietly = false;
 
         // Re-enable collider before returning to pool
         if (col != null)
