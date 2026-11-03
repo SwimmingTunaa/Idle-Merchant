@@ -1021,16 +1021,25 @@
     align-items: center;
 }
 
-/* ── Below-rank warning under the layer name ── */
+/* ── Rank-fit tooltip (RankFit.Describe): shown while the fit face is hovered ── */
 .detail-rank-warning {
     position: absolute;
-    top: 82px;                           /* under the rank-fit face */
+    top: 70px;                           /* under the rank-fit face */
     right: 4px;
-    max-width: 160px;                    /* the rank-fit line (RankFit.Describe) wraps instead of reaching the portrait */
+    max-width: 180px;
     white-space: normal;
     font-size: 16px;                     /* Body/SM */
     color: var(--color-text-danger);
-    -unity-text-align: upper-right;
+    -unity-text-align: upper-left;
+    background-color: var(--color-bg-surface);
+    border-width: 2px;
+    border-color: var(--color-border-dark);
+    border-radius: 3px;
+    padding: 4px 6px;
+}
+
+.detail-rank-warning--fit {
+    color: var(--color-text-success);
 }
 
 /* ── Move / swap between depths: drag a portrait (RosterPanelController MOVE / SWAP) or the picker ── */
@@ -1054,20 +1063,34 @@
     opacity: 0.5;
 }
 
-.detail-move {
-    position: absolute;
-    top: 24px;
-    right: 4px;
-    padding: 0;
-    font-size: 16px;                     /* Body/SM, like the depth name above it */
-    color: var(--color-text-link);
-    border-bottom-width: 1px;
-    border-color: var(--color-text-link);
+/* The depth name doubles as the "Move to depth" dropdown (RosterPanelController.SetupMovePicker) */
+.detail-layer--drop {
+    padding: 2px 22px 2px 8px;           /* room for the caret on the right */
+    color: var(--color-text-primary);
+    background-color: var(--color-box-bg);
+    border-width: 1px;
+    border-color: var(--color-box-border);
+    border-radius: 3px;
 }
 
-.detail-move:hover {
-    color: var(--color-text-primary);
-    border-color: var(--color-text-primary);
+.detail-layer--drop:hover,
+.detail-layer--open {
+    background-color: var(--color-secondary-hover);
+}
+
+.detail-layer__caret {                   /* the tracker's chevron, flipped to point down; up while open (a sibling over the label's right padding) */
+    position: absolute;
+    right: 11px;
+    top: 12px;                           /* centred on the label (top 4, ~22 px tall) */
+    width: 11px;
+    height: 7px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/chevron-up.png?fileID=21300000&guid=b941cbb03276441e1875e0e9cf9b35bc&type=3#chevron-up");
+    -unity-background-scale-mode: scale-to-fit;
+    rotate: 180deg;
+}
+
+.detail-layer__caret--open {
+    rotate: 0deg;
 }
 
 .roster-drop {                           /* parchment sheet hanging under the link (top set in code) */
@@ -1165,7 +1188,7 @@
 /* ── Rank fit faces (RankFit.faces, drawn by Tools/draw_fit_faces.py): 16 px art at 2× ── */
 .detail-fit-face {
     position: absolute;
-    top: 46px;                           /* under the "Move to depth" link; the fit line sits below it */
+    top: 34px;                           /* under the depth dropdown; the fit tooltip hangs below it */
     right: 4px;
     width: 32px;
     height: 32px;

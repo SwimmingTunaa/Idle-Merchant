@@ -375,21 +375,24 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             layerLabel.text = GetLayerName(agent.layerIndex);
         CloseMoveDrop();
 
-        // Rank vs depth (RankFit): outmatched below, too easy above; hidden on a good fit
+        // Rank vs depth (RankFit): the fit face, with its line (outmatched below, too easy above) as a hover tooltip
         var rankWarning = rightContent.Q<Label>("detail-rank-warning");
         if (rankWarning != null)
         {
             string fitText = RankFit.Describe(agent.Fit);
-            rankWarning.text = fitText;
-            rankWarning.style.display = fitText.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            rankWarning.text = fitText.Length > 0 ? fitText : "Good fit for this depth";
+            rankWarning.style.display = DisplayStyle.None;
+            rankWarning.EnableInClassList("detail-rank-warning--fit", fitText.Length == 0);
 
-            // The fit face above the line — every state, the content smile included
+            // The fit face — every state, the content smile included
             var fitFace = rankWarning.parent.Q("detail-fit-face");
             if (fitFace == null)
             {
-                fitFace = new VisualElement { name = "detail-fit-face", pickingMode = PickingMode.Ignore };
+                fitFace = new VisualElement { name = "detail-fit-face" };
                 fitFace.AddToClassList("detail-fit-face");
                 rankWarning.parent.Add(fitFace);
+                fitFace.RegisterCallback<PointerEnterEvent>(_ => { rankWarning.style.display = DisplayStyle.Flex; rankWarning.BringToFront(); });
+                fitFace.RegisterCallback<PointerLeaveEvent>(_ => rankWarning.style.display = DisplayStyle.None);
             }
             var faceSprite = RankFit.Instance != null ? RankFit.Instance.Face(RankFit.MoodOf(agent.Fit)) : null;
             fitFace.style.backgroundImage = faceSprite != null ? new StyleBackground(faceSprite) : StyleKeyword.None;
@@ -628,16 +631,17 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (select != null) SelectAgent(select);
     }
 
-    // "Move to depth" link under the depth name + its dropdown, both built in code on the right page.
+    // The depth name is the "Move to depth" dropdown (caret added in code) + its picker, built on the right page.
     private void SetupMovePicker(VisualElement rightPage)
     {
-        var layerLabel = rightPage.Q<Label>("detail-layer");
-        moveLink = rightPage.Q<Label>("detail-move");
-        if (moveLink == null && layerLabel != null)
+        moveLink = rightPage.Q<Label>("detail-layer");
+        if (moveLink != null && moveLink.parent.Q("detail-layer-caret") == null)
         {
-            moveLink = new Label("Move to depth") { name = "detail-move" };
-            moveLink.AddToClassList("detail-move");
-            layerLabel.parent.Add(moveLink);
+            // A sibling, not a child: a Label with children stops measuring its text (Yoga measures leaves only)
+            var caret = new VisualElement { name = "detail-layer-caret", pickingMode = PickingMode.Ignore };
+            caret.AddToClassList("detail-layer__caret");
+            moveLink.parent.Add(caret);
+            moveLink.AddToClassList("detail-layer--drop");
             moveLink.RegisterCallback<ClickEvent>(_ => ToggleMoveDrop());
         }
 
@@ -701,11 +705,20 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         var pos = moveLink.ChangeCoordinatesTo(rightContent, Vector2.zero);
         moveDrop.style.top = pos.y + moveLink.layout.height + 4f;
         moveDrop.style.display = DisplayStyle.Flex;
+        SetMoveDropOpen(true);
     }
 
     private void CloseMoveDrop()
     {
         if (moveDrop != null) moveDrop.style.display = DisplayStyle.None;
+        SetMoveDropOpen(false);
+    }
+
+    private void SetMoveDropOpen(bool open)
+    {
+        if (moveLink == null) return;
+        moveLink.EnableInClassList("detail-layer--open", open);
+        moveLink.parent?.Q("detail-layer-caret")?.EnableInClassList("detail-layer__caret--open", open);
     }
 
     /// <summary>Box-splice badge (label on top, coloured value below) for the Stats / Traits rows.</summary>
