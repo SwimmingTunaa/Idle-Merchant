@@ -292,14 +292,10 @@ public class AdventurerManager : UnitManager<AdventurerAgent>
         if (agent == null) return false;
         bool fitted = agent.layerIndex == agent.CurrentRank;
         if (!agent.Promote(line)) return false;
-        if (!fitted) return true;
-        var to = ManagerForLayer(agent.CurrentRank);
-        if (to == null || MoveBlocker(agent, to) != null) return true;
-        var next = Move(agent, to);
-        if (next == null) return true;
-        result = next; moved = true;
-        if (DamageNumberManager.Instance != null)
-            DamageNumberManager.Instance.ShowText($"Off to Depth {to.LayerIndex}!", next.transform, new Color(0.45f, 0.85f, 0.3f));
+        var to = fitted ? ManagerForLayer(agent.CurrentRank) : null;
+        var next = to != null && MoveBlocker(agent, to) == null ? Move(agent, to) : null;
+        if (next != null) { result = next; moved = true; }
+        ClickHitVFX.Instance?.QueuePromotion(result, moved ? $"Off to Depth {to.LayerIndex}!" : null);
         return true;
     }
 

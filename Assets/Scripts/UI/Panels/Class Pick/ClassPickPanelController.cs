@@ -216,8 +216,10 @@ public class ClassPickPanelController : BasePanelController
         if (agent == null || picked == ClassLine.Novice) return;
         // A path pick keeps the rank (no move); a real promotion follows the fit to the next depth
         AdventurerAgent result = agent;
-        bool done = agent.NeedsPathPick ? agent.ChoosePath(picked) : AdventurerManager.PromoteAndFollow(agent, picked, out result, out _);
+        bool pathPick = agent.NeedsPathPick;
+        bool done = pathPick ? agent.ChoosePath(picked) : AdventurerManager.PromoteAndFollow(agent, picked, out result, out _);
         if (!done) return;
+        if (pathPick) ClickHitVFX.Instance?.QueuePromotion(agent);
         var cb = onPicked;
         UIManager.Instance.ClosePanel(this);
         cb?.Invoke(result);

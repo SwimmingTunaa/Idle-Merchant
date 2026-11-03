@@ -33,6 +33,7 @@ public class Health : MonoBehaviour, IDamageable
     private bool isDead;
     private SpriteRenderer[] spriteRenderers;
     private CountdownTimer flashTimer;
+    private bool tinted;   // a Flash() left the blend colour off the damage colour
     
     // Cached shader property IDs
     private static readonly int BlendAmountID = Shader.PropertyToID("_BlendAmount");
@@ -196,8 +197,28 @@ public class Health : MonoBehaviour, IDamageable
 
     // ===== VISUAL FEEDBACK =====
     
+    /// <summary>One-off flash in another colour (promotion glow); the next hit flashes in the damage colour again.</summary>
+    public void Flash(Color colour, float duration)
+    {
+        SetFlashColour(colour);
+        tinted = true;
+        flashTimer.Reset(duration);
+        flashTimer.Start();
+        for (int i = 0; i < spriteRenderers.Length; i++)
+            if (spriteRenderers[i] != null && spriteRenderers[i].material != null)
+                spriteRenderers[i].material.SetFloat(BlendAmountID, 1f);
+    }
+
+    private void SetFlashColour(Color colour)
+    {
+        for (int i = 0; i < spriteRenderers.Length; i++)
+            if (spriteRenderers[i] != null && spriteRenderers[i].material != null)
+                spriteRenderers[i].material.SetColor(BlendColorID, colour);
+    }
+
     private void TriggerFlash()
     {
+        if (tinted) { SetFlashColour(damageFlashColor); tinted = false; }
         flashTimer.Reset(damageFlashDuration);
         flashTimer.Start();
 
@@ -221,6 +242,7 @@ public class Health : MonoBehaviour, IDamageable
 
     private void ResetFlash()
     {
+        if (tinted) { SetFlashColour(damageFlashColor); tinted = false; }
         for (int i = 0; i < spriteRenderers.Length; i++)
         {
             if (spriteRenderers[i] != null && spriteRenderers[i].material != null)

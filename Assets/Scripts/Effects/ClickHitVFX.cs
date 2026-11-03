@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -30,6 +31,7 @@ public class ClickHitVFX : MonoBehaviour
     private ParticleSystem ring;      // no gravity, own system so a new click can Clear() just the ring
     private ParticleSystem shockRing; // expanding damage-AOE ring, white -> red fade over its own lifetime
     private bool stopping;
+    private readonly List<(AdventurerAgent unit, string extra)> pendingPromotions = new();
 
     void Awake()
     {
@@ -50,8 +52,14 @@ public class ClickHitVFX : MonoBehaviour
         col.color = new ParticleSystem.MinMaxGradient(grad);
     }
 
+    void Start()
+    {
+        if (UIManager.Instance != null) UIManager.Instance.OnWorldInputBlockedChanged += OnWorldBlockChanged;
+    }
+
     void OnDestroy()
     {
+        if (UIManager.Instance != null) UIManager.Instance.OnWorldInputBlockedChanged -= OnWorldBlockChanged;
         if (Instance == this) Instance = null;
     }
 
@@ -218,6 +226,65 @@ public class ClickHitVFX : MonoBehaviour
             var v = new Vector3(Random.Range(-0.8f, 0.8f), Random.Range(0.2f, 0.9f), 0f);
             Emit(sparks, pos + new Vector3(Random.Range(-0.15f, 0.15f), 0f, 0f), v, dust, Random.Range(0.22f, 0.32f), Random.Range(0.12f, 0.2f));
         }
+    }
+
+    // ── Promotion: the world half of the promote fx (the Roster plays the in-book half). Queued while a panel
+    // covers the world, played when it clears — i.e. as the book closes — so the player actually sees it.
+
+    /// <summary>Gold pillar + glow + class-name float on a freshly promoted unit; <paramref name="extra"/> floats after it ("Off to Depth N!").</summary>
+    public void QueuePromotion(AdventurerAgent unit, string extra = null)
+    {
+        if (unit == null) return;
+        pendingPromotions.Add((unit, extra));
+        if (UIManager.Instance == null || !UIManager.Instance.IsBlockingWorldInput) OnWorldBlockChanged(false);
+    }
+
+    private void OnWorldBlockChanged(bool blocking)
+    {
+        if (blocking || pendingPromotions.Count == 0) return;
+        StartCoroutine(PlayPromotions(pendingPromotions.ToArray()));
+        pendingPromotions.Clear();
+    }
+
+    private IEnumerator PlayPromotions((AdventurerAgent unit, string extra)[] list)
+    {
+        foreach (var (unit, extra) in list)
+        {
+            // moved or dismissed again before the book closed → that instance is gone
+            if (unit == null || !unit.gameObject.activeInHierarchy) continue;
+            StartCoroutine(PlayPromotion(unit));
+            if (extra != null) StartCoroutine(FloatLater(unit, extra, 0.7f));
+            yield return new WaitForSecondsRealtime(0.25f);
+        }
+    }
+
+    private IEnumerator PlayPromotion(AdventurerAgent unit)
+    {
+        SfxManager.Instance?.Play(SfxId.MilestoneDing);   // ponytail: placeholder until a promotion chime exists
+        if (unit.TryGetComponent<Health>(out var hp)) hp.Flash(sparkGold, 0.45f);
+        DamageNumberManager.Instance?.ShowText($"{unit.ClassName}!", unit.transform, sparkGold);
+        // pillar: three waves of gold / white squares streaming up a column from the feet
+        for (int wave = 0; wave < 3; wave++)
+        {
+            if (unit == null) yield break;
+            var feet = unit.transform.position; feet.z = 0f;
+            for (int i = 0; i < 22; i++)
+            {
+                var p = feet + new Vector3(Random.Range(-0.45f, 0.45f), Random.Range(0f, 1.6f), 0f);
+                Emit(sparks, p, new Vector3(0f, Random.Range(5f, 10f), 0f), i % 3 == 0 ? sparkWhite : sparkGold, Random.Range(0.4f, 0.75f), Random.Range(0.2f, 0.34f));
+            }
+            if (wave == 0)   // ground burst: sparks skidding out along the floor
+                for (int i = 0; i < 12; i++)
+                    Emit(debris, feet, new Vector3((i % 2 == 0 ? 1f : -1f) * Random.Range(1.5f, 3.5f), Random.Range(1f, 2.6f), 0f), sparkGold, Random.Range(0.4f, 0.6f), 0.2f);
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private IEnumerator FloatLater(AdventurerAgent unit, string text, float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        if (unit != null && unit.gameObject.activeInHierarchy)
+            DamageNumberManager.Instance?.ShowText(text, unit.transform, new Color(0.45f, 0.85f, 0.3f));
     }
 
     private IEnumerator HitStop()
