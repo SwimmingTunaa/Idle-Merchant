@@ -28,6 +28,13 @@ public class ClassCatalog : ScriptableObject
     [Tooltip("Class hires cost (Novice price + the promotions they skip) × this.")]
     public float hirePremium = 1.4f;
 
+    [Header("Rank Badges")]
+    [Tooltip("Badge per rank (index 0 = Wood … 4 = Gold), Sprites/Icons/ranks (2–5 drawn by Tools/draw_rank_badges.py). Roster, hire posters and the world promote badge all read it.")]
+    public Sprite[] rankBadges = new Sprite[5];
+
+    public Sprite RankBadge(int rank) =>
+        rankBadges != null && rankBadges.Length > 0 ? rankBadges[Mathf.Clamp(rank - 1, 0, rankBadges.Length - 1)] : null;
+
     private static ClassCatalog instance;
     public static ClassCatalog Instance => instance != null ? instance : instance = Resources.Load<ClassCatalog>("ClassCatalog");
 

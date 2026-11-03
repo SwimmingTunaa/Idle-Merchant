@@ -11,10 +11,6 @@ using UnityEngine;
 public class PromoteIndicator : MonoBehaviour
 {
     [Header("Sprites")]
-    [Tooltip("Badge per rank the adventurer can promote INTO (index 0 = rank 2's badge). " +
-             "Clamps to the last entry while badge art is missing.")]
-    [SerializeField] private Sprite[] rankBadges;
-
     [Tooltip("Up-arrow sprite. Leave empty to use a generated pixel arrow until art exists.")]
     [SerializeField] private Sprite arrowSprite;
 
@@ -119,8 +115,9 @@ public class PromoteIndicator : MonoBehaviour
             promoteShown = promote;
             if (promote)
             {
-                if (rankBadges != null && rankBadges.Length > 0)
-                    badgeRenderer.sprite = rankBadges[Mathf.Clamp(agent.CurrentRank - 1, 0, rankBadges.Length - 1)];
+                // The badge of the rank it promotes INTO (a path pick keeps the rank)
+                var next = ClassCatalog.Instance != null ? ClassCatalog.Instance.RankBadge(agent.NeedsPathPick ? agent.CurrentRank : agent.CurrentRank + 1) : null;
+                if (next != null) badgeRenderer.sprite = next;
                 // Normalise badge to a fixed world height — badge art PPU varies
                 if (badgeRenderer.sprite != null && badgeRenderer.sprite.bounds.size.y > 0f)
                     badgeRenderer.transform.localScale = Vector3.one * (badgeWorldHeight / badgeRenderer.sprite.bounds.size.y);

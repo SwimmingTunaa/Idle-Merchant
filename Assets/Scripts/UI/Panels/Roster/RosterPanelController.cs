@@ -13,9 +13,6 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     [SerializeField] private VisualTreeAsset slotTemplate;
     [SerializeField] private HireController hireController;
 
-    [Tooltip("Optional per-rank gem sprites (index 0 = Wood … 4 = Gold). Falls back to the slot's placeholder when empty.")]
-    [SerializeField] private Sprite[] rankBadgeSprites;
-
     private static readonly string[] LayerNames =
     {
         "",                 // index 0 unused
@@ -493,11 +490,16 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             return;
         }
 
+        var before = CurrentPortrait();
         if (!AdventurerManager.PromoteAndFollow(selectedAgent, ClassLine.Novice, out var unit, out bool moved)) return;
-        if (moved) { AfterMove(unit); FlashMoved(unit); return; }
-        ShowDetail(selectedAgent);
-        if (agentSlots.TryGetValue(selectedAgent, out var slot))
-            RefreshSlot(slot, selectedAgent);
+        if (moved) { AfterMove(unit); FlashMoved(unit); }
+        else
+        {
+            ShowDetail(selectedAgent);
+            if (agentSlots.TryGetValue(selectedAgent, out var slot))
+                RefreshSlot(slot, selectedAgent);
+        }
+        PlayPromoteFx(unit, before);
     }
 
     // Dismiss = clear the selection and return to the placeholder.
@@ -814,14 +816,8 @@ public class RosterPanelController : MonoBehaviour, IBookPage
             RefreshDetailRank(selectedAgent);   // Promote button enable tracks gold too
     }
 
-    /// <summary>Optional per-rank gem sprite (1-based rank); null falls back to the slot placeholder.</summary>
-    private Sprite RankSprite(int rank)
-    {
-        int i = rank - 1;
-        if (rankBadgeSprites != null && i >= 0 && i < rankBadgeSprites.Length)
-            return rankBadgeSprites[i];
-        return null;
-    }
+    /// <summary>Per-rank badge (1-based rank) from the ClassCatalog; null falls back to the slot placeholder.</summary>
+    private static Sprite RankSprite(int rank) => ClassCatalog.Instance != null ? ClassCatalog.Instance.RankBadge(rank) : null;
 
     private void RefreshDetailXP(AdventurerAgent agent)
     {
@@ -852,6 +848,9 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
         var rankNum = rightContent.Q<Label>("detail-rank-number");
         if (rankNum != null) rankNum.text = AdventurerRank.Roman(agent.CurrentLevel);
+        var rankShield = rightContent.Q("Rank");
+        var rankSprite = RankSprite(agent.CurrentRank);
+        if (rankShield != null && rankSprite != null) rankShield.style.backgroundImage = new StyleBackground(rankSprite);
 
         var rankName = rightContent.Q<Label>("detail-rank-name");
         if (rankName != null) rankName.text = agent.RankName;
@@ -878,17 +877,131 @@ public class RosterPanelController : MonoBehaviour, IBookPage
     // CLASS PICK (first promotion / free pick) — the "Choose a Class" modal
     // ═════════════════════════════════════════════
 
-    private void OpenClassPick(AdventurerAgent agent) =>
-        FindAnyObjectByType<ClassPickPanelController>()?.OpenFor(agent, unit => OnClassPicked(agent, unit));
+    private void OpenClassPick(AdventurerAgent agent)
+    {
+        var before = CurrentPortrait();
+        FindAnyObjectByType<ClassPickPanelController>()?.OpenFor(agent, unit => OnClassPicked(agent, unit, before));
+    }
 
     // Promote also raises OnAdventurerPromoted; ChoosePath doesn't, so refresh here either way.
     // A first promotion that followed the fit to the next depth hands back the respawned unit.
-    private void OnClassPicked(AdventurerAgent agent, AdventurerAgent unit)
+    private void OnClassPicked(AdventurerAgent agent, AdventurerAgent unit, Sprite before)
     {
         if (rightContent == null) return;   // Roster closed meanwhile
-        if (unit != null && unit != agent) { AfterMove(unit); FlashMoved(unit); return; }
-        if (agent == selectedAgent) ShowDetail(agent);
-        if (agentSlots.TryGetValue(agent, out var slot)) RefreshSlot(slot, agent);
+        if (unit != null && unit != agent) { AfterMove(unit); FlashMoved(unit); }
+        else
+        {
+            if (agent == selectedAgent) ShowDetail(agent);
+            if (agentSlots.TryGetValue(agent, out var slot)) RefreshSlot(slot, agent);
+        }
+        PlayPromoteFx(unit ?? agent, before);
+    }
+
+    // ═════════════════════════════════════════════
+    // PROMOTION FX — the detail page's transformation beat: the old look whites out, the new one is
+    // swapped in under the flash and settles with a squash, the rank badge slams on with sparks, the class
+    // name punches. ~0.5 s, never blocks input. Runs after ShowDetail has drawn the new look.
+    // ═════════════════════════════════════════════
+
+    private Sprite CurrentPortrait() => rightContent?.Q("detail-sprite")?.style.backgroundImage.value.sprite;
+
+    private void PlayPromoteFx(AdventurerAgent unit, Sprite before)
+    {
+        var portrait = rightContent?.Q("detail-sprite");
+        if (portrait == null || unit == null || unit != selectedAgent) return;
+        var after = portrait.style.backgroundImage.value.sprite;
+        SfxManager.Instance?.Play(SfxId.MilestoneDing);   // ponytail: placeholder until a promotion chime exists
+
+        var whites = new List<Texture2D>();
+        var flash = new VisualElement { pickingMode = PickingMode.Ignore };
+        flash.style.position = Position.Absolute;
+        flash.style.left = flash.style.top = flash.style.right = flash.style.bottom = 0;
+        flash.style.backgroundSize = portrait.resolvedStyle.backgroundSize;
+        flash.style.opacity = 0f;
+        portrait.Add(flash);
+        void Whiteout(Sprite s)
+        {
+            var t = WhiteSilhouette(s);
+            if (t != null) whites.Add(t);
+            flash.style.backgroundImage = t != null ? new StyleBackground(t) : StyleKeyword.None;
+        }
+        void Cleanup()
+        {
+            flash.RemoveFromHierarchy();
+            foreach (var t in whites) Destroy(t);
+        }
+
+        if (before != null) portrait.style.backgroundImage = new StyleBackground(before);
+        Whiteout(before != null ? before : after);
+        var badge = rightContent.Q("Rank");
+        if (badge != null) badge.style.opacity = 0f;   // the new badge waits for its slam
+        flash.experimental.animation.Start(0f, 1f, 150, (e, v) => e.style.opacity = v).OnCompleted(() =>
+        {
+            portrait.style.backgroundImage = new StyleBackground(after);   // the new look, under the flash
+            if (unit != selectedAgent || portrait.panel == null)
+            {
+                if (badge != null) badge.style.opacity = 1f;
+                Cleanup();
+                return;
+            }
+            Whiteout(after);
+            flash.experimental.animation.Start(1f, 0f, 350, (e, v) => e.style.opacity = v).OnCompleted(Cleanup);
+
+            portrait.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(100));
+            portrait.experimental.animation.Start(0f, 1f, 280, (e, v) =>
+                e.style.scale = new Scale(new Vector2(Mathf.LerpUnclamped(1.18f, 1f, v), Mathf.LerpUnclamped(0.84f, 1f, v))))
+                .Ease(UnityEngine.UIElements.Experimental.Easing.OutBack);
+
+            if (badge != null)
+            {
+                badge.experimental.animation.Start(0f, 1f, 220, (e, v) =>
+                {
+                    e.style.scale = new Scale(Vector2.one * Mathf.LerpUnclamped(2.2f, 1f, v));
+                    e.style.opacity = Mathf.Clamp01(v * 3f);
+                }).Ease(UnityEngine.UIElements.Experimental.Easing.OutBack).OnCompleted(() => Sparks(badge));
+            }
+            rightContent.Q("detail-class")?.experimental.animation.Start(0f, 1f, 300, (e, v) =>
+                e.style.scale = new Scale(Vector2.one * Mathf.LerpUnclamped(1.4f, 1f, v)))
+                .Ease(UnityEngine.UIElements.Experimental.Easing.OutBack);
+        });
+    }
+
+    // A white copy of the sprite's pixels (alpha kept) for the flash; null if its texture isn't readable.
+    private static Texture2D WhiteSilhouette(Sprite s)
+    {
+        if (s == null || !s.texture.isReadable) return null;
+        var r = s.textureRect;
+        var px = s.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
+        for (int i = 0; i < px.Length; i++) px[i] = new Color(1f, 1f, 1f, px[i].a);
+        var t = new Texture2D((int)r.width, (int)r.height, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
+        t.SetPixels(px);
+        t.Apply();
+        return t;
+    }
+
+    // A handful of pixel sparks bursting off the badge on impact.
+    private void Sparks(VisualElement badge)
+    {
+        if (rightContent == null || badge.panel == null) return;
+        Vector2 c = badge.ChangeCoordinatesTo(rightContent, badge.layout.size * 0.5f);
+        var cols = new[] { new Color(0.94f, 0.71f, 0.16f), new Color(0.9f, 0.45f, 0.15f) };   // gold / ember: reads on parchment
+        for (int i = 0; i < 12; i++)
+        {
+            var spark = new VisualElement { pickingMode = PickingMode.Ignore };
+            float size = i % 3 == 0 ? 10f : 6f;
+            spark.style.position = Position.Absolute;
+            spark.style.width = spark.style.height = size;
+            spark.style.backgroundColor = cols[i % 2];
+            rightContent.Add(spark);
+            float ang = (i + Random.Range(-0.3f, 0.3f)) * Mathf.PI * 2f / 12f;
+            Vector2 dir = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * Random.Range(80f, 130f);
+            spark.experimental.animation.Start(0f, 1f, 550, (e, v) =>
+            {
+                e.style.left = c.x + dir.x * v - size * 0.5f;
+                e.style.top = c.y + dir.y * v - size * 0.5f;
+                e.style.opacity = 1f - v * v * v;
+            }).Ease(UnityEngine.UIElements.Experimental.Easing.OutCubic).OnCompleted(spark.RemoveFromHierarchy);
+        }
     }
 
     // ═════════════════════════════════════════════

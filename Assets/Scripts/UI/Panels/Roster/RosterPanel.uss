@@ -543,12 +543,8 @@
     transition-timing-function: ease-in-out;
 }
 
-/* Promote-ready gem: gold tint + up arrow. --affordable adds the slow pulse (motion = actionable),
+/* Promote-ready gem: up arrow (no tint — the badge carries its rank colour). --affordable adds the slow pulse (motion = actionable),
    driven by RosterPanelController toggling .roster-pulse on the left page every 700ms. */
-.slot-rank--ready {
-    -unity-background-image-tint-color: rgb(255, 205, 70);
-}
-
 .roster-pulse .slot-rank--affordable {
     scale: 1.18;
 }

@@ -36,12 +36,13 @@ public static class CandidateUIMapper
         if (advDef != null && advDef.classIcon != null)
             classIcon.style.backgroundImage = new StyleBackground(advDef.classIcon);
 
-        // Rank gem + portrait frame: tiers above Wood take the tier tint so a Gold find pops
+        // Rank badge per tier; the portrait frame takes the tier tint above Wood so a Gold find pops
         root.Q<Label>("rank-level").text = rank.ToString();
+        var badge = ClassCatalog.Instance != null ? ClassCatalog.Instance.RankBadge(rank) : null;
+        if (badge != null) root.Q("rank-gem").style.backgroundImage = new StyleBackground(badge);
         if (rank >= 2)
         {
             Color tint = TierTint(rank);
-            root.Q("rank-gem").style.unityBackgroundImageTintColor = tint;
             var frame = root.Q("portrait");
             frame.style.borderTopColor = tint;
             frame.style.borderRightColor = tint;
