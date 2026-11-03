@@ -7,7 +7,11 @@ source sheets, so the class's .meta slices and library entries fit the outputs u
 Mage: hat brim + robe hem + cuffs. Rogue (fixed grey cloak + hood): hood lip (per column, the hood pixel right above the
 topmost skin: one line across the brow) + cloak hem (bottom-most armour-body pixel per column) recoloured silver in place; no cuffs (a silver
 sleeve end next to the dagger hand read as an uncoloured patch, as did a rim all round the face).
-Run: uv run --with pillow --with numpy python3 Tools/silver_trim.py <Mage|Rogue> <class sheet prefix, e.g. …/Classes/Mage/Mage > <out dir>"""
+Warrior (steel already fixed, so silver needs colour or skin behind it): a chest stripe (the tunic front's middle
+column, moved shirt → armour) + a 2 px wide nasal guard on the helmet from its lower edge to just below the eyes,
+between the eyes (the rig's face is 4 px wide with the eyes at its edges).
+Guardian: the shield's dark-blue rim recoloured gold on the weapon sheet (the Elf Warden's gold: Gold Juggernaut carries it on).
+Run: uv run --with pillow --with numpy python3 Tools/silver_trim.py <Mage|Rogue|Warrior|Guardian> <class sheet prefix, e.g. …/Classes/Mage/Mage > <out dir>"""
 import sys, os
 import numpy as np
 from PIL import Image
@@ -31,6 +35,9 @@ def touching(a, b):
 def trim(cls, prefix, out):
     L = lambda n: np.array(Image.open(prefix + n + ".png").convert("RGBA"))
     shirt, hat, armour, helmet, armf, armb, body = L("Shirt"), L("Hat"), L("Armour"), L("Helmet"), L("Arm Front"), L("Arm Back"), L("Body")
+    if cls == "Guardian":
+        weapon = L("Weapon"); weapon[(weapon[..., 3] > 1) & (weapon[..., :3] == (64, 88, 192)).all(-1), :3] = (247, 247, 87)
+        os.makedirs(out, exist_ok=True); Image.fromarray(weapon).save(os.path.join(out, "Weapon.png")); return
 
     def paint(sheet, mask, y0, x0):   # silver in place (already a fixed-colour sheet)
         c = sheet[y0:y0 + C, x0:x0 + C]
@@ -48,7 +55,7 @@ def trim(cls, prefix, out):
             if cls == "Mage":
                 h = hat[r * C:r * C + C, x0:x0 + C, 3] > 1
                 if h.any(): move(hat, helmet, bottom_per_col(h), r * C, x0)
-            else:
+            elif cls == "Rogue":
                 hd = helmet[r * C:r * C + C, x0:x0 + C, 3] > 1
                 sk = body[r * C:r * C + C, x0:x0 + C, 3] > 1
                 top = np.zeros_like(sk); brow = np.nonzero(sk)[0].min() if sk.any() else 0
@@ -58,6 +65,18 @@ def trim(cls, prefix, out):
                 paint(helmet, hd & top, r * C, x0)
                 y0 = (r * 3 + 1) * C; a = armour[y0:y0 + C, x0:x0 + C, 3] > 1
                 if a.any(): paint(armour, bottom_per_col(a), y0, x0)
+            elif cls == "Warrior":
+                y0 = (r * 3 + 1) * C; s = shirt[y0:y0 + C, x0:x0 + C, 3] > 1
+                if s.any():
+                    cx = int(np.median(np.nonzero(s)[1])); m = np.zeros_like(s); m[:, cx] = s[:, cx]
+                    move(shirt, armour, m, y0, x0)
+                b = body[r * C:r * C + C, x0:x0 + C]; h = helmet[r * C:r * C + C, x0:x0 + C]
+                ink = np.argwhere((b[..., 3] > 1) & (b[..., :3].mean(-1) < 60)); hy = np.nonzero((h[..., 3] > 1).any(1))[0]
+                if len(ink) and len(hy):
+                    ey, ex = int(ink[:, 0].min()), int(ink[:, 1].min())   # the left eye (one eye showing → the same offset)
+                    for x in (ex + 1, ex + 2):
+                        for y in range(hy.max() + 1, ey + 2):
+                            h[y, x] = ((150, 160, 178) if y > ey else (222, 228, 236) if x == ex + 1 else (190, 198, 212)) + (255,)
             for sub, arm in ((0, armb), (1, None), (2, armf)):
                 if cls != "Mage": continue
                 y0 = (r * 3 + sub) * C; s = shirt[y0:y0 + C, x0:x0 + C, 3] > 1

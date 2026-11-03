@@ -44,14 +44,19 @@ CLOTH_TONES = {"MiniThief": {(176, 112, 64): (235, 235, 235), (112, 80, 48): (16
                "MiniMage": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
                "MiniArchMage": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
                "MiniLightningWarrior": {(240, 213, 10): (235, 235, 235), (224, 145, 40): (165, 165, 165)},   # yellow vest + hair
+               "MiniEarthWarrior": {(176, 112, 64): (235, 235, 235), (112, 80, 48): (165, 165, 165),        # leather jerkin
+                                    (78, 75, 73): (235, 235, 235), (49, 46, 45): (165, 165, 165)},          # dark hair + beard
                "MiniHalberdMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
-               "MiniShieldMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)}}   # robe + hat: the tint multiplies source grey, so the dark blues showed palette colours at ~half brightness
+               "MiniShieldMan": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)},
+               "MiniElfWarden": {(96, 152, 232): (235, 235, 235), (64, 88, 192): (165, 165, 165)}}   # robe + hat: the tint multiplies source grey, so the dark blues showed palette colours at ~half brightness
 # Robe classes: the robe is one garment. Its cloth never routes to the weapon (a swinging sleeve or the cuff at the
 # staff hand reaches past the body, and the weapon sheet never recolours), and the hem below the hips stays on the
 # shirt body instead of pants (pants roll their own palette, so a split robe came out two colours)
 ROBE = {"MiniMage": {(64, 88, 192), (96, 152, 232)}, "MiniArchMage": {(64, 88, 192), (96, 152, 232)}}
 # Extra fixed-colour tones per pack (→ armour / helmet like steel): the arch mage's gold trim
-FIXED = {"MiniArchMage": {(247, 247, 87), (223, 199, 111)}, "MiniLightningWarrior": {(167, 71, 63), (111, 47, 39)}}   # + the lightning warrior's red scarf
+FIXED = {"MiniArchMage": {(247, 247, 87), (223, 199, 111)}, "MiniLightningWarrior": {(167, 71, 63), (111, 47, 39)},   # + the lightning warrior's red scarf
+         "MiniEarthWarrior": {(224, 84, 13)},                                                         # + the earth warrior's orange marking
+         "MiniElfWarden": {(247, 247, 87), (223, 199, 111)}}                                          # + the warden's gold trim (Elves pack)
 CRYSTAL = {(152, 216, 248), (216, 248, 248), (223, 249, 249)}   # staff orb core: robe-blue touching it is the orb's rim (stays weapon)
 # Beard → its own face sheet, recoloured in-game with the def's FaceColourPalette (natural hair colours). The pack's
 # beard greys are dark, and the Outfit shader takes source lightness, so they're lifted onto our hair sheet's tones.
@@ -60,7 +65,14 @@ BEARD = {"MiniMage": {(78, 75, 73): (199, 199, 199), (62, 59, 57): (131, 131, 13
          "MiniArchMage": {(229, 233, 222): (199, 199, 199), (174, 182, 161): (131, 131, 131)}}   # long hair + beard, same tones as the mage's beard → its colour roll carries over
 # Hair packs (the hair-top layer is real hair, recoloured by the hair palette): hair-tone cloth touching the head's hat
 # region joins it, so a lock hanging past the face line doesn't land on the shirt
-HAIR = {"MiniLightningWarrior": {(240, 213, 10), (224, 145, 40)}}
+HAIR = {"MiniLightningWarrior": {(240, 213, 10), (224, 145, 40)},
+        "MiniEarthWarrior": {(78, 75, 73), (49, 46, 45)}}   # hair + beard (the beard joins through the sideburns); these greys leave the fixed set
+# Layers stacked under main in the file (the earth warrior's back-slung axe): laid on the weapon sheet only where
+# main / hands don't cover them, so the body still hides what it hid
+BACK_LAYERS = ("weapon2",)
+# Hair packs whose beard sits over our arm masks (grow through sleeve cloth too); the lightning warrior's vest touches
+# its hair the same way, so it stays out
+BEARD_OVER_ARMS = {"MiniEarthWarrior"}
 DROP = {(144, 16, 0)}                                                           # the hurt-face red eye
 
 
@@ -150,7 +162,8 @@ def chop(name, out, jump=False):
     robe_tones = ROBE.get(os.path.basename(name).removesuffix(".aseprite"), set())
     beard_tones = BEARD.get(os.path.basename(name).removesuffix(".aseprite"), {})
     hair_tones = HAIR.get(os.path.basename(name).removesuffix(".aseprite"), set())
-    fixed = STEEL | FIXED.get(os.path.basename(name).removesuffix(".aseprite"), set())
+    beard_over_arms = os.path.basename(name).removesuffix(".aseprite") in BEARD_OVER_ARMS
+    fixed = (STEEL | FIXED.get(os.path.basename(name).removesuffix(".aseprite"), set())) - hair_tones
     L = lambda p: Image.open(ADV + p).convert("RGBA")
     ours = dict(af=L("Base/Arm Front/base arm front.png"), ab=L("Base/Arm Back/base arm back.png"), pants=L("Equipment/Pants/pants 1.png"))
     S = {k: Image.new("RGBA", (7 * C, R * C)) for k in ("body", "armf", "armb", "pants", "hat", "helmet", "weapon") + (("face",) if beard_tones else ())}
@@ -222,8 +235,9 @@ def chop(name, out, jump=False):
             # legs → pants, else torso
             c_f = cloth & (af | (robe_held & ~ab)); c_b = cloth & ab & ~c_f; rest = cloth & ~c_f & ~c_b   # robe_held → a sleeve, never the hat
             hat = rest & head
-            hairish = rest & np.array([[key[y][x] in hair_tones for x in range(C)] for y in range(C)])
+            hairish = (cloth if beard_over_arms else rest) & np.array([[key[y][x] in hair_tones for x in range(C)] for y in range(C)])
             while hair_tones and (grow := dilate(hat, 1) & hairish & ~hat).any(): hat |= grow
+            c_f &= ~hat; c_b &= ~hat
             legs = rest & ~hat & (ys >= pan_top) & ~robe; c_body = rest & ~hat & ~legs
             m_f = metal & af; m_b = metal & ab & ~m_f; mrest = metal & ~m_f & ~m_b
             helmet = mrest & head; m_body = mrest & ~helmet
@@ -239,6 +253,7 @@ def chop(name, out, jump=False):
                 put(S["face"], face_px, f, row, Tb)
             for (layer, i), px in frames.items():   # effects ride on top of the weapon
                 if i == fmap[oc] and layer not in NOT_FX and px[..., 3].any():
+                    if layer in BACK_LAYERS: px = px.copy(); px[alpha] = 0
                     S["weapon"].alpha_composite(Image.fromarray(px), (f * C, row * C))
             put(S["shirt"], c_b, f, row * 3, Tc); put(S["shirt"], c_body, f, row * 3 + 1, Tc); put(S["shirt"], c_f, f, row * 3 + 2, Tc)
             put(S["armour"], m_b, f, row * 3); put(S["armour"], m_body, f, row * 3 + 1); put(S["armour"], m_f, f, row * 3 + 2)
