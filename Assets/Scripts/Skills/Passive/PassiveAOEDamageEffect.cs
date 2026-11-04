@@ -23,6 +23,7 @@ public class PassiveAOEDamageEffect : PassiveEffect
     private readonly float attackDamageFraction;   // > 0: each tick deals this × owner's AttackDamage instead
     private readonly float radius;
     private readonly LayerMask targetLayerMask;
+    private readonly List<Collider2D> aoeHits = new();
 
     /// <summary>
     /// Create AOE damage effect
@@ -62,11 +63,7 @@ public class PassiveAOEDamageEffect : PassiveEffect
 
         // Use Unity's built-in 2D overlap for AOE damage
         // This is simpler than spatial grid for damage (don't need per-layer tracking)
-        Collider2D[] hits = Physics2D.OverlapCircleAll(
-            owner.transform.position, 
-            radius, 
-            targetLayerMask
-        );
+        var hits = Overlap.Circle(owner.transform.position, radius, aoeHits, targetLayerMask);
 
         float damage = attackDamageFraction > 0f && owner.Stats != null
             ? owner.Stats.AttackDamage * attackDamageFraction

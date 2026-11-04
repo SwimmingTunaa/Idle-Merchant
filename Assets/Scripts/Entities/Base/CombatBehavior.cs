@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -9,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class CombatBehavior : MonoBehaviour
 {
+    private static readonly List<Collider2D> scanHits = new();   // FindTarget isn't re-entrant: one buffer for all
+
     // ===== EVENTS =====
     
     /// <summary>Fired when a target is acquired. Args: (target)</summary>
@@ -111,7 +114,7 @@ public class CombatBehavior : MonoBehaviour
         }
         
         // Find all entities within range
-        Collider2D[] hits = Physics2D.OverlapCircleAll(scanPosition, scanRange);
+        var hits = Overlap.Circle(scanPosition, scanRange, scanHits);
         
         GameObject closestTarget = null;
         float closestDistance = float.MaxValue;

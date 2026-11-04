@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class ClickerManager : MonoBehaviour
 {
+    private readonly List<Collider2D> shockwaveHits = new(), vacuumHits = new();
+
     [Header("Damage")]
     [SerializeField] private float clickDamage = 10f;
     [SerializeField] private int clicksPerSecondCap = 10;
@@ -529,7 +531,7 @@ public class ClickerManager : MonoBehaviour
             elapsed += Time.deltaTime;
             currentShockwaveRadius = Mathf.Lerp(0f, maxRadius, elapsed / duration);
 
-            Collider2D[] hits = Physics2D.OverlapCircleAll(origin, currentShockwaveRadius);
+            var hits = Overlap.Circle(origin, currentShockwaveRadius, shockwaveHits);
             
             foreach (var hit in hits)
             {
@@ -567,7 +569,7 @@ public class ClickerManager : MonoBehaviour
         if (ClickHitVFX.Instance != null)
             ClickHitVFX.Instance.PlayVacuumRing(center, radius);
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
+        var hits = Overlap.Circle(center, radius, vacuumHits);
 
         foreach (var hit in hits)
         {
