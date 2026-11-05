@@ -95,7 +95,7 @@ public class CounterService : MonoBehaviour
         int stock = SalesManager.Instance.GetAvailableForSale(c.desiredItem);
         if (stock <= 0) return false;
 
-        unitPrice = c.desiredItem.sellPrice;
+        unitPrice = c.desiredItem.sellPrice * c.PriceMultiplier;
         if (unitPrice > c.budget + 0.001f) return false;
 
         maxAffordable = Mathf.Min(
@@ -146,7 +146,11 @@ public class CounterService : MonoBehaviour
             if (wasRushed)
             {
                 int tip = Mathf.Max(1, Mathf.RoundToInt(totalCost * serveBonus));
-                if (DamageNumberManager.Instance != null) DamageNumberManager.Instance.ShowGoldGain(tip, c.transform);
+                if (DamageNumberManager.Instance != null)
+                {
+                    DamageNumberManager.Instance.ShowGoldGain(tip, c.transform);
+                    DamageNumberManager.Instance.ShowText($"+{Mathf.RoundToInt(serveBonus * 100f)}%", c.transform, new Color(1f, 0.84f, 0.3f));
+                }
                 else Inventory.Instance.AddGold(tip);
                 if (clicker != null) clicker.Serves++;
             }

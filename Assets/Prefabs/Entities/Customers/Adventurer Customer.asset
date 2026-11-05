@@ -15,7 +15,15 @@ MonoBehaviour:
   prefab: {fileID: 5389948795088366679, guid: 474d6c90a41a14c17ba845b6b1dc8f6c, type: 3}
   useModularCharacter: 0
   animatorOverrideController:
-  - {fileID: 22100000, guid: da36e69b1ab8146f985bcd6812f81567, type: 2}
+  - {fileID: 22100000, guid: deec9e17a0074778b8ab9ffb65dd5cdb, type: 2}
+  - {fileID: 22100000, guid: ce205736ff7644e68122f8059098b814, type: 2}
+  - {fileID: 22100000, guid: 7df3ace2bcf544ddbdc77711b01643d7, type: 2}
+  - {fileID: 22100000, guid: 6274cb8aa423497f9021fdc767e14fac, type: 2}
+  - {fileID: 22100000, guid: d7138ada04df457f87ecbb139f764dda, type: 2}
+  - {fileID: 22100000, guid: b02eda22a6234fda80203aa35d1e5888, type: 2}
+  - {fileID: 22100000, guid: f083257328284d8e81a587b801d11d53, type: 2}
+  - {fileID: 22100000, guid: 6de6028b26404a40ba8c636ac66aef3a, type: 2}
+  - {fileID: 22100000, guid: a67afe66519e43aeacf4d254219356d9, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Adventurer Customer
@@ -44,13 +52,30 @@ MonoBehaviour:
   hairBackSpriteLibraries: []
   frontWeaponSpriteLibraries: []
   backWeaponSpriteLibraries: []
+  armourSpriteLibraries: []
+  helmetSpriteLibraries: []
+  faceSpriteLibraries: []
   skinColourPalette: {fileID: 0}
   ShirtColourPalette: {fileID: 0}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 0}
+  FaceColourPalette: {fileID: 0}
+  hatMatchesShirt: 0
   startingState: 0
   customerArcheType: 1
   itemPreferance: 1
+  preferredItems:
+  - {fileID: 11400000, guid: 76113c00b9b6744d8999cf3eff4d5113, type: 2}
+  - {fileID: 11400000, guid: 2186b48dd73334f89a067c1a1214afa1, type: 2}
+  - {fileID: 11400000, guid: 13020a3c8650b41f4a8223fe092620fc, type: 2}
+  - {fileID: 11400000, guid: 4926b1817c39641adb212d52b39fb2be, type: 2}
+  - {fileID: 11400000, guid: 8a85f7ac7f7bf4764bf57009a21c490b, type: 2}
+  - {fileID: 11400000, guid: 7537df6c387a34ed391446bdb91e9e7a, type: 2}
+  - {fileID: 11400000, guid: 1359fe709c5384d3cb31c23bbb7e14ba, type: 2}
+  - {fileID: 11400000, guid: 5e480447998c046378c561b50559c986, type: 2}
+  - {fileID: 11400000, guid: 0dd48d2bbe89447a397a5430c0e844d2, type: 2}
+  - {fileID: 11400000, guid: 3da1bb507502c4fb39872910d7644dac, type: 2}
+  priceMultiplier: 1
   wanderDuration: {x: 5, y: 10}
   wanderSpeedMultiplier: 0.8
   wanderPauseDuration: {x: 0.5, y: 2}

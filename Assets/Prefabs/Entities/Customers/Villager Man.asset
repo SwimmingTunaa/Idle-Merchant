@@ -16,6 +16,7 @@ MonoBehaviour:
   useModularCharacter: 0
   animatorOverrideController:
   - {fileID: 22100000, guid: da36e69b1ab8146f985bcd6812f81567, type: 2}
+  - {fileID: 22100000, guid: 2e0bb06465ec4b0ca568645d8b38287d, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Villager Man
@@ -51,6 +52,15 @@ MonoBehaviour:
   startingState: 0
   customerArcheType: 0
   itemPreferance: 0
+  preferredItems:
+  - {fileID: 11400000, guid: e9e83dcb06ebf4228af77e4dbbf96c14, type: 2}
+  - {fileID: 11400000, guid: 55284c34a41b841e093a08f3d9a71534, type: 2}
+  - {fileID: 11400000, guid: ce6d0ec72a4fa415792f04379a32646c, type: 2}
+  - {fileID: 11400000, guid: 4e8726575cadc421985069c829e50a84, type: 2}
+  - {fileID: 11400000, guid: e9e49d793f136462d8ecdc12ace37dbe, type: 2}
+  - {fileID: 11400000, guid: 62677ba2dadd944cbb080f84503b6924, type: 2}
+  - {fileID: 11400000, guid: 6cb7a920380f74e88be92e31aa0d3c6e, type: 2}
+  - {fileID: 11400000, guid: 329a89ca5855d4f4e9f06ac293fdbac9, type: 2}
   wanderDuration: {x: 5, y: 10}
   wanderSpeedMultiplier: 0.8
   wanderPauseDuration: {x: 0.5, y: 2}

@@ -40,6 +40,8 @@ public class LootPile : PersistentSingleton<LootPile>
     private ItemDef lastAdded;
     private int summoning;          // pile→counter legs in flight
     private bool shopkeeperRestFlip;
+    private Animator keeperAnim;
+    private static readonly int SaleTrigger = Animator.StringToHash("Sale");
 
     protected override void Awake()
     {
@@ -66,7 +68,7 @@ public class LootPile : PersistentSingleton<LootPile>
         if (binFront != null) binFront.sortingOrder = baseSortingOrder + maxSprites;
         if (shopkeeper != null) shopkeeperRestFlip = shopkeeper.flipX;
         // Real time, like the station workers: the shopkeeper keeps idling behind the paused main menu
-        if (shopkeeper != null && shopkeeper.TryGetComponent(out Animator keeperAnim)) keeperAnim.updateMode = AnimatorUpdateMode.UnscaledTime;
+        if (shopkeeper != null && shopkeeper.TryGetComponent(out keeperAnim)) keeperAnim.updateMode = AnimatorUpdateMode.UnscaledTime;
 
         GameSignals.OnItemAdded += OnItemAdded;
         GameSignals.OnItemSold += OnItemSold;
@@ -89,6 +91,9 @@ public class LootPile : PersistentSingleton<LootPile>
     // ponytail: TryRemove raises no signal, so crafting-ingredient removals show on the next add/sale.
     private void OnItemAdded(ResourceStack stack) { lastAdded = stack.itemDef; pending = true; }
 
+    /// <summary>Stock changed without a sale/add signal (pirate grab, drop-back): redraw the heap next frame.</summary>
+    public void Refresh() => pending = true;
+
     // The sale hop itself is driven by the buyer (CustomerCarryDisplay → FlySale), so it can hand off to them.
     private void OnItemSold(ResourceStack stack) => pending = true;
 
@@ -109,7 +114,12 @@ public class LootPile : PersistentSingleton<LootPile>
         {
             Summon(-1);   // leg-1 callback always fires (arrival, despawn, or sync on spawn failure) → counter can't leak
             if (buyer == null || !buyer.gameObject.activeInHierarchy) { onArrive?.Invoke(); return; }   // left mid-hop
-            vfx.FlyToWorld(icon, counter, buyer.position, homing: buyer, speed: saleHopSpeed, onArrive: onArrive);
+            // Hand-over: the keeper plays their "Sale" flourish (Merchant Shopkeeper.controller: Idle → Sale (idle2) → Idle)
+            vfx.FlyToWorld(icon, counter, buyer.position, homing: buyer, speed: saleHopSpeed, onArrive: () =>
+            {
+                if (keeperAnim != null) keeperAnim.SetTrigger(SaleTrigger);
+                onArrive?.Invoke();
+            });
         });
     }
 

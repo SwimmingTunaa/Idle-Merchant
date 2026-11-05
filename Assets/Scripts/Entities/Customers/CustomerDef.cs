@@ -1,7 +1,7 @@
 using UnityEngine;
 public enum CustomerArcheType
 {
-    Commoner, Adventurer, Noble
+    Commoner, Adventurer, Noble, Royalty   // serialized ints: append only
 }
 
 [CreateAssetMenu(menuName = "Data/Customer")]
@@ -11,6 +11,10 @@ public class CustomerDef : EntityDef
     public CustomerState startingState = CustomerState.Entering;
     public CustomerArcheType customerArcheType = CustomerArcheType.Commoner;
     public ItemCategory itemPreferance;
+    [Tooltip("Shopping list: these items first (any category), then the preferred category, then anything affordable. Empty = category only.")]
+    public ItemDef[] preferredItems;
+    [Tooltip("Pays this × sellPrice (Bulk Trader 0.8, Collector 2). The want pick scales the budget to match.")]
+    public float priceMultiplier = 1f;
 
   
 

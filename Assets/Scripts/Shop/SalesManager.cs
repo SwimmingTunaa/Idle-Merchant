@@ -123,27 +123,44 @@ public class SalesManager : PersistentSingleton<SalesManager>
     public bool TryPickDesiredForCustomer(
         Inventory inventory,
         ItemCategory preference,
+        ItemDef[] preferredItems,
         int budget,
         Vector2Int batchRange,
         out ItemDef desiredItem,
         out int desiredQty,
         out WalkoutReason reason)
     {
-        // Preferred category first; only if it yields nothing, the best affordable item from any other category.
+        // Shopping list first, then the preferred category, then the best affordable item from any other category.
         // ponytail: strict preferred-then-fallback (no weighted mix) — commoners stay Basic-focused because Basic is
         // almost always stocked; add a per-archetype fallback chance if they start draining Advanced stock.
+        bool sawStock = false;
+        if (preferredItems != null && preferredItems.Length > 0)
+        {
+            if (TryPickFrom(inventory, preference, true, budget, batchRange, out desiredItem, out desiredQty, out reason, preferredItems))
+                return true;
+            sawStock = reason == WalkoutReason.TooExpensive;
+        }
         if (TryPickFrom(inventory, preference, true, budget, batchRange, out desiredItem, out desiredQty, out reason))
             return true;
-        bool sawStock = reason == WalkoutReason.TooExpensive;
+        sawStock |= reason == WalkoutReason.TooExpensive;
         if (TryPickFrom(inventory, preference, false, budget, batchRange, out desiredItem, out desiredQty, out reason))
             return true;
         if (sawStock) reason = WalkoutReason.TooExpensive;
         return false;
     }
 
+    // Adds the item to _sellableBuffer when it's for sale, in stock and affordable; stock without budget marks TooExpensive.
+    private void Consider(ItemDef item, int budget, ref WalkoutReason reason)
+    {
+        if (item == null || GetAvailableForSale(item) <= 0 || item.sellPrice <= 0) return;
+        reason = WalkoutReason.TooExpensive; // stock matched; only budget can fail now
+        if (item.sellPrice > budget) return;
+        _sellableBuffer.Add(item);
+    }
+
     private static readonly ItemCategory[] AllCategories = { ItemCategory.Basic, ItemCategory.Advanced, ItemCategory.Premium };
 
-    // preferredOnly: scan just `preference`; otherwise scan every category except it.
+    // only != null: scan just those items (any category). Else preferredOnly: scan just `preference`; otherwise every other category.
     private bool TryPickFrom(
         Inventory inventory,
         ItemCategory preference,
@@ -152,7 +169,8 @@ public class SalesManager : PersistentSingleton<SalesManager>
         Vector2Int batchRange,
         out ItemDef desiredItem,
         out int desiredQty,
-        out WalkoutReason reason)
+        out WalkoutReason reason,
+        ItemDef[] only = null)
     {
         desiredItem = null;
         desiredQty = 0;
@@ -162,25 +180,20 @@ public class SalesManager : PersistentSingleton<SalesManager>
 
         _sellableBuffer.Clear();
 
-        foreach (var cat in AllCategories)
+        if (only != null)
         {
-            if ((cat == preference) != preferredOnly) continue;
-            var dict = inventory.GetInventoryType(cat);
-            if (dict == null) continue;
-
-            // Build candidate list from *sellable* stock, not raw inventory.
-            foreach (var kvp in dict)
+            foreach (var item in only) Consider(item, budget, ref reason);
+        }
+        else
+        {
+            foreach (var cat in AllCategories)
             {
-                var item = kvp.Key;
-                if (item == null) continue;
+                if ((cat == preference) != preferredOnly) continue;
+                var dict = inventory.GetInventoryType(cat);
+                if (dict == null) continue;
 
-                if (GetAvailableForSale(item) <= 0) continue;
-
-                if (item.sellPrice <= 0) continue;
-                reason = WalkoutReason.TooExpensive; // stock matched; only budget can fail now
-                if (item.sellPrice > budget) continue;
-
-                _sellableBuffer.Add(item);
+                // Build candidate list from *sellable* stock, not raw inventory.
+                foreach (var kvp in dict) Consider(kvp.Key, budget, ref reason);
             }
         }
 

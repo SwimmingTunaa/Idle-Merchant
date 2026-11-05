@@ -149,6 +149,9 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         UpdateMovementSmooth();
     }
 
+    /// <summary>What this customer pays per item relative to sellPrice (CustomerDef.priceMultiplier).</summary>
+    public float PriceMultiplier => customerDef != null && customerDef.priceMultiplier > 0f ? customerDef.priceMultiplier : 1f;
+
     public void PickWantFromInventory()
     {
         if (SalesManager.Instance == null)
@@ -167,7 +170,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         SalesManager.Instance.TryPickDesiredForCustomer(
             Inventory.Instance,
             customerDef.itemPreferance,
-            (int)budget,
+            customerDef.preferredItems,
+            (int)(budget / PriceMultiplier),   // list prices vs a budget scaled by what they actually pay
             customerDef.batchRange,
             out desiredItem,
             out desiredQty,
