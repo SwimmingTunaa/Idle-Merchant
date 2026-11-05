@@ -203,6 +203,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
             d.clicker.autoClick = clicker.AutoClickLevel;
             d.clicker.autoCollect = clicker.AutoCollectLevel;
             d.clicker.inspects = clicker.Inspects;
+            d.clicker.serves = clicker.Serves;
         }
 
         foreach (var m in advManagers)
@@ -336,6 +337,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
             clicker.RestoreLevels(d.clicker.clickDamage, d.clicker.pickupRadius, d.clicker.damageAOE,
                 d.clicker.autoClick, d.clicker.autoCollect);
             clicker.Inspects = d.clicker.inspects;
+            clicker.Serves = d.clicker.serves;
         }
 
         if (GameManager.Instance != null) GameManager.Instance.SetTimeScale(d.settings.gameSpeed);
@@ -695,6 +697,7 @@ public class ClickerSave
 {
     public int clickDamage, pickupRadius, damageAOE, autoClick, autoCollect;
     public int inspects;   // successful right-click inspects; the hover nameplate's RMB hint hides at 3
+    public int serves;     // customers served by a click; the "Click to serve!" float stops at 3
 }
 
 public class ContractSave

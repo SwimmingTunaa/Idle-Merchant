@@ -95,7 +95,14 @@ public class ClickerManager : MonoBehaviour
     private DecorSlot hoveredDecor;
     private CaravanManager hoveredCaravan;
     private TransportPoint hoveredLadder;
+    private CustomerAgent hoveredCustomer;
+    private CounterService counter;
     private TextMeshPro nameplate;
+    private TextMeshPro serveHint;
+
+    /// <summary>Customers served by a click (saved). An LMB glyph bobs over the customer at the counter until this reaches ServeHintCount.</summary>
+    public int Serves { get; set; }
+    public const int ServeHintCount = 3;
 
     /// <summary>Successful right-click inspects (saved). The nameplate's RMB glyph shows until this reaches InspectHintCount.</summary>
     public int Inspects { get; set; }
@@ -235,6 +242,7 @@ public class ClickerManager : MonoBehaviour
 
     void Awake()
     {
+        counter = FindAnyObjectByType<CounterService>();
         // One world-space nameplate for the hovered adventurer; not parented to units, so it never flips
         // and PermanentOutline never flags it (rendering layer 1 = outline bits 2/4 clear).
         nameplate = new GameObject("HoverNameplate").AddComponent<TextMeshPro>();
@@ -249,6 +257,12 @@ public class ClickerManager : MonoBehaviour
         mr.sortingOrder = 10000;
         mr.renderingLayerMask = 1 | HoverOutlineFeature.OverlayRenderingLayer;   // above the outline of what it names
         nameplate.gameObject.SetActive(false);
+
+        // Same plate again for the serve hint: the LMB glyph over the customer being served (first ServeHintCount serves)
+        serveHint = Instantiate(nameplate, transform);
+        serveHint.name = "ServeHint";
+        serveHint.fontSize = nameplateFontSize * 2.5f;   // the glyph alone reads tiny at nameplate size (~5 px over a 24 px customer)
+        serveHint.text = "<sprite=\"LMB\" index=0>";
     }
 
     // Nameplate follows the hovered adventurer; hidden when dead or a world-blocking panel is open.
@@ -256,11 +270,25 @@ public class ClickerManager : MonoBehaviour
     {
         bool show = hoveredAdv != null && hoveredAdv.IsAlive
                     && (UIManager.Instance == null || !UIManager.Instance.IsBlockingWorldInput);
+        UpdateServeHint();
         if (nameplate.gameObject.activeSelf != show) nameplate.gameObject.SetActive(show);
         if (!show) return;
 
         float top = hoveredAdv.TryGetComponent(out BoxCollider2D col) ? col.offset.y + col.size.y * 0.5f : 1f;
         nameplate.transform.position = hoveredAdv.transform.TransformPoint(new Vector3(0f, top + nameplateOffset, 0f));
+    }
+
+    // LMB glyph bobbing over the customer at the counter until the player has served ServeHintCount of them.
+    private void UpdateServeHint()
+    {
+        var c = counter != null && Serves < ServeHintCount ? counter.Serving : null;
+        bool show = c != null && (UIManager.Instance == null || !UIManager.Instance.IsBlockingWorldInput);
+        if (serveHint.gameObject.activeSelf != show) serveHint.gameObject.SetActive(show);
+        if (!show) return;
+
+        float top = c.TryGetComponent(out BoxCollider2D col) ? col.offset.y + col.size.y * 0.5f : 1f;
+        float bob = Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4f)) * 0.15f;
+        serveHint.transform.position = c.transform.TransformPoint(new Vector3(0f, top + nameplateOffset + bob, 0f));
     }
 
     void Update()
@@ -301,6 +329,7 @@ public class ClickerManager : MonoBehaviour
         DecorSlot decor = null;
         CaravanManager caravan = null;
         TransportPoint ladder = null;
+        CustomerAgent cust = null;
 
         // No world hover while the book is open (you're already inside it).
         if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
@@ -313,7 +342,15 @@ public class ClickerManager : MonoBehaviour
                 if (caravan == null) hit.TryGetComponent(out caravan);
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
                 if (ladder == null) hit.TryGetComponent(out ladder);
+                if (cust == null && counter != null && hit.TryGetComponent(out CustomerAgent cc) && cc == counter.Serving) cust = cc;
             }
+        }
+
+        if (cust != hoveredCustomer)
+        {
+            if (hoveredCustomer != null) hoveredCustomer.SetHoverOutline(false);
+            hoveredCustomer = cust;
+            if (hoveredCustomer != null) hoveredCustomer.SetHoverOutline(true);
         }
         if (under != null) prop = null;   // a hero standing in front of a workshop takes the outline
         if (under != null || prop != null) caravan = null;   // click priority: workshops, caravan, decor, ladders
@@ -419,6 +456,13 @@ public class ClickerManager : MonoBehaviour
 
             ClickAttackMob(enemy, hit.transform, world);
             return;
+        }
+
+        // Priority 2b: the customer being served at the counter — serve them now for the bonus
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out CustomerAgent cust) || counter == null) continue;
+            if (counter.TryServe(cust)) return;
         }
 
         // Priority 3: a workshop prop in the guild opens its panel

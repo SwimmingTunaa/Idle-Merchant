@@ -3,7 +3,9 @@ using UnityEngine;
 public class CounterService : MonoBehaviour
 {
     [Header("Service Settings")]
-    public float serveTime = 1.5f;
+    public float serveTime = 3f;
+    [Tooltip("Click the customer at the counter to serve them now: the sale pays this much extra (active income, not passive).")]
+    [Range(0f, 1f)] public float serveBonus = 0.15f;
     public Transform exitPoint;
 
     [Header("Gold VFX Settings")]
@@ -12,11 +14,17 @@ public class CounterService : MonoBehaviour
 
     private CustomerAgent currentCustomer;
     private float t;
+    private bool rushed;
     private QueueController queue;
+    private ClickerManager clicker;
+
+    /// <summary>The customer being served right now (click target), or null.</summary>
+    public CustomerAgent Serving => currentCustomer;
 
     void Start()
     {
         queue = QueueController.Instance;
+        clicker = FindAnyObjectByType<ClickerManager>();
         
         // Default to counter point if goldSpawnPoint not assigned
         if (goldSpawnPoint == null && queue != null)
@@ -61,6 +69,16 @@ public class CounterService : MonoBehaviour
         currentCustomer = null;
     }
 
+    /// <summary>Serve the customer at the counter now (player click): the sale lands immediately with the serve bonus.</summary>
+    public bool TryServe(CustomerAgent c)
+    {
+        if (c == null || c != currentCustomer) return false;
+        rushed = true;
+        CompleteService(c);
+        currentCustomer = null;
+        return true;
+    }
+
     // ===== HELPERS =====
 
     bool IsPurchasableNow(CustomerAgent c, out int maxAffordable, out float unitPrice)
@@ -103,6 +121,9 @@ public class CounterService : MonoBehaviour
 
     void CompleteService(CustomerAgent c)
     {
+        bool wasRushed = rushed;
+        rushed = false;
+
         // Re-check at completion in case stock changed during the wait
         if (!IsPurchasableNow(c, out int qty, out float price)) 
         {
@@ -120,6 +141,15 @@ public class CounterService : MonoBehaviour
             SpawnGoldVFX(c.transform.position, totalCost);
             GameSignals.RaiseItemSold(new ResourceStack(c.desiredItem, qty, totalCost));
             GameSignals.RaiseCustomerServed();
+
+            // Serve bonus: banks on coin arrival like click gold (never raised as ItemSold → not passive income)
+            if (wasRushed)
+            {
+                int tip = Mathf.Max(1, Mathf.RoundToInt(totalCost * serveBonus));
+                if (DamageNumberManager.Instance != null) DamageNumberManager.Instance.ShowGoldGain(tip, c.transform);
+                else Inventory.Instance.AddGold(tip);
+                if (clicker != null) clicker.Serves++;
+            }
         }
 
         Inventory.Instance.InventoryDebugUi();

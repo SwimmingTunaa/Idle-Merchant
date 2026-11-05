@@ -10182,7 +10182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a86ba1d737b16408e8d390dbb5b5aa15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CounterService
-  serveTime: 1.5
+  serveTime: 3
   exitPoint: {fileID: 455401622}
   goldSpawnPoint: {fileID: 0}
 --- !u!114 &354730532
@@ -46766,7 +46766,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RosterPanelController
   slotTemplate: {fileID: 9197481963319205126, guid: 6eba097cdc81c406083b05c2e13f2368, type: 3}
   hireController: {fileID: 266967779}
-  rankBadgeSprites: []
 --- !u!1 &1698155365
 GameObject:
   m_ObjectHideFlags: 0
@@ -51886,6 +51885,7 @@ MonoBehaviour:
   hasOverlay: 1
   overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
   showDebugLogs: 0
+  menuZoom: 1.06
 --- !u!1 &1881252642
 GameObject:
   m_ObjectHideFlags: 0
@@ -60179,6 +60179,9 @@ MonoBehaviour:
   hangDepth: 1.6
   swayPerSpeed: 1.5
   maxSway: 25
+  gravity: 60
+  maxThrowSpeed: 12
+  landSquashTime: 0.12
   labelFont: {fileID: 11400000, guid: d0ee66017f1424cd1ac25ca52b761561, type: 2}
   labelFontSize: 7
 --- !u!1 &2065549476

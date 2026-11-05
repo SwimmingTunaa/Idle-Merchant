@@ -49,6 +49,20 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private int batchMin, batchMax;
 
     private bool hasInitialized = false;
+    private bool hoverOutline;
+    private const uint OutlineRenderingLayer = 2;   // HoverOutlineFeature hover/selection bit
+
+    /// <summary>Outline while the cursor is over this customer at the counter (set by ClickerManager).</summary>
+    public void SetHoverOutline(bool on)
+    {
+        if (hoverOutline == on) return;
+        hoverOutline = on;
+        foreach (var sr in GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            if (on) sr.renderingLayerMask |= OutlineRenderingLayer;
+            else    sr.renderingLayerMask &= ~OutlineRenderingLayer;
+        }
+    }
    
     [Header("Debug")]
     [SerializeField] private bool showDebugColours = false;
@@ -408,6 +422,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
             Debug.Log($"[CustomerAgent] {name} Despawn() called at position {transform.position}");
         
         // Clear customer-specific data before returning to pool
+        SetHoverOutline(false);
         desiredItem = null;
         desiredQty = 0;
         walkoutReason = WalkoutReason.None;
