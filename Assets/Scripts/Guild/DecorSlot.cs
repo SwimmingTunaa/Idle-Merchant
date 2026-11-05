@@ -50,7 +50,7 @@ public class DecorSlot : MonoBehaviour
     private static float quietUntil;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    public static void ResetStatics()   // also New Guild (PauseMenuController), which reloads without a domain reset
     {
         pendingSlots.Clear();
         savedPending.Clear();

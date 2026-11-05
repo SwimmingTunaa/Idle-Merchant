@@ -57,7 +57,7 @@ public static class WelcomeBackPanel
             host.style.display = DisplayStyle.None;    // …then the panel goes
         });
 
-        host.style.display = DisplayStyle.Flex;
+        PauseMenuController.AfterContinue(() => host.style.display = DisplayStyle.Flex);   // not over the boot menu
         return true;
     }
 }

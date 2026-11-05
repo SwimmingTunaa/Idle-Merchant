@@ -15,7 +15,7 @@ public class GameManager : PersistentSingleton<GameManager>
     public string mainMenuSceneName = "MainMenu";
     // Time management
     private float previousTimeScale = 1f;
-    private bool IsPaused {get; set;}
+    public bool IsPaused { get; private set; }
     public float CurrentTimeScale => Time.timeScale;
     /// <summary>Player's chosen speed (1x/2x/3x), unaffected by pause or hit-stop. Saved as a setting.</summary>
     public float GameSpeed => previousTimeScale;
@@ -55,9 +55,11 @@ public class GameManager : PersistentSingleton<GameManager>
         Debug.Log($"[GameManager] Time scale set to {scale}x");
     }
 
+    // previousTimeScale is kept by SetTimeScale only: capturing Time.timeScale here grabbed a hit-stop's 0 (or a
+    // second pause's 0) and Unpause restored a frozen game
     public void PauseGame()
     {
-        previousTimeScale = Time.timeScale;
+        if (IsPaused) return;
         Time.timeScale = 0f;
         IsPaused = true;
     }

@@ -296,7 +296,7 @@ public class ClickHitVFX : MonoBehaviour
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(hitStopSeconds);
         // Only restore if nothing else (pause menu) grabbed the timescale meanwhile
-        if (Time.timeScale == 0f) Time.timeScale = prev;
+        if (Time.timeScale == 0f && !(GameManager.Instance != null && GameManager.Instance.IsPaused)) Time.timeScale = prev;
         stopping = false;
     }
 }

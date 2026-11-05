@@ -48,6 +48,8 @@ public class WorkshopProp : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         if (worker == null) worker = GetComponentInChildren<Animator>(true);
+        // Real time, like the lit loop below: the station keeps working behind the paused main menu
+        if (worker != null) worker.updateMode = AnimatorUpdateMode.UnscaledTime;
         renderers = GetComponentsInChildren<SpriteRenderer>(true);
         colliders = GetComponentsInChildren<Collider2D>(true);
     }
@@ -117,7 +119,7 @@ public class WorkshopProp : MonoBehaviour
         if (!lit) return;
         if ((workerTimer += Time.deltaTime) >= WorkerPollInterval) { workerTimer = 0f; UpdateWorker(); }
         if (frames.Length < 2) return;
-        timer += Time.deltaTime;
+        timer += Time.unscaledDeltaTime;
         if (timer < 1f / fps) return;
         timer = 0f;
         frame = frame % (frames.Length - 1) + 1;

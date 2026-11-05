@@ -19,7 +19,6 @@
         <ui:Instance template="TopNavigation" name="TopNavigation"/>
         <ui:VisualElement name="body" class="game-view-area" style="flex-grow: 1;">
             <ui:Instance template="HirePanel" name="HirePanel" style="display: none;"/>
-            <ui:Instance template="PausePanel" name="PausePanel" style="flex-grow: 1; display: none;"/>
             <ui:Instance template="BookPanel" name="BookPanel" style="flex-grow: 0; position: absolute; bottom: 0; top: 0; left: 0; right: 0; display: none;"/>
             <ui:Instance template="WorkshopPanel" name="WorkshopPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
             <ui:Instance template="CaravanPanel" name="CaravanPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
@@ -32,6 +31,8 @@
         <ui:Instance template="DecoratePanel" name="DecoratePanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         <!-- dungeon-ladder Transport modal (click a ladder): Elevator ranks + Teleport Circle -->
         <ui:Instance template="TransportPanel" name="TransportPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
+        <!-- main menu (book cover): over the HUD and every world modal; the book (Settings) hides it while open -->
+        <ui:Instance template="PausePanel" name="PausePanel" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
         <!-- star fanfare draws over everything (book, HUD, tracker); never picks except its ribbon and cards -->
         <ui:Instance template="StarFanfare" name="StarFanfare" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
     </ui:VisualElement>

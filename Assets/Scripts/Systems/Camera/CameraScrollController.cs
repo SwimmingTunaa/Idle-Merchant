@@ -130,6 +130,8 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         GameSignals.OnLayerUnlocked -= HandleExpandVeritcalBounds;   
     }
 
+    void OnDestroy() => inputActions?.Dispose();   // generated actions assert a leak when finalized undisposed
+
     void Update()
     {
         UpdateCameraFrustum();

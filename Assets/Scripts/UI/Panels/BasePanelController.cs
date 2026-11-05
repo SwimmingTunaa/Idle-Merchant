@@ -247,9 +247,9 @@ public abstract class BasePanelController : MonoBehaviour, IPanelController
     }
     
     /// <summary>
-    /// Virtual for pause-compatible panels. Override to return Time.unscaledDeltaTime.
+    /// Unscaled: panels animate the same at 3x speed, and the book still opens over the paused main menu.
     /// </summary>
-    protected virtual float GetDeltaTime() => Time.deltaTime;
+    protected virtual float GetDeltaTime() => Time.unscaledDeltaTime;
     
     // ═════════════════════════════════════════════
     // OVERLAY SETUP

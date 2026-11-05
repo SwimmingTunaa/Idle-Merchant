@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Data/Adventurer")]

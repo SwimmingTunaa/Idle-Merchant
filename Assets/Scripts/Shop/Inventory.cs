@@ -33,6 +33,7 @@ public class Inventory : PersistentSingleton<Inventory>
     {
         base.Awake();
         gold.ResetToDefault();
+        GameSignals.RaiseGoldChanged(gold.Int);   // the SO outlives a scene reload (New Guild): labels already bound must drop the old balance
         InventoryDebugUi();
     }
 

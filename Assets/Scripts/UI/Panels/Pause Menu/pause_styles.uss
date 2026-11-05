@@ -1,26 +1,139 @@
-/* ── Pause Menu — pixel-art pass ───────────────────────────────────────────
-   Buttons now use the shared .btn-* system (Components/Button.uss).
-   Board + header styling is token-driven here; layout one-offs stay inline. */
+/* ── Main menu — the guild book's closed cover over the paused guild ─────────
+   Cover art 336×421 shown at 2× (672×842); the logo (83×73) at 4× so its pixels
+   match the cover's (the cover art is itself drawn at 2×). Gold foil text in Ithaca. */
 
-/* Dim the game behind the board so it reads as a modal. */
-.pause-overlay {
-    background-color: var(--color-bg-overlay);
+.menu-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 140px;
 }
 
-/* No sprite — transparent board, just lays out the header + buttons. */
-.pause-board {
-    background-image: none;
+/* warm dark wash on the left so the cover sits in shadow, the guild stays lit on the right */
+.menu-shade {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;   /* gradient drawn in PauseMenuController.DrawShade */
+}
+
+.menu-book {
+    width: 672px;
+    height: 842px;
+    flex-shrink: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/book%20cover.png?fileID=2800000&guid=44a4d50696d2348eeb94f3bbdd66dd09&type=3#book cover");
+    -unity-background-scale-mode: stretch-to-fill;
+    transform-origin: left bottom;
+}
+
+/* leather face right of the spine */
+.menu-face {
+    position: absolute;
+    left: 10%;
+    right: 5%;
+    top: 3.5%;
+    bottom: 13%;
+    align-items: center;
+}
+
+.menu-logo {
+    width: 332px;
+    height: 292px;
+    margin-top: 48px;
+    flex-shrink: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/logo.png?fileID=2800000&guid=6c94726aad5b44291bec662857f8db6b&type=3#logo");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.menu-list {
+    margin-top: 28px;
+    width: 76%;
+    align-items: stretch;
+}
+
+.menu-item {
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
-    border-radius: 0;
+    margin: 0;
+    padding: 8px 0;
     align-items: center;
     justify-content: center;
 }
 
-/* Title — NotJam pixel blackletter with a hard (blur-0) offset shadow. */
-.pause-header {
-    font-size: var(--font-size-heading-lg);
-    color: var(--color-text-inverse);
-    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/NotJamBlkltr13.ttf?fileID=12800000&guid=bf0206d6060cb4ed89e74ae40ea01e22&type=3#NotJamBlkltr13");
+.menu-item:hover,
+.menu-item:active,
+.menu-item:focus {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.menu-item-text {
+    -unity-font-definition: var(--font-body);
+    font-size: 48px;
+    color: rgb(217, 163, 92);
     -unity-text-align: middle-center;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-item-sub {
+    -unity-font-definition: var(--font-body);
+    font-size: var(--font-size-body);
+    color: rgb(196, 143, 85);
+    -unity-text-align: middle-center;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-item:hover .menu-item-text {
+    color: rgb(255, 227, 154);
+}
+
+.menu-item:active .menu-item-text {
+    color: rgb(255, 245, 215);
+}
+
+/* foil diamonds either side of the hovered line */
+.menu-diamond {
+    position: absolute;
+    top: 30px;
+    width: 9px;
+    height: 9px;
+    background-color: rgb(255, 227, 154);
+    rotate: 45deg;
+    display: none;
+}
+
+.menu-diamond--left { left: 6%; }
+.menu-diamond--right { right: 6%; }
+
+.menu-item:hover .menu-diamond {
+    display: flex;
+}
+
+.menu-question {
+    -unity-font-definition: var(--font-body);
+    font-size: 48px;
+    color: rgb(240, 207, 126);
+    -unity-text-align: middle-center;
+    margin: 0;
+}
+
+.menu-warning {
+    margin-bottom: 18px;
+    white-space: normal;
+}
+
+.menu-seal {
+    position: absolute;
+    right: -2%;
+    bottom: 8%;
+    width: 56px;
+    height: 56px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/wax-seal.png?fileID=21300000&guid=1f20b428f177408a805f644670704f78&type=3#wax-seal");
+    -unity-background-scale-mode: stretch-to-fill;
 }

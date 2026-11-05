@@ -1,20 +1,51 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
-    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss" />
     <Style src="project://database/Assets/Scripts/UI/Panels/Pause%20Menu/pause_styles.uss?fileID=7433441132597879392&amp;guid=79324d611df2a4e7686726032c96d01a&amp;type=3#pause_styles" />
-    <ui:VisualElement name="pause-panel" class="pause-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; align-items: center; justify-content: center;">
-        <ui:VisualElement name="board-container" class="pause-board" style="width: 560px; padding: 48px 44px;">
-            <ui:VisualElement name="content-container" style="align-items: center; justify-content: center; width: 100%;">
-                <ui:Label text="PAUSED" name="pause-header" class="pause-header" style="margin-bottom: 36px;" />
-                <ui:VisualElement name="button-container" style="align-items: center; width: 100%;">
-                    <ui:Button text="Resume" name="resume-button" class="btn-primary" style="width: 100%; margin-bottom: 16px;" />
-                    <ui:Button text="Settings" name="settings-button" class="btn-disabled" style="width: 100%; margin-bottom: 16px;" />
-                    <ui:Button text="Save Game" name="save-button" class="btn-disabled" style="width: 100%; margin-bottom: 16px;" />
-                    <ui:Button text="Load Game" name="load-button" class="btn-disabled" style="width: 100%; margin-bottom: 16px;" />
-                    <ui:Button text="Main Menu" name="mainmenu-button" class="btn-secondary" style="width: 100%; margin-bottom: 16px;" />
-                    <ui:Button text="Quit Game" name="quit-button" class="btn-danger" style="width: 100%;" />
+    <!-- Main menu = the guild book's closed cover, over the paused guild. Same panel id as the old pause menu (Esc binding). -->
+    <ui:VisualElement name="pause-panel" class="menu-root">
+        <ui:VisualElement name="menu-shade" class="menu-shade" picking-mode="Ignore" />
+        <ui:VisualElement name="menu-book" class="menu-book">
+            <ui:VisualElement class="menu-face">
+                <ui:VisualElement class="menu-logo" picking-mode="Ignore" />
+                <ui:VisualElement name="menu-main" class="menu-list">
+                    <ui:Button name="continue-button" class="menu-item">
+                        <ui:VisualElement class="menu-diamond menu-diamond--left" picking-mode="Ignore" />
+                        <ui:Label text="Continue" class="menu-item-text" picking-mode="Ignore" />
+                        <ui:Label name="continue-sub" text="" class="menu-item-sub" picking-mode="Ignore" />
+                        <ui:VisualElement class="menu-diamond menu-diamond--right" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="newguild-button" class="menu-item">
+                        <ui:VisualElement class="menu-diamond menu-diamond--left" picking-mode="Ignore" />
+                        <ui:Label text="New Guild" class="menu-item-text" picking-mode="Ignore" />
+                        <ui:VisualElement class="menu-diamond menu-diamond--right" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="settings-button" class="menu-item">
+                        <ui:VisualElement class="menu-diamond menu-diamond--left" picking-mode="Ignore" />
+                        <ui:Label text="Settings" class="menu-item-text" picking-mode="Ignore" />
+                        <ui:VisualElement class="menu-diamond menu-diamond--right" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="quit-button" class="menu-item">
+                        <ui:VisualElement class="menu-diamond menu-diamond--left" picking-mode="Ignore" />
+                        <ui:Label text="Quit" class="menu-item-text" picking-mode="Ignore" />
+                        <ui:VisualElement class="menu-diamond menu-diamond--right" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="menu-confirm" class="menu-list" style="display: none;">
+                    <ui:Label text="Start a new guild?" class="menu-question" picking-mode="Ignore" />
+                    <ui:Label text="This guild and all its progress will be lost." class="menu-item-sub menu-warning" picking-mode="Ignore" />
+                    <ui:Button name="confirm-yes" class="menu-item">
+                        <ui:VisualElement class="menu-diamond menu-diamond--left" picking-mode="Ignore" />
+                        <ui:Label text="Start over" class="menu-item-text" picking-mode="Ignore" />
+                        <ui:VisualElement class="menu-diamond menu-diamond--right" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="confirm-no" class="menu-item">
+                        <ui:VisualElement class="menu-diamond menu-diamond--left" picking-mode="Ignore" />
+                        <ui:Label text="Keep my guild" class="menu-item-text" picking-mode="Ignore" />
+                        <ui:VisualElement class="menu-diamond menu-diamond--right" picking-mode="Ignore" />
+                    </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement class="menu-seal" picking-mode="Ignore" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -65,6 +65,8 @@ public class LootPile : PersistentSingleton<LootPile>
         }
         if (binFront != null) binFront.sortingOrder = baseSortingOrder + maxSprites;
         if (shopkeeper != null) shopkeeperRestFlip = shopkeeper.flipX;
+        // Real time, like the station workers: the shopkeeper keeps idling behind the paused main menu
+        if (shopkeeper != null && shopkeeper.TryGetComponent(out Animator keeperAnim)) keeperAnim.updateMode = AnimatorUpdateMode.UnscaledTime;
 
         GameSignals.OnItemAdded += OnItemAdded;
         GameSignals.OnItemSold += OnItemSold;
