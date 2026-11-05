@@ -256,6 +256,18 @@
     color: rgb(168, 50, 42);
 }
 
+/* hover tip under a trait chip (CandidateUIMapper.PopulateTraits positions it) */
+.poster .poster-trait-tip {
+    position: absolute;
+    font-size: var(--font-size-caption);
+    padding: 4px 10px;
+    border-width: 3px;
+    border-color: rgb(74, 50, 32);
+    background-color: rgb(247, 238, 216);
+    color: rgb(74, 50, 32);
+    white-space: nowrap;
+}
+
 .poster-bars {
     margin-top: 12px;
 }

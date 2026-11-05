@@ -1,4 +1,4 @@
-/* ── Stat bars: 10 cells over 0.5→1.5, tick at 1.0 (cells built by CandidateUIMapper.PopulateBars; poster + roster detail) ── */
+/* ── Stat bars: 10 cells (cells built by CandidateUIMapper.PopulateBars; poster + roster detail) ── */
 .bar-row {
     flex-direction: row;
     align-items: center;
@@ -14,6 +14,7 @@
 }
 
 .stat-damage { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_damage.png"); }
+.stat-health { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_health.png"); }
 .stat-aspd   { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_aspd.png"); }
 .stat-reach  { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_reach.png"); }
 .stat-speed  { background-image: url("project://database/Assets/Sprites/Icons/Stats/stat_speed.png"); }
@@ -36,14 +37,3 @@
 }
 
 .bar-cell--on { background-color: rgb(107, 68, 38); }
-
-/* every cell carries a 3px right margin, so the 1.0 gap sits at 50% − 3px */
-.bar-tick {
-    position: absolute;
-    left: 50%;
-    margin-left: -3px;
-    top: -5px;
-    width: 3px;
-    height: 30px;
-    background-color: rgb(43, 26, 18);
-}

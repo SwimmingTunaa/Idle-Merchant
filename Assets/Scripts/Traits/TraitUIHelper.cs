@@ -31,7 +31,8 @@ public static class TraitUIHelper
         }
         else // Mult
         {
-            float percent = (mod.value - 1f) * 100f;
+            // AttackSpeed is the attack *interval*: ×0.9 seconds between hits = 11% more attacks
+            float percent = ((mod.stat == StatType.AttackSpeed && mod.value > 0f ? 1f / mod.value : mod.value) - 1f) * 100f;
             return percent >= 0 ? $"+{percent:F0}%" : $"{percent:F0}%";
         }
     }

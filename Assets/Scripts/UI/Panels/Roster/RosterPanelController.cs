@@ -415,7 +415,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
                 dpsLabel.text = (agent.Stats.AttackDamage * aps).ToString("F1");
         }
 
-        // Trait bars, same reading as the hiring poster: this unit's traits vs its class baseline
+        // Stat bars, same fixed scale as the hiring poster (class tier + traits)
         var bars = rightContent.Q("detail-bars");
         if (bars != null && agent.ClassDef != null)
             CandidateUIMapper.PopulateBars(bars,

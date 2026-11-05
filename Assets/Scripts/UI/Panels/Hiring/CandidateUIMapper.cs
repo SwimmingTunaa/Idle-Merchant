@@ -8,9 +8,10 @@ using UnityEngine.UIElements;
 /// </summary>
 public static class CandidateUIMapper
 {
-    // Bar rows (stat, icon class suffix). Adventurer: Damage / Attack speed / Reach / Speed; porter: Speed / Carry / Pickup.
-    private static readonly (StatType stat, string icon)[] AdventurerBars =
-        { (StatType.AttackDamage, "damage"), (StatType.AttackSpeed, "aspd"), (StatType.AttackRange, "reach"), (StatType.MoveSpeed, "speed") };
+    // Adventurer bar rows (icon class suffix, tooltip): absolute values, see AdvValue / AdvRange.
+    private static readonly (string icon, string tip)[] AdventurerBars =
+        { ("damage", "Damage per second"), ("health", "Health"), ("reach", "Reach"), ("speed", "Move speed") };
+    // Porter rows (stat, icon class suffix): trait multiplier vs the def's baseline.
     private static readonly (StatType stat, string icon)[] PorterBars =
         { (StatType.MoveSpeed, "speed"), (StatType.CarryCapacity, "carry"), (StatType.PickupTime, "pickup") };
 
@@ -140,6 +141,17 @@ public static class CandidateUIMapper
         var container = root.Q("trait-container");
         container.Clear();
 
+        // Hover tip with the trait's bonuses: one label, last child of the body so it draws over the bars
+        var body = root.Q("poster-body");
+        var tip = body.Q<Label>("trait-tip");
+        if (tip == null)
+        {
+            tip = new Label { name = "trait-tip", pickingMode = PickingMode.Ignore };
+            tip.AddToClassList("poster-trait-tip");
+            body.Add(tip);
+        }
+        tip.style.display = DisplayStyle.None;
+
         if (candidate.traits != null)
             foreach (var t in candidate.traits)
             {
@@ -148,45 +160,140 @@ public static class CandidateUIMapper
                 var chip = new Label(traitDef.displayName);
                 chip.AddToClassList("poster-trait");
                 chip.EnableInClassList("poster-trait--cursed", candidate.IsCursed);
+                string bonus = BonusText(traitDef, t.tier);
+                if (bonus.Length > 0)
+                {
+                    chip.RegisterCallback<PointerEnterEvent>(_ =>
+                    {
+                        var r = body.WorldToLocal(chip.worldBound);
+                        tip.text = bonus;
+                        tip.style.left = r.xMin;
+                        tip.style.top = r.yMax + 6f;
+                        tip.style.display = DisplayStyle.Flex;
+                        tip.BringToFront();
+                    });
+                    chip.RegisterCallback<PointerLeaveEvent>(_ => tip.style.display = DisplayStyle.None);
+                }
                 container.Add(chip);
             }
 
         container.style.display = container.childCount > 0 ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
-    // 10 cells over 0.5→1.5 in 0.1 steps: a cell is filled iff its upper edge ≤ m; tick at 1.0.
+    /// <summary>One line per stat modifier, green when it helps, red when it hurts ("+30% Move Speed").</summary>
+    private static string BonusText(TraitDef def, int tier)
+    {
+        if (tier < 1 || tier > def.tiers.Length || def.tiers[tier - 1].modifiers == null) return "";
+        var sb = new System.Text.StringBuilder();
+        foreach (var mod in def.tiers[tier - 1].modifiers)
+        {
+            string delta = TraitUIHelper.FormatModifier(mod);
+            bool lowerIsBetter = mod.stat == StatType.PickupTime || mod.stat == StatType.DepositTime;
+            bool good = delta.StartsWith("+") != lowerIsBetter;
+            if (sb.Length > 0) sb.Append('\n');
+            sb.Append(good ? "<color=#3F7A2A>" : "<color=#A8322A>").Append(delta).Append(' ')
+              .Append(TraitUIHelper.GetStatDisplayName(mod.stat)).Append("</color>");
+        }
+        return sb.ToString();
+    }
+
     // Also drives the roster detail page (a hired unit's traits wrapped in a candidate). Styles: Components/StatBars.uss
+    // Adventurers: absolute power on one fixed log scale shared by every class × tier, so Wood vs Bronze compare
+    // directly (each tier ≈ 2 cells). Porters: 10 cells over 0.5→1.5 of the trait multiplier.
     public static void PopulateBars(VisualElement bars, HiringCandidate candidate, bool adventurer, BaseStats baseStats)
     {
         bars.Clear();
+        var advDef = candidate.entityDef as AdventurerDef;
 
-        foreach (var (stat, icon) in adventurer ? AdventurerBars : PorterBars)
+        if (adventurer && advDef != null)
+        {
+            for (int r = 0; r < AdventurerBars.Length; r++)
+            {
+                var (lo, hi) = AdvRange(r);
+                AddBarRow(bars, AdventurerBars[r].icon, AdventurerBars[r].tip,
+                          LogCells(AdvValue(r, advDef, baseStats, candidate), lo, hi));
+            }
+            return;
+        }
+
+        foreach (var (stat, icon) in PorterBars)
         {
             float m = Mathf.Clamp(Mathf.Round(BarMult(candidate, stat, baseStats) * 10f) / 10f, 0.5f, 1.5f); // whole cells
-
-            var row = new VisualElement();
-            row.AddToClassList("bar-row");
-            var iconEl = new VisualElement { tooltip = TraitUIHelper.GetStatDisplayName(stat) };
-            iconEl.AddToClassList("bar-icon");
-            iconEl.AddToClassList("stat-" + icon);
-            row.Add(iconEl);
-
-            var bar = new VisualElement();
-            bar.AddToClassList("bar");
-            for (int k = 0; k < 10; k++)
-            {
-                var cell = new VisualElement();
-                cell.AddToClassList("bar-cell");
-                if (CellFilled(m, k)) cell.AddToClassList("bar-cell--on");
-                bar.Add(cell);
-            }
-            var tick = new VisualElement();
-            tick.AddToClassList("bar-tick");
-            bar.Add(tick);
-
-            row.Add(bar);
-            bars.Add(row);
+            int filled = 0;
+            for (int k = 0; k < 10; k++) if (CellFilled(m, k)) filled++;
+            AddBarRow(bars, icon, TraitUIHelper.GetStatDisplayName(stat), filled);
         }
+    }
+
+    private static void AddBarRow(VisualElement bars, string icon, string tip, int filled)
+    {
+        var row = new VisualElement();
+        row.AddToClassList("bar-row");
+        var iconEl = new VisualElement { tooltip = tip };
+        iconEl.AddToClassList("bar-icon");
+        iconEl.AddToClassList("stat-" + icon);
+        row.Add(iconEl);
+
+        var bar = new VisualElement();
+        bar.AddToClassList("bar");
+        for (int k = 0; k < 10; k++)
+        {
+            var cell = new VisualElement();
+            cell.AddToClassList("bar-cell");
+            if (k < filled) cell.AddToClassList("bar-cell--on");
+            bar.Add(cell);
+        }
+        row.Add(bar);
+        bars.Add(row);
+    }
+
+    /// <summary>Adventurer bar row value: 0 damage/s, 1 health, 2 reach, 3 move speed (class base × trait multipliers).</summary>
+    private static float AdvValue(int row, AdventurerDef def, BaseStats b, HiringCandidate c) => row switch
+    {
+        0 => b.attackDamage * TraitMult(c, StatType.AttackDamage, b) / (b.attackSpeed * TraitMult(c, StatType.AttackSpeed, b)),
+        1 => def.MaxHealth,
+        2 => b.attackRange * TraitMult(c, StatType.AttackRange, b),
+        _ => b.moveSpeed * TraitMult(c, StatType.MoveSpeed, b),
+    };
+
+    /// <summary>1–10 cells: the low end of the range still shows one cell, the high end all ten, log in between.</summary>
+    private static int LogCells(float v, float lo, float hi) =>
+        hi <= lo ? 5 : 1 + Mathf.Clamp(Mathf.RoundToInt(9f * Mathf.Log(Mathf.Max(v, lo) / lo) / Mathf.Log(hi / lo)), 0, 9);
+
+    // Fixed per-row range over every ClassCatalog def × (no trait | each adventurer trait at tier 1), built once.
+    // ponytail: single-trait extremes; a cursed pair can exceed them and just clamps. Rebuild if trait tiers start rolling higher.
+    private static (float lo, float hi)[] advRanges;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRanges() => advRanges = null;
+
+    private static (float lo, float hi) AdvRange(int row)
+    {
+        if (advRanges == null)
+        {
+            advRanges = new (float, float)[AdventurerBars.Length];
+            for (int r = 0; r < advRanges.Length; r++) advRanges[r] = (float.MaxValue, 0f);
+
+            var traits = TraitDatabase.GetTraitsForRole(TraitRole.Adventurer);
+            var catalog = ClassCatalog.Instance;
+            if (catalog != null)
+                foreach (var def in catalog.defs)
+                {
+                    if (def == null) continue;
+                    var b = BaseStats.FromEntityDef(def);
+                    for (int t = -1; t < traits.Count; t++)
+                    {
+                        var c = new HiringCandidate { entityDef = def };
+                        if (t >= 0) c.traits = new[] { new TraitInstance { traitId = traits[t].traitId, tier = 1 } };
+                        for (int r = 0; r < advRanges.Length; r++)
+                        {
+                            float v = AdvValue(r, def, b, c);
+                            advRanges[r] = (Mathf.Min(advRanges[r].lo, v), Mathf.Max(advRanges[r].hi, v));
+                        }
+                    }
+                }
+        }
+        return advRanges[row];
     }
 
     /// <summary>Bar cell k (covering [0.5 + k/10, 0.6 + k/10]) is filled iff its upper edge ≤ m.</summary>
