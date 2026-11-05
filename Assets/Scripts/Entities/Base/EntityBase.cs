@@ -60,9 +60,13 @@ public class EntityBase : MonoBehaviour
 
     public float GetWidth() => spriteRenderer.bounds.size.x;
 
+    /// <summary>Bumps every Init: a pooled instance comes back as a new unit, so holders of a reference compare this to tell them apart.</summary>
+    public int SpawnSerial { get; private set; }
+
     public virtual void Init(EntityDef entityDef, int layer, Spawner spawner, Collider2D playArea)
     {
         def = entityDef;
+        SpawnSerial++;
         // Every spawn path routes here; the prefab's appearance manager has no def until this (its Start reads it).
         if (appearanceManager != null) appearanceManager.SetEntityDef(entityDef);
         layerIndex = layer;

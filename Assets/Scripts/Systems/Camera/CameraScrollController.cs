@@ -242,6 +242,13 @@ public class CameraScrollController : PersistentSingleton<CameraScrollController
         followTarget = target;
     }
 
+    /// <summary>Ease the camera to a world point (clamped to bounds); drops any lock-on. HUD event cards use it.</summary>
+    public void JumpTo(Vector3 worldPos)
+    {
+        followTarget = null;
+        targetPosition = ClampToBounds(new Vector3(worldPos.x, worldPos.y, targetPosition.z));
+    }
+
     /// <summary>Release the lock-on follow; the camera stays where it is and manual scroll resumes.</summary>
     public void ClearLock()
     {

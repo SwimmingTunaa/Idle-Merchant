@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb74b0a158b36417f923eaef50cb6c6e, type: 3}
+  m_Name: Event_AdventurerParty
+  m_EditorClassIdentifier: Assembly-CSharp::EventDef
+  displayName: Adventurer Party
+  effectLine: 5 adventurers want gear
+  icon: {fileID: 1811167131, guid: 98b2f1c9237cb4662958fb3b4cdf2261, type: 3}
+  kind: 1
+  unlockStar: 2
+  weight: 1
+  durationSeconds: 180
+  cooldownSeconds: 600
+  rateMultiplier: 3
+  partySize: 5
+  partyCustomer: {fileID: 11400000, guid: 455cc9d2be604429983f4b2da1c56905, type: 2}

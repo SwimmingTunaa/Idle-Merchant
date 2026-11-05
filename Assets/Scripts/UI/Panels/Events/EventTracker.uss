@@ -1,0 +1,71 @@
+/* ── Event tracker: plank cards down the left edge (mirror of the milestone tracker) ── */
+.ev-root {
+    width: 320px;
+}
+
+.ev-card {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 12px 0;
+    padding: var(--space-md) var(--space-md);
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Box.png?fileID=2800000&guid=b1a09ce780a154f14af9ecb3b7d86965&type=3#Box");
+    -unity-slice-left: 5;
+    -unity-slice-right: 5;
+    -unity-slice-top: 5;
+    -unity-slice-bottom: 5;
+    -unity-slice-scale: 5px;
+    cursor: link;
+}
+
+.ev-card:hover {
+    -unity-background-image-tint-color: rgb(226, 196, 164);
+}
+
+.ev-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    margin-right: var(--space-sm);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.ev-text {
+    flex-grow: 1;
+    align-items: stretch;
+}
+
+.ev-name {
+    -unity-font-definition: var(--font-body);
+    font-size: var(--font-size-small);
+    color: var(--color-text-strong);
+    margin: 0;
+    padding: 0;
+}
+
+.ev-effect {
+    -unity-font-definition: var(--font-body);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-primary);
+    margin: 2px 0 0 0;
+    padding: 0;
+}
+
+.ev-track {
+    margin-top: 10px;
+}
+
+.ev-fill {
+    background-color: rgb(240, 190, 40);
+    transition-duration: 0s;
+}
+
+.ev-left {
+    -unity-font-definition: var(--font-body);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-strong);
+    margin: 0 0 0 var(--space-sm);
+    padding: 0;
+    flex-shrink: 0;
+}

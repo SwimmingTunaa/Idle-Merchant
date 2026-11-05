@@ -53,6 +53,7 @@ public static class GameSignals
     public static event Action<Contract> OnContractCompleted;  // target met / goods handed over → claimable
     public static event Action<int> OnSealsChanged;            // new seal balance
     public static event Action OnCaravanChanged;               // caravan arrived / left / offer taken
+    public static event Action OnEventsChanged;                // a world event started or ended (EventManager.Active)
 
     // Public invoke methods
     public static void RaiseGoldEarned(int amount) => OnGoldEarned?.Invoke(amount);
@@ -84,6 +85,7 @@ public static class GameSignals
     public static void RaiseContractCompleted(Contract c) => OnContractCompleted?.Invoke(c);
     public static void RaiseSealsChanged(int balance) => OnSealsChanged?.Invoke(balance);
     public static void RaiseCaravanChanged() => OnCaravanChanged?.Invoke();
+    public static void RaiseEventsChanged() => OnEventsChanged?.Invoke();
 
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("Tools/Game Signals/Clear All Listeners")]
@@ -117,6 +119,7 @@ public static class GameSignals
         OnContractCompleted = null;
         OnSealsChanged = null;
         OnCaravanChanged = null;
+        OnEventsChanged = null;
 
         Debug.Log("[GameSignals] All listeners cleared");
     }

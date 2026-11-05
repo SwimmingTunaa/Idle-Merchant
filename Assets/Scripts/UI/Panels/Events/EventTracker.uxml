@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/ProgressBar.uss?fileID=7433441132597879392&amp;guid=492d8502d093f41ecb20460e908cfc39&amp;type=3#ProgressBar" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Events/EventTracker.uss" />
+    <!-- Running events, left edge (EventTracker.cs fills ev-list; hidden when empty) -->
+    <ui:VisualElement name="event-tracker" class="ev-root" style="display: none;">
+        <ui:VisualElement name="ev-list" class="ev-list" />
+    </ui:VisualElement>
+</ui:UXML>

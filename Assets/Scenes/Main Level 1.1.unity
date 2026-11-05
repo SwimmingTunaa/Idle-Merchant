@@ -10183,6 +10183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CounterService
   serveTime: 3
+  serveBonus: 0.15
   exitPoint: {fileID: 455401622}
   goldSpawnPoint: {fileID: 0}
 --- !u!114 &354730532
@@ -19663,6 +19664,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5b96350e763244ec0818fcc9b0bd2c86, type: 2}
   - {fileID: 11400000, guid: 455cc9d2be604429983f4b2da1c56905, type: 2}
   - {fileID: 11400000, guid: 516a5c37cb024e36a2fc97ca7f58e3c0, type: 2}
+  - {fileID: 11400000, guid: 830d1040ebad496ca05da48e4d54ea25, type: 2}
+  - {fileID: 11400000, guid: ac543d70307342a3bfcfc5f82110aceb, type: 2}
+  - {fileID: 11400000, guid: a3b1028f7a3643f29ee49cc33c4b6689, type: 2}
+  - {fileID: 11400000, guid: 65f50dd22c07494e82bac7f77f25d82d, type: 2}
+  - {fileID: 11400000, guid: 881da24501d04eaaae610f01441c166d, type: 2}
+  - {fileID: 11400000, guid: fa7c84a02cca4d92a48b8cd0d4d75607, type: 2}
   spawnsPerMinute: 30
   maxAlive: 10
   spawnArea: {fileID: 2059042693}
@@ -19672,9 +19679,13 @@ MonoBehaviour:
     m_Bits: 0
   adventurerUnlockStar: 2
   nobleUnlockStar: 3
+  royaltyUnlockStar: 5
   maxCommoner: 999
   maxAdventurer: 5
   maxNoble: 3
+  maxRoyalty: 4
+  royalPairChance: 0.5
+  royalSoloChance: 0.3
   baseSpawnsPerMinute: 5
   spawnRatePerStar: 2
   spawnRatePerSaleItem: 0.5
@@ -26761,6 +26772,61 @@ Transform:
   - {fileID: 1914940253}
   m_Father: {fileID: 1498712769}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &911689725
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 911689726}
+  - component: {fileID: 911689727}
+  m_Layer: 0
+  m_Name: EventManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &911689726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911689725}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945178581}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &911689727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911689725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f658a5897dc74b9c8f08027016aa2f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EventManager
+  defs:
+  - {fileID: 11400000, guid: 79825c4c9f0794280b79431c1735ed0c, type: 2}
+  - {fileID: 11400000, guid: 479a635a3ccad4253864e6ab707adc0f, type: 2}
+  - {fileID: 11400000, guid: cb6cc08ff0e2948a6b0af3801fd18e66, type: 2}
+  - {fileID: 11400000, guid: b42d3feecd5f947c7947662fe3361e7b, type: 2}
+  - {fileID: 11400000, guid: 090bc5dd0d2254a49a58749a17e01e0d, type: 2}
+  - {fileID: 11400000, guid: 907c196ff07d145a4b50cf0ce4a5beae, type: 2}
+  rollMin: 240
+  rollMax: 360
+  maxActive: 2
+  showDebugLogs: 0
 --- !u!1 &917538589
 GameObject:
   m_ObjectHideFlags: 0
@@ -32406,6 +32472,7 @@ Transform:
   - {fileID: 2044110758}
   - {fileID: 788272035}
   - {fileID: 291574149}
+  - {fileID: 911689726}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &945178582
@@ -41593,6 +41660,7 @@ GameObject:
   - component: {fileID: 1433364567}
   - component: {fileID: 1433364568}
   - component: {fileID: 1433364571}
+  - component: {fileID: 1433364572}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -41861,6 +41929,19 @@ MonoBehaviour:
   coinFlightTime: 0.65
   coinStagger: 0.04
   showDebugLogs: 0
+--- !u!114 &1433364572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433364561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55e34b63b20354afd874a92d3cf28a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EventTracker
+  uiDocument: {fileID: 1433364562}
 --- !u!1 &1434789753
 GameObject:
   m_ObjectHideFlags: 0
@@ -52897,8 +52978,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: 05b009f5283364f00baddc7c1fc055ba, type: 3}
       propertyPath: m_Name
-      value: MiniNobleMan
+      value: MiniMerchant
       objectReference: {fileID: 0}
+    - target: {fileID: 1160356261127867848, guid: 05b009f5283364f00baddc7c1fc055ba, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 590c65cfb89a4415bb5bc63df25dbf01, type: 2}
+    - target: {fileID: 3626916397498700004, guid: 05b009f5283364f00baddc7c1fc055ba, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 3311811577602110540, guid: 9814825c2a8d54572b66f6911cb393f5, type: 3}
     - target: {fileID: 7878350319992209165, guid: 05b009f5283364f00baddc7c1fc055ba, type: 3}
       propertyPath: m_LocalPosition.x
       value: 19.85

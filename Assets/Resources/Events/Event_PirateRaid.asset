@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb74b0a158b36417f923eaef50cb6c6e, type: 3}
+  m_Name: Event_PirateRaid
+  m_EditorClassIdentifier: Assembly-CSharp::EventDef
+  displayName: Pirate Raid
+  effectLine: Click them before they run!
+  icon: {fileID: -6644701819260611078, guid: 1558f4f8972449fb9def10be0748fc35, type: 3}
+  kind: 4
+  unlockStar: 3
+  weight: 0.8
+  durationSeconds: 120
+  cooldownSeconds: 900
+  rateMultiplier: 3
+  partySize: 5
+  partyCustomer: {fileID: 0}
+  partyMembers:
+  - {fileID: 11400000, guid: 363475ceedea4cd19811a73a0bd5dfa2, type: 2}
+  - {fileID: 11400000, guid: c230c5aeeeb64576aa30f03dd20c41a1, type: 2}
+  - {fileID: 11400000, guid: 4634deda216f4a638363e5065357a34e, type: 2}
+  - {fileID: 11400000, guid: 676eac0fd18341d184ffff7b2e5f5924, type: 2}
+  stealInterval: 4
+  carryMax: 3
+  stealPercent: 0.15

@@ -231,7 +231,7 @@ public class PauseMenuController : BasePanelController
         confirmList = panel.Q("menu-confirm");
         continueButton = panel.Q("continue-button");
         continueSub = panel.Q<Label>("continue-sub");
-        hud = new[] { root.Q("TopNavigation"), root.Q("MilestoneTracker") };
+        hud = new[] { root.Q("TopNavigation"), root.Q("MilestoneTracker"), root.Q("EventTracker") };
 
         panel.Q<Button>("continue-button").clicked += Continue;
         panel.Q<Button>("newguild-button").clicked += OnNewGuildClicked;

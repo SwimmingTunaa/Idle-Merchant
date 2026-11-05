@@ -342,7 +342,7 @@ public class ClickerManager : MonoBehaviour
                 if (caravan == null) hit.TryGetComponent(out caravan);
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
                 if (ladder == null) hit.TryGetComponent(out ladder);
-                if (cust == null && counter != null && hit.TryGetComponent(out CustomerAgent cc) && cc == counter.Serving) cust = cc;
+                if (cust == null && hit.TryGetComponent(out CustomerAgent cc) && ((counter != null && cc == counter.Serving) || hit.TryGetComponent(out PirateRaider _))) cust = cc;
             }
         }
 
@@ -463,6 +463,14 @@ public class ClickerManager : MonoBehaviour
         {
             if (!hit.TryGetComponent(out CustomerAgent cust) || counter == null) continue;
             if (counter.TryServe(cust)) return;
+        }
+
+        // Priority 2c: a pirate raider — click scares them off and drops what they carry
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out PirateRaider pirate)) continue;
+            pirate.Drop();
+            return;
         }
 
         // Priority 3: a workshop prop in the guild opens its panel

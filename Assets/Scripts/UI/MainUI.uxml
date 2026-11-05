@@ -10,6 +10,7 @@
     <ui:Template name="TransportPanel" src="project://database/Assets/Scripts/UI/Panels/Transport/TransportPanel.uxml"/>
     <ui:Template name="StarFanfare" src="project://database/Assets/Scripts/UI/Panels/Star%20Fanfare/StarFanfare.uxml"/>
     <ui:Template name="WelcomeBack" src="project://database/Assets/Scripts/UI/Panels/Welcome%20Back/WelcomeBack.uxml"/>
+    <ui:Template name="EventTracker" src="project://database/Assets/Scripts/UI/Panels/Events/EventTracker.uxml"/>
     <ui:Template name="TopNavigation" src="project://database/Assets/Scripts/UI/TopNavigation.uxml?fileID=9197481963319205126&amp;guid=ea5112a68ff84455992e270c7a46c49f&amp;type=3#TopNavigation"/>
     <Style src="project://database/Assets/Scripts/UI/MainUI.uss?fileID=7433441132597879392&amp;guid=4213a91c70ef441ea9b066247634b523&amp;type=3#MainUI"/>
     <Style src="project://database/Assets/Scripts/UI/Panels/Hiring/HirePanel.uss?fileID=7433441132597879392&amp;guid=624f2716701eb49f29adeb10fda31f63&amp;type=3#HirePanel"/>
@@ -24,6 +25,7 @@
             <ui:Instance template="CaravanPanel" name="CaravanPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         </ui:VisualElement>
         <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
+        <ui:Instance template="EventTracker" name="EventTracker" style="position: absolute; left: 16px; top: 200px;"/>
         <ui:Instance template="WelcomeBack" name="WelcomeBack" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
         <!-- last child of main-root, so its dim backdrop covers the top nav and milestone tracker too -->
         <ui:Instance template="ClassPickPanel" name="ClassPickPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
