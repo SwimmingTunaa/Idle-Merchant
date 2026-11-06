@@ -26,6 +26,17 @@ public class CustomerDef : EntityDef
     [Tooltip("How long customer pauses at each wander point before picking the next")]
     public Vector2 wanderPauseDuration = new Vector2(0.5f, 2f);
 
+    [Tooltip("Pirates: the sheet's death clip, played through a Playable when the raider is clicked (the customer controller has no Dead state)")]
+    public AnimationClip deathClip;
+
+    [Header("Decisive")]
+    [Tooltip("Chance this customer already knows what they want: they pick at the door and go straight to the line (no browse)")]
+    [Range(0f, 1f)] public float decisiveChance = 0.1f;
+
+    [Header("Patience")]
+    [Tooltip("Seconds they'll wait to buy (queue full / standing in line) before walking out Impatient; tints red over the last quarter")]
+    public float patienceSeconds = 60f;
+
     [Header("Budget")]
     public Vector2 budget = new Vector2(80, 160);
     public Vector2Int batchRange = new Vector2Int(1, 3); // items per visit

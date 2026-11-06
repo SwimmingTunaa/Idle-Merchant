@@ -16,10 +16,11 @@ MonoBehaviour:
   useModularCharacter: 0
   animatorOverrideController:
   - {fileID: 22100000, guid: edd5f63b2af444bceb7de0cd1f6080e3, type: 2}
+  - {fileID: 22100000, guid: 36f2b3214824436cbc0bdd810dec40f4, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Potion Lady
-  displayName: Potion Lady
+  displayName: Herbalist
   description: 
   hireCost: 500
   rank: 1
@@ -66,3 +67,5 @@ MonoBehaviour:
   wanderPauseDuration: {x: 0.5, y: 2}
   budget: {x: 200, y: 600}
   batchRange: {x: 1, y: 3}
+  patienceSeconds: 90
+  decisiveChance: 0.15

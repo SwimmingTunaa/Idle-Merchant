@@ -48,6 +48,14 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private CustomerDef customerDef;
     private int batchMin, batchMax;
 
+    // Patience: ticks whenever they have a want and aren't being served; red tint over the last quarter.
+    private float patienceLeft;
+    private bool wantsToBuy;
+    private bool decisive;   // rolled per visit: knows what they want before walking in
+    private Color baseColor = Color.white;
+    private static readonly Color ImpatientTint = new Color(1f, 0.45f, 0.4f);
+    public float Patience01 => customerDef != null && customerDef.patienceSeconds > 0f ? Mathf.Clamp01(patienceLeft / customerDef.patienceSeconds) : 1f;
+
     private bool hasInitialized = false;
     private bool hoverOutline;
     private const uint OutlineRenderingLayer = 2;   // HoverOutlineFeature hover/selection bit
@@ -98,6 +106,9 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         base.Init(entityDef, layer, spawner, playArea);
         customerDef = (CustomerDef)entityDef;
         budget = Random.Range(customerDef.budget.x, customerDef.budget.y + 1);
+        patienceLeft = customerDef.patienceSeconds;
+        wantsToBuy = false;
+        decisive = Random.value < customerDef.decisiveChance;
         batchMin = customerDef.batchRange.x;
         batchMax = customerDef.batchRange.y;
         
@@ -147,7 +158,33 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     {
         base.Update();
         UpdateMovementSmooth();
+        ApplyTint();
     }
+
+    private void SetBaseColor(Color c) { baseColor = c; ApplyTint(); }
+
+    // Last quarter of patience fades the sprite toward red; everything else shows the state colour.
+    private void ApplyTint()
+    {
+        if (spriteRenderer == null) return;
+        float t = wantsToBuy && State != CustomerState.Buying && State != CustomerState.Leaving ? Mathf.Clamp01(1f - Patience01 / 0.25f) : 0f;
+        spriteRenderer.color = t > 0f ? Color.Lerp(baseColor, ImpatientTint, t) : baseColor;
+    }
+
+    // Waiting to buy (queue full → browsing again, or standing in line) burns patience; at zero they walk out Impatient.
+    private void TickPatience()
+    {
+        if (!wantsToBuy || State == CustomerState.Buying) return;
+        patienceLeft -= TickDelta;
+        if (patienceLeft > 0f) return;
+        if (QueueController.Instance != null) QueueController.Instance.Remove(this);
+        walkoutReason = WalkoutReason.Impatient;
+        desiredItem = null;
+        desiredQty = 0;
+        ChangeState(CustomerState.Leaving);
+    }
+
+    public CustomerDef Def => customerDef;
 
     /// <summary>What this customer pays per item relative to sellPrice (CustomerDef.priceMultiplier).</summary>
     public float PriceMultiplier => customerDef != null && customerDef.priceMultiplier > 0f ? customerDef.priceMultiplier : 1f;
@@ -176,6 +213,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
             out desiredItem,
             out desiredQty,
             out walkoutReason);
+        if (desiredItem != null) wantsToBuy = true;
     }
 
     /// <summary>
@@ -215,7 +253,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         switch (newState)
         {
             case CustomerState.Idle:
-                spriteRenderer.color = wanderColor;
+                SetBaseColor(wanderColor);
                 targetPos = null;
                 
                 // Create idle timer from EntityDef idle time range
@@ -225,7 +263,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.SeekingQueue:
-                spriteRenderer.color = seekingColor;
+                SetBaseColor(seekingColor);
                 sortingGroup.sortingOrder = 5;
                 // Seek the END of the queue, not the front
                 SetTarget(QueueController.Instance.GetQueueEndPosition());
@@ -239,7 +277,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Queueing:
-                spriteRenderer.color = queueingColor;
+                SetBaseColor(queueingColor);
                 sortingGroup.sortingOrder = 5;
                 
                 // Face toward counter (right side)
@@ -251,13 +289,13 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Entering:
-                spriteRenderer.color = Color.white;
+                SetBaseColor(Color.white);
                 sortingGroup.sortingOrder = 6;
                 SetTarget(ShopManager.Instance.entrancePoint.position);
                 break;
 
             case CustomerState.Wander:
-                spriteRenderer.color = wanderColor;
+                SetBaseColor(wanderColor);
                 sortingGroup.sortingOrder = 4;
                 float wanderDuration = Mathf.Max(1f, Random.Range(customerDef.wanderDuration.x, customerDef.wanderDuration.y));
                 wanderTimer = new CountdownTimer(wanderDuration);
@@ -273,14 +311,14 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 break;
                 
             case CustomerState.Buying:
-                spriteRenderer.color = Color.white;
+                SetBaseColor(Color.white);
                 targetPos = null;
                 sortingGroup.sortingOrder = 5;
                 break;
                 
             case CustomerState.Leaving:
                 targetPos = ShopManager.Instance.exitPoint.position;
-                spriteRenderer.color = leavingColor;
+                SetBaseColor(leavingColor);
                 sortingGroup.sortingOrder = 3;
                 break;
 
@@ -297,6 +335,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     
     protected override void OnUpdateState(CustomerState currentState)
     {
+        TickPatience();
+        if (State == CustomerState.Leaving && currentState != CustomerState.Leaving) return;   // just walked out
         switch (currentState)
         {
             case CustomerState.Idle:
@@ -365,7 +405,15 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
 
             case CustomerState.Entering:
                 if (!targetPos.HasValue)
-                    ChangeState(CustomerState.Wander);
+                {
+                    if (decisive)
+                    {
+                        // Knew what they wanted on the way in: pick at the door, straight to the line (or straight back out)
+                        PickWantFromInventory();
+                        ChangeState(desiredItem != null ? CustomerState.SeekingQueue : CustomerState.Leaving);
+                    }
+                    else ChangeState(CustomerState.Wander);
+                }
                 break;
 
             case CustomerState.Wander:
@@ -431,6 +479,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         desiredQty = 0;
         walkoutReason = WalkoutReason.None;
         budget = 0f;
+        wantsToBuy = false;
+        decisive = false;
         targetPos = null;
         customerDef = null; // Clear def so Start() doesn't use old data
         spriteRenderer.sortingOrder = 5;

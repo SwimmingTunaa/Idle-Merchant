@@ -17,6 +17,7 @@ MonoBehaviour:
   animatorOverrideController:
   - {fileID: 22100000, guid: da36e69b1ab8146f985bcd6812f81567, type: 2}
   - {fileID: 22100000, guid: 2e0bb06465ec4b0ca568645d8b38287d, type: 2}
+  - {fileID: 22100000, guid: 4f09ee909ea440e59a9138c99ec824a5, type: 2}
   spriteDrop: {fileID: 0}
   shopSprite: {fileID: 0}
   id: Villager Man
@@ -66,3 +67,5 @@ MonoBehaviour:
   wanderPauseDuration: {x: 0.5, y: 2}
   budget: {x: 200, y: 600}
   batchRange: {x: 1, y: 3}
+  patienceSeconds: 90
+  decisiveChance: 0.1

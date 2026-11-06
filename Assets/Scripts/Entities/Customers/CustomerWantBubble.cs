@@ -37,6 +37,8 @@ public class CustomerWantBubble : MonoBehaviour
     [SerializeField] private Sprite noStockSprite;
     [Tooltip("Walkout: matching stock existed but none fit their budget.")]
     [SerializeField] private Sprite tooExpensiveSprite;
+    [Tooltip("Walked out after their patience ran out (hourglass)")]
+    [SerializeField] private Sprite impatientSprite;
     [SerializeField] private float decideFlashDuration = 0.6f;
 
     // Cache last values to avoid work every frame
@@ -97,7 +99,7 @@ public class CustomerWantBubble : MonoBehaviour
 
     private void OnCustomerStateChanged(CustomerState prev, CustomerState next)
     {
-        if (next == CustomerState.SeekingQueue && (prev == CustomerState.Wander || prev == CustomerState.Idle))
+        if (next == CustomerState.SeekingQueue && (prev == CustomerState.Wander || prev == CustomerState.Idle || prev == CustomerState.Entering))
             _decideFlashUntil = Time.time + decideFlashDuration;
 
         RefreshAll();
@@ -113,6 +115,7 @@ public class CustomerWantBubble : MonoBehaviour
         {
             WalkoutReason.NoStock      => noStockSprite,
             WalkoutReason.TooExpensive => tooExpensiveSprite,
+            WalkoutReason.Impatient    => impatientSprite,
             _                          => null
         },
         _ => null

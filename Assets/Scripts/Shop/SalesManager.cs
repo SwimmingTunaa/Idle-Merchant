@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>Why a customer's want-pick failed (shown in their bubble as they walk out).</summary>
-public enum WalkoutReason { None, NoStock, TooExpensive }
+public enum WalkoutReason { None, NoStock, TooExpensive, Impatient }
 
 public class SalesManager : PersistentSingleton<SalesManager>
 {
