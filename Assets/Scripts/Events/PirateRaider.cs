@@ -1,16 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 /// <summary>
 /// A pirate during the Pirate Raid event: rides a pooled customer (its look + animator) with the CustomerAgent
 /// switched off, walks to the loot pile, grabs stealPercent of one random stack every stealInterval (gone for
-/// good when they reach the exit), and runs after carryMax grabs. Click (ClickerManager priority 2c) → Drop: everything
-/// carried flies back onto the pile and the pirate flees empty-handed. Removed on despawn so the pooled
-/// customer is clean next time.
+/// good when they reach the exit), and runs after carryMax grabs. What they carry stacks over their head. Click
+/// (ClickerManager priority 2c) → Kill: everything carried flies back onto the pile, the sheet's death clip plays
+/// (CustomerDef.deathClip through a Playable — the customer controller has no Dead state) and they're pooled.
+/// Removed on despawn so the pooled customer is clean next time.
 /// </summary>
 public class PirateRaider : MonoBehaviour
 {
-    private enum Phase { Approach, Loot, Flee }
+    private enum Phase { Approach, Loot, Flee, Dying }
 
     private CustomerAgent agent;
     private Animator anim;
@@ -19,7 +22,11 @@ public class PirateRaider : MonoBehaviour
     private float speed, stealInterval, stealTimer, stealPercent;
     private int carryMax;
     private readonly List<(ItemDef item, int qty)> carried = new();
+    private readonly List<SpriteRenderer> stack = new();   // one icon per grab, piled over the head
     private static readonly List<ItemDef> pick = new();
+    private PlayableGraph deathGraph;
+    private float dieLeft;
+    private const float StackBase = 1.45f, StackStep = 0.42f;
 
     /// <summary>Items carried right now (sum of grabbed stacks).</summary>
     public int Carried { get { int n = 0; foreach (var c in carried) n += c.qty; return n; } }
@@ -39,6 +46,12 @@ public class PirateRaider : MonoBehaviour
     void Update()
     {
         if (agent == null) return;
+        if (phase == Phase.Dying)
+        {
+            dieLeft -= Time.deltaTime;
+            if (dieLeft <= 0f) Leave();
+            return;
+        }
         bool moving = phase != Phase.Loot;
         if (moving)
         {
@@ -76,6 +89,7 @@ public class PirateRaider : MonoBehaviour
         int qty = Mathf.Max(1, Mathf.FloorToInt(stack[item] * stealPercent));
         if (!inv.TryRemove(stack, item, qty)) return;
         carried.Add((item, qty));
+        AddStackIcon(item);
         if (LootPile.Instance != null)
         {
             LootPile.Instance.Refresh();
@@ -86,10 +100,27 @@ public class PirateRaider : MonoBehaviour
         if (carried.Count >= carryMax) Flee();   // grabs, not items
     }
 
-    /// <summary>Player click: carried stock goes back on the pile, pirate runs.</summary>
-    public void Drop()
+    /// <summary>Player click: carried stock goes back on the pile, then the pirate dies (death clip) and is pooled.</summary>
+    public void Kill()
     {
-        if (phase == Phase.Flee && carried.Count == 0) return;
+        if (phase == Phase.Dying) return;
+        Drop();
+        phase = Phase.Dying;
+        if (anim != null) anim.SetFloat(AnimHash.Velocity, 0f);
+        if (ClickHitVFX.Instance != null) ClickHitVFX.Instance.PlayKill(transform.position + Vector3.up * 0.6f);
+        if (SfxManager.Instance != null) SfxManager.Instance.Play(SfxId.Kill);
+        var clip = agent.Def is CustomerDef cd ? cd.deathClip : null;
+        if (clip != null && anim != null)
+        {
+            AnimationPlayableUtilities.PlayClip(anim, clip, out deathGraph);
+            dieLeft = clip.length;
+        }
+        else dieLeft = 0.3f;
+    }
+
+    /// <summary>Carried stock goes back on the pile (icons fly from the head).</summary>
+    private void Drop()
+    {
         var inv = Inventory.Instance;
         int dropped = Carried;
         foreach (var (item, qty) in carried)
@@ -100,8 +131,28 @@ public class PirateRaider : MonoBehaviour
         if (DamageNumberManager.Instance != null)
             DamageNumberManager.Instance.ShowText(dropped > 0 ? $"Dropped {dropped}!" : "Scared off!", transform, new Color(1f, 0.84f, 0.3f));
         carried.Clear();
+        ClearStack();
         if (LootPile.Instance != null) LootPile.Instance.Refresh();
-        Flee();
+    }
+
+    private void AddStackIcon(ItemDef item)
+    {
+        var body = GetComponentInChildren<SpriteRenderer>();
+        var go = new GameObject("carried");
+        go.transform.SetParent(transform, false);
+        go.transform.localPosition = new Vector3(0f, StackBase + StackStep * stack.Count, 0f);
+        go.transform.localScale = Vector3.one * 0.75f;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = item.spriteDrop != null ? item.spriteDrop : item.icon;
+        if (body != null) { sr.sortingLayerID = body.sortingLayerID; sr.sortingOrder = body.sortingOrder + 1; sr.sharedMaterial = body.sharedMaterial; }
+        sr.renderingLayerMask = 1;   // no outline on the loot
+        stack.Add(sr);
+    }
+
+    private void ClearStack()
+    {
+        foreach (var sr in stack) if (sr != null) Destroy(sr.gameObject);
+        stack.Clear();
     }
 
     private void Flee()
@@ -113,6 +164,8 @@ public class PirateRaider : MonoBehaviour
 
     private void Leave()
     {
+        if (deathGraph.IsValid()) deathGraph.Destroy();   // hands the Animator back to its controller
+        ClearStack();
         var a = agent; agent = null;
         a.enabled = true;            // hand the pooled customer back clean
         a.SetHoverOutline(false);

@@ -342,7 +342,7 @@ public class ClickerManager : MonoBehaviour
                 if (caravan == null) hit.TryGetComponent(out caravan);
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
                 if (ladder == null) hit.TryGetComponent(out ladder);
-                if (cust == null && hit.TryGetComponent(out CustomerAgent cc) && ((counter != null && cc == counter.Serving) || hit.TryGetComponent(out PirateRaider _))) cust = cc;
+                if (cust == null && hit.TryGetComponent(out CustomerAgent cc) && ((counter != null && cc == counter.Serving) || hit.TryGetComponent(out PirateRaider _) || (hit.TryGetComponent(out RoyalAudience ra) && ra.Waiting))) cust = cc;
             }
         }
 
@@ -465,11 +465,19 @@ public class ClickerManager : MonoBehaviour
             if (counter.TryServe(cust)) return;
         }
 
-        // Priority 2c: a pirate raider — click scares them off and drops what they carry
+        // Priority 2b': a royal waiting at the dais — opens the audience
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out RoyalAudience royal) || !royal.Waiting) continue;
+            FindAnyObjectByType<AudiencePanelController>()?.OpenFor(royal);
+            return;
+        }
+
+        // Priority 2c: a pirate raider — click kills them; what they carry flies back to the pile
         foreach (var hit in hits)
         {
             if (!hit.TryGetComponent(out PirateRaider pirate)) continue;
-            pirate.Drop();
+            pirate.Kill();
             return;
         }
 

@@ -19671,7 +19671,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 881da24501d04eaaae610f01441c166d, type: 2}
   - {fileID: 11400000, guid: fa7c84a02cca4d92a48b8cd0d4d75607, type: 2}
   spawnsPerMinute: 30
-  maxAlive: 10
+  maxAlive: 40
   spawnArea: {fileID: 2059042693}
   wander: {fileID: 1157966446}
   groundMask:
@@ -51288,6 +51288,7 @@ GameObject:
   - component: {fileID: 1837106735}
   - component: {fileID: 1837106736}
   - component: {fileID: 1837106737}
+  - component: {fileID: 1837106738}
   m_Layer: 0
   m_Name: Workshop Panel
   m_TagString: Untagged
@@ -51382,6 +51383,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cccb03682215e409ebd3b802d0e7ee6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CaravanPanelController
+  uiDocument: {fileID: 1433364562}
+  panelAsset: {fileID: 0}
+  blocksWorldInput: 1
+  isModal: 1
+  openCloseDuration: 0.3
+  hasOverlay: 1
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
+--- !u!114 &1837106738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1837106732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aaae1ae468bf4149a7ce43bafd18fcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudiencePanelController
   uiDocument: {fileID: 1433364562}
   panelAsset: {fileID: 0}
   blocksWorldInput: 1

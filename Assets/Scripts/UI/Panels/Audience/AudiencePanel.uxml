@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Workshop/WorkshopPanel.uss" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Caravan/CaravanPanel.uss" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Audience/AudiencePanel.uss" />
+    <!-- Royal audience: AudiencePanelController.OpenFor(RoyalAudience) when the waiting royal is clicked. -->
+    <ui:VisualElement name="audience-panel" class="wp-host">
+        <ui:VisualElement class="wp-card cv-card au-card">
+            <ui:VisualElement picking-mode="Ignore" class="wp-beam" />
+            <ui:VisualElement class="wp-body">
+                <ui:VisualElement name="au-hero" picking-mode="Ignore" class="wp-hero au-hero" />
+                <ui:VisualElement class="wp-main">
+                    <ui:VisualElement class="wp-head">
+                        <ui:Label name="au-title" text="Audience" class="wp-title" />
+                        <ui:Button name="au-close" class="wp-close">
+                            <ui:Label text="X" picking-mode="Ignore" class="wp-close__x" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                    <ui:Label name="au-taste" text="The Queen fancies something arcane." class="cv-text" />
+                    <ui:VisualElement name="au-offers" class="au-offers" />
+                    <ui:Label name="au-leaves" text="Leaves in 0:60" class="cv-caption" />
+                    <ui:VisualElement class="cv-row cv-actions">
+                        <ui:Button name="au-decline" class="btn-secondary cv-btn">
+                            <ui:Label text="Decline" picking-mode="Ignore" class="btn-label" />
+                        </ui:Button>
+                        <ui:Label name="au-error" class="cv-error" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -14,7 +14,8 @@ public class CaravanManager : MonoBehaviour
     public const float StayFor = 90f;       // the offer stays open this long (parked in the opening camera view)
     public const int SealReward = 5;
     public const int MinQty = 20;           // a smaller best lot = no visit this time
-    private const float SlideDistance = 8f, SlideTime = 1.2f, WheelFps = 10f;
+    // Drives in from past the camera's left bound (minX −50 − half a 17-ortho view) and back out the same way.
+    private const float SlideDistance = 75f, SlideTime = 6f, WheelFps = 10f;
 
     public static CaravanManager Instance { get; private set; }
 

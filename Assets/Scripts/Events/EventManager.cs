@@ -19,6 +19,10 @@ public class EventManager : MonoBehaviour
         public readonly List<CustomerAgent> party = new();
         public readonly List<int> serials = new();   // SpawnSerial per member: a pooled instance reused as a new customer no longer counts
         public int partySize;
+        /// <summary>Live status line for the HUD card (empty = the def's effectLine).</summary>
+        public string note = "";
+        /// <summary>Set by RoyalAudience when the lead left unserved: the cooldown is multiplied on End.</summary>
+        public bool snubbed;
         /// <summary>Party members still in the shop (0 for timed-only events).</summary>
         public int PartyLeft
         {
@@ -127,6 +131,7 @@ public class EventManager : MonoBehaviour
                 spawner.SpawnRoyalVisit(e.party);
                 e.partySize = e.party.Count;
                 if (e.partySize == 0) return false;
+                e.party[0].gameObject.AddComponent<RoyalAudience>().Begin(e.party[0], def, e);
                 break;
             case EventKind.Delegation:
             case EventKind.PirateRaid:
@@ -136,6 +141,8 @@ public class EventManager : MonoBehaviour
                 if (e.partySize == 0) return false;
                 if (def.kind == EventKind.PirateRaid)
                     foreach (var c in e.party) c.gameObject.AddComponent<PirateRaider>().Begin(c, def.stealInterval, def.carryMax, def.stealPercent);
+                else
+                    e.party[0].gameObject.AddComponent<RoyalAudience>().Begin(e.party[0], def, e);
                 Announce(e.party[0], def.kind == EventKind.PirateRaid ? "Pirates!" : $"{def.displayName}!");
                 break;
         }
@@ -153,11 +160,11 @@ public class EventManager : MonoBehaviour
             spawner.RateMultiplier /= e.def.rateMultiplier;
             spawner.RecalculateSpawnRate();
         }
-        cooldownUntil[e.def] = Time.time + e.def.cooldownSeconds;
+        cooldownUntil[e.def] = Time.time + e.def.cooldownSeconds * (e.snubbed ? e.def.snubCooldownMultiplier : 1f);
         if (showDebugLogs) Debug.Log($"[EventManager] {e.def.name} ended");
     }
 
-    private static void Announce(Component at, string text)
+    public static void Announce(Component at, string text)
     {
         if (at != null && DamageNumberManager.Instance != null)
             DamageNumberManager.Instance.ShowText(text, at.transform, new Color(1f, 0.84f, 0.3f));
@@ -171,8 +178,22 @@ public class EventManager : MonoBehaviour
         return q != null && q.counterPoint != null ? q.counterPoint.position : transform.position;
     }
 
+    /// <summary>The first party member still in the shop (the lead while they're around), or null for timed-only events.</summary>
+    public CustomerAgent Lead(ActiveEvent e)
+    {
+        for (int i = 0; i < e.party.Count; i++)
+        {
+            var c = e.party[i];
+            if (c != null && c.SpawnSerial == e.serials[i] && c.gameObject.activeInHierarchy && c.State != CustomerState.Exited) return c;
+        }
+        return null;
+    }
+
+    /// <summary>HUD card click: follow the event's lead customer (manual scroll releases it), else ease to its spot.</summary>
     public void FocusOn(ActiveEvent e)
     {
-        if (CameraScrollController.Instance != null) CameraScrollController.Instance.JumpTo(FocusPoint(e));
+        var cam = CameraScrollController.Instance; if (cam == null) return;
+        var lead = Lead(e);
+        if (lead != null) cam.LockOnto(lead.transform); else cam.JumpTo(FocusPoint(e));
     }
 }

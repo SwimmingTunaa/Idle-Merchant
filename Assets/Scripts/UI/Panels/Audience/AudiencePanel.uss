@@ -1,0 +1,61 @@
+/* Royal audience — Workshop shell + Caravan text styles; offer rows are buttons. */
+.wp-card.au-card {
+    width: 760px;
+}
+
+/* the royal's own current frame at 4× (32×32 → 128×128) */
+.wp-hero.au-hero {
+    width: 128px;
+    height: 128px;
+    margin-right: 22px;
+    align-self: center;
+}
+
+.au-offers {
+    margin-top: 8px;
+}
+
+.au-offer {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 6px 0;
+    padding: 6px 12px;
+    background-color: rgba(0, 0, 0, 0.25);
+    border-width: 2px;
+    border-color: rgb(96, 72, 48);
+    cursor: link;
+}
+
+.au-offer:hover {
+    background-color: rgba(255, 220, 150, 0.12);
+    border-color: rgb(243, 220, 160);
+}
+
+.au-offer--fancied {
+    border-color: rgb(240, 190, 40);
+}
+
+.au-offer-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.au-offer-name {
+    flex-grow: 1;
+    font-size: var(--font-size-body);
+    color: rgb(255, 236, 214);
+}
+
+.au-offer-price {
+    font-size: var(--font-size-body);
+    color: rgb(240, 190, 40);
+    margin-left: 12px;
+}
+
+.au-offer-tag {
+    font-size: var(--font-size-caption);
+    color: rgb(240, 190, 40);
+    margin-left: 10px;
+}

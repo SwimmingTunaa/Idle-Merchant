@@ -35,4 +35,14 @@ public class EventDef : ScriptableObject
     public float stealInterval = 4f;
     public int carryMax = 3;
     [Range(0.01f, 0.5f)] public float stealPercent = 0.15f;
+
+    [Header("Audience (RoyalVisit / Delegation)")]
+    [Tooltip("The lead waits this long at the dais for the player to present a piece; then they're snubbed")]
+    public float audienceSeconds = 60f;
+    [Tooltip("Price multiplier for the piece they fancy, and for the two alternatives")]
+    public float fanciedMultiplier = 3f;
+    public float altMultiplier = 1.5f;
+    public int audienceSeals = 20;
+    [Tooltip("A snub multiplies this event's cooldown")]
+    public float snubCooldownMultiplier = 2f;
 }
