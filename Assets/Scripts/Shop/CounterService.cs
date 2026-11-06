@@ -4,6 +4,8 @@ public class CounterService : MonoBehaviour
 {
     [Header("Service Settings")]
     public float serveTime = 3f;
+    [Tooltip("Seconds off serveTime per owned Quick Counter rank (UpgradeType.QuickCounter); never below 0.5 s.")]
+    public float serveTimePerRank = 0.6f;
     [Tooltip("Click the customer at the counter to serve them now: the sale pays this much extra (active income, not passive).")]
     [Range(0f, 1f)] public float serveBonus = 0.15f;
     public Transform exitPoint;
@@ -17,6 +19,7 @@ public class CounterService : MonoBehaviour
     private bool rushed;
     private QueueController queue;
     private ClickerManager clicker;
+    private float effectiveServeTime;
 
     /// <summary>The customer being served right now (click target), or null.</summary>
     public CustomerAgent Serving => currentCustomer;
@@ -25,12 +28,24 @@ public class CounterService : MonoBehaviour
     {
         queue = QueueController.Instance;
         clicker = FindAnyObjectByType<ClickerManager>();
+        ProgressionManager.OnUpgradePurchased += OnUpgradePurchased;
+        ApplyQuickCounter();
         
         // Default to counter point if goldSpawnPoint not assigned
         if (goldSpawnPoint == null && queue != null)
         {
             goldSpawnPoint = queue.counterPoint;
         }
+    }
+
+    void OnDestroy() => ProgressionManager.OnUpgradePurchased -= OnUpgradePurchased;
+
+    private void OnUpgradePurchased(GuildUpgradeDef u) { if (u != null && u.upgradeType == UpgradeType.QuickCounter) ApplyQuickCounter(); }
+
+    private void ApplyQuickCounter()
+    {
+        int ranks = ProgressionManager.Instance != null ? ProgressionManager.Instance.CountUpgrades(UpgradeType.QuickCounter) : 0;
+        effectiveServeTime = Mathf.Max(0.5f, serveTime - serveTimePerRank * ranks);
     }
 
     void Update()
@@ -63,7 +78,7 @@ public class CounterService : MonoBehaviour
 
         // Serving
         t += Time.deltaTime;
-        if (t < serveTime) return;
+        if (t < effectiveServeTime) return;
 
         CompleteService(currentCustomer);
         currentCustomer = null;

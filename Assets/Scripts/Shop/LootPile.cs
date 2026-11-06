@@ -94,6 +94,14 @@ public class LootPile : PersistentSingleton<LootPile>
     /// <summary>Stock changed without a sale/add signal (pirate grab, drop-back): redraw the heap next frame.</summary>
     public void Refresh() => pending = true;
 
+    /// <summary>Hover outline (rendering-layer bit 2) on the bin and the heap — the click affordance (click = Inventory page).</summary>
+    public void SetHover(bool on)
+    {
+        const uint bit = 2;
+        if (binFront != null) binFront.renderingLayerMask = on ? binFront.renderingLayerMask | bit : binFront.renderingLayerMask & ~bit;
+        foreach (var sr in slots) sr.renderingLayerMask = on ? sr.renderingLayerMask | bit : sr.renderingLayerMask & ~bit;
+    }
+
     // The sale hop itself is driven by the buyer (CustomerCarryDisplay → FlySale), so it can hand off to them.
     private void OnItemSold(ResourceStack stack) => pending = true;
 

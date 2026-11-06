@@ -26,6 +26,7 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
     // Data
     private List<GuildUpgradeDef> allUpgrades = new List<GuildUpgradeDef>();
     private Dictionary<GuildUpgradeDef, VisualElement> upgradeCards = new Dictionary<GuildUpgradeDef, VisualElement>();
+    private List<GuildUpgradeDef> shownOrder = new List<GuildUpgradeDef>();   // cards in grid order (rebuild check)
     private MilestoneProgressEvents progressEvents;
     private MilestoneTracker coinShower;   // HUD tracker owns the UI coin flight to the gold counter
 
@@ -89,7 +90,11 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
     private void OnProgressionChanged()
     {
         UpdateLeftPage();
-        OnGoldChanged(0);
+        var visible = VisibleUpgrades();
+        bool same = visible.Count == shownOrder.Count;
+        for (int i = 0; same && i < visible.Count; i++) same = visible[i] == shownOrder[i];
+        if (same) OnGoldChanged(0);
+        else BuildUpgradeCards();   // a ladder stepped or completed: its card shows the next rank / sinks to the bottom
     }
 
     // ═════════════════════════════════════════════
@@ -102,9 +107,35 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         allUpgrades = new List<GuildUpgradeDef>(upgrades);
         allUpgrades.Sort((a, b) =>
         {
-            int starCompare = a.starRequirement.CompareTo(b.starRequirement);
-            return starCompare != 0 ? starCompare : a.goldCost.CompareTo(b.goldCost);
+            int c = a.targetLayer.CompareTo(b.targetLayer);   // depth ladders: Elevator then Teleporter; ranks by star then cost
+            if (c == 0 && a.layerSpecific && b.layerSpecific) c = ((int)a.upgradeType).CompareTo((int)b.upgradeType);
+            if (c == 0) c = a.starRequirement.CompareTo(b.starRequirement);
+            return c != 0 ? c : a.goldCost.CompareTo(b.goldCost);
         });
+    }
+
+    // One card per ladder: ranked upgrades ladder by UpgradeType (Queue Room I → II → III), depth upgrades by depth
+    // (Depth N Elevator → Depth N Teleporter, one card per depth). The card is the first unowned step, or the last
+    // step as Owned once the ladder is complete. Single upgrades (stations) are a one-step ladder.
+    private static string LadderKey(GuildUpgradeDef u) => u.layerSpecific ? $"depth{u.targetLayer}" : u.upgradeType.ToString();
+
+    private List<GuildUpgradeDef> VisibleUpgrades()
+    {
+        var pm = ProgressionManager.Instance;
+        var shown = new Dictionary<string, GuildUpgradeDef>();
+        foreach (var u in allUpgrades)   // sorted by step; keep the first unowned, else the last
+        {
+            string key = LadderKey(u);
+            if (!shown.TryGetValue(key, out var cur) || pm.IsUpgradeOwned(cur)) shown[key] = u;
+        }
+        var list = new List<GuildUpgradeDef>(shown.Values);
+        list.Sort((a, b) =>
+        {
+            int c = pm.IsUpgradeOwned(a).CompareTo(pm.IsUpgradeOwned(b));   // completed ladders sink below anything buyable
+            if (c == 0) c = a.starRequirement.CompareTo(b.starRequirement);
+            return c != 0 ? c : a.goldCost.CompareTo(b.goldCost);
+        });
+        return list;
     }
 
     // ═════════════════════════════════════════════
@@ -204,7 +235,8 @@ public class GuildUpgradePanel : MonoBehaviour, IBookPage
         upgradeGrid.Clear();
         upgradeCards.Clear();
 
-        foreach (var upgrade in allUpgrades)
+        shownOrder = VisibleUpgrades();
+        foreach (var upgrade in shownOrder)
         {
             var card = CreateUpgradeCard(upgrade);
             upgradeGrid.Add(card);

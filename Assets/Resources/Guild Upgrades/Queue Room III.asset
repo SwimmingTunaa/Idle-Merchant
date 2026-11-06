@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d104bfc79eea6439390eebc84fc7f607, type: 3}
+  m_Name: Queue Room III
+  m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradeDef
+  upgradeName: Queue Room III
+  description: Velvet ropes and more standing room. +2 customers can wait in line.
+  icon: {fileID: 21300000, guid: 4563d628fd3a43d9a28ed3257a0b2f66, type: 3}
+  goldCost: 25000
+  materials:
+  - item: {fileID: 11400000, guid: 55284c34a41b841e093a08f3d9a71534, type: 2}
+    qty: 200
+  starRequirement: 3
+  requiredUpgrade: {fileID: 11400000, guid: 649785a2ec5a42269cc7cd6c1d0a07ba, type: 2}
+  upgradeType: 9
+  layerSpecific: 0
+  targetLayer: 1
+  requiresResearch: 0
+  requiredResearchNodeID: 

@@ -67,4 +67,6 @@ public enum UpgradeType
     GuildHall,        // Visual upgrade
     Smithy,           // Crafting station: armor (appended — values are serialized as ints)
     ArcaneWorkshop,   // Crafting station: charms/jewelry
+    QueueRoom,        // +queue slots at the counter (ranked, global)
+    QuickCounter,     // −serve time at the counter (ranked, global)
 }

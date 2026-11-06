@@ -191,6 +191,7 @@ public class ItemFlyAnimation : MonoBehaviour
     private Vector2 WorldToScreen(Vector3 worldPos)
     {
         if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) return Vector2.zero;   // scene teardown: OnDisable relays a pending callback after the camera is gone
         return mainCamera.WorldToScreenPoint(worldPos);
     }
     

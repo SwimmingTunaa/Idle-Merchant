@@ -95,6 +95,7 @@ public class ClickerManager : MonoBehaviour
     private DecorSlot hoveredDecor;
     private CaravanManager hoveredCaravan;
     private TransportPoint hoveredLadder;
+    private LootPile hoveredPile;
     private CustomerAgent hoveredCustomer;
     private CounterService counter;
     private TextMeshPro nameplate;
@@ -329,6 +330,7 @@ public class ClickerManager : MonoBehaviour
         DecorSlot decor = null;
         CaravanManager caravan = null;
         TransportPoint ladder = null;
+        LootPile pile = null;
         CustomerAgent cust = null;
 
         // No world hover while the book is open (you're already inside it).
@@ -342,6 +344,7 @@ public class ClickerManager : MonoBehaviour
                 if (caravan == null) hit.TryGetComponent(out caravan);
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
                 if (ladder == null) hit.TryGetComponent(out ladder);
+                if (pile == null) hit.TryGetComponent(out pile);
                 if (cust == null && hit.TryGetComponent(out CustomerAgent cc) && ((counter != null && cc == counter.Serving) || hit.TryGetComponent(out PirateRaider _) || (hit.TryGetComponent(out RoyalAudience ra) && ra.Waiting))) cust = cc;
             }
         }
@@ -356,6 +359,14 @@ public class ClickerManager : MonoBehaviour
         if (under != null || prop != null) caravan = null;   // click priority: workshops, caravan, decor, ladders
         if (under != null || prop != null || caravan != null) decor = null;
         if (under != null || prop != null || caravan != null || decor != null) ladder = null;   // ladders last
+        if (under != null || cust != null) pile = null;   // a hero / served customer in front of the stash takes it
+
+        if (pile != hoveredPile)
+        {
+            if (hoveredPile != null) hoveredPile.SetHover(false);
+            hoveredPile = pile;
+            if (hoveredPile != null) hoveredPile.SetHover(true);
+        }
 
         if (caravan != hoveredCaravan)
         {
@@ -486,6 +497,14 @@ public class ClickerManager : MonoBehaviour
         {
             if (!hit.TryGetComponent(out WorkshopProp prop)) continue;
             FindAnyObjectByType<WorkshopPanelController>()?.OpenFor(prop);
+            return;
+        }
+
+        // Priority 3a: the loot stash behind the counter opens the book's Inventory page
+        foreach (var hit in hits)
+        {
+            if (!hit.TryGetComponent(out LootPile _)) continue;
+            FindAnyObjectByType<BookPanelController>()?.OpenToTab(2);
             return;
         }
 

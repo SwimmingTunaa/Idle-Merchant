@@ -9,6 +9,9 @@ public class QueueController : MonoBehaviour
     [Header("Queue Layout")]
     public Transform counterPoint;           // where the head stands to be served
     public int maxQueueAmount;
+    [Tooltip("Extra queue slots per owned Queue Room rank (UpgradeType.QueueRoom).")]
+    public int slotsPerQueueRoom = 2;
+    private int baseMaxQueue;
 
     public Vector2 lineDirection = new Vector2(-1f, 0f);
 
@@ -33,6 +36,23 @@ public class QueueController : MonoBehaviour
             Destroy(this);
         else
             Instance = this;
+        baseMaxQueue = maxQueueAmount;
+    }
+
+    void Start()
+    {
+        ProgressionManager.OnUpgradePurchased += OnUpgradePurchased;
+        ApplyQueueRoom();
+    }
+
+    void OnDestroy() => ProgressionManager.OnUpgradePurchased -= OnUpgradePurchased;
+
+    private void OnUpgradePurchased(GuildUpgradeDef u) { if (u != null && u.upgradeType == UpgradeType.QueueRoom) ApplyQueueRoom(); }
+
+    private void ApplyQueueRoom()
+    {
+        if (ProgressionManager.Instance != null)
+            maxQueueAmount = baseMaxQueue + slotsPerQueueRoom * ProgressionManager.Instance.CountUpgrades(UpgradeType.QueueRoom);
     }
 
     /// <summary>
