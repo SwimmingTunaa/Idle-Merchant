@@ -44,6 +44,13 @@ public class ContractsPage : MonoBehaviour, IBookPage
         offerList.Clear();
         for (int i = 0; i < ContractManager.OfferSlots; i++) BindOffer(offerList, i);
 
+        var notices = leftPage.Q<VisualElement>("notice-list");
+        if (notices != null && EventManager.Instance != null)
+        {
+            notices.Clear();
+            foreach (var ad in EventManager.Instance.Ads) BindNotice(notices, ad);
+        }
+
         activeEmpty = rightPage.Q<Label>("active-empty");
         var activeSlot = rightPage.Q<VisualElement>("active-slot");
         activeSlot.Clear();
@@ -172,6 +179,95 @@ public class ContractsPage : MonoBehaviour, IBookPage
             Show(button, a.complete || a.kind == ContractKind.Deliver);
             buttonLabel.text = a.complete ? "Claim" : "Fulfil";
             button.SetEnabled(a.complete || cm.CanFulfil);
+        });
+    }
+
+    // ═════════════════════════════════════════════
+    // NOTICES — player-posted ads (EventManager.Ads): ◀ pick ▶ an audience / an item, Post for gold
+    // ═════════════════════════════════════════════
+
+    private void BindNotice(VisualElement list, EventDef ad)
+    {
+        var em = EventManager.Instance;
+        // Compact ledger row (the page has no height left for two more cards): icon | name | ◀ pick ▶ | Post
+        var row = new VisualElement(); row.AddToClassList("contracts-notice");
+        var iconEl = new VisualElement { pickingMode = PickingMode.Ignore }; iconEl.AddToClassList("contracts-notice-icon");
+        var name = new Label(ad.displayName) { pickingMode = PickingMode.Ignore }; name.AddToClassList("contracts-notice-name");
+        var prev = new Button { text = "<" }; prev.AddToClassList("btn-secondary"); prev.AddToClassList("contracts-picker-btn");
+        var pick = new Label { pickingMode = PickingMode.Ignore }; pick.AddToClassList("contracts-picker-label");
+        var next = new Button { text = ">" }; next.AddToClassList("btn-secondary"); next.AddToClassList("contracts-picker-btn");
+        var button = new Button(); button.AddToClassList("btn-success"); button.AddToClassList("contracts-notice-post");
+        var buttonLabel = new Label { pickingMode = PickingMode.Ignore }; buttonLabel.AddToClassList("btn-label"); buttonLabel.AddToClassList("contracts-notice-post-label");
+        var coin = new VisualElement { pickingMode = PickingMode.Ignore }; coin.AddToClassList("btn-coin"); coin.AddToClassList("contracts-post-coin");
+        button.Add(buttonLabel); button.Add(coin);
+        row.Add(iconEl); row.Add(name); row.Add(prev); row.Add(pick); row.Add(next); row.Add(button);
+        list.Add(row);
+
+        bool crowd = ad.kind == EventKind.Advertise;
+        var customers = new List<CustomerDef>();
+        var items = new List<ItemDef>();
+        int index = 0;
+        int Count() => crowd ? customers.Count : items.Count;
+        prev.clicked += () => { if (Count() > 0) { index = (index - 1 + Count()) % Count(); Refresh(); } };
+        next.clicked += () => { if (Count() > 0) { index = (index + 1) % Count(); Refresh(); } };
+        button.clicked += () =>
+        {
+            if (Count() == 0) return;
+            SfxManager.Instance?.Play(SfxId.UiTick);
+            bool ok = crowd ? em.TryPost(ad, customer: customers[index]) : em.TryPost(ad, item: items[index]);
+            if (ok) EventManager.Announce(QueueController.Instance != null ? QueueController.Instance.counterPoint : null, "Notice posted!");
+            Refresh();
+        };
+
+        refreshers.Add(() =>
+        {
+            // Options: walk-in defs past their star gate / sellable items in stock (re-read: stars, stock and sale marks move)
+            if (crowd)
+            {
+                var spawner = FindAnyObjectByType<CustomerSpawner>();
+                customers.Clear(); if (spawner != null) customers.AddRange(spawner.AdvertisableDefs());
+            }
+            else
+            {
+                items.Clear();
+                var sm = SalesManager.Instance;
+                if (sm != null && Inventory.Instance != null)
+                    foreach (var r in Inventory.Instance.SnapshotAll())
+                        if (sm.CanSell(r.item) && sm.GetAvailableForSale(r.item) > 0) items.Add(r.item);
+            }
+            int n = Count();
+            if (n == 0) { index = 0; pick.text = crowd ? "Nobody to call" : "Nothing for sale"; iconEl.style.backgroundImage = new StyleBackground(); }
+            else
+            {
+                index = Mathf.Clamp(index, 0, n - 1);
+                Sprite icon = crowd ? customers[index].portrait : items[index].icon;
+                iconEl.style.backgroundImage = icon != null ? new StyleBackground(icon) : new StyleBackground();
+                pick.text = crowd ? customers[index].displayName
+                                  : $"{items[index].displayName} ({SalesManager.Instance.GetAvailableForSale(items[index])})";
+            }
+
+            var running = em.ActiveOf(ad);
+            float cd = em.CooldownLeft(ad);
+            bool canPick = running == null && n > 1;
+            prev.SetEnabled(canPick); next.SetEnabled(canPick);
+            if (running != null)
+            {
+                int secs = Mathf.CeilToInt(running.remaining);
+                pick.text = running.note;
+                iconEl.style.backgroundImage = running.Icon != null ? new StyleBackground(running.Icon) : new StyleBackground();
+                buttonLabel.text = $"{secs / 60}:{secs % 60:00}"; Show(coin, false); button.SetEnabled(false);
+            }
+            else if (cd > 0f)
+            {
+                int secs = Mathf.CeilToInt(cd);
+                buttonLabel.text = $"{secs / 60}:{secs % 60:00}"; Show(coin, false); button.SetEnabled(false);
+            }
+            else
+            {
+                int cost = em.CostOf(ad);
+                buttonLabel.text = AnimatedNumberUITK.Abbrev(cost); Show(coin, true);
+                button.SetEnabled(n > 0 && Inventory.Instance != null && Inventory.Instance.CanAfford(cost));
+            }
         });
     }
 

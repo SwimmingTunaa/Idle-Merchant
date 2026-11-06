@@ -120,6 +120,11 @@ public class SalesManager : PersistentSingleton<SalesManager>
         return true;
     }
 
+    /// <summary>Shop Sale notice (EventKind.FeaturedItem): walk-ins try this item first with FeaturedChance. Null = none.</summary>
+    public ItemDef Featured { get; set; }
+    public float FeaturedChance { get; set; }
+    private readonly ItemDef[] _featuredOnly = new ItemDef[1];
+
     public bool TryPickDesiredForCustomer(
         Inventory inventory,
         ItemCategory preference,
@@ -134,6 +139,13 @@ public class SalesManager : PersistentSingleton<SalesManager>
         // ponytail: strict preferred-then-fallback (no weighted mix) — commoners stay Basic-focused because Basic is
         // almost always stocked; add a per-archetype fallback chance if they start draining Advanced stock.
         bool sawStock = false;
+        // Shop Sale notice: the featured item first, some of the time (stock + budget still decide)
+        if (Featured != null && Random.value < FeaturedChance)
+        {
+            _featuredOnly[0] = Featured;
+            if (TryPickFrom(inventory, preference, true, budget, batchRange, out desiredItem, out desiredQty, out reason, _featuredOnly))
+                return true;
+        }
         if (preferredItems != null && preferredItems.Length > 0)
         {
             if (TryPickFrom(inventory, preference, true, budget, batchRange, out desiredItem, out desiredQty, out reason, preferredItems))

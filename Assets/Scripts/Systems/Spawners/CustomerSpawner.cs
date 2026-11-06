@@ -43,6 +43,32 @@ public class CustomerSpawner : Spawner
     /// <summary>Spawn-rate factor applied by events (Rush Hour); 1 = normal. Call RecalculateSpawnRate after changing.</summary>
     public float RateMultiplier { get; set; } = 1f;
 
+    // Advertise events: per-def spawn-weight multipliers (× into spawnWeight at the roll; never an override, so the crowd stays mixed)
+    private readonly Dictionary<CustomerDef, float> weightBoost = new();
+    public void BoostWeight(CustomerDef def, float mult)
+    {
+        if (def == null || mult <= 0f) return;
+        float m = (weightBoost.TryGetValue(def, out float cur) ? cur : 1f) * mult;
+        if (Mathf.Abs(m - 1f) < 0.001f) weightBoost.Remove(def); else weightBoost[def] = m;
+    }
+    private float Boost(EntityDef def) => def is CustomerDef c && weightBoost.TryGetValue(c, out float m) ? m : 1f;
+
+    /// <summary>Walk-in defs the player can advertise to: candidates past their star gate (royals never).</summary>
+    public List<CustomerDef> AdvertisableDefs()
+    {
+        var list = new List<CustomerDef>();
+        foreach (var def in candidates) if (def is CustomerDef c && Unlocked(c)) list.Add(c);
+        return list;
+    }
+
+    private bool Unlocked(CustomerDef c)
+    {
+        int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
+        if (c.customerArcheType == CustomerArcheType.Adventurer && stars < adventurerUnlockStar) return false;
+        if (c.customerArcheType == CustomerArcheType.Noble && stars < nobleUnlockStar) return false;
+        return c.customerArcheType != CustomerArcheType.Royalty;   // royals only arrive as the Royal Visit event (EventManager → SpawnRoyalVisit)
+    }
+
     private Dictionary<CustomerArcheType, int> customerTypeCount = new();
 
     private readonly List<EntityDef> eligible = new(32);
@@ -103,8 +129,6 @@ public class CustomerSpawner : Spawner
             return;
 
         eligible.Clear();
-        int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
-
         for (int i = 0; i < candidates.Count; i++)
         {
             EntityDef def = candidates[i];
@@ -113,12 +137,7 @@ public class CustomerSpawner : Spawner
             if (def is not CustomerDef customerDef)
                 continue;
 
-            if (customerDef.customerArcheType == CustomerArcheType.Adventurer && stars < adventurerUnlockStar)
-                continue;
-            if (customerDef.customerArcheType == CustomerArcheType.Noble && stars < nobleUnlockStar)
-                continue;
-            if (customerDef.customerArcheType == CustomerArcheType.Royalty)
-                continue;   // royals only arrive as the Royal Visit event (EventManager → SpawnRoyalVisit)
+            if (!Unlocked(customerDef)) continue;
 
             // Check spawn limits for all types
             if (customerTypeCount[customerDef.customerArcheType] >= GetMaxForType(customerDef.customerArcheType))
@@ -130,7 +149,21 @@ public class CustomerSpawner : Spawner
         if (eligible.Count == 0)
             return;
 
-        SpawnOne((CustomerDef)PickWeighted(eligible));
+        SpawnOne((CustomerDef)PickBoosted(eligible));
+    }
+
+    // Spawner.PickWeighted with the Advertise boosts folded in
+    private EntityDef PickBoosted(List<EntityDef> list)
+    {
+        float total = 0f;
+        foreach (var e in list) total += Mathf.Max(0.001f, e.spawnWeight * Boost(e));
+        float r = Random.value * total, run = 0f;
+        foreach (var e in list)
+        {
+            run += Mathf.Max(0.001f, e.spawnWeight * Boost(e));
+            if (r <= run) return e;
+        }
+        return list[list.Count - 1];
     }
 
     /// <summary>Event: n of one def arrive together (ignores maxAlive and the type cap). Spawned agents go in <paramref name="into"/>.</summary>

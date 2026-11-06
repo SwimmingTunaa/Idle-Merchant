@@ -146,3 +146,78 @@
     padding: 0;
     -unity-font-definition: var(--font-body);
 }
+
+/* Notices: one ledger row per posted ad — icon | name | ◀ pick ▶ | Post (no card chrome: the page has no height for two more cards) */
+.contracts-notices-header {
+    margin-top: 2px;
+    margin-bottom: 6px;
+}
+
+.contracts-notice {
+    flex-direction: row;
+    align-items: center;
+    height: 46px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+}
+
+.contracts-notice-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.contracts-notice-name {
+    width: 96px;
+    font-size: 20px;
+    color: rgb(101, 67, 33);
+    margin: 0;
+    padding: 0;
+    white-space: normal;
+    -unity-font-definition: var(--font-body);
+}
+
+.contracts-picker-btn {
+    width: 28px;
+    height: 32px;
+    margin: 0;
+    padding: 0 0 4px 0;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.contracts-picker-label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-size: 18px;
+    color: rgb(101, 67, 33);
+    margin: 0 4px;
+    padding: 0;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    overflow: hidden;
+    -unity-font-definition: var(--font-body);
+}
+
+.contracts-notice-post {
+    width: 104px;
+    height: 40px;
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 0 8px;
+    padding: 2px 8px 7px 8px;
+}
+
+.contracts-notice-post-label {
+    font-size: 20px;
+}
+
+.contracts-post-coin {
+    width: 18px;
+    height: 18px;
+    margin-left: 5px;
+}

@@ -14,6 +14,10 @@
             </ui:VisualElement>
             <ui:Label name="rotation-label" text="New offers in 10:00" class="contracts-note" />
             <ui:VisualElement name="offer-list" class="contracts-list" />
+            <ui:VisualElement class="contracts-shop-header contracts-notices-header">
+                <ui:Label text="Notices" class="contracts-shop-title" />
+            </ui:VisualElement>
+            <ui:VisualElement name="notice-list" class="contracts-list" />
         </ui:VisualElement>
         <ui:VisualElement name="right-content" style="flex-grow: 1; flex-basis: 0; overflow: hidden; padding: 24px 8px 24px 55px; margin-left: 4px;">
             <ui:VisualElement name="book-header" style="flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; margin-bottom: 8px;">

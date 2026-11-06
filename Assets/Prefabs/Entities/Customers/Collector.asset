@@ -45,10 +45,15 @@ MonoBehaviour:
   hairBackSpriteLibraries: []
   frontWeaponSpriteLibraries: []
   backWeaponSpriteLibraries: []
+  armourSpriteLibraries: []
+  helmetSpriteLibraries: []
+  faceSpriteLibraries: []
   skinColourPalette: {fileID: 0}
   ShirtColourPalette: {fileID: 0}
   PantsColourPalette: {fileID: 0}
   HairColourPalette: {fileID: 0}
+  FaceColourPalette: {fileID: 0}
+  hatMatchesShirt: 0
   startingState: 0
   customerArcheType: 2
   itemPreferance: 2
@@ -59,11 +64,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 97da4d44606c64c25bf257e9df5eae74, type: 2}
   - {fileID: 11400000, guid: 6cb7a920380f74e88be92e31aa0d3c6e, type: 2}
   - {fileID: 11400000, guid: 6862d44a13f76463ba6395176db82162, type: 2}
+  priceMultiplier: 2
+  portrait: {fileID: -6644701819260611078, guid: d2b69bc9167f4ad6aa5777825ff3cbec, type: 3}
   wanderDuration: {x: 5, y: 10}
   wanderSpeedMultiplier: 0.8
   wanderPauseDuration: {x: 0.5, y: 2}
+  deathClip: {fileID: 0}
+  decisiveChance: 0.8
+  patienceSeconds: 60
   budget: {x: 1000, y: 3000}
   batchRange: {x: 1, y: 2}
-  priceMultiplier: 2
-  patienceSeconds: 60
-  decisiveChance: 0.8

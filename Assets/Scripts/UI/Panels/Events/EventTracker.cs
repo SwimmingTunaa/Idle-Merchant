@@ -56,7 +56,7 @@ public class EventTracker : MonoBehaviour
         foreach (var e in em.Active)
         {
             var ev = e;
-            AddCard(e.def.icon, e.def.displayName, e.def.effectLine, () => em.FocusOn(ev),
+            AddCard(e.Icon, e.def.displayName, e.def.effectLine, () => em.FocusOn(ev),
                     () => 1f - ev.Progress01,
                     () => string.IsNullOrEmpty(ev.note) ? ev.def.effectLine : ev.note,
                     e.partySize > 0 ? () => $"{ev.PartyLeft} left" : null);

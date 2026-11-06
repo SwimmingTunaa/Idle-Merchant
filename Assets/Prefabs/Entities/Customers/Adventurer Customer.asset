@@ -76,10 +76,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0dd48d2bbe89447a397a5430c0e844d2, type: 2}
   - {fileID: 11400000, guid: 3da1bb507502c4fb39872910d7644dac, type: 2}
   priceMultiplier: 1
+  portrait: {fileID: -6644701819260611078, guid: d1b847076bee458c8ff85a8de2b15eb7, type: 3}
   wanderDuration: {x: 5, y: 10}
   wanderSpeedMultiplier: 0.8
   wanderPauseDuration: {x: 0.5, y: 2}
+  deathClip: {fileID: 0}
+  decisiveChance: 0.4
+  patienceSeconds: 45
   budget: {x: 600, y: 3000}
   batchRange: {x: 2, y: 6}
-  patienceSeconds: 45
-  decisiveChance: 0.4

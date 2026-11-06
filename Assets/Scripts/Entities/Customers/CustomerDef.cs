@@ -15,6 +15,8 @@ public class CustomerDef : EntityDef
     public ItemDef[] preferredItems;
     [Tooltip("Pays this × sellPrice (Bulk Trader 0.8, Collector 2). The want pick scales the budget to match.")]
     public float priceMultiplier = 1f;
+    [Tooltip("Face for UI (Contracts notices picker, HUD ad card): a frame of one of the looks' sheets")]
+    public Sprite portrait;
 
   
 

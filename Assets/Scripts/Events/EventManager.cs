@@ -23,6 +23,10 @@ public class EventManager : MonoBehaviour
         public string note = "";
         /// <summary>Set by RoyalAudience when the lead left unserved: the cooldown is multiplied on End.</summary>
         public bool snubbed;
+        /// <summary>Notices: the audience (Advertise) or the item (FeaturedItem) the player chose at post time.</summary>
+        public CustomerDef customer;
+        public ItemDef item;
+        public Sprite Icon => item != null ? item.icon : customer != null && customer.portrait != null ? customer.portrait : def.icon;
         /// <summary>Party members still in the shop (0 for timed-only events).</summary>
         public int PartyLeft
         {
@@ -53,6 +57,9 @@ public class EventManager : MonoBehaviour
     private CustomerSpawner spawner;
 
     public IReadOnlyList<ActiveEvent> Active => active;
+    /// <summary>Player-posted notices (Resources/Events/Ads, playerOnly): posted from the Contracts page, never rolled.</summary>
+    public IReadOnlyList<EventDef> Ads => ads;
+    private readonly List<EventDef> ads = new();
 
     void Awake()
     {
@@ -63,7 +70,11 @@ public class EventManager : MonoBehaviour
 
     void OnDestroy() { if (Instance == this) Instance = null; }
 
-    void Start() { spawner = FindAnyObjectByType<CustomerSpawner>(); }
+    void Start()
+    {
+        spawner = FindAnyObjectByType<CustomerSpawner>();
+        foreach (var d in Resources.LoadAll<EventDef>("Events/Ads")) if (d != null && d.playerOnly) ads.Add(d);
+    }
 
     void Update()
     {
@@ -87,13 +98,15 @@ public class EventManager : MonoBehaviour
 
     private void Roll()
     {
-        if (active.Count >= maxActive) return;
+        int natural = 0;
+        foreach (var e in active) if (!e.def.playerOnly) natural++;   // posted notices never crowd out the dice
+        if (natural >= maxActive) return;
         int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
         eligible.Clear();
         float total = 0f;
         foreach (var d in defs)
         {
-            if (d == null || stars < d.unlockStar || IsActive(d)) continue;
+            if (d == null || d.playerOnly || stars < d.unlockStar || IsActive(d)) continue;
             if (d.kind == EventKind.PirateRaid && !ShopOnScreen) continue;   // a raid you can't see is just a tax
             if (cooldownUntil.TryGetValue(d, out float until) && Time.time < until) continue;
             eligible.Add(d); total += Mathf.Max(0.001f, d.weight);
@@ -109,13 +122,44 @@ public class EventManager : MonoBehaviour
 
     public bool IsActive(EventDef def) { foreach (var e in active) if (e.def == def) return true; return false; }
 
-    /// <summary>Start an event now (the roll, or the Game Debugger).</summary>
-    public bool Fire(EventDef def)
+    public ActiveEvent ActiveOf(EventDef def) { foreach (var e in active) if (e.def == def) return e; return null; }
+    public float CooldownLeft(EventDef def) => cooldownUntil.TryGetValue(def, out float until) ? Mathf.Max(0f, until - Time.time) : 0f;
+
+    /// <summary>Gold to post a notice: goldCostMinutes of passive income, at least minGoldCost.</summary>
+    public int CostOf(EventDef def)
+    {
+        float goldPerMin = Mathf.Max(30f, SaveManager.Instance != null ? SaveManager.Instance.GoldPerMin : 0f);
+        return Mathf.Max(def.minGoldCost, Mathf.RoundToInt(goldPerMin * def.goldCostMinutes));
+    }
+
+    /// <summary>Contracts page: pay for and start a notice (one of each at a time, cooldown after).</summary>
+    public bool TryPost(EventDef def, CustomerDef customer = null, ItemDef item = null)
+    {
+        if (def == null || !def.playerOnly || IsActive(def) || CooldownLeft(def) > 0f) return false;
+        if (def.kind == EventKind.Advertise && customer == null) return false;
+        if (def.kind == EventKind.FeaturedItem && item == null) return false;
+        if (Inventory.Instance == null || !Inventory.Instance.TrySpendGold(CostOf(def))) return false;
+        return Fire(def, customer, item);
+    }
+
+    /// <summary>Start an event now (the roll, the Game Debugger, or a posted notice).</summary>
+    public bool Fire(EventDef def, CustomerDef customer = null, ItemDef item = null)
     {
         if (def == null || IsActive(def) || spawner == null) return false;
-        var e = new ActiveEvent { def = def, remaining = def.durationSeconds };
+        var e = new ActiveEvent { def = def, remaining = def.durationSeconds, customer = customer, item = item };
         switch (def.kind)
         {
+            case EventKind.Advertise:
+                if (customer == null) return false;
+                spawner.BoostWeight(customer, def.rateMultiplier);
+                e.note = $"{customer.displayName} ×{def.rateMultiplier:0.#}";
+                break;
+            case EventKind.FeaturedItem:
+                if (item == null || SalesManager.Instance == null) return false;
+                SalesManager.Instance.Featured = item;
+                SalesManager.Instance.FeaturedChance = def.featuredChance;
+                e.note = $"Sale on {item.displayName}";
+                break;
             case EventKind.RushHour:
                 spawner.RateMultiplier *= def.rateMultiplier;
                 spawner.RecalculateSpawnRate();
@@ -160,6 +204,8 @@ public class EventManager : MonoBehaviour
             spawner.RateMultiplier /= e.def.rateMultiplier;
             spawner.RecalculateSpawnRate();
         }
+        if (e.def.kind == EventKind.Advertise && spawner != null) spawner.BoostWeight(e.customer, 1f / e.def.rateMultiplier);
+        if (e.def.kind == EventKind.FeaturedItem && SalesManager.Instance != null && SalesManager.Instance.Featured == e.item) SalesManager.Instance.Featured = null;
         cooldownUntil[e.def] = Time.time + e.def.cooldownSeconds * (e.snubbed ? e.def.snubCooldownMultiplier : 1f);
         if (showDebugLogs) Debug.Log($"[EventManager] {e.def.name} ended");
     }

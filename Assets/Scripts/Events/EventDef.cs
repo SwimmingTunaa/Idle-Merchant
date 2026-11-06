@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum EventKind { RushHour, AdventurerParty, RoyalVisit, Delegation, PirateRaid }   // serialized ints: append only
+public enum EventKind { RushHour, AdventurerParty, RoyalVisit, Delegation, PirateRaid, Advertise, FeaturedItem }   // serialized ints: append only
 
 /// <summary>
 /// One timed world event (data only). EventManager rolls these from its list, runs the kind's effect for
@@ -45,4 +45,13 @@ public class EventDef : ScriptableObject
     public int audienceSeals = 20;
     [Tooltip("A snub multiplies this event's cooldown")]
     public float snubCooldownMultiplier = 2f;
+
+    [Header("Notices (player-posted ads, Resources/Events/Ads)")]
+    [Tooltip("Never rolls; the player posts it from the Contracts page for gold. Advertise: the chosen customer's spawn weight × rateMultiplier. FeaturedItem: walk-ins ask for the chosen item first")]
+    public bool playerOnly;
+    [Tooltip("Gold cost = this many minutes of passive gold/min (SaveManager.GoldPerMin), at least minGoldCost")]
+    public float goldCostMinutes = 2f;
+    public int minGoldCost = 500;
+    [Tooltip("FeaturedItem: chance a walk-in's want pick tries the featured item first (if affordable and in stock)")]
+    [Range(0f, 1f)] public float featuredChance = 0.6f;
 }
