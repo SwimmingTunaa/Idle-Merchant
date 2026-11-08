@@ -10166,6 +10166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QueueController
   counterPoint: {fileID: 303045904}
   maxQueueAmount: 5
+  slotsPerQueueRoom: 2
   lineDirection: {x: 1, y: 0}
   minGap: 0.5
   maxGap: 0.8
@@ -10183,6 +10184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CounterService
   serveTime: 3
+  serveTimePerRank: 0.6
   serveBonus: 0.15
   exitPoint: {fileID: 455401622}
   goldSpawnPoint: {fileID: 0}
@@ -19681,8 +19683,8 @@ MonoBehaviour:
   nobleUnlockStar: 3
   royaltyUnlockStar: 5
   maxCommoner: 999
-  maxAdventurer: 5
-  maxNoble: 3
+  maxAdventurer: 8
+  maxNoble: 5
   maxRoyalty: 4
   royalPairChance: 0.5
   royalSoloChance: 0.3
@@ -26823,8 +26825,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b42d3feecd5f947c7947662fe3361e7b, type: 2}
   - {fileID: 11400000, guid: 090bc5dd0d2254a49a58749a17e01e0d, type: 2}
   - {fileID: 11400000, guid: 907c196ff07d145a4b50cf0ce4a5beae, type: 2}
-  rollMin: 240
-  rollMax: 360
+  rollMin: 150
+  rollMax: 240
   maxActive: 2
   showDebugLogs: 0
 --- !u!1 &917538589

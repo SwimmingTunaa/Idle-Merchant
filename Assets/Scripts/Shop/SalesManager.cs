@@ -211,43 +211,32 @@ public class SalesManager : PersistentSingleton<SalesManager>
 
         if (_sellableBuffer.Count == 0) return false;
 
-        // Pick 1 item. Simple approach: "best value I can afford" but only among sellables.
-        // You can swap this to weighted random later if you want variety.
+        // Pick the priciest item the customer can afford a full batch of (batchRange.x), from stock that covers it.
+        // Picking the priciest *affordable* item and then failing the batch minimum sent adventurers (2-6 pieces,
+        // 600-3000 gold) home over a 750 blade they could buy one of, or down to raw Soul Shards.
+        int min = Mathf.Max(1, batchRange.x);
         ItemDef best = null;
         int bestPrice = int.MinValue;
+        bool stockShort = false;
 
         for (int i = 0; i < _sellableBuffer.Count; i++)
         {
             var item = _sellableBuffer[i];
-            if (item.sellPrice > bestPrice)
-            {
-                bestPrice = item.sellPrice;
-                best = item;
-            }
+            if (item.sellPrice <= bestPrice) continue;
+            if (budget / item.sellPrice < min) continue;
+            if (GetAvailableForSale(item) < min) { stockShort = true; continue; }
+            bestPrice = item.sellPrice;
+            best = item;
         }
 
-        if (best == null) return false;
-
-        // Qty must be affordable AND in available-for-sale.
-        int maxByBudget = budget / best.sellPrice;
-        if (maxByBudget <= 0) return false;
-
-        int maxByStock = GetAvailableForSale(best);
-        int max = Mathf.Min(maxByBudget, maxByStock);
-        if (max <= 0) return false;
-
-        // IMPORTANT: don’t clamp up to batchMin if you can’t afford it.
-        int min = Mathf.Max(1, batchRange.x);
-        int qty = Mathf.Clamp(max, 1, batchRange.y);
-
-        if (qty < min)
+        if (best == null)
         {
-            reason = maxByBudget < min ? WalkoutReason.TooExpensive : WalkoutReason.NoStock;
-            // If you want: allow "buy less than batchMin" as fallback, or fail.
-            // I recommend failing, so customers don't constantly do tiny buys if your design expects batches.
-            //may add an ability or stat in the future, to upsell cusomters
+            // Affordable stock exists (Consider set TooExpensive) but no batch fits: stock short → NoStock, else budget.
+            if (stockShort) reason = WalkoutReason.NoStock;
             return false;
         }
+
+        int qty = Mathf.Clamp(Mathf.Min(budget / best.sellPrice, GetAvailableForSale(best)), min, batchRange.y);
 
         // If you want a bit of randomness inside range:
         // qty = Random.Range(min, Mathf.Min(batchRange.y, max) + 1);

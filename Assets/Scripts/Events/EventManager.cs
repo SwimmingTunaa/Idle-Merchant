@@ -46,7 +46,7 @@ public class EventManager : MonoBehaviour
 
     [SerializeField] private List<EventDef> defs = new();
     [Tooltip("Game seconds between rolls (random in range); the first roll waits a full interval")]
-    [SerializeField] private float rollMin = 240f, rollMax = 360f;
+    [SerializeField] private float rollMin = 150f, rollMax = 240f;
     [SerializeField] private int maxActive = 2;
     [SerializeField] private bool showDebugLogs;
 
@@ -99,14 +99,14 @@ public class EventManager : MonoBehaviour
     private void Roll()
     {
         int natural = 0;
-        foreach (var e in active) if (!e.def.playerOnly) natural++;   // posted notices never crowd out the dice
-        if (natural >= maxActive) return;
+        foreach (var e in active) if (!e.def.playerOnly && !e.def.outsideCap) natural++;   // posted notices and raids never crowd out the dice
+        bool capFull = natural >= maxActive;   // only outsideCap defs (pirates) may still roll
         int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
         eligible.Clear();
         float total = 0f;
         foreach (var d in defs)
         {
-            if (d == null || d.playerOnly || stars < d.unlockStar || IsActive(d)) continue;
+            if (d == null || d.playerOnly || stars < d.unlockStar || (IsActive(d) && !d.stackable) || (capFull && !d.outsideCap)) continue;
             if (d.kind == EventKind.PirateRaid && !ShopOnScreen) continue;   // a raid you can't see is just a tax
             if (cooldownUntil.TryGetValue(d, out float until) && Time.time < until) continue;
             eligible.Add(d); total += Mathf.Max(0.001f, d.weight);
@@ -145,7 +145,7 @@ public class EventManager : MonoBehaviour
     /// <summary>Start an event now (the roll, the Game Debugger, or a posted notice).</summary>
     public bool Fire(EventDef def, CustomerDef customer = null, ItemDef item = null)
     {
-        if (def == null || IsActive(def) || spawner == null) return false;
+        if (def == null || (IsActive(def) && !def.stackable) || spawner == null) return false;
         var e = new ActiveEvent { def = def, remaining = def.durationSeconds, customer = customer, item = item };
         switch (def.kind)
         {

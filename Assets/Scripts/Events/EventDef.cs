@@ -22,6 +22,10 @@ public class EventDef : ScriptableObject
     public float durationSeconds = 90f;
     [Tooltip("Game seconds after it ends before it can roll again")]
     public float cooldownSeconds = 600f;
+    [Tooltip("May roll again while one is already running (a second Adventurer Party); otherwise one at a time")]
+    public bool stackable;
+    [Tooltip("Rolls outside maxActive and doesn't count toward it (a pirate raid can land during a royal visit or delegation)")]
+    public bool outsideCap;
 
     [Header("Kind parameters")]
     [Tooltip("RushHour: customer spawn rate multiplier")]

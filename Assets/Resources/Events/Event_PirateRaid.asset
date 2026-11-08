@@ -19,7 +19,8 @@ MonoBehaviour:
   unlockStar: 3
   weight: 0.8
   durationSeconds: 120
-  cooldownSeconds: 900
+  cooldownSeconds: 240
+  outsideCap: 1
   rateMultiplier: 3
   partySize: 5
   partyCustomer: {fileID: 0}
