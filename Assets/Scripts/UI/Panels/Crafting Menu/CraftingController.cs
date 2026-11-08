@@ -61,7 +61,8 @@ public class CraftingController : MonoBehaviour, IBookPage
     private VisualElement wiredRoot;
     private ScrollView scroll;
     private StatusFrame detailFrame;
-    private Label dName, dStation, dValue, dCap, dDesc, dTime, dSlot, stampText;
+    private Label dName, dStation, dValue, dDesc, dTime, dSlot, stampText;
+    private IntegerField dCap;
     private VisualElement ingList, stampSlot, stampBadge, stampBadgeText, slamOverlay;
 
     void Awake() => hideFlags = HideFlags.HideInInspector;
@@ -122,7 +123,10 @@ public class CraftingController : MonoBehaviour, IBookPage
         dName = right.Q<Label>("detail-name");
         dStation = right.Q<Label>("detail-station");
         dValue = right.Q<Label>("detail-value");
-        dCap = right.Q<Label>("detail-cap");
+        dCap = right.Q<IntegerField>("detail-cap");
+        // Typed cap commits on Enter / focus-out; the arrows step it (StepCap)
+        if (dCap != null) dCap.isDelayed = true;   // commit on Enter / focus-out, not per keystroke
+        dCap?.RegisterValueChangedCallback(e => { if (selected != null) CraftingManager.Instance.SetCap(selected, e.newValue); });
         dDesc = right.Q<Label>("detail-desc");
         dTime = right.Q<Label>("detail-time");
         ingList = right.Q<VisualElement>("ingredient-list");
@@ -347,7 +351,7 @@ public class CraftingController : MonoBehaviour, IBookPage
         if (selected == null) return;
         var state = StateOf(selected);
         detailFrame.SetState(state, cm.GetCraftingProgress(selected));
-        dCap.text = $"{cm.GetCap(selected)}";
+        if (dCap != null && dCap.focusController?.focusedElement != dCap) dCap.SetValueWithoutNotify(cm.GetCap(selected));
 
         // "have" = usable stock (above the item's keep floor), matching what CanCraft checks
         foreach (var row in ingRows)

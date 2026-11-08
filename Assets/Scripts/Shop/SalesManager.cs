@@ -211,35 +211,20 @@ public class SalesManager : PersistentSingleton<SalesManager>
 
         if (_sellableBuffer.Count == 0) return false;
 
-        // Pick the priciest item the customer can afford a full batch of (batchRange.x), from stock that covers it.
-        // Picking the priciest *affordable* item and then failing the batch minimum sent adventurers (2-6 pieces,
-        // 600-3000 gold) home over a 750 blade they could buy one of, or down to raw Soul Shards.
-        int min = Mathf.Max(1, batchRange.x);
+        // Priciest affordable item in stock (Consider already filtered price <= budget and stock > 0), as many as
+        // budget and stock allow up to batchRange.y. batchRange.x is no longer a gate: failing below it sent
+        // adventurers (2 pieces, 600-3000 gold) home over anything dearer than a 1500 sword, so nothing above tier
+        // one ever had a walk-in buyer. A customer who can afford one of something buys what they can.
         ItemDef best = null;
         int bestPrice = int.MinValue;
-        bool stockShort = false;
-
         for (int i = 0; i < _sellableBuffer.Count; i++)
         {
             var item = _sellableBuffer[i];
-            if (item.sellPrice <= bestPrice) continue;
-            if (budget / item.sellPrice < min) continue;
-            if (GetAvailableForSale(item) < min) { stockShort = true; continue; }
-            bestPrice = item.sellPrice;
-            best = item;
+            if (item.sellPrice > bestPrice) { bestPrice = item.sellPrice; best = item; }
         }
+        if (best == null) return false;
 
-        if (best == null)
-        {
-            // Affordable stock exists (Consider set TooExpensive) but no batch fits: stock short → NoStock, else budget.
-            if (stockShort) reason = WalkoutReason.NoStock;
-            return false;
-        }
-
-        int qty = Mathf.Clamp(Mathf.Min(budget / best.sellPrice, GetAvailableForSale(best)), min, batchRange.y);
-
-        // If you want a bit of randomness inside range:
-        // qty = Random.Range(min, Mathf.Min(batchRange.y, max) + 1);
+        int qty = Mathf.Clamp(Mathf.Min(budget / best.sellPrice, GetAvailableForSale(best)), 1, Mathf.Max(1, batchRange.y));
 
         desiredItem = best;
         desiredQty = qty;

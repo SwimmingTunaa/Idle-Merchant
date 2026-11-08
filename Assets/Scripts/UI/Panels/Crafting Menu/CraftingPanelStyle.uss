@@ -335,6 +335,24 @@ Label {
 .craft-cap-num {
     flex-grow: 1;
     -unity-text-align: middle-center;
+    margin: 0;
+}
+
+/* Typeable cap: the IntegerField's chrome stripped so it reads like the value plank's label */
+.craft-cap-num > .unity-base-field__input {
+    background-color: transparent;
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+    font-size: 34px;
+    color: var(--color-text-strong);
+    -unity-text-align: middle-center;
+    --unity-cursor-color: var(--color-text-strong);
+}
+
+.craft-cap-num > .unity-base-field__input:focus {
+    background-color: rgba(0, 0, 0, 0.08);
 }
 
 .craft-stepper {

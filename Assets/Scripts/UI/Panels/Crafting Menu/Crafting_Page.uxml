@@ -32,7 +32,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="craft-plank craft-plank--cap">
                     <ui:Label text="CAP" class="plank-caption" />
-                    <ui:Label name="detail-cap" text="10" class="craft-plank__num craft-cap-num" />
+                    <ui:IntegerField name="detail-cap" value="10" max-length="3" class="craft-plank__num craft-cap-num" />
                     <ui:VisualElement class="craft-stepper">
                         <ui:VisualElement name="cap-up" class="reserve-step-btn craft-step">
                             <ui:VisualElement picking-mode="Ignore" class="craft-arrow" />
