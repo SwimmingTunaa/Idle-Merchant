@@ -269,14 +269,17 @@ public class ClickerManager : MonoBehaviour
     // Nameplate follows the hovered adventurer; hidden when dead or a world-blocking panel is open.
     void LateUpdate()
     {
-        bool show = hoveredAdv != null && hoveredAdv.IsAlive
-                    && (UIManager.Instance == null || !UIManager.Instance.IsBlockingWorldInput);
+        bool blocked = UIManager.Instance != null && UIManager.Instance.IsBlockingWorldInput;
+        Transform over = hoveredAdv != null && hoveredAdv.IsAlive ? hoveredAdv.transform
+                       : hoveredCustomer != null && hoveredCustomer.enabled && hoveredCustomer.gameObject.activeInHierarchy ? hoveredCustomer.transform
+                       : null;
+        bool show = over != null && !blocked;
         UpdateServeHint();
         if (nameplate.gameObject.activeSelf != show) nameplate.gameObject.SetActive(show);
         if (!show) return;
 
-        float top = hoveredAdv.TryGetComponent(out BoxCollider2D col) ? col.offset.y + col.size.y * 0.5f : 1f;
-        nameplate.transform.position = hoveredAdv.transform.TransformPoint(new Vector3(0f, top + nameplateOffset, 0f));
+        float top = over.TryGetComponent(out BoxCollider2D col) ? col.offset.y + col.size.y * 0.5f : 1f;
+        nameplate.transform.position = over.TransformPoint(new Vector3(0f, top + nameplateOffset, 0f));
     }
 
     // LMB glyph bobbing over the customer at the counter until the player has served ServeHintCount of them.
@@ -345,7 +348,7 @@ public class ClickerManager : MonoBehaviour
                 if (decor == null && hit.TryGetComponent(out DecorSlot d) && d.CanDecorate) decor = d;
                 if (ladder == null) hit.TryGetComponent(out ladder);
                 if (pile == null) hit.TryGetComponent(out pile);
-                if (cust == null && hit.TryGetComponent(out CustomerAgent cc) && ((counter != null && cc == counter.Serving) || hit.TryGetComponent(out PirateRaider _) || (hit.TryGetComponent(out RoyalAudience ra) && ra.Waiting))) cust = cc;
+                if (cust == null && hit.TryGetComponent(out CustomerAgent cc)) cust = cc;   // every walk-in: outline + nameplate, right-click = their card
             }
         }
 
@@ -353,7 +356,11 @@ public class ClickerManager : MonoBehaviour
         {
             if (hoveredCustomer != null) hoveredCustomer.SetHoverOutline(false);
             hoveredCustomer = cust;
-            if (hoveredCustomer != null) hoveredCustomer.SetHoverOutline(true);
+            if (hoveredCustomer != null)
+            {
+                hoveredCustomer.SetHoverOutline(true);
+                if (hoveredCustomer.enabled) nameplate.text = Inspects < InspectHintCount ? hoveredCustomer.Persona.Name + " <sprite=\"RMB\" index=0>" : hoveredCustomer.Persona.Name;
+            }
         }
         if (under != null) prop = null;   // a hero standing in front of a workshop takes the outline
         if (under != null || prop != null) caravan = null;   // click priority: workshops, caravan, decor, ladders
@@ -427,6 +434,16 @@ public class ClickerManager : MonoBehaviour
             {
                 Inspects++;
                 GameSignals.RaiseAdventurerFocusRequested(adv);
+                return;
+            }
+        }
+        // No hero under the cursor: a walk-in opens their card (pirates have the agent off — not customers)
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent(out CustomerAgent c) && c.enabled && CustomerPanelController.Instance != null)
+            {
+                Inspects++;
+                CustomerPanelController.Instance.Show(c);
                 return;
             }
         }

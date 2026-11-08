@@ -1,0 +1,77 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/GlobalVariables.uss?fileID=7433441132597879392&amp;guid=a78c87095b9cb4d12a022ef277e19da6&amp;type=3#GlobalVariables" />
+    <Style src="project://database/Assets/Scripts/UI/Components/Button.uss?fileID=7433441132597879392&amp;guid=ca85a2c69b8914d29a2cd1cd9d9d5556&amp;type=3#Button" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Roster/RosterPanel.uss?fileID=7433441132597879392&amp;guid=fcda90a85139941bea862f290df11926&amp;type=3#RosterPanel" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Class Pick/ClassPickPanel.uss" />
+    <Style src="project://database/Assets/Scripts/UI/Panels/Customer/CustomerPanel.uss" />
+    <!-- Customer card: right-click a walk-in (CustomerPanelController). The Roster detail page's top block (diamond,
+         name banner, epithet ribbon, EXP-style bar, stat badges, description box) on the Class Pick's torn parchment. -->
+    <ui:VisualElement name="customer-panel" class="cp-host">
+        <ui:VisualElement class="cp-card cu-card">
+            <ui:Button name="cu-close" class="cp-close">
+                <ui:Label text="X" picking-mode="Ignore" class="cp-close__x" />
+            </ui:Button>
+            <ui:VisualElement class="cu-top">
+                <ui:VisualElement name="cu-type" class="class-frame cu-type">
+                    <ui:Label name="cu-type-label" text="Herbalist" class="cu-type__label" />
+                </ui:VisualElement>
+                <ui:VisualElement class="cu-portrait">
+                    <ui:VisualElement class="deco-diamond-big" />
+                    <ui:VisualElement class="slot">
+                        <ui:VisualElement name="cu-hero" class="adv-sprite-big" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="item-name-container">
+                        <ui:VisualElement class="name-shadow" />
+                        <ui:VisualElement class="name-fill" />
+                        <ui:VisualElement class="name-text-container cu-name-box">
+                            <ui:Label name="cu-name" text="Mabel Turnipwhistle" class="cu-name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="cu-epithet-wrap" class="epithet-wrapper cu-epithet-wrap">
+                        <ui:VisualElement class="epithet-rotate">
+                            <ui:VisualElement class="epithet cu-epithet-box">
+                                <ui:VisualElement class="epithet-shadow" />
+                                <ui:VisualElement class="epithet-fill" />
+                                <ui:Label name="cu-epithet" text="of dubious repute" class="cu-epithet" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="progress-bar-label cu-patience">
+                <ui:VisualElement class="exp-head">
+                    <ui:Label text="PATIENCE" class="exp-label" />
+                    <ui:Label name="cu-state" text="Waiting in line" class="cu-state" />
+                </ui:VisualElement>
+                <ui:VisualElement class="exp-bar-bg">
+                    <ui:VisualElement name="cu-bar-fill" class="cu-bar-fill" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="heading cu-heading">
+                <ui:VisualElement class="heading-deco" />
+                <ui:Label text="Shopping" class="heading-title" />
+                <ui:VisualElement class="heading-deco heading-deco--right" />
+            </ui:VisualElement>
+            <ui:VisualElement class="badge-row cu-badges">
+                <ui:VisualElement class="badge cu-badge cu-badge--want">
+                    <ui:Label name="cu-want-label" text="WANTS" class="badge-label cu-badge__label" />
+                    <ui:VisualElement class="cu-want-row">
+                        <ui:VisualElement name="cu-icon" class="cu-icon" />
+                        <ui:Label name="cu-want" text="x3 Iron Ore" class="badge-value cu-badge__value cu-want" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="badge cu-badge">
+                    <ui:Label text="PAYS" class="badge-label cu-badge__label" />
+                    <ui:Label name="cu-pays" text="240" class="badge-value cu-badge__value cu-pays" />
+                </ui:VisualElement>
+                <ui:VisualElement class="badge cu-badge">
+                    <ui:Label text="PURSE" class="badge-label cu-badge__label" />
+                    <ui:VisualElement name="cu-purse" class="cu-purse cu-purse--middling" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="description-container cu-desc">
+                <ui:Label name="cu-blurb" text="" class="cu-blurb" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

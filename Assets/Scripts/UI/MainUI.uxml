@@ -6,6 +6,7 @@
     <ui:Template name="WorkshopPanel" src="project://database/Assets/Scripts/UI/Panels/Workshop/WorkshopPanel.uxml"/>
     <ui:Template name="CaravanPanel" src="project://database/Assets/Scripts/UI/Panels/Caravan/CaravanPanel.uxml"/>
     <ui:Template name="AudiencePanel" src="project://database/Assets/Scripts/UI/Panels/Audience/AudiencePanel.uxml"/>
+    <ui:Template name="CustomerPanel" src="project://database/Assets/Scripts/UI/Panels/Customer/CustomerPanel.uxml"/>
     <ui:Template name="ClassPickPanel" src="project://database/Assets/Scripts/UI/Panels/Class%20Pick/ClassPickPanel.uxml"/>
     <ui:Template name="DecoratePanel" src="project://database/Assets/Scripts/UI/Panels/Decorate/DecoratePanel.uxml"/>
     <ui:Template name="TransportPanel" src="project://database/Assets/Scripts/UI/Panels/Transport/TransportPanel.uxml"/>
@@ -25,6 +26,7 @@
             <ui:Instance template="WorkshopPanel" name="WorkshopPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
             <ui:Instance template="CaravanPanel" name="CaravanPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
             <ui:Instance template="AudiencePanel" name="AudiencePanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
+            <ui:Instance template="CustomerPanel" name="CustomerPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         </ui:VisualElement>
         <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
         <ui:Instance template="EventTracker" name="EventTracker" style="position: absolute; left: 16px; top: 200px;"/>

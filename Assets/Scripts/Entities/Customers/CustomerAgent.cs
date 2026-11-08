@@ -54,6 +54,9 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private bool decisive;   // rolled per visit: knows what they want before walking in
     private Color baseColor = Color.white;
     private static readonly Color ImpatientTint = new Color(1f, 0.45f, 0.4f);
+    /// <summary>Who they are this visit: name by look, blurb by def (CustomerCast). Rolled in Init, never saved.</summary>
+    public CustomerCast.Persona Persona { get; private set; }
+
     public float Patience01 => customerDef != null && customerDef.patienceSeconds > 0f ? Mathf.Clamp01(patienceLeft / customerDef.patienceSeconds) : 1f;
 
     private bool hasInitialized = false;
@@ -105,6 +108,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         
         base.Init(entityDef, layer, spawner, playArea);
         customerDef = (CustomerDef)entityDef;
+        Persona = CustomerCast.Roll(customerDef, animator != null && animator.runtimeAnimatorController != null ? animator.runtimeAnimatorController.name : null);
         budget = Random.Range(customerDef.budget.x, customerDef.budget.y + 1);
         patienceLeft = customerDef.patienceSeconds;
         wantsToBuy = false;

@@ -51338,6 +51338,7 @@ GameObject:
   - component: {fileID: 1837106736}
   - component: {fileID: 1837106737}
   - component: {fileID: 1837106738}
+  - component: {fileID: 1837106739}
   m_Layer: 0
   m_Name: Workshop Panel
   m_TagString: Untagged
@@ -51452,6 +51453,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aaae1ae468bf4149a7ce43bafd18fcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudiencePanelController
+  uiDocument: {fileID: 1433364562}
+  panelAsset: {fileID: 0}
+  blocksWorldInput: 1
+  isModal: 1
+  openCloseDuration: 0.3
+  hasOverlay: 1
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  showDebugLogs: 0
+--- !u!114 &1837106739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1837106732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bfc18593f1ff4a7898273e7959604a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerPanelController
   uiDocument: {fileID: 1433364562}
   panelAsset: {fileID: 0}
   blocksWorldInput: 1

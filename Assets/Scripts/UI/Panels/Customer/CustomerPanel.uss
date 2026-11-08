@@ -1,0 +1,170 @@
+/* Customer card — the Roster detail page's top block + EXP bar + stat badges + description box (RosterPanel.uss classes),
+   on the Class Pick's torn parchment modal (ClassPickPanel.uss cp-host / cp-card / cp-close). Only overrides live here.
+   Text sizes follow the new scale (body 24 / small 20 / caption 18); the Roster's 16px rules aren't reused. */
+
+.cp-card.cu-card {
+    width: 600px;
+    margin-top: 0;
+    padding: 30px 40px 34px 40px;
+    align-items: stretch;
+}
+
+/* ── top block: type plate left, purse right, portrait (diamond + banner + ribbon) centred ── */
+.cu-top {
+    height: 262px;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.class-frame.cu-type {
+    left: 0;
+    top: 28px;
+    padding: 6px 18px;
+}
+
+.cu-type__label {
+    font-size: var(--font-size-body);
+    color: var(--color-text-strong);
+}
+
+
+.cu-portrait {
+    width: 210px;
+    height: 262px;
+    flex-shrink: 0;
+}
+
+/* banner text grows with the name (Roster names are one word; "Mabel Turnipwhistle" isn't) */
+.name-text-container.cu-name-box {
+    width: auto;
+    min-width: 241px;
+    padding: 0 24px;
+}
+
+.cu-name {
+    font-size: 40px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    -unity-text-align: middle-center;
+}
+
+/* ribbon a touch wider than the Roster's 200 for "the eternally bored" */
+.epithet-wrapper.cu-epithet-wrap {
+    left: -22px;
+    width: 254px;
+    top: 226px;
+}
+
+.epithet.cu-epithet-box {
+    width: 250px;
+}
+
+.cu-epithet {
+    font-size: var(--font-size-body);
+    color: var(--color-text-strong);
+    white-space: nowrap;
+    -unity-text-align: middle-center;
+}
+
+/* ── patience: the EXP row's shape ── */
+.progress-bar-label.cu-patience {
+    margin-left: 0;
+    margin-top: 14px;   /* clears the tilted epithet ribbon hanging off the top block */
+    flex-shrink: 0;
+}
+
+.cu-state {
+    flex-grow: 1;
+    margin-left: 12px;
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    -unity-text-align: lower-right;
+}
+
+.cu-bar-fill {
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-exp);
+    transition-property: width;
+    transition-duration: 0.1s;
+}
+
+.cu-bar-fill--low {
+    background-color: var(--color-destructive);
+}
+
+.cu-heading {
+    margin-top: 14px;
+}
+
+/* ── want / pays / purse badges — taller than the Roster's 64px row so the 48px pouch fits under its caption ── */
+.badge-row.cu-badges {
+    height: 76px;
+}
+
+.cu-badge--want {
+    flex-grow: 2;
+}
+
+.cu-badge__label {
+    font-size: var(--font-size-caption);
+    margin-bottom: -4px;
+}
+
+.cu-badge__value {
+    font-size: var(--font-size-body-lg);
+}
+
+.cu-want-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.cu-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.cu-want {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cu-pays {
+    color: var(--color-text-gold);
+}
+
+/* purse: thin / middling / fat pouch (Sprites/UI/Purse, Tools/draw_purse_icons.py) at 3× in the badge value slot */
+.cu-purse {
+    width: 48px;
+    height: 48px;
+    margin-top: 2px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.cu-purse--thin {
+    background-image: url("project://database/Assets/Sprites/UI/Purse/purse_thin.png");
+}
+
+.cu-purse--middling {
+    background-image: url("project://database/Assets/Sprites/UI/Purse/purse_middling.png");
+}
+
+.cu-purse--fat {
+    background-image: url("project://database/Assets/Sprites/UI/Purse/purse_fat.png");
+}
+
+/* ── blurb in the dark description box ── */
+.description-container.cu-desc {
+    margin-left: 0;
+    height: auto;
+    min-height: 84px;
+}
+
+.cu-blurb {
+    font-size: var(--font-size-small);
+    color: var(--color-text-primary);
+    white-space: normal;
+}
