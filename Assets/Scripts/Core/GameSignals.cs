@@ -16,7 +16,7 @@ public static class GameSignals
     public static event Action<ResourceStack> OnItemAdded;            // any item added to inventory
     public static event Action<ResourceStack> OnItemSold;             // item sold to customer
     public static event Action<ResourceStack> OnLootCollected;        // from dungeon/porter/click
-    public static event Action<ResourceStack> OnProductCrafted;       // artisan → shelf
+    public static event Action<ResourceStack> OnProductCrafted;       // crafting job finished (progression, book pages)
     public static event Action<RecipeDef> OnCraftStarted;             // job started (ingredients consumed)
     public static event Action OnCraftingConfigChanged;               // slot assigned/cleared/bought, cap, item floor, crafting load
 

@@ -69,4 +69,5 @@ public enum UpgradeType
     ArcaneWorkshop,   // Crafting station: charms/jewelry
     QueueRoom,        // +queue slots at the counter (ranked, global)
     QuickCounter,     // −serve time at the counter (ranked, global)
+    Shelves,          // display shelves: customers browse faster, one more shelf prop per rank (ranked, global)
 }

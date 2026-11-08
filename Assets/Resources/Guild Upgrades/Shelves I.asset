@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d104bfc79eea6439390eebc84fc7f607, type: 3}
+  m_Name: Shelves I
+  m_EditorClassIdentifier: Assembly-CSharp::GuildUpgradeDef
+  upgradeName: Shelves I
+  description: A plank of goods on the back wall. Customers see what you sell and make up their minds 25% faster — keep the counter quick.
+  icon: {fileID: 21300000, guid: 8816f7aa0bae54c2995723b532f1ae17, type: 3}
+  goldCost: 5000
+  materials: []
+  starRequirement: 1
+  requiredUpgrade: {fileID: 11400000, guid: 78c472726db1428ab22ac60424e07ecd, type: 2}
+  upgradeType: 11
+  layerSpecific: 0
+  targetLayer: 1
+  requiresResearch: 0
+  requiredResearchNodeID: 

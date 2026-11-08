@@ -52,6 +52,9 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private float patienceLeft;
     private bool wantsToBuy;
     private bool decisive;   // rolled per visit: knows what they want before walking in
+    private float browseScale = 1f;   // Shelves upgrade: idle + wander timers × this (set per visit in Init)
+    // browse time per owned Shelves rank (UpgradeType.Shelves): goods on show, customers make up their minds faster
+    private static readonly float[] ShelfBrowseScale = { 1f, 0.75f, 0.55f, 0.4f };
     private Color baseColor = Color.white;
     private static readonly Color ImpatientTint = new Color(1f, 0.45f, 0.4f);
     /// <summary>Who they are this visit: name by look, blurb by def (CustomerCast). Rolled in Init, never saved.</summary>
@@ -113,6 +116,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         patienceLeft = customerDef.patienceSeconds;
         wantsToBuy = false;
         decisive = Random.value < customerDef.decisiveChance;
+        int shelves = ProgressionManager.Instance != null ? ProgressionManager.Instance.CountUpgrades(UpgradeType.Shelves) : 0;
+        browseScale = ShelfBrowseScale[Mathf.Clamp(shelves, 0, ShelfBrowseScale.Length - 1)];
         batchMin = customerDef.batchRange.x;
         batchMax = customerDef.batchRange.y;
         
@@ -261,7 +266,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 targetPos = null;
                 
                 // Create idle timer from EntityDef idle time range
-                float idleDuration = Random.Range(def.idleTimeRange.x, def.idleTimeRange.y);
+                float idleDuration = Random.Range(def.idleTimeRange.x, def.idleTimeRange.y) * browseScale;
                 idleTimer = new CountdownTimer(idleDuration);
                 idleTimer.Start();
                 break;
@@ -301,7 +306,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
             case CustomerState.Wander:
                 SetBaseColor(wanderColor);
                 sortingGroup.sortingOrder = 4;
-                float wanderDuration = Mathf.Max(1f, Random.Range(customerDef.wanderDuration.x, customerDef.wanderDuration.y));
+                float wanderDuration = Mathf.Max(1f, Random.Range(customerDef.wanderDuration.x, customerDef.wanderDuration.y) * browseScale);
                 wanderTimer = new CountdownTimer(wanderDuration);
                 wanderTimer.Start();
                 wanderPauseTimer = null;
@@ -347,7 +352,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
                 if (idleTimer == null)
                 {
                     Debug.LogWarning($"[CustomerAgent] {name} idleTimer is null in Idle state - reinitializing");
-                    float idleDuration = Random.Range(def.idleTimeRange.x, def.idleTimeRange.y);
+                    float idleDuration = Random.Range(def.idleTimeRange.x, def.idleTimeRange.y) * browseScale;
                     idleTimer = new CountdownTimer(idleDuration);
                     idleTimer.Start();
                     return;
