@@ -357,8 +357,8 @@ public class ClickerManager : MonoBehaviour
         LootPile pile = null;
         CustomerAgent cust = null;
 
-        // No world hover while the book is open (you're already inside it).
-        if (UIManager.Instance == null || !UIManager.Instance.IsPanelOpen("BookPanel"))
+        // No world hover while a world-blocking panel is open (you're already inside it).
+        if (UIManager.Instance == null || !UIManager.Instance.IsBlockingWorldInput)
         {
             var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
             foreach (var hit in hits)
@@ -445,8 +445,8 @@ public class ClickerManager : MonoBehaviour
     /// A separate input channel from the left-click clicker so the two never collide.</summary>
     public void OnPlayerInspect()
     {
-        // Already viewing the book? Don't inspect through it.
-        if (UIManager.Instance != null && UIManager.Instance.IsPanelOpen("BookPanel")) return;
+        // Already inside a panel? Don't inspect through it.
+        if (UIManager.Instance != null && UIManager.Instance.IsBlockingWorldInput) return;
 
         var hits = Physics2D.OverlapPointAll(GetCursorWorldPos());
         foreach (var hit in hits)
@@ -472,6 +472,9 @@ public class ClickerManager : MonoBehaviour
 
     public void OnPlayerClick()
     {
+        // A world-blocking panel (book, workshop, transport …) eats the click: the input action fires regardless of
+        // what's under the cursor, and only a few props carry a WorldInputBlocker collider switch
+        if (UIManager.Instance != null && UIManager.Instance.IsBlockingWorldInput) return;
         if (clicksThisSecond >= clicksPerSecondCap) return;
         clicksThisSecond++;
 
