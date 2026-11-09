@@ -180,8 +180,8 @@ public class AdventurerCarry : MonoBehaviour
 
     private static EntityBase Move(EntityBase unit, int layer) => unit switch
     {
-        AdventurerAgent a => AdventurerManager.Move(a, AdventurerManager.ManagerForLayer(layer)),
-        PorterAgent p => PorterManager.Move(p, PorterManager.ManagerForLayer(layer)),
+        AdventurerAgent a => Moved(AdventurerManager.Move(a, AdventurerManager.ManagerForLayer(layer))),
+        PorterAgent p => Moved(PorterManager.Move(p, PorterManager.ManagerForLayer(layer))),
         _ => null,
     };
 
@@ -199,9 +199,11 @@ public class AdventurerCarry : MonoBehaviour
         {
             case (AdventurerAgent x, AdventurerAgent y):
                 if (!AdventurerManager.Swap(x, y, out var ax, out var ay)) return false;
+                TutorialManager.Flag("moved");
                 newA = ax; newB = ay; return true;
             case (PorterAgent x, PorterAgent y):
                 if (!PorterManager.Swap(x, y, out var px, out var py)) return false;
+                TutorialManager.Flag("moved");
                 newA = px; newB = py; return true;
         }
         return false;
@@ -301,5 +303,11 @@ public class AdventurerCarry : MonoBehaviour
         }
         // ponytail: O(n²) over ~5 managers per frame while carrying; cache floors if depths ever grow
         return best != null && world.y < bestFloor + gap ? best : null;
+    }
+
+    private static T Moved<T>(T unit) where T : EntityBase
+    {
+        if (unit != null) TutorialManager.Flag("moved");
+        return unit;
     }
 }

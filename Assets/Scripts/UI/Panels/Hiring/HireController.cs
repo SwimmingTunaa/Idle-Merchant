@@ -166,6 +166,13 @@ public class HireController : BasePanelController
     // OPEN AT SPECIFIC LAYER (called from Roster empty slots)
     // ═════════════════════════════════════════════
 
+    /// <summary>Opens the board on a tab (0 Adventurers, 1 Porters) — tutorial Show me.</summary>
+    public void OpenTab(int tab)
+    {
+        if (tabView != null) tabView.selectedTabIndex = tab;
+        UIManager.Instance.OpenPanel(PanelID);
+    }
+
     public void OpenAtLayer(int layerIndex)
     {
         int maxLayer = ProgressionManager.Instance != null ? ProgressionManager.Instance.maxUnlockedLayer : 1;
@@ -190,6 +197,12 @@ public class HireController : BasePanelController
         }
         BuildStack();
         UpdateLayerSelector();
+        // First open ever: the restock note explains the pile instead of counting it (tutorial)
+        if (TutorialManager.Instance != null && !TutorialManager.Instance.BoardOpened)
+        {
+            TutorialManager.Instance.Mark("board");
+            if (noticeLabel != null) noticeLabel.text = "Pull the tack for the next poster";
+        }
 
         OnOpenStart();
         StartCoroutine(OpenAnimation());

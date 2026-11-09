@@ -153,6 +153,7 @@ public class Loot : MonoBehaviour, IClickableLoot
 
     public void OnManualCollect()
     {
+        TutorialManager.Instance?.OnClickPickup();
         if (showDebugLogs)
             Debug.Log($"[Loot] Clicked {def.displayName} x{qty}");
 

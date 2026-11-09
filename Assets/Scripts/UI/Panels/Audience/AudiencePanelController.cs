@@ -51,6 +51,7 @@ public class AudiencePanelController : BasePanelController
     public void OpenFor(RoyalAudience a)
     {
         audience = a;
+        TutorialManager.Flag("audience");
         UIManager.Instance.OpenPanel(this);
     }
 

@@ -379,7 +379,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
                 fitFace = new VisualElement { name = "detail-fit-face" };
                 fitFace.AddToClassList("detail-fit-face");
                 rankWarning.parent.Add(fitFace);
-                fitFace.RegisterCallback<PointerEnterEvent>(_ => { rankWarning.style.display = DisplayStyle.Flex; rankWarning.BringToFront(); });
+                fitFace.RegisterCallback<PointerEnterEvent>(_ => { rankWarning.style.display = DisplayStyle.Flex; rankWarning.BringToFront(); TutorialManager.Flag("fitface"); });
                 fitFace.RegisterCallback<PointerLeaveEvent>(_ => rankWarning.style.display = DisplayStyle.None);
             }
             var faceSprite = RankFit.Instance != null ? RankFit.Instance.Face(RankFit.MoodOf(agent.Fit)) : null;
@@ -588,6 +588,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         else if (target.userData is AdventurerManager m)
         {
             var moved = AdventurerManager.Move(agent, m);
+            if (moved != null) TutorialManager.Flag("moved");
             if (moved != null) AfterMove(moved);
         }
     }
@@ -688,6 +689,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
                 {
                     CloseMoveDrop();
                     var moved = AdventurerManager.Move(agent, target);
+                    if (moved != null) TutorialManager.Flag("moved");
                     if (moved != null) AfterMove(moved);
                 });
             }

@@ -195,9 +195,13 @@ public class BookPanelController : BasePanelController
         }
     }
 
+    /// <summary>The open page's tab index, −1 while the book is closed (tutorial triggers poll it).</summary>
+    public int CurrentTab => State == PanelState.Open ? lastActiveTab : -1;
+
     private void SwitchToTab(int index)
     {
         if (index < 0 || index >= TAB_COUNT) return;
+        TutorialManager.Flag("tab" + index);
 
         // Hide previous page
         (_pages[lastActiveTab] as IBookPage)?.OnPageHidden();

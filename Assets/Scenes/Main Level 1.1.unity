@@ -30589,6 +30589,54 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &928719836
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 928719837}
+  - component: {fileID: 928719838}
+  m_Layer: 0
+  m_Name: Tutorial
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &928719837
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928719836}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945178581}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &928719838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928719836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2977c2e8001c747aea0234f5a6a74d50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
+  showDebugLogs: 0
+  ShowTips: 1
+  ClickKills: 0
+  ClickPickups: 0
 --- !u!1 &932872117
 GameObject:
   m_ObjectHideFlags: 0
@@ -33258,6 +33306,7 @@ Transform:
   - {fileID: 788272035}
   - {fileID: 291574149}
   - {fileID: 911689726}
+  - {fileID: 928719837}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &945178582
@@ -47260,7 +47309,7 @@ MonoBehaviour:
   guildPage: {fileID: 1901297918}
   inventoryPage: {fileID: 1698155367}
   craftingPage: {fileID: 811366031}
-  settingsPage: {fileID: 1875925581}
+  settingsPage: {fileID: 1694265163}
   cursorPage: {fileID: 1657271964}
   contractsPage: {fileID: 1657271965}
 --- !u!114 &1657271964
@@ -47941,6 +47990,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1694265161}
   - component: {fileID: 1694265162}
+  - component: {fileID: 1694265163}
   m_Layer: 5
   m_Name: Roster
   m_TagString: Untagged
@@ -47977,6 +48027,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RosterPanelController
   slotTemplate: {fileID: 9197481963319205126, guid: 6eba097cdc81c406083b05c2e13f2368, type: 3}
   hireController: {fileID: 266967779}
+--- !u!114 &1694265163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694265160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdee0ba0eb514e91a266edead0dd035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SettingsPageController
 --- !u!1 &1698155365
 GameObject:
   m_ObjectHideFlags: 0
@@ -61584,12 +61646,14 @@ MonoBehaviour:
   goldPerDamage: 1
   clickDamageLevel: 0
   pickupRadiusLevel: 0
-  radiusPerLevel: 0.2
+  maxPickupRadius: 12
   maxPickupRadiusLevel: 50
+  radiusCostGrowth: 1.15
   damageAOELevel: 0
   aoeBaseRadius: 0.8
-  aoeRadiusPerLevel: 0.3
+  aoeMaxRadius: 6
   maxDamageAOELevel: 50
+  aoeCostGrowth: 1.2
   aoeStarRequirement: 2
   autoClickLevel: 0
   maxAutoClickLevel: 21

@@ -1,6 +1,6 @@
 # Tutorial — design
 
-**Status:** draft for review, 2026-11-09. Nothing built.
+**Status:** built 2026-11-09 (`Scripts/Tutorial/TutorialManager.cs`). Deviations from the draft below: the step table is code, not `TutorialStepDef` assets (one designer, copy edits are a recompile); triggers and done-conditions are polled twice a second plus a handful of session flags (`TutorialManager.Flag`) at the verbs, no new signals; the Workshops note is done by opening the Workshop panel (recipes are pinned on unlock, so "a recipe pinned" was already true); the cold-open camera uses the existing `JumpTo` ease; the first-open board string is the restock note's count line; Show me never scrolls inside a page, it opens the tab.
 **Companions:** `GDD.md` §8.2 (the 1★ chain is already "the implicit tutorial"), `STAR_FANFARE_DESIGN.md`, `HIRING_BOARD_DESIGN.md`, `CONTRACTS_DESIGN.md`.
 
 ## 1. The problem

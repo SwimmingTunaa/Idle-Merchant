@@ -59,6 +59,7 @@ public class CaravanPanelController : BasePanelController
     protected override void OnOpenStart()
     {
         GameSignals.OnCaravanChanged += Refresh;
+        TutorialManager.Flag("caravan");
         error.text = "";
         Refresh();
         tick.Resume();

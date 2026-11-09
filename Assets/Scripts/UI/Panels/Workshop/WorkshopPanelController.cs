@@ -50,6 +50,7 @@ public class WorkshopPanelController : BasePanelController
         if (p == null || panel == null) return;
         prop = p;
         station = p.Station;
+        TutorialManager.Flag("workshop");
         if (State == PanelState.Open) Rebuild();
         else UIManager.Instance.OpenPanel(this);
     }

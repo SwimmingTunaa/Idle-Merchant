@@ -27,6 +27,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
     // Cold-boot flag: scene reloads within a session never re-load. Reset per play session even with
     // domain reload disabled.
     private static bool bootLoadDone;
+    /// <summary>No save was read at boot (or New Guild wiped it): the tutorial's cold open runs on the first Continue.</summary>
+    public static bool NewGame { get; private set; } = true;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetBootFlag() => bootLoadDone = false;
 
@@ -83,6 +85,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
         if (bootLoadDone) return;
         bootLoadDone = true;
         pending = ReadSave(out savingDisabled);
+        NewGame = pending == null;
     }
 
     void OnDestroy()
@@ -159,6 +162,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
     /// <summary>Deletes save.json + .bak (+ stray .tmp). The running session stops saving so quit can't rewrite it.</summary>
     public static void WipeSaveFiles()
     {
+        NewGame = true;
         if (Instance != null) Instance.SuspendSaving();
         foreach (var f in new[] { SavePath, SavePath + ".bak", SavePath + ".tmp" })
             if (File.Exists(f)) File.Delete(f);
@@ -221,6 +225,11 @@ public class SaveManager : PersistentSingleton<SaveManager>
         if (CraftingManager.Instance != null) d.crafting = CraftingManager.Instance.ToSave();
         if (CaravanManager.Instance != null) d.caravan = CaravanManager.Instance.ToSave();
         if (EventManager.Instance != null) d.events = EventManager.Instance.ToSave();
+        if (TutorialManager.Instance != null)
+        {
+            d.tutorial = TutorialManager.Instance.ToSave();
+            d.settings.showTips = TutorialManager.Instance.ShowTips;
+        }
         var hire = FindAnyObjectByType<HireController>();
         if (hire != null) d.contracts.favors = hire.FavorsToSave();
 
@@ -339,6 +348,12 @@ public class SaveManager : PersistentSingleton<SaveManager>
                 d.clicker.autoClick, d.clicker.autoCollect);
             clicker.Inspects = d.clicker.inspects;
             clicker.Serves = d.clicker.serves;
+        }
+
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.LoadFrom(d.tutorial);   // null (older save) → every step done
+            TutorialManager.Instance.ShowTips = d.settings.showTips;
         }
 
         if (GameManager.Instance != null) GameManager.Instance.SetTimeScale(d.settings.gameSpeed);
@@ -626,6 +641,7 @@ public class SaveData
     public DecorSave decor = new DecorSave();
     public CaravanSave caravan;   // null in saves from before the caravan → first visit in 8 min
     public EventsSave events;     // null in older saves → fresh roll clock, no cooldowns
+    public TutorialSave tutorial; // null in saves from before the tutorial → every step done
     public SettingsSave settings = new SettingsSave();
 }
 
@@ -761,4 +777,5 @@ public class SettingsSave
 {
     public float gameSpeed = 1f;
     public float masterVolume = 0.8f, sfxVolume = 1f, musicVolume = 1f;   // SfxManager volumes
+    public bool showTips = true;   // TutorialManager.ShowTips
 }

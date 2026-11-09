@@ -444,3 +444,13 @@
 
 .unity-button {
 }
+
+/* Tutorial: LMB glyph beside the hiring sign (TutorialManager.UpdateSignCue), bobbed by a scheduled translate */
+.tut-cue {
+    position: absolute;
+    top: -10px;
+    left: -22px;
+    width: 40px;
+    height: 40px;
+    -unity-background-scale-mode: scale-to-fit;
+}

@@ -292,6 +292,17 @@ public class ClickerManager : MonoBehaviour
         nameplate.transform.position = over.TransformPoint(new Vector3(0f, top + nameplateOffset, 0f));
     }
 
+    /// <summary>Another LMB glyph like the serve hint's, for the tutorial's world pointer (starts inactive).</summary>
+    public TextMeshPro MakeHint(string name)
+    {
+        var h = Instantiate(serveHint, transform);
+        h.name = name;
+        h.gameObject.SetActive(false);
+        return h;
+    }
+
+    public float HintOffset => nameplateOffset;
+
     // LMB glyph bobbing over the customer at the counter until the player has served ServeHintCount of them.
     private void UpdateServeHint()
     {
@@ -589,6 +600,7 @@ public class ClickerManager : MonoBehaviour
 
         // Health.OnDamage flips IsAlive synchronously, so this reads the kill blow.
         bool killed = enemy is Health hp && !hp.IsAlive;
+        if (killed) TutorialManager.Instance?.OnClickKill();
         if (ClickHitVFX.Instance != null)
         {
             ClickHitVFX.Instance.PlayHit(hitPos, mob);
