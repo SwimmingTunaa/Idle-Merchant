@@ -9,7 +9,6 @@ public class CustomerSpawner : Spawner
     [Header("Archetype Unlocks (guild stars)")]
     [SerializeField] private int adventurerUnlockStar = 2;
     [SerializeField] private int nobleUnlockStar = 3;
-    [SerializeField] private int royaltyUnlockStar = 5;
 
     [Header("Spawn Config")]
     [SerializeField] private int maxCommoner = 999;

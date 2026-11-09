@@ -30,6 +30,8 @@ public class PirateRaider : MonoBehaviour
 
     /// <summary>Items carried right now (sum of grabbed stacks).</summary>
     public int Carried { get { int n = 0; foreach (var c in carried) n += c.qty; return n; } }
+    /// <summary>The grabbed stacks (save: a raid dropped on reload gives them back).</summary>
+    public IReadOnlyList<(ItemDef item, int qty)> CarriedStacks => carried;
 
     public void Begin(CustomerAgent a, float interval, int max, float percent)
     {

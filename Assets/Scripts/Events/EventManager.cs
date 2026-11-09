@@ -6,7 +6,8 @@ using UnityEngine;
 /// (weighted) while fewer than maxActive run. Each kind's effect is applied on start and reverted on end;
 /// parties end early once every member has left the shop. Signal OnEventsChanged on every start/end;
 /// the HUD EventTracker reads Active. Saved as SaveData.events: timed effects (Rush Hour, notices) keep
-/// their clock across a reload; party events can't (customers aren't saved) and go on cooldown as if ended.
+/// their clock across a reload; party events can't (customers aren't saved) and go on cooldown as if ended,
+/// and what pirates held at save goes back on the pile at load.
 /// </summary>
 public class EventManager : MonoBehaviour
 {
@@ -217,7 +218,16 @@ public class EventManager : MonoBehaviour
         foreach (var kv in cooldownUntil) { float left = kv.Value - Time.time; if (left > 0f) s.cooldowns[kv.Key.name] = left; }
         foreach (var e in active)
         {
-            if (e.partySize > 0) s.cooldowns[e.def.name] = e.def.cooldownSeconds;   // dropped on load: treat as ended now
+            if (e.partySize > 0)
+            {
+                s.cooldowns[e.def.name] = e.def.cooldownSeconds;   // dropped on load: treat as ended now
+                for (int i = 0; i < e.party.Count; i++)   // pirates vanish with the raid: what they hold goes back at load
+                {
+                    var c = e.party[i];
+                    if (c == null || c.SpawnSerial != e.serials[i] || !c.gameObject.activeInHierarchy || !c.TryGetComponent<PirateRaider>(out var pr)) continue;
+                    foreach (var (item, qty) in pr.CarriedStacks) s.stolen[item.name] = (s.stolen.TryGetValue(item.name, out int have) ? have : 0) + qty;
+                }
+            }
             else s.active.Add(new EventsSave.Entry { def = e.def.name, remaining = e.remaining, customer = e.customer != null ? e.customer.name : null, item = e.item != null ? e.item.name : null });
         }
         return s;
@@ -233,6 +243,9 @@ public class EventManager : MonoBehaviour
         var customers = new Dictionary<string, CustomerDef>();
         if (spawner != null) foreach (var c in spawner.AdvertisableDefs()) customers[c.name] = c;
         if (s.nextRollIn > 0f) nextRollIn = s.nextRollIn;
+        var inv = Inventory.Instance;
+        if (inv != null && s.stolen != null)
+            foreach (var kv in s.stolen) if (kv.Value > 0 && items.TryGetValue(kv.Key, out var it)) inv.Add(inv.GetInventoryType(it.itemCategory), new ResourceStack(it, kv.Value, 0));
         foreach (var kv in s.cooldowns) if (byName.TryGetValue(kv.Key, out var d)) cooldownUntil[d] = Time.time + kv.Value;
         foreach (var a in s.active)
         {

@@ -661,6 +661,7 @@ public class EventsSave
     public float nextRollIn;   // game seconds to the next event roll
     public Dictionary<string, float> cooldowns = new Dictionary<string, float>();   // EventDef asset name → game seconds left
     public List<Entry> active = new List<Entry>();   // timed effects only (Rush Hour, Crowd / Sale notices)
+    public Dictionary<string, int> stolen = new Dictionary<string, int>();   // ItemDef asset name → qty pirates held at save; back on the pile at load
     public class Entry { public string def; public float remaining; public string customer; public string item; }
 }
 
