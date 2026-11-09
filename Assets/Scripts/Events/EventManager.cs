@@ -5,8 +5,8 @@ using UnityEngine;
 /// Timed world events: every rollMin–rollMax game seconds one unlocked, off-cooldown EventDef is drawn
 /// (weighted) while fewer than maxActive run. Each kind's effect is applied on start and reverted on end;
 /// parties end early once every member has left the shop. Signal OnEventsChanged on every start/end;
-/// the HUD EventTracker reads Active. Nothing is saved: a reload drops running events and cooldowns
-/// (ponytail: add an EventsSave chunk if players reload-farm them).
+/// the HUD EventTracker reads Active. Saved as SaveData.events: timed effects (Rush Hour, notices) keep
+/// their clock across a reload; party events can't (customers aren't saved) and go on cooldown as if ended.
 /// </summary>
 public class EventManager : MonoBehaviour
 {
@@ -208,6 +208,39 @@ public class EventManager : MonoBehaviour
         if (e.def.kind == EventKind.FeaturedItem && SalesManager.Instance != null && SalesManager.Instance.Featured == e.item) SalesManager.Instance.Featured = null;
         cooldownUntil[e.def] = Time.time + e.def.cooldownSeconds * (e.snubbed ? e.def.snubCooldownMultiplier : 1f);
         if (showDebugLogs) Debug.Log($"[EventManager] {e.def.name} ended");
+    }
+
+    // ===== SAVE =====
+    public EventsSave ToSave()
+    {
+        var s = new EventsSave { nextRollIn = nextRollIn };
+        foreach (var kv in cooldownUntil) { float left = kv.Value - Time.time; if (left > 0f) s.cooldowns[kv.Key.name] = left; }
+        foreach (var e in active)
+        {
+            if (e.partySize > 0) s.cooldowns[e.def.name] = e.def.cooldownSeconds;   // dropped on load: treat as ended now
+            else s.active.Add(new EventsSave.Entry { def = e.def.name, remaining = e.remaining, customer = e.customer != null ? e.customer.name : null, item = e.item != null ? e.item.name : null });
+        }
+        return s;
+    }
+
+    /// <summary>Null chunk (older save) keeps the defaults; unknown names are skipped.</summary>
+    public void LoadFrom(EventsSave s, Dictionary<string, ItemDef> items)
+    {
+        if (s == null) return;
+        var byName = new Dictionary<string, EventDef>();
+        foreach (var d in defs) if (d != null) byName[d.name] = d;
+        foreach (var d in ads) byName[d.name] = d;
+        var customers = new Dictionary<string, CustomerDef>();
+        if (spawner != null) foreach (var c in spawner.AdvertisableDefs()) customers[c.name] = c;
+        if (s.nextRollIn > 0f) nextRollIn = s.nextRollIn;
+        foreach (var kv in s.cooldowns) if (byName.TryGetValue(kv.Key, out var d)) cooldownUntil[d] = Time.time + kv.Value;
+        foreach (var a in s.active)
+        {
+            if (!byName.TryGetValue(a.def, out var d) || a.remaining <= 0f) continue;
+            customers.TryGetValue(a.customer ?? "", out var c);
+            items.TryGetValue(a.item ?? "", out var it);
+            if (Fire(d, c, it)) ActiveOf(d).remaining = a.remaining;
+        }
     }
 
     public static void Announce(Component at, string text)

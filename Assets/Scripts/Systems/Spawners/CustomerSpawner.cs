@@ -32,6 +32,8 @@ public class CustomerSpawner : Spawner
     [SerializeField] private float spawnRatePerSaleItem = 0.5f;
     [Tooltip("Additional spawns/min per active dungeon layer.")]
     [SerializeField] private float spawnRatePerLayer = 1f;
+    [Tooltip("Spawn-rate bonus per owned Shelves rank (UpgradeType.Shelves): displayed goods draw walk-ins. 0.15 = +15% / +30% / +45%.")]
+    [SerializeField] private float spawnRatePerShelfRank = 0.15f;
     [Tooltip("Minimum spawns/min regardless of other factors.")]
     [SerializeField] private float minSpawnsPerMinute = 1f;
     [Tooltip("Maximum spawns/min cap.")]
@@ -91,6 +93,7 @@ public class CustomerSpawner : Spawner
     {
         GameSignals.OnStarEarned           += OnStarEarnedHandler;
         GameSignals.OnLayerUnlocked        += OnLayerUnlockedHandler;
+        ProgressionManager.OnUpgradePurchased += OnUpgradePurchasedHandler;
         GameSignals.OnMarkedForSaleChanged += OnMarkedForSaleChangedHandler;
     }
 
@@ -98,29 +101,32 @@ public class CustomerSpawner : Spawner
     {
         GameSignals.OnStarEarned           -= OnStarEarnedHandler;
         GameSignals.OnLayerUnlocked        -= OnLayerUnlockedHandler;
+        ProgressionManager.OnUpgradePurchased -= OnUpgradePurchasedHandler;
         GameSignals.OnMarkedForSaleChanged -= OnMarkedForSaleChangedHandler;
     }
 
     private void OnStarEarnedHandler(int _)        => RecalculateSpawnRate();
     private void OnLayerUnlockedHandler(int _)     => RecalculateSpawnRate();
     private void OnMarkedForSaleChangedHandler()   => RecalculateSpawnRate();
+    private void OnUpgradePurchasedHandler(GuildUpgradeDef u) { if (u != null && u.upgradeType == UpgradeType.Shelves) RecalculateSpawnRate(); }
 
     public void RecalculateSpawnRate()
     {
         int stars     = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
         int layers    = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetUnlockedLayerCount() : 1;
         int saleItems = SalesManager.Instance != null ? SalesManager.Instance.GetMarkedForSaleCount() : 0;
+        int shelves   = ProgressionManager.Instance != null ? ProgressionManager.Instance.CountUpgrades(UpgradeType.Shelves) : 0;
 
         float newRate = baseSpawnsPerMinute
             + spawnRatePerStar     * stars
             + spawnRatePerSaleItem * saleItems
             + spawnRatePerLayer    * layers;
 
-        spawnsPerMinute = Mathf.Clamp(newRate * RateMultiplier, minSpawnsPerMinute, maxSpawnsPerMinute);
+        spawnsPerMinute = Mathf.Clamp(newRate * (1f + spawnRatePerShelfRank * shelves) * RateMultiplier, minSpawnsPerMinute, maxSpawnsPerMinute);
 
         if (showDebugLogs)
             Debug.Log($"[CustomerSpawner] SpawnRate={spawnsPerMinute:F1}/min " +
-                      $"(stars={stars}, items={saleItems}, layers={layers})");
+                      $"(stars={stars}, items={saleItems}, layers={layers}, shelves={shelves})");
     }
 
     public override void TrySpawn()

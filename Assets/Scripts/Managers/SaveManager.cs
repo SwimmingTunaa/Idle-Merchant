@@ -220,6 +220,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
         if (ContractManager.Instance != null) d.contracts = ContractManager.Instance.ToSave();
         if (CraftingManager.Instance != null) d.crafting = CraftingManager.Instance.ToSave();
         if (CaravanManager.Instance != null) d.caravan = CaravanManager.Instance.ToSave();
+        if (EventManager.Instance != null) d.events = EventManager.Instance.ToSave();
         var hire = FindAnyObjectByType<HireController>();
         if (hire != null) d.contracts.favors = hire.FavorsToSave();
 
@@ -383,6 +384,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
         // After stock: an old save without the chunk rolls fresh offers against the restored stockpile
         if (ContractManager.Instance != null) ContractManager.Instance.LoadFrom(d.contracts, items);
         if (CaravanManager.Instance != null) CaravanManager.Instance.LoadFrom(d.caravan, items);
+        if (EventManager.Instance != null) EventManager.Instance.LoadFrom(d.events, items);
 
         // Same signals live play raises, so camera bounds, hire pools and the Cursor page catch up
         if (pm != null)
@@ -623,6 +625,7 @@ public class SaveData
     public CraftingSave crafting;   // null in saves from before crafting batch 2 → defaults
     public DecorSave decor = new DecorSave();
     public CaravanSave caravan;   // null in saves from before the caravan → first visit in 8 min
+    public EventsSave events;     // null in older saves → fresh roll clock, no cooldowns
     public SettingsSave settings = new SettingsSave();
 }
 
@@ -651,6 +654,14 @@ public class CaravanSave
     public string item;      // ItemDef asset name of the wanted lot
     public int qty;
     public float leaveIn;    // game seconds left on the open offer
+}
+
+public class EventsSave
+{
+    public float nextRollIn;   // game seconds to the next event roll
+    public Dictionary<string, float> cooldowns = new Dictionary<string, float>();   // EventDef asset name → game seconds left
+    public List<Entry> active = new List<Entry>();   // timed effects only (Rush Hour, Crowd / Sale notices)
+    public class Entry { public string def; public float remaining; public string customer; public string item; }
 }
 
 public class CraftingSave
