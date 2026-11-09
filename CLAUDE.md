@@ -55,6 +55,7 @@ Concrete: `AdventurerManager`, `PorterManager`, `MobManager`.
 - Panels live in `Scripts/UI/Panels/`; each has a controller inheriting `BasePanelController`
 - `UIManager` — top-level panel orchestration
 - `GameSignals` drives reactive UI updates (gold display, unit counts, etc.)
+- HUD gold plate shows the passive income rate under the total (`gold-rate-label`, `.coin-rate`, `UIManager.RefreshGoldRate` once a second from `SaveManager.GoldPerMin`, the offline-award rate: customer sales + porter deliveries, never click gold; blank below 1/min)
 - Design tokens: `Scripts/UI/GlobalVariables.uss` — colour / text / spacing / font-size `--vars` mirrored from Figma; consume via `var()` in `.class`/`#id` rules
 - Reusable Button: `Scripts/UI/Components/Button.uss` + `Button.uxml` — tint-driven 9-slice variants (`btn-primary` / `-secondary` / `-success` / `-danger` / `-disabled`)
 - Top-nav board badges: `UIManager.SetBoardBadge(badge, visible, wiggle)` — shared badge toggle + ~5s button tilt-wiggle (scheduled item kept in the badge's `userData`); used by the cursor and hiring boards and the Units bookmark (promote-ready count via pure `AdventurerManager.CountPromoteReady`, gold dirty flag)

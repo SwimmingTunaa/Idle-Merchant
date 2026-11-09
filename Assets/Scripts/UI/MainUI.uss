@@ -349,6 +349,23 @@
     -unity-slice-scale: 5px;
 }
 
+/* Gold plate: total on top, shop income per minute under it (UIManager.RefreshGoldRate, SaveManager.GoldPerMin) */
+.coin-plate--stacked {
+    flex-direction: column;
+    align-items: flex-end;
+    padding-top: var(--space-xs);
+    padding-bottom: 10px;
+}
+
+.coin-rate {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-primary);
+    -unity-font-definition: var(--font-body);
+    -unity-text-align: middle-right;
+    margin: -4px 42px 0 0;
+    padding: 0;
+}
+
 .coin {
     flex-direction: row;
     align-items: center;

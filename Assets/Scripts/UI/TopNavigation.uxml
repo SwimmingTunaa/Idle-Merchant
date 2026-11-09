@@ -72,11 +72,12 @@
                     <ui:VisualElement name="seal-icon" class="seal-icon"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="coin-container" class="coin-plate">
+            <ui:VisualElement name="coin-container" class="coin-plate coin-plate--stacked">
                 <ui:VisualElement name="coin" class="coin">
                     <ui:Label name="coin-label" text="100k" class="coin-label"/>
                     <ui:VisualElement name="coin-icon" class="coin-icon pulse-target" style="background-image: url(&quot;project://database/Assets/Sprites/UI/Main%20UI/Copper%20Coin.png?fileID=2407117006326520345&amp;guid=16798bfa02f8d44348f9fffdaf153786&amp;type=3#Copper Coin_0&quot;);"/>
                 </ui:VisualElement>
+                <ui:Label name="gold-rate-label" text="" picking-mode="Ignore" class="coin-rate"/>
             </ui:VisualElement>
             <ui:VisualElement name="utility-buttons" class="utility-buttons" style="display: none;">
                 <ui:Button name="settings-button" text="⚙" class="utility-button settings-button"/>

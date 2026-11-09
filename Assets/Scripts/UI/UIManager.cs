@@ -71,6 +71,15 @@ public class UIManager : PersistentSingleton<UIManager>
             uiDocument = GetComponent<UIDocument>();
     }
 
+    // Under the gold total: passive shop income (customer sales + porter deliveries' value, the offline-award rate), once a second
+    private Label goldRateLabel;
+    private void RefreshGoldRate()
+    {
+        var sm = SaveManager.Instance;
+        int perMin = sm != null ? Mathf.RoundToInt(sm.GoldPerMin) : 0;
+        goldRateLabel.text = perMin >= 1 ? $"{AnimatedNumberUITK.Abbrev(perMin)} / min" : "";
+    }
+
     /// <summary>Top-bar pennant text = GuildName (rolled per guild, restored by SaveManager.ApplyEarly).</summary>
     public void RefreshGuildName()
     {
@@ -90,6 +99,8 @@ public class UIManager : PersistentSingleton<UIManager>
         SetUpClickUpgradeButton();
         SetUpUnitsBadge();
         RefreshGuildName();
+        goldRateLabel = uiDocument != null ? uiDocument.rootVisualElement?.Q<Label>("gold-rate-label") : null;
+        goldRateLabel?.schedule.Execute(RefreshGoldRate).Every(1000);
 
         sealLabel = uiDocument != null ? uiDocument.rootVisualElement?.Q<Label>("seal-label") : null;
         GameSignals.OnSealsChanged += OnSealsChanged;
