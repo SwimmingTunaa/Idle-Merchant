@@ -27,6 +27,8 @@ public class CustomerSpawner : Spawner
     [SerializeField] private float baseSpawnsPerMinute = 5f;
     [Tooltip("Additional spawns/min per guild star earned.")]
     [SerializeField] private float spawnRatePerStar = 2f;
+    [Tooltip("Cheap walk-ins (budget.y ≤ cheapBudget: Villager, Herbalist) have their spawn weight divided by (stars − 1) from 3★ (×0.5 at 3★, ×0.33 at 4★, ×0.25 at 5★), so the counter's ~20 serves a minute go to adventurers and nobles as the guild grows.")]
+    [SerializeField] private int cheapBudget = 1000;
     [Tooltip("Additional spawns/min per item marked for sale.")]
     [SerializeField] private float spawnRatePerSaleItem = 0.5f;
     [Tooltip("Additional spawns/min per active dungeon layer.")]
@@ -52,7 +54,16 @@ public class CustomerSpawner : Spawner
         float m = (weightBoost.TryGetValue(def, out float cur) ? cur : 1f) * mult;
         if (Mathf.Abs(m - 1f) < 0.001f) weightBoost.Remove(def); else weightBoost[def] = m;
     }
-    private float Boost(EntityDef def) => def is CustomerDef c && weightBoost.TryGetValue(c, out float m) ? m : 1f;
+    private float Boost(EntityDef def) => def is CustomerDef c && weightBoost.TryGetValue(c, out float m) ? m * StarScale(c) : def is CustomerDef c2 ? StarScale(c2) : 1f;
+
+    // Cheap commoners thin out as stars rise (the queue is the bottleneck from 3★; a 400-gold sale costs the same serve as a 4,000-gold one)
+    private static float StarScale(CustomerDef c, int cheapBudget)
+    {
+        if (c.customerArcheType != CustomerArcheType.Commoner || c.budget.y > cheapBudget) return 1f;
+        int stars = ProgressionManager.Instance != null ? ProgressionManager.Instance.GetCurrentStars() : 0;
+        return 1f / Mathf.Max(1, stars - 1);
+    }
+    private float StarScale(CustomerDef c) => StarScale(c, cheapBudget);
 
     /// <summary>Walk-in defs the player can advertise to: candidates past their star gate (royals never).</summary>
     public List<CustomerDef> AdvertisableDefs()

@@ -143,6 +143,24 @@ public class QueueController : MonoBehaviour
         ReflowQueue();
     }
 
+    /// <summary>Out of patience in line: step ahead of the first cheaper basket behind the head (the head is being served
+    /// or walking to the counter). One jump per visit (CustomerAgent); false = nobody cheaper ahead.</summary>
+    public bool TryJumpAhead(CustomerAgent agent)
+    {
+        int idx = queue.IndexOf(agent);
+        if (idx < 2) return false;
+        float mine = agent.BasketValue;
+        for (int j = 1; j < idx; j++)
+        {
+            if (queue[j].BasketValue >= mine) continue;
+            queue.RemoveAt(idx);
+            queue.Insert(j, agent);
+            ReflowQueue();
+            return true;
+        }
+        return false;
+    }
+
     /// Remove a specific agent (e.g., leaves angry) and reflow
     public void Remove(CustomerAgent agent)
     {

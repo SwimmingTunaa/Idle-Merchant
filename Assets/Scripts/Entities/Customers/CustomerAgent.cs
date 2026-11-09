@@ -52,6 +52,7 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     private float patienceLeft;
     private bool wantsToBuy;
     private bool decisive;   // rolled per visit: knows what they want before walking in
+    private bool jumped;     // used their one queue jump this visit (TickPatience)
     private float browseScale = 1f;   // Shelves upgrade: idle + wander timers × this (set per visit in Init)
     // browse time per owned Shelves rank (UpgradeType.Shelves): goods on show, customers make up their minds faster
     private static readonly float[] ShelfBrowseScale = { 1f, 0.75f, 0.55f, 0.4f };
@@ -115,7 +116,8 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         budget = Random.Range(customerDef.budget.x, customerDef.budget.y + 1);
         patienceLeft = customerDef.patienceSeconds;
         wantsToBuy = false;
-        decisive = Random.value < customerDef.decisiveChance;
+        jumped = false;
+        decisive = Random.value < customerDef.decisiveChance || (EventManager.Instance != null && EventManager.Instance.RushHour);   // rush: everyone knows what they want
         int shelves = ProgressionManager.Instance != null ? ProgressionManager.Instance.CountUpgrades(UpgradeType.Shelves) : 0;
         browseScale = ShelfBrowseScale[Mathf.Clamp(shelves, 0, ShelfBrowseScale.Length - 1)];
         batchMin = customerDef.batchRange.x;
@@ -186,6 +188,14 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
         if (!wantsToBuy || State == CustomerState.Buying) return;
         patienceLeft -= TickDelta;
         if (patienceLeft > 0f) return;
+        // Out of patience in line: a bigger spender steps ahead of a cheaper basket once, then waits half their patience again
+        if (!jumped && State == CustomerState.Queueing && QueueController.Instance != null && QueueController.Instance.TryJumpAhead(this))
+        {
+            jumped = true;
+            patienceLeft = customerDef.patienceSeconds * 0.5f;
+            EventManager.Announce(this, "Excuse me!");
+            return;
+        }
         if (QueueController.Instance != null) QueueController.Instance.Remove(this);
         walkoutReason = WalkoutReason.Impatient;
         desiredItem = null;
@@ -194,6 +204,9 @@ public class CustomerAgent : EntityStateMachine<CustomerState>
     }
 
     public CustomerDef Def => customerDef;
+
+    /// <summary>What this visit is worth at the counter (want × qty × price multiplier); 0 while browsing. Queue jumps compare it.</summary>
+    public float BasketValue => desiredItem != null ? desiredItem.sellPrice * desiredQty * PriceMultiplier : 0f;
 
     /// <summary>What this customer pays per item relative to sellPrice (CustomerDef.priceMultiplier).</summary>
     public float PriceMultiplier => customerDef != null && customerDef.priceMultiplier > 0f ? customerDef.priceMultiplier : 1f;
