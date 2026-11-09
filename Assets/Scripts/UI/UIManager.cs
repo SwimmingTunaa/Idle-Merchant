@@ -71,6 +71,13 @@ public class UIManager : PersistentSingleton<UIManager>
             uiDocument = GetComponent<UIDocument>();
     }
 
+    /// <summary>Top-bar pennant text = GuildName (rolled per guild, restored by SaveManager.ApplyEarly).</summary>
+    public void RefreshGuildName()
+    {
+        var label = uiDocument != null ? uiDocument.rootVisualElement?.Q<Label>("guild-name-label") : null;
+        if (label != null) label.text = GuildName.TwoLines;
+    }
+
     void Start()
     {
         SetUpUIBindings();
@@ -82,6 +89,7 @@ public class UIManager : PersistentSingleton<UIManager>
 
         SetUpClickUpgradeButton();
         SetUpUnitsBadge();
+        RefreshGuildName();
 
         sealLabel = uiDocument != null ? uiDocument.rootVisualElement?.Q<Label>("seal-label") : null;
         GameSignals.OnSealsChanged += OnSealsChanged;

@@ -182,6 +182,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
         d.meta.version = CurrentVersion;
         d.meta.lastPlayedUtc = DateTime.UtcNow - pendingAway;
         d.meta.totalPlayTime = playTime;
+        d.meta.guildName = GuildName.Current;
         d.meta.goldPerMin = GoldPerMin;
         d.meta.lootPerMin = LootPerMin;
         d.meta.servedPerMin = ServedPerMin;
@@ -338,6 +339,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
     // Before any other Start: activators, tracker, Guild page and Cursor page build from this state.
     private static void ApplyEarly(SaveData d)
     {
+        GuildName.Set(d.meta.guildName);
+        UIManager.Instance?.RefreshGuildName();
         if (ProgressionManager.Instance != null)
             ProgressionManager.Instance.LoadFrom(d.progression, d.guild.ownedUpgrades);
 
@@ -648,6 +651,7 @@ public class SaveData
 public class MetaSave
 {
     public int version;
+    public string guildName;       // GuildName.Current; empty in older saves → rolled fresh
     public DateTime lastPlayedUtc;
     public double totalPlayTime;   // seconds, all sessions
     public float goldPerMin;       // phase 2 (offline earnings)

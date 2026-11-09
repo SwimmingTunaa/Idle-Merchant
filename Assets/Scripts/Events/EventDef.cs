@@ -33,6 +33,9 @@ public class EventDef : ScriptableObject
     [Tooltip("AdventurerParty: how many arrive together, and who")]
     public int partySize = 5;
     public CustomerDef partyCustomer;
+    [Tooltip("AdventurerParty: parties of partySize in all (a Dungeon Raid = 3), the later ones waveGapSeconds apart; the event ends when the last has left")]
+    public int waves = 1;
+    public float waveGapSeconds = 20f;
     [Tooltip("Delegation / PirateRaid: these defs arrive together, one each (lead first)")]
     public CustomerDef[] partyMembers;
     [Tooltip("PirateRaid: seconds between grabs per pirate, grabs each makes before running, and the share of one random stack a grab takes (at least 1)")]

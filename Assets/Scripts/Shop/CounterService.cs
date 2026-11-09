@@ -78,7 +78,7 @@ public class CounterService : MonoBehaviour
 
         // Serving
         t += Time.deltaTime;
-        if (t < effectiveServeTime) return;
+        if (t < effectiveServeTime * (EventManager.Instance != null && EventManager.Instance.RushHour ? EventManager.RushServeScale : 1f)) return;
 
         CompleteService(currentCustomer);
         currentCustomer = null;

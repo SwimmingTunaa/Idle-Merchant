@@ -20,6 +20,9 @@ public class EventManager : MonoBehaviour
         public readonly List<CustomerAgent> party = new();
         public readonly List<int> serials = new();   // SpawnSerial per member: a pooled instance reused as a new customer no longer counts
         public int partySize;
+        /// <summary>AdventurerParty waves still to arrive (EventDef.waves − 1 at Fire) and the clock to the next.</summary>
+        public int wavesLeft;
+        public float nextWaveIn;
         /// <summary>Live status line for the HUD card (empty = the def's effectLine).</summary>
         public string note = "";
         /// <summary>Set by RoyalAudience when the lead left unserved: the cooldown is multiplied on End.</summary>
@@ -85,7 +88,8 @@ public class EventManager : MonoBehaviour
         {
             var e = active[i];
             e.remaining -= dt;
-            if (e.remaining <= 0f || (e.partySize > 0 && e.PartyLeft == 0)) { End(e); active.RemoveAt(i); changed = true; }
+            if (e.wavesLeft > 0 && (e.nextWaveIn -= dt) <= 0f) SpawnWave(e);
+            if (e.remaining <= 0f || (e.partySize > 0 && e.wavesLeft == 0 && e.PartyLeft == 0)) { End(e); active.RemoveAt(i); changed = true; }
         }
         if (changed) GameSignals.RaiseEventsChanged();
 
@@ -122,6 +126,11 @@ public class EventManager : MonoBehaviour
     private static bool ShopOnScreen => Camera.main != null && Camera.main.transform.position.y > -6f;
 
     public bool IsActive(EventDef def) { foreach (var e in active) if (e.def == def) return true; return false; }
+
+    /// <summary>A Rush Hour is on: spawn rate × the def's multiplier (Fire/End), every walk-in decisive
+    /// (CustomerAgent.Init) and the counter serves at RushServeScale (CounterService); coin border on the HUD (EventTracker).</summary>
+    public bool RushHour { get { foreach (var e in active) if (e.def != null && e.def.kind == EventKind.RushHour) return true; return false; } }
+    public const float RushServeScale = 0.5f;
 
     public ActiveEvent ActiveOf(EventDef def) { foreach (var e in active) if (e.def == def) return e; return null; }
     public float CooldownLeft(EventDef def) => cooldownUntil.TryGetValue(def, out float until) ? Mathf.Max(0f, until - Time.time) : 0f;
@@ -170,6 +179,8 @@ public class EventManager : MonoBehaviour
                 spawner.SpawnParty(def.partyCustomer, def.partySize, e.party);
                 e.partySize = e.party.Count;
                 if (e.partySize == 0) return false;
+                e.wavesLeft = Mathf.Max(0, def.waves - 1);
+                e.nextWaveIn = def.waveGapSeconds;
                 Announce(e.party[0], $"{def.displayName}!");
                 break;
             case EventKind.RoyalVisit:
@@ -197,6 +208,23 @@ public class EventManager : MonoBehaviour
         if (showDebugLogs) Debug.Log($"[EventManager] {def.name} started ({def.durationSeconds}s)");
         GameSignals.RaiseEventsChanged();
         return true;
+    }
+
+    /// <summary>AdventurerParty with waves: the next party walks in, joining the event's roster (serials + pennants).</summary>
+    private void SpawnWave(ActiveEvent e)
+    {
+        e.wavesLeft--;
+        e.nextWaveIn = e.def.waveGapSeconds;
+        if (spawner == null || e.def.partyCustomer == null) return;
+        int before = e.party.Count;
+        spawner.SpawnParty(e.def.partyCustomer, e.def.partySize, e.party);
+        for (int i = before; i < e.party.Count; i++)
+        {
+            e.serials.Add(e.party[i].SpawnSerial);
+            EventMarker.Attach(e.party[i], e.def.icon);
+        }
+        e.partySize = e.party.Count;
+        if (e.party.Count > before) Announce(e.party[before], "Another party!");
     }
 
     private void End(ActiveEvent e)

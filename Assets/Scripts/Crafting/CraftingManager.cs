@@ -13,7 +13,8 @@ public class CraftingManager : MonoBehaviour
 {
     public static CraftingManager Instance { get; private set; }
 
-    public const int DefaultCap = 25, MaxCap = 999;
+    public const int DefaultCap = 999, MaxCap = 999;   // default = no cap in practice; the player lowers it per recipe
+    private const int OldDefaultCap = 25;              // pre-2026-11-10 default: a saved 25 is read as "never set" and lifted
 
     // Indexed by CraftingStation. Forging starts with 2 slots (it's the first station bought).
     private static readonly UpgradeType[] StationUpgrade = { UpgradeType.ForgingStation, UpgradeType.Smithy, UpgradeType.ArcaneWorkshop };
@@ -389,7 +390,8 @@ public class CraftingManager : MonoBehaviour
         caps.Clear();
         activeCrafts.Clear();
         foreach (var kv in s.recipes)
-            if (byName.TryGetValue(kv.Key, out var r) && kv.Value != null) caps[r] = Mathf.Clamp(kv.Value.cap, 1, MaxCap);
+            if (byName.TryGetValue(kv.Key, out var r) && kv.Value != null)
+                caps[r] = Mathf.Clamp(kv.Value.cap == OldDefaultCap ? DefaultCap : kv.Value.cap, 1, MaxCap);
 
         for (int i = 0; i < slots.Length; i++)
         {

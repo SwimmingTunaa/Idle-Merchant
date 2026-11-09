@@ -23,6 +23,7 @@ public class EventTracker : MonoBehaviour
         if (list == null) { Debug.LogWarning("[EventTracker] event-tracker / ev-list not found in MainUI"); enabled = false; return; }
         GameSignals.OnEventsChanged += Rebuild;
         GameSignals.OnCaravanChanged += Rebuild;
+        BuildRush();
         Rebuild();
     }
 
@@ -78,6 +79,7 @@ public class EventTracker : MonoBehaviour
                     () => { if (CameraScrollController.Instance != null) CameraScrollController.Instance.LockOnto(cv.transform); },   // it drives: follow it
                     () => cv.LeaveIn / CaravanManager.StayFor, null, null);
         root.style.display = cards.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+        rushOn = em.RushHour;
     }
 
     void Update()
@@ -87,6 +89,71 @@ public class EventTracker : MonoBehaviour
             c.fill.style.width = Length.Percent(Mathf.Clamp01(c.progress()) * 100f);
             if (c.note != null) { string n = c.note(); if (c.effect.text != n) c.effect.text = n; }
             if (c.left != null) c.left.text = c.count();
+        }
+        TickRush();
+    }
+
+    // ═════════════════════════════════════════════
+    // RUSH HOUR — gold frame + coins raining down both screen edges (centre stays clear, nothing picks)
+    // ═════════════════════════════════════════════
+
+    private const int RushCoins = 36;
+    private const float RushBand = 0.13f, RushFade = 0.5f, CoinSize = 26f;
+    private VisualElement rushHost, rushFrame;
+    private struct RushCoin { public VisualElement el; public float x, y, speed, spin, phase; }
+    private readonly List<RushCoin> rushCoins = new();
+    private bool rushOn;
+    private float rushAlpha;
+
+    private void BuildRush()
+    {
+        var docRoot = uiDocument.rootVisualElement;
+        var coin = docRoot.Q("coin-icon");
+        rushHost = new VisualElement { name = "rush-hour", pickingMode = PickingMode.Ignore };
+        rushHost.AddToClassList("rush-host");
+        rushFrame = new VisualElement { pickingMode = PickingMode.Ignore };
+        rushFrame.AddToClassList("rush-frame");
+        rushHost.Add(rushFrame);
+        var inner = new VisualElement { pickingMode = PickingMode.Ignore };
+        inner.AddToClassList("rush-frame--inner");
+        rushHost.Add(inner);
+        for (int i = 0; i < RushCoins; i++)
+        {
+            var el = new VisualElement { pickingMode = PickingMode.Ignore };
+            el.AddToClassList("rush-coin");
+            if (coin != null) el.style.backgroundImage = coin.resolvedStyle.backgroundImage;
+            rushHost.Add(el);
+            rushCoins.Add(new RushCoin { el = el, x = Random.value, y = Random.value, speed = Random.Range(0.18f, 0.34f), spin = Random.Range(-240f, 240f), phase = Random.value * 6.28f });
+        }
+        rushHost.style.display = DisplayStyle.None;
+        docRoot.Insert(0, rushHost);   // first child: over the world, under every other HUD element
+    }
+
+    private void TickRush()
+    {
+        if (rushHost == null) return;
+        float target = rushOn ? 1f : 0f;
+        if (rushAlpha == target && !rushOn) return;
+        rushAlpha = Mathf.MoveTowards(rushAlpha, target, Time.unscaledDeltaTime / RushFade);
+        rushHost.style.display = rushAlpha > 0f ? DisplayStyle.Flex : DisplayStyle.None;
+        if (rushAlpha <= 0f) return;
+        rushHost.style.opacity = rushAlpha;
+        float now = Time.unscaledTime;
+        rushFrame.style.opacity = 0.7f + 0.3f * Mathf.Sin(now * 5f);   // the frame breathes
+        var size = rushHost.layout.size;
+        if (size.x <= 0f) return;
+        float band = size.x * RushBand;
+        for (int i = 0; i < rushCoins.Count; i++)
+        {
+            var c = rushCoins[i];
+            c.y += c.speed * Time.unscaledDeltaTime;
+            if (c.y > 1.05f) { c.y = -0.05f; c.x = Random.value; }
+            rushCoins[i] = c;
+            bool left = i % 2 == 0;
+            float x = left ? c.x * band : size.x - band + c.x * band;
+            x += Mathf.Sin(now * 2f + c.phase) * 8f;   // a little drift
+            c.el.style.translate = new Translate(x - CoinSize * 0.5f, c.y * size.y - CoinSize * 0.5f);
+            c.el.style.rotate = new Rotate(now * c.spin + c.phase * 57f);
         }
     }
 }

@@ -454,3 +454,42 @@
     height: 40px;
     -unity-background-scale-mode: scale-to-fit;
 }
+
+/* ── Rush Hour overlay (EventTracker.BuildRush; lives here, not in EventTracker.uss, because the host is a child of the UI root, outside the tracker template's style scope): gold edge frame + coins raining down both screen edges ── */
+
+.rush-host {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.rush-frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-width: 14px;
+    border-color: rgba(255, 196, 64, 0.55);
+}
+
+.rush-frame--inner {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-width: 44px;
+    border-color: rgba(255, 196, 64, 0.16);
+}
+
+.rush-coin {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    -unity-background-scale-mode: scale-to-fit;
+}
