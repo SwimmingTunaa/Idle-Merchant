@@ -19,12 +19,6 @@ public class ClassCatalog : ScriptableObject
     [Tooltip("Weight per tier (index 0 = Wood/Novice … 4 = Gold), normalised over the unlocked tiers.")]
     public float[] tierWeights = { 50f, 25f, 13f, 8f, 4f };
 
-    [Tooltip("Weight multiplier for a newly unlocked layer's tier.")]
-    public float unlockBoost = 2f;
-
-    [Tooltip("How long (game seconds) the unlock boost lasts.")]
-    public float unlockBoostSeconds = 600f;
-
     [Tooltip("Class hires cost (Novice price + the promotions they skip) × this.")]
     public float hirePremium = 1.4f;
 

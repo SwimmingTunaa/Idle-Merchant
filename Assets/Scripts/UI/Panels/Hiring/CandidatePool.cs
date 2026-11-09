@@ -20,7 +20,7 @@ public class CandidatePool
     private readonly List<HiringCandidate> candidates = new List<HiringCandidate>();
     private readonly List<HiringCandidate> favored = new List<HiringCandidate>(); // paid for — survive refreshes until hired
     private float refreshTimer;
-    private float refreshInterval = 300f;
+    private float refreshInterval = 180f;
     private float traitChance = 0.7f;
     private readonly System.Func<int> ownedCount; // guild-wide units of this role, for cost scaling
 
@@ -31,7 +31,7 @@ public class CandidatePool
         HireRole role,
         int layerIndex,
         EntityDef entityDef,
-        float refreshIntervalSeconds = 300f,
+        float refreshIntervalSeconds = 180f,
         float traitChance = 0.7f,
         System.Func<int> ownedCount = null)
     {

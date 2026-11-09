@@ -102,7 +102,7 @@ A weak unit in a deep layer is allowed — it just struggles (dies and revives).
 
 ## Open
 
-1. Odds and the 10-minute unlock boost — tune after a playtest.
+1. Odds — tune after a playtest. (The 10-minute unlock boost was removed 2026-11-09.)
 2. Porters stay one def for now (layers 2–5 porter managers just get `Porter lvl 1`).
 
 ## Phase 1 as built (2026-10-21)
@@ -118,7 +118,6 @@ Deviations / decisions:
 - **Picker arrows** compare each line to the same tier's Warrior (1 = less, 2 = about the same, 3 = clearly more) so they still read at Iron+ free picks; the "Splash" lives in the Mage role line.
 - **Promote label** uses "»" ("Promote » Knight 3,750") — the body font has no →.
 - **Per-rank attack-speed step (×0.9) is kept**; only the flat damage/HP rank multipliers were replaced.
-- **Unlock boost isn't saved** — quitting inside the 10-minute window drops the rest; a save load's replayed unlock signals don't start one.
 - **HireRoster now draws without replacement** — the old re-roll-on-duplicate leaked the shallow Novice pool's share to the 4× deeper class tiers (measured 57/43 instead of 67/33 with two tiers).
 - Promoted units stay tracked under their hire def in `UnitManager.spawnedByType` (harmless: adventurer managers have no per-type limits).
 

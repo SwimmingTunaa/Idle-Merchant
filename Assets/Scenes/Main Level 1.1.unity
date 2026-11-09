@@ -6778,7 +6778,7 @@ MonoBehaviour:
   - {fileID: 1039670842}
   - {fileID: 2048421329}
   - {fileID: 2089243275}
-  refreshIntervalSeconds: 300
+  refreshIntervalSeconds: 180
   traitChance: 0.3
   maxRosterSize: 5
   rankWeights:
@@ -20084,6 +20084,7 @@ MonoBehaviour:
   spawnRatePerStar: 2
   spawnRatePerSaleItem: 0.5
   spawnRatePerLayer: 1
+  spawnRatePerShelfRank: 0.15
   minSpawnsPerMinute: 1
   maxSpawnsPerMinute: 60
   showDebugLogs: 0

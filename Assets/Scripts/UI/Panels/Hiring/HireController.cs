@@ -19,7 +19,7 @@ public class HireController : BasePanelController
     [SerializeField] private List<PorterManager> porterManagers = new();
 
     [Header("Refresh Settings")]
-    [SerializeField] private float refreshIntervalSeconds = 300f;
+    [SerializeField] private float refreshIntervalSeconds = 180f;
     [SerializeField][Range(0f, 1f)] private float traitChance = 0.7f;
 
     [Header("Roster Settings")]
@@ -82,11 +82,6 @@ public class HireController : BasePanelController
 
     private bool isHireAnimating;
     private bool isSliding;
-
-    // Newest tier's odds boost after its layer unlocks (ClassCatalog.unlockBoost / unlockBoostSeconds).
-    // ponytail: not saved — quitting inside the window drops the rest of the boost.
-    private int boostTier;
-    private float boostUntil;
 
     // Top-bar sign: badge = coin (can afford a hire, wiggles) > "!" (new stock while closed); stopwatch = refresh countdown
     private Label hiringBadge;
@@ -552,15 +547,10 @@ public class HireController : BasePanelController
         return owned;
     }
 
-    // Catalog tier weights, newest tier ×unlockBoost while its post-unlock window runs
     private float[] AdventurerTierWeights()
     {
         var catalog = ClassCatalog.Instance;
-        if (catalog == null) return rankWeights;
-        var w = (float[])catalog.tierWeights.Clone();
-        if (Time.time < boostUntil && boostTier >= 1 && boostTier <= w.Length)
-            w[boostTier - 1] *= catalog.unlockBoost;
-        return w;
+        return catalog == null ? rankWeights : catalog.tierWeights;
     }
 
     // Called when a new layer is unlocked mid-session (and re-raised by a save restore).
@@ -572,14 +562,6 @@ public class HireController : BasePanelController
         UpdateLayerSelector();
         affordPending = true;
         rosterDirty = true;
-
-        // A real unlock (not the load-time replay) boosts that tier's odds for a while
-        var catalog = ClassCatalog.Instance;
-        if (catalog != null && (SaveManager.Instance == null || !SaveManager.Instance.IsRestoring))
-        {
-            boostTier = layer;
-            boostUntil = Time.time + catalog.unlockBoostSeconds;
-        }
 
         if (showDebugLogs)
             Debug.Log($"[HirePanel] Layer {layer} unlocked — new rank {layer} candidate pools created");
