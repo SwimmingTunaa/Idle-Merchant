@@ -21,7 +21,7 @@ public enum PorterState
 /// Uses LootManager for loot reservation to prevent conflicts.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
-public class PorterAgent : EntityStateMachine<PorterState>
+public class PorterAgent : EntityStateMachine<PorterState>, ICarriable
 {
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = true;
@@ -83,6 +83,11 @@ public class PorterAgent : EntityStateMachine<PorterState>
     private bool Gliding => transport != null && transport.transportType == TransportType.Elevator
                             && (State == PorterState.Travel || (State == PorterState.ReturnToLayer && climbingDown));
     
+    // Lifted by the player's in-world drag (AdventurerCarry): AI tick, walking, hops and rides pause
+    private bool carried;
+    public bool IsCarried => carried;
+    public bool IsAlive => isActiveAndEnabled;   // porters have no health
+
     // State timing
     private CountdownTimer stateTimer;
     private float stateTargetTime; // Keep for reference in debug
@@ -120,13 +125,35 @@ public class PorterAgent : EntityStateMachine<PorterState>
         hopWait = 0f;
         transform.localScale = Vector3.one;
         if (platform != null) platform.enabled = false;
+        carried = false;
 
         ChangeState(porterDef.startingState);
+    }
+
+    /// <summary>Lift / set down by the in-world drag: any trip, hop or pickup is abandoned and the run restarts from home
+    /// (Idle on its own depth) once set down; the carrier owns the position meanwhile.</summary>
+    public void SetCarried(bool on)
+    {
+        carried = on;
+        targetPos = null;
+        if (!on) return;
+        if (pickupCoroutine != null) { StopCoroutine(pickupCoroutine); pickupCoroutine = null; }
+        ReleaseCurrentTarget();
+        hopElapsed = -1f;
+        hopWait = 0f;
+        transform.localScale = Vector3.one;
+        if (platform != null) platform.enabled = false;
+        if (animator != null) { animator.SetBool(AnimHash.Climb, false); animator.SetFloat(AnimHash.Velocity, 0f); }
+        leg = 0;
+        transport = route != null && route.Length > 0 ? route[0] : null;
+        ChangeState(PorterState.Idle);
+        targetPos = null;
     }
     
     protected override void Update()
     {
         base.Update();
+        if (carried) return;
         bool glide = Gliding;
         if (platform != null) platform.enabled = glide;
         UpdateMovementSmooth(glide ? transport.TravelSpeed(Stats.MoveSpeed) : 0f);
@@ -264,6 +291,7 @@ public class PorterAgent : EntityStateMachine<PorterState>
 
     protected override void OnUpdateState(PorterState currentState)
     {
+        if (carried) return;   // the carrier owns the position
         switch (currentState)
         {
             case PorterState.Idle:

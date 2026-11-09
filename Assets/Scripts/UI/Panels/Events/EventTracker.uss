@@ -19,6 +19,17 @@
     cursor: link;
 }
 
+.ev-card {
+    transition-property: scale, -unity-background-image-tint-color;
+    transition-duration: 0.45s;
+    transition-timing-function: ease-out;
+}
+
+.ev-card--new {
+    scale: 1.08 1.08;
+    -unity-background-image-tint-color: rgb(255, 236, 190);
+}
+
 .ev-card:hover {
     -unity-background-image-tint-color: rgb(226, 196, 164);
 }

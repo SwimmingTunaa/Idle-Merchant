@@ -23,7 +23,6 @@ public class StarFanfare : MonoBehaviour
     private const float PopAt = 1.4f, PopDur = 0.55f;
     private const float CardAt = 1.3f, CardStep = 0.3f, CardDur = 0.32f;
     private const float HintAt = 2.6f, HintDur = 0.3f;
-    private const float AutoFoldAt = 4.6f;
     private const float RibbonFoldDur = 0.5f, CardFoldDur = 0.35f, RevealAfter = 0.35f, VigOut = 0.35f, DoneAfter = 0.9f;
     private const float SparkDur = 0.9f;
     private const long FlagStepMs = 220;      // UIManager.WiggleOnce: 4 tilts ≈ 0.9 s
@@ -44,7 +43,8 @@ public class StarFanfare : MonoBehaviour
     private static StarFanfare instance;
 
     private VisualElement host, vignette, bigStar, ribbon, cardRow;
-    private Label sub, hint;
+    private Label sub;
+    private Button hint;   // the Continue button: the fanfare stays up until it's pressed (or the ribbon / a card is clicked)
     private readonly List<VisualElement> cards = new();
 
     private int star;                  // playing star, 0 = idle
@@ -92,7 +92,8 @@ public class StarFanfare : MonoBehaviour
         ribbon = host.Q("sf-ribbon");
         cardRow = host.Q("sf-cards");
         sub = host.Q<Label>("sf-sub");
-        hint = host.Q<Label>("sf-hint");
+        hint = host.Q<Button>("sf-dismiss");
+        hint.clicked += () => { if (star != 0 && foldAt == float.MaxValue) Fold(Time.unscaledTime - t0); };
         host.style.display = DisplayStyle.None;
         // Only the ribbon and stamped cards pick; their clicks bubble here
         host.RegisterCallback<ClickEvent>(_ => { if (star != 0 && foldAt == float.MaxValue) Fold(Time.unscaledTime - t0); });
@@ -231,11 +232,12 @@ public class StarFanfare : MonoBehaviour
         ribbon.style.opacity = 0f;
         bigStar.style.opacity = 0f;
         hint.style.opacity = 0f;
+        hint.pickingMode = PickingMode.Ignore;
         host.style.display = DisplayStyle.Flex;
         if (showDebugLogs) Debug.Log($"[StarFanfare] {s}★ — {cards.Count} cards");
     }
 
-    /// <summary>Skip or the 4.6 s mark: ribbon and cards fly into the tracker; the star card slides in behind them.</summary>
+    /// <summary>Continue / skip: ribbon and cards fly into the tracker; the star card slides in behind them.</summary>
     private void Fold(float at)
     {
         foldAt = at;
@@ -263,7 +265,6 @@ public class StarFanfare : MonoBehaviour
         if (star == 0) return;
 
         float t = Time.unscaledTime - t0;
-        if (t >= AutoFoldAt && foldAt == float.MaxValue) Fold(AutoFoldAt);
         float tf = foldAt;
 
         // Vignette in at 0, out with the tracker card
@@ -322,6 +323,7 @@ public class StarFanfare : MonoBehaviour
         }
 
         hint.style.opacity = Seg(t, HintAt, HintDur) * (1f - Seg(t, tf, 0.15f));
+        hint.pickingMode = t >= HintAt && foldAt == float.MaxValue ? PickingMode.Position : PickingMode.Ignore;
 
         UpdateSparks();
 

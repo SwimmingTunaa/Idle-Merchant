@@ -114,23 +114,30 @@
     scale: -1 1;
 }
 
+/* same pixel-slip close as the Workshop / Caravan / Audience panels (wp-close): parchment chip, black rim, thicker right/bottom = hard shadow, red X */
 .book-close-button {
     position: absolute;
     top: 18px;
     right: 60px;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    padding: 0;
-    font-size: 20px;
-    -unity-font-style: bold;
-    color: rgb(80, 55, 35);
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    padding: 0 0 3px 0;
+    background-color: rgb(233, 217, 184);
+    background-image: none;
+    border-color: rgb(30, 26, 26);
+    border-radius: 0;
+    border-left-width: 3px;
+    border-top-width: 3px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    font-size: var(--font-size-body);
+    color: var(--color-text-danger);
     -unity-text-align: middle-center;
 }
 
 .book-close-button:hover {
-    color: rgb(180, 60, 50);
+    background-color: rgb(245, 232, 205);
 }
 
 .tab-badge {

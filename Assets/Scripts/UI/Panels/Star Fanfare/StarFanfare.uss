@@ -144,11 +144,11 @@
     -unity-text-align: middle-center;
 }
 
-.sf-hint {
+.sf-dismiss {
     margin-top: 26px;
-    font-size: var(--font-size-small);
-    color: rgb(243, 220, 160);
-    -unity-text-align: middle-center;
+    min-width: 180px;
+    padding: 7px 20px 11px 20px;
+    align-self: center;
 }
 
 .sf-spark {

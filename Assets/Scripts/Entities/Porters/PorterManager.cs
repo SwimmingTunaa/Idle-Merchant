@@ -289,6 +289,71 @@ public class PorterManager : UnitManager<PorterAgent>
         return agent;
     }
 
+    // ===== MOVING BETWEEN DEPTHS (AdventurerCarry) — the adventurer pattern: respawn on the target depth from the
+    // same def / identity / traits / looks, new instance before the old one goes. Loot in its arms banks into stock
+    // (the save does the same); the move is the player's, so it isn't counted as a delivery.
+
+    public static string MoveBlocker(PorterAgent agent, PorterManager to)
+    {
+        if (agent == null || to == null) return "—";
+        if (to.LayerIndex == agent.layerIndex) return "Here";
+        if (ProgressionManager.Instance != null && to.LayerIndex > ProgressionManager.Instance.maxUnlockedLayer) return "Locked";
+        if (to.GetTotalCount() >= to.MaxUnits) return "Full";
+        return null;
+    }
+
+    public static PorterAgent Move(PorterAgent agent, PorterManager to)
+    {
+        var from = ManagerFor(agent);
+        if (from == null || MoveBlocker(agent, to) != null) return null;
+        var moved = Respawn(agent, to);
+        if (moved != null) from.RemoveUnit(agent);
+        return moved;
+    }
+
+    public static string SwapBlocker(PorterAgent a, PorterAgent b) =>
+        a == null || b == null || a == b || a.layerIndex == b.layerIndex ? "—" : null;
+
+    public static bool Swap(PorterAgent a, PorterAgent b, out PorterAgent newA, out PorterAgent newB)
+    {
+        newA = newB = null;
+        var ma = ManagerFor(a); var mb = ManagerFor(b);
+        if (ma == null || mb == null || SwapBlocker(a, b) != null) return false;
+        newA = Respawn(a, mb);
+        newB = Respawn(b, ma);
+        if (newA != null) ma.RemoveUnit(a);
+        if (newB != null) mb.RemoveUnit(b);
+        return newA != null && newB != null;
+    }
+
+    public static PorterManager ManagerFor(PorterAgent agent) => agent == null ? null : ManagerForLayer(agent.layerIndex);
+
+    public static PorterManager ManagerForLayer(int layer)
+    {
+        foreach (var m in FindObjectsByType<PorterManager>())
+            if (m.LayerIndex == layer) return m;
+        return null;
+    }
+
+    private static PorterAgent Respawn(PorterAgent a, PorterManager to)
+    {
+        var inv = Inventory.Instance;
+        if (inv != null)
+            foreach (var s in a.CarriedLoot)
+                if (s.itemDef != null && s.qty > 0) inv.Add(inv.GetInventoryType(s.itemDef.itemCategory), new ResourceStack(s.itemDef, s.qty, 0));
+        var ic = a.GetComponent<IdentityComponent>();
+        var candidate = new HiringCandidate
+        {
+            entityDef = a.def,
+            identity = ic != null && ic.Identity != null ? ic.Identity : a.Identity,
+            traits = a.traitComponent != null ? a.traitComponent.GetTraitsForSave() : System.Array.Empty<TraitInstance>(),
+            appearanceIndices = a.appearanceManager != null ? a.appearanceManager.GetCurrentIndices() : default,
+        };
+        var moved = to.SpawnFromData(candidate);
+        if (moved != null) a.despawnQuietly = true;   // it left, it didn't die
+        return moved;
+    }
+
     /// <summary>
     /// Wrapper for RemoveUnit() to maintain old API.
     /// Call RemoveUnit() directly in new code.

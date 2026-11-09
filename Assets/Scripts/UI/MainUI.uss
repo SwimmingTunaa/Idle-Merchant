@@ -269,6 +269,18 @@
     background-image: url("project://database/Assets/Sprites/UI/Book%20UI/Custom/Star.png?fileID=5199979006384268662&guid=391cae39f2cc64ebca5e7d6893d13427&type=3#Star_disabled");
 }
 
+.guild-flag:hover {
+    -unity-background-image-tint-color: rgb(255, 236, 200);
+    translate: 0 -3px;
+    transition-property: translate, -unity-background-image-tint-color;
+    transition-duration: 0.08s;
+}
+
+.guild-flag:active {
+    -unity-background-image-tint-color: rgb(210, 190, 160);
+    translate: 0 2px;
+}
+
 .guild-flag {
     width: 185px;
     height: 225px;

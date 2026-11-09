@@ -182,16 +182,7 @@ public class RosterPanelController : MonoBehaviour, IBookPage
         if (agent == selectedAgent)
             slot.Q<VisualElement>("slot-frame")?.AddToClassList("slot-selected");
 
-        // Sprite
-        var unitIcon = slot.Q<VisualElement>("unit-icon");
-        if (unitIcon != null && agent.appearanceManager != null && agent.def != null && agent.def.useModularCharacter)
-        {
-            var sprite = CharacterSpriteGenerator.GenerateSprite(agent.def, agent.appearanceManager.GetCurrentIndices());
-            if (sprite != null)
-                unitIcon.style.backgroundImage = new StyleBackground(sprite);
-        }
-
-        RefreshSlot(slot, agent);
+        RefreshSlot(slot, agent);   // bakes the portrait too
 
         // Press + release without moving = select; press + move past DragStartPx = drag (move / swap)
         slot.userData = agent;   // drop target: swap with this adventurer
@@ -747,6 +738,14 @@ public class RosterPanelController : MonoBehaviour, IBookPage
 
     private void RefreshSlot(VisualElement slot, AdventurerAgent agent)
     {
+        // Portrait: baked once per tier def (userData remembers which), so a promotion while the book is open re-bakes
+        var unitIcon = slot.Q<VisualElement>("unit-icon");
+        if (unitIcon != null && !ReferenceEquals(unitIcon.userData, agent.def) && agent.appearanceManager != null && agent.def != null && agent.def.useModularCharacter)
+        {
+            var sprite = CharacterSpriteGenerator.GenerateSprite(agent.def, agent.appearanceManager.GetCurrentIndices());
+            if (sprite != null) { unitIcon.style.backgroundImage = new StyleBackground(sprite); unitIcon.userData = agent.def; }
+        }
+
         // Rank-fit face on the portrait's corner — misfits only, so the badge means "move me"
         var frame = slot.Q("slot-frame");
         if (frame != null)

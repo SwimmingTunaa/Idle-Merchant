@@ -31,3 +31,10 @@ public interface IUnitManager
     System.Collections.Generic.List<UnitTypeLimit> UnitLimits { get; } // Added for HireController access
     System.Collections.Generic.List<EntityDef> HireableDefs { get; }
 }
+/// <summary>A unit the player can lift with the mouse (AdventurerCarry) and drop on another depth.</summary>
+public interface ICarriable
+{
+    bool IsAlive { get; }
+    bool IsCarried { get; }
+    void SetCarried(bool on);
+}

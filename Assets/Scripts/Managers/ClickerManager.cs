@@ -19,23 +19,28 @@ public class ClickerManager : MonoBehaviour
     [Tooltip("Click damage upgrade level. Effective click damage = clickDamage * (1 + 0.1 * level).")]
     [SerializeField] private int clickDamageLevel = 0;
 
-    [Tooltip("Pickup radius upgrade level. Effective radius = lootPickupRadius + radiusPerLevel * level.")]
+    [Tooltip("Pickup radius upgrade level. Radius climbs a log curve from lootPickupRadius at 0 to maxPickupRadius at the top level (big early steps, small late ones).")]
     [SerializeField] private int pickupRadiusLevel = 0;
 
-    [Tooltip("World units of loot-vacuum radius added per upgrade level.")]
-    [SerializeField] private float radiusPerLevel = 0.2f;
+    [Tooltip("World units of loot-vacuum radius at the top level.")]
+    [SerializeField] private float maxPickupRadius = 12f;
 
-    [Tooltip("Max pickup radius upgrade levels (spatial upgrades need a ceiling).")]
-    [SerializeField] private int maxPickupRadiusLevel = 5;
+    [Tooltip("Top pickup radius level.")]
+    [SerializeField] private int maxPickupRadiusLevel = 50;
+
+    [Tooltip("Cost of the next level = 250 × growth^level.")]
+    [SerializeField] private float radiusCostGrowth = 1.15f;
 
     [Header("AOE Settings")]
     [Tooltip("Damage AOE upgrade level (0 = single target). Purchases gated by star requirement.")]
     [SerializeField] private int damageAOELevel = 0;
 
-    [Tooltip("Shockwave radius at AOE level 1; each further level adds aoeRadiusPerLevel.")]
+    [Tooltip("Shockwave radius at AOE level 1; it climbs a log curve to aoeMaxRadius at the top level.")]
     [SerializeField] private float aoeBaseRadius = 0.8f;
-    [SerializeField] private float aoeRadiusPerLevel = 0.3f;
-    [SerializeField] private int maxDamageAOELevel = 3;
+    [SerializeField] private float aoeMaxRadius = 6f;
+    [SerializeField] private int maxDamageAOELevel = 50;
+    [Tooltip("Cost of the next level = 1000 × growth^level.")]
+    [SerializeField] private float aoeCostGrowth = 1.2f;
 
     [Tooltip("Guild stars required before Damage AOE can be bought.")]
     [SerializeField] private int aoeStarRequirement = 2;
@@ -118,11 +123,14 @@ public class ClickerManager : MonoBehaviour
     // ── Pickup radius upgrade ──
     public int PickupRadiusLevel => pickupRadiusLevel;
     public bool PickupRadiusMaxed => pickupRadiusLevel >= maxPickupRadiusLevel;
-    public float LootPickupRadius => lootPickupRadius + radiusPerLevel * pickupRadiusLevel;
-    public float NextLootPickupRadius => lootPickupRadius + radiusPerLevel * (pickupRadiusLevel + 1);
+    public float LootPickupRadius => RadiusAt(pickupRadiusLevel);
+    public float NextLootPickupRadius => RadiusAt(pickupRadiusLevel + 1);
+    // log curve: ln(1+L) / ln(1+Lmax) of the way from the base radius to the max
+    private float RadiusAt(int level) => maxPickupRadiusLevel <= 0 ? lootPickupRadius
+        : lootPickupRadius + (maxPickupRadius - lootPickupRadius) * Mathf.Log(1f + Mathf.Clamp(level, 0, maxPickupRadiusLevel)) / Mathf.Log(1f + maxPickupRadiusLevel);
 
-    /// <summary>Gold cost of the next pickup radius upgrade: round(250 * 1.5^level).</summary>
-    public int RadiusUpgradeCost => Mathf.RoundToInt(250f * Mathf.Pow(1.5f, pickupRadiusLevel));
+    /// <summary>Gold cost of the next pickup radius upgrade: round(250 × radiusCostGrowth^level).</summary>
+    public int RadiusUpgradeCost => Mathf.RoundToInt(250f * Mathf.Pow(radiusCostGrowth, pickupRadiusLevel));
 
     /// <summary>Spends gold on the next pickup radius upgrade. Returns false if maxed or unaffordable.</summary>
     public bool TryBuyRadiusUpgrade()
@@ -145,12 +153,14 @@ public class ClickerManager : MonoBehaviour
         ProgressionManager.Instance != null && ProgressionManager.Instance.GetCurrentStars() >= required;
 
     /// <summary>Shockwave radius at the current AOE level; 0 = single target.</summary>
-    public float EffectiveDamageRadius =>
-        damageAOELevel <= 0 ? 0f : aoeBaseRadius + aoeRadiusPerLevel * (damageAOELevel - 1);
-    public float NextDamageRadius => aoeBaseRadius + aoeRadiusPerLevel * damageAOELevel;
+    public float EffectiveDamageRadius => AoeRadiusAt(damageAOELevel);
+    public float NextDamageRadius => AoeRadiusAt(damageAOELevel + 1);
+    // level 1 = base, top level = max, log curve between (0 = single target)
+    private float AoeRadiusAt(int level) => level <= 0 ? 0f : maxDamageAOELevel <= 1 ? aoeBaseRadius
+        : aoeBaseRadius + (aoeMaxRadius - aoeBaseRadius) * Mathf.Log(Mathf.Clamp(level, 1, maxDamageAOELevel)) / Mathf.Log(maxDamageAOELevel);
 
-    /// <summary>Gold cost of the next Damage AOE level: 1000 * 2^level.</summary>
-    public int AOEUpgradeCost => Mathf.RoundToInt(1000f * Mathf.Pow(2f, damageAOELevel));
+    /// <summary>Gold cost of the next Damage AOE level: 1000 × aoeCostGrowth^level.</summary>
+    public int AOEUpgradeCost => Mathf.RoundToInt(1000f * Mathf.Pow(aoeCostGrowth, damageAOELevel));
 
     /// <summary>Spends gold on the next Damage AOE level. Requires the star gate; returns false if locked, maxed or unaffordable.</summary>
     public bool TryBuyAOEUpgrade()

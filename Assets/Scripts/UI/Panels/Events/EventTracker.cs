@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -48,6 +50,8 @@ public class EventTracker : MonoBehaviour
         return card;
     }
 
+    private readonly HashSet<EventManager.ActiveEvent> seen = new();   // cards already shown: a new event's card pops in
+
     private void Rebuild()
     {
         list.Clear(); cards.Clear();
@@ -56,11 +60,17 @@ public class EventTracker : MonoBehaviour
         foreach (var e in em.Active)
         {
             var ev = e;
-            AddCard(e.Icon, e.def.displayName, e.def.effectLine, () => em.FocusOn(ev),
+            var card = AddCard(e.Icon, e.def.displayName, e.def.effectLine, () => em.FocusOn(ev),
                     () => 1f - ev.Progress01,
                     () => string.IsNullOrEmpty(ev.note) ? ev.def.effectLine : ev.note,
                     e.partySize > 0 ? () => $"{ev.PartyLeft} left" : null);
+            if (seen.Add(ev))
+            {
+                card.AddToClassList("ev-card--new");   // held big + bright for a beat, then the .ev-card transition eases it down
+                card.schedule.Execute(() => card.RemoveFromClassList("ev-card--new")).ExecuteLater(220);
+            }
         }
+        seen.RemoveWhere(x => !em.Active.Contains(x));
         // The caravan keeps its own clock but rides the same list, so it's visible from down a depth
         var cv = CaravanManager.Instance;
         if (cv != null && cv.Present)

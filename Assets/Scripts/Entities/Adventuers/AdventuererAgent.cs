@@ -16,7 +16,7 @@ public enum AdventurerState
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Health))]
 [RequireComponent(typeof(CombatBehavior))]
-public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
+public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity, ICarriable
 {
     [Header("Adventurer Data")]
     [SerializeField] private AdventurerDef adventurerDef;
@@ -680,6 +680,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
     // adventurer managers have no per-type limits.
     private void SetClassDef(AdventurerDef next)
     {
+        var prev = adventurerDef;
         adventurerDef = next;
         def = next;
         Stats.SetBaseStats(BaseStats.FromEntityDef(next));
@@ -693,6 +694,7 @@ public class AdventurerAgent : EntityStateMachine<AdventurerState>, IEntity
         // Dress in the new tier's libraries / palettes now (same rolled indices), not on the next respawn
         if (appearanceManager != null && next.useModularCharacter)
         {
+            if (prev != null) appearanceManager.RemapShirtColour(prev.ShirtColourPalette, next.ShirtColourPalette);   // same colour, new palette
             appearanceManager.SetEntityDef(next);
             appearanceManager.ApplyAppearance();
         }

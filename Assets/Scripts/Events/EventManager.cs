@@ -192,6 +192,7 @@ public class EventManager : MonoBehaviour
                 break;
         }
         foreach (var c in e.party) e.serials.Add(c.SpawnSerial);
+        if (def.kind != EventKind.PirateRaid) foreach (var c in e.party) EventMarker.Attach(c, def.icon);   // pennant over each member
         active.Add(e);
         if (showDebugLogs) Debug.Log($"[EventManager] {def.name} started ({def.durationSeconds}s)");
         GameSignals.RaiseEventsChanged();
@@ -200,6 +201,8 @@ public class EventManager : MonoBehaviour
 
     private void End(ActiveEvent e)
     {
+        for (int i = 0; i < e.party.Count; i++)
+            if (e.party[i] != null && e.party[i].SpawnSerial == e.serials[i]) EventMarker.Remove(e.party[i]);
         if (e.def.kind == EventKind.RushHour && spawner != null)
         {
             spawner.RateMultiplier /= e.def.rateMultiplier;

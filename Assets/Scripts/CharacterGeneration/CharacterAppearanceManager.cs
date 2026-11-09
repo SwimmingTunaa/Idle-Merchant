@@ -198,6 +198,22 @@ public class CharacterAppearanceManager : MonoBehaviour
 
     public CharacterAppearanceIndices GetCurrentIndices() => appearanceIndices;
 
+    /// <summary>Promotion: the new tier's palette may order its colours differently, so carry the rolled colour over by
+    /// nearest RGB instead of keeping the index (a red Novice becomes a red Warrior, or the Mage's nearest to red).</summary>
+    public void RemapShirtColour(ColourPalette from, ColourPalette to)
+    {
+        if (from == null || to == null || from == to || to.colourSet.Length == 0) return;
+        Color c = from.GetPaletteColour(appearanceIndices.shirtColour);
+        int best = 0; float bestD = float.MaxValue;
+        for (int i = 0; i < to.colourSet.Length; i++)
+        {
+            Color o = to.Adjust(to.colourSet[i]);
+            float d = (o.r - c.r) * (o.r - c.r) + (o.g - c.g) * (o.g - c.g) + (o.b - c.b) * (o.b - c.b);
+            if (d < bestD) { bestD = d; best = i; }
+        }
+        appearanceIndices.shirtColour = best;
+    }
+
     public void ApplyAppearance()
     {
         autoChangeOnStart = false; // an applied (saved/candidate) look must survive Start's randomise
