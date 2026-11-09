@@ -57,7 +57,7 @@ public class DecoratePanelController : BasePanelController
         rows = panel.Q("dp-rows");
         title = panel.Q<Label>("dp-title");
         panel.Q<Button>("dp-close").clicked += () => UIManager.Instance.ClosePanel(this);
-        panel.RegisterCallback<ClickEvent>(e => { if (e.target == panel) UIManager.Instance.ClosePanel(this); });   // backdrop
+        panel.RegisterCallback<PointerDownEvent>(e => { if (e.target == panel && State == PanelState.Open) UIManager.Instance.ClosePanel(this); });   // backdrop: a press that starts while open (the opening click's own release lands here too — ClickEvent would close it as it opens)
     }
 
     protected override void OnOpenStart()

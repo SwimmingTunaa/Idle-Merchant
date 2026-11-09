@@ -20480,7 +20480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 5
   operationArea: {fileID: 1875431948}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
@@ -34029,7 +34029,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 3
   operationArea: {fileID: 1670800987}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
@@ -34253,7 +34253,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 3
   operationArea: {fileID: 1670800987}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -35352,7 +35352,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 4
   operationArea: {fileID: 1804721977}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
@@ -41946,7 +41946,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 2
   operationArea: {fileID: 166850357}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -48986,7 +48986,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdventurerManager
   _layerIndex: 2
   operationArea: {fileID: 166850357}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits: []
   hireableDefs: []
   showDebugLogs: 0
@@ -61262,7 +61262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 4
   operationArea: {fileID: 1804721977}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5
@@ -61585,11 +61585,11 @@ MonoBehaviour:
   clickDamageLevel: 0
   pickupRadiusLevel: 0
   radiusPerLevel: 0.2
-  maxPickupRadiusLevel: 5
+  maxPickupRadiusLevel: 50
   damageAOELevel: 0
   aoeBaseRadius: 0.8
   aoeRadiusPerLevel: 0.3
-  maxDamageAOELevel: 3
+  maxDamageAOELevel: 50
   aoeStarRequirement: 2
   autoClickLevel: 0
   maxAutoClickLevel: 21
@@ -62086,7 +62086,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PorterManager
   _layerIndex: 5
   operationArea: {fileID: 1875431948}
-  _maxUnits: 10
+  _maxUnits: 5
   unitLimits:
   - unitDef: {fileID: 11400000, guid: f8dbd13e0656b424b977b297348ff398, type: 2}
     maxCount: 5

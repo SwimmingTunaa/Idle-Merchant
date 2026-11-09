@@ -52,7 +52,7 @@ public class TransportPanelController : BasePanelController
         title = panel.Q<Label>("tp-title");
         sub = panel.Q<Label>("tp-sub");
         panel.Q<Button>("tp-close").clicked += () => UIManager.Instance.ClosePanel(this);
-        panel.RegisterCallback<ClickEvent>(e => { if (e.target == panel) UIManager.Instance.ClosePanel(this); });   // backdrop
+        panel.RegisterCallback<PointerDownEvent>(e => { if (e.target == panel && State == PanelState.Open) UIManager.Instance.ClosePanel(this); });   // backdrop: a press that starts while open (the opening click's own release lands here too — ClickEvent would close it as it opens)
     }
 
     protected override void OnOpenStart()

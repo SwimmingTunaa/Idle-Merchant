@@ -80,7 +80,7 @@ public class ClassPickPanelController : BasePanelController
         confirmCost = panel.Q<Label>("cp-confirm-cost");
         confirm.clicked += OnConfirm;
         panel.Q<Button>("cp-close").clicked += () => UIManager.Instance.ClosePanel(this);
-        panel.RegisterCallback<ClickEvent>(e => { if (e.target == panel) UIManager.Instance.ClosePanel(this); });   // backdrop
+        panel.RegisterCallback<PointerDownEvent>(e => { if (e.target == panel && State == PanelState.Open) UIManager.Instance.ClosePanel(this); });   // backdrop: a press that starts while open (the opening click's own release lands here too — ClickEvent would close it as it opens)
     }
 
     protected override void OnOpenStart()
