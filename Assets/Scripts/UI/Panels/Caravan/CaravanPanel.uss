@@ -1,36 +1,237 @@
-/* Caravan offer — layout on top of the Workshop shell (WorkshopPanel.uss: wp-host / card / beam / hero / head / close). */
+/* Caravan offer — a trade at the wagon's tailgate. Pixel art at 3×: awning tile 16×16 → 48, plank tile 32×32 → 96
+   (Sprites/UI/Caravan/, drawn by hand in the wagon's palette), manifest = the hiring poster's paper.
+   Only wp-host / wp-close / wp-title come from the Workshop shell. */
 
-.wp-card.cv-card {
-    width: 680px;
+.cv-card {
+    width: 700px;
+}
+
+/* striped canvas with a scalloped hem hanging over the board; the hem overlaps the planks by its 15 px of scallop */
+.cv-awning {
+    height: 48px;
+    margin: 0 -3px -15px -3px;
+    background-image: url("project://database/Assets/Sprites/UI/Caravan/awning.png");
+    background-repeat: repeat no-repeat;
+    background-size: 48px 48px;
+    background-position-x: left 0;
+    background-position-y: top 0;
+}
+
+.cv-board {
+    flex-direction: row;
+    padding: 36px 20px 18px 20px;
+    background-image: url("project://database/Assets/Sprites/UI/Caravan/planks.png");
+    background-repeat: repeat repeat;
+    background-size: 96px 96px;
+    background-position-x: left 0;
+    background-position-y: top 0;
+    border-color: rgb(30, 26, 26);
+    border-left-width: 6px;
+    border-top-width: 0;
+    border-right-width: 12px;
+    border-bottom-width: 12px;
+}
+
+/* ─ left column: title, the driver's line, the wagon, the scale ─ */
+.cv-left {
+    width: 250px;
+    flex-shrink: 0;
+    margin-right: 18px;
+    align-items: center;
+}
+
+.cv-head {
+    align-self: flex-start;
+    margin-bottom: 4px;
+}
+
+.cv-bubble {
+    align-self: flex-start;
+    max-width: 240px;
+    margin: 0 0 14px 6px;
+    padding: 6px 10px 8px 10px;
+    background-color: rgb(239, 226, 196);
+    border-color: rgb(30, 26, 26);
+    border-width: 3px;
+}
+
+.cv-say {
+    font-size: var(--font-size-small);
+    color: rgb(42, 33, 26);
+    white-space: normal;
+}
+
+.cv-bubble-tail {
+    position: absolute;
+    left: 22px;
+    bottom: -9px;
+    width: 12px;
+    height: 12px;
+    background-color: rgb(239, 226, 196);
+    border-color: rgb(30, 26, 26);
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    rotate: 45deg;
 }
 
 /* wagon frame 0 at 3× (48×30 → 144×90); sprite set in CaravanPanelController */
-.wp-hero.cv-hero {
+.cv-hero {
     width: 144px;
     height: 90px;
-    margin-right: 22px;
-    align-self: center;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
-.cv-row {
+/* balance scale: post + foot, a beam that tips, two hanging pans. Tipped while Shake on it is hovered (.cv-scale--tip). */
+.cv-scale {
+    width: 200px;
+    height: 96px;
+    margin-top: 6px;
+}
+
+.cv-post {
+    position: absolute;
+    left: 98px;
+    top: 0;
+    width: 4px;
+    height: 74px;
+    background-color: rgb(217, 182, 90);
+}
+
+.cv-foot {
+    position: absolute;
+    left: 84px;
+    top: 72px;
+    width: 32px;
+    height: 6px;
+    background-color: rgb(217, 182, 90);
+}
+
+.cv-beam {
+    position: absolute;
+    left: 10px;
+    top: 12px;
+    width: 180px;
+    height: 4px;
+    background-color: rgb(217, 182, 90);
+    transform-origin: center;
+    rotate: 0deg;
+    transition-property: rotate;
+    transition-duration: 0.25s;
+}
+
+.cv-pan {
+    position: absolute;
+    top: 15px;
+    width: 70px;
+    height: 46px;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 2px;
+    border-color: rgb(217, 182, 90);
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-bottom-left-radius: 34px;
+    border-bottom-right-radius: 34px;
+    transition-property: translate;
+    transition-duration: 0.25s;
+}
+
+.cv-pan--l { left: 0; }
+.cv-pan--r { right: 0; }
+
+.cv-scale--tip .cv-beam { rotate: -5deg; }
+.cv-scale--tip .cv-pan--l { translate: 0 8px; }
+.cv-scale--tip .cv-pan--r { translate: 0 -8px; }
+
+.cv-pan-icon {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.cv-pan-label {
+    font-size: var(--font-size-caption);
+    color: rgb(239, 226, 196);
+    margin-top: -2px;
+}
+
+/* ─ right: the manifest, a sheet nailed to the planks ─ */
+.cv-manifest {
+    flex-grow: 1;
+    min-width: 0;
+    padding: 18px 18px 14px 18px;
+    background-image: url("project://database/Assets/Sprites/UI/Main%20UI/Paper/1.png?fileID=21300000&guid=67b077c3e16c24cbba49d219cfacf6bf&type=3#1");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.cv-nail {
+    position: absolute;
+    top: -5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: rgb(96, 96, 92);
+    border-color: rgb(30, 26, 26);
+    border-width: 2px;
+}
+
+.cv-nail--l { left: 14px; }
+.cv-nail--r { right: 14px; }
+
+.wp-close.cv-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    margin: 0;
+}
+
+.cv-mf-title {
+    font-size: var(--font-size-small);
+    letter-spacing: 6px;
+    color: rgb(122, 90, 42);
+    -unity-text-align: middle-center;
+    border-bottom-width: 2px;
+    border-color: rgb(201, 180, 138);
+    padding-bottom: 6px;
+    margin: 0 44px 10px 44px;
+}
+
+.cv-mf-row {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 6px;
+    justify-content: space-between;
+    margin-bottom: 4px;
 }
 
-.cv-text {
+.cv-mf-key {
+    font-size: var(--font-size-caption);
+    letter-spacing: 2px;
+    color: rgb(122, 90, 42);
+}
+
+.cv-mf-val {
+    flex-direction: row;
+    align-items: center;
+}
+
+.cv-mf-text {
     font-size: var(--font-size-body);
-    color: rgb(243, 220, 160);
+    color: rgb(42, 33, 26);
 }
 
-.cv-want {
-    color: rgb(255, 236, 214);
-    margin-left: 8px;
+.cv-mf-note {
+    font-size: var(--font-size-caption);
+    color: rgb(138, 122, 90);
+    -unity-text-align: middle-right;
+    margin: -4px 0 8px 0;
 }
 
 .cv-icon {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -38,26 +239,56 @@
     margin-left: 6px;
 }
 
-.cv-caption {
+.cv-mf-rule {
+    height: 0;
+    border-top-width: 2px;
+    border-color: rgb(201, 180, 138);
+    margin: 10px 0 8px 0;
+}
+
+/* departure fuse: burns right to left with LeaveIn / StayFor, a spark riding the end */
+.cv-fuse {
+    height: 8px;
     margin-top: 4px;
-    font-size: var(--font-size-caption);
-    color: rgb(185, 169, 143);
+    background-color: rgb(201, 180, 138);
+}
+
+.cv-fuse-fill {
+    height: 100%;
+    width: 100%;
+    background-color: rgb(138, 106, 74);
+}
+
+.cv-fuse-spark {
+    position: absolute;
+    top: -4px;
+    left: 100%;
+    width: 6px;
+    height: 16px;
+    margin-left: -3px;
+    background-color: rgb(226, 75, 74);
 }
 
 .cv-actions {
-    margin-top: 12px;
+    flex-direction: row;
+    margin-top: 16px;
 }
 
 .cv-btn {
+    flex-grow: 1;
+    flex-basis: 0;
     margin: 0 10px 0 0;
-    padding: 7px 18px 11px 18px;
+    padding: 7px 10px 11px 10px;
 }
+
+.cv-btn:last-child { margin-right: 0; }
 
 .cv-btn Label {
     font-size: var(--font-size-small);
 }
 
 .cv-error {
+    margin-top: 6px;
     font-size: var(--font-size-small);
     color: var(--color-destructive-hover);
 }

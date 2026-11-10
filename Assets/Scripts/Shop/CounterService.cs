@@ -156,6 +156,7 @@ public class CounterService : MonoBehaviour
             SpawnGoldVFX(c.transform.position, totalCost);
             GameSignals.RaiseItemSold(new ResourceStack(c.desiredItem, qty, totalCost));
             GameSignals.RaiseCustomerServed();
+            CustomerSpawner.Instance?.RecordSale(c.Def);   // word of mouth: more of this kind walk in for a while
 
             // Serve bonus: banks on coin arrival like click gold (never raised as ItemSold → not passive income)
             if (wasRushed)

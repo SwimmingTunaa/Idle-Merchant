@@ -54,7 +54,30 @@ public class CustomerSpawner : Spawner
         float m = (weightBoost.TryGetValue(def, out float cur) ? cur : 1f) * mult;
         if (Mathf.Abs(m - 1f) < 0.001f) weightBoost.Remove(def); else weightBoost[def] = m;
     }
-    private float Boost(EntityDef def) => def is CustomerDef c && weightBoost.TryGetValue(c, out float m) ? m * StarScale(c) : def is CustomerDef c2 ? StarScale(c2) : 1f;
+    private float Boost(EntityDef def) => def is CustomerDef c ? (weightBoost.TryGetValue(c, out float m) ? m : 1f) * WordBoost(c) * StarScale(c) : 1f;
+
+    // Word of mouth: selling to a def's customers draws more of them. Each sale adds wordPerSale (capped at 1), the whole
+    // thing fades to 0 over wordDecaySeconds; weight × (1 + word × (wordMaxBoost − 1)). A share shift, never an override:
+    // ×2 on Bulk Traders at 3★ is 17% → 28% of walk-ins. Self-limiting — once the stock they want is gone they walk out and the word fades.
+    [Header("Word of mouth")]
+    [Tooltip("Word of mouth gained per sale to a def's customers (0–1 scale).")]
+    [SerializeField] private float wordPerSale = 0.15f;
+    [Tooltip("Spawn-weight multiplier at full word of mouth.")]
+    [SerializeField] private float wordMaxBoost = 2f;
+    [Tooltip("Seconds for full word of mouth to fade to nothing.")]
+    [SerializeField] private float wordDecaySeconds = 180f;
+    private readonly Dictionary<CustomerDef, (float word, float at)> wordOfMouth = new();
+    public static CustomerSpawner Instance { get; private set; }
+
+    public void RecordSale(CustomerDef def)
+    {
+        if (def == null) return;
+        wordOfMouth[def] = (Mathf.Min(1f, WordOf(def) + wordPerSale), Time.time);
+    }
+    /// <summary>Current word of mouth for a def, 0–1 (decayed lazily, nothing to tick).</summary>
+    public float WordOf(CustomerDef def) =>
+        wordOfMouth.TryGetValue(def, out var w) ? Mathf.Max(0f, w.word - (Time.time - w.at) / Mathf.Max(1f, wordDecaySeconds)) : 0f;
+    private float WordBoost(CustomerDef def) => 1f + WordOf(def) * (wordMaxBoost - 1f);
 
     // Cheap commoners thin out as stars rise (the queue is the bottleneck from 3★; a 400-gold sale costs the same serve as a 4,000-gold one)
     private static float StarScale(CustomerDef c, int cheapBudget)
@@ -88,6 +111,7 @@ public class CustomerSpawner : Spawner
     public override void Awake()
     {
         base.Awake();
+        Instance = this;
         customerTypeCount[CustomerArcheType.Commoner] = 0;
         customerTypeCount[CustomerArcheType.Adventurer] = 0;
         customerTypeCount[CustomerArcheType.Noble] = 0;
