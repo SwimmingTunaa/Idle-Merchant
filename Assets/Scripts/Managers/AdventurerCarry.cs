@@ -199,11 +199,9 @@ public class AdventurerCarry : MonoBehaviour
         {
             case (AdventurerAgent x, AdventurerAgent y):
                 if (!AdventurerManager.Swap(x, y, out var ax, out var ay)) return false;
-                TutorialManager.Flag("moved");
                 newA = ax; newB = ay; return true;
             case (PorterAgent x, PorterAgent y):
                 if (!PorterManager.Swap(x, y, out var px, out var py)) return false;
-                TutorialManager.Flag("moved");
                 newA = px; newB = py; return true;
         }
         return false;
@@ -307,7 +305,6 @@ public class AdventurerCarry : MonoBehaviour
 
     private static T Moved<T>(T unit) where T : EntityBase
     {
-        if (unit != null) TutorialManager.Flag("moved");
         return unit;
     }
 }

@@ -55,6 +55,10 @@
                             <ui:VisualElement class="btn-seal cv-seal" />
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement class="cv-mf-row">
+                        <ui:Label text="HAULING" class="cv-mf-key" />
+                        <ui:Label name="cv-haul" text="nothing over a ceiling" class="cv-mf-text" />
+                    </ui:VisualElement>
                     <ui:VisualElement class="cv-mf-rule" />
                     <ui:VisualElement class="cv-mf-row">
                         <ui:Label text="DEPARTS" class="cv-mf-key" />

@@ -29,7 +29,11 @@
             <ui:Instance template="CustomerPanel" name="CustomerPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         </ui:VisualElement>
         <ui:Instance template="MilestoneTracker" name="MilestoneTracker" style="position: absolute; right: 16px; top: 129px;"/>
-        <ui:Instance template="EventTracker" name="EventTracker" style="position: absolute; left: 16px; top: 200px;"/>
+        <!-- Left HUD column: the active contract card (MilestoneTracker fills contract-tracker) over the running events -->
+        <ui:VisualElement name="hud-left" picking-mode="Ignore" style="position: absolute; left: 16px; top: 200px; width: 320px;">
+            <ui:VisualElement name="contract-tracker" picking-mode="Ignore"/>
+            <ui:Instance template="EventTracker" name="EventTracker"/>
+        </ui:VisualElement>
         <ui:Instance template="WelcomeBack" name="WelcomeBack" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
         <!-- last child of main-root, so its dim backdrop covers the top nav and milestone tracker too -->
         <ui:Instance template="ClassPickPanel" name="ClassPickPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
@@ -38,7 +42,7 @@
         <!-- dungeon-ladder Transport modal (click a ladder): Elevator ranks + Teleport Circle -->
         <ui:Instance template="TransportPanel" name="TransportPanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
         <!-- main menu (book cover): over the HUD and every world modal; the book (Settings) hides it while open -->
-        <ui:Instance template="PausePanel" name="PausePanel" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
+        <ui:Instance template="PausePanel" name="PausePanel" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
         <!-- star fanfare draws over everything (book, HUD, tracker); never picks except its ribbon and cards -->
         <ui:Instance template="StarFanfare" name="StarFanfare" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"/>
     </ui:VisualElement>

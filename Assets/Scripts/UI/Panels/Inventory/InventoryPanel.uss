@@ -95,9 +95,14 @@
 #detail-name,
 #detail-description { color: var(--color-text-primary); }
 #item-value,
-#reserve-count { color: var(--color-text-secondary); }
-#reserve-stepper { background-color: var(--primary-200); }
-#reserve-up { border-bottom-color: var(--primary-300); }
+#reserve-count,
+#ship-count { color: var(--color-text-secondary); }
+#reserve-count,
+#ship-count { flex-grow: 1; -unity-text-align: middle-right; margin-right: 10px; }   /* number sits by the arrows, whatever the caption's width */
+#reserve-stepper,
+#ship-stepper { background-color: var(--primary-200); }
+#reserve-up,
+#ship-up { border-bottom-color: var(--primary-300); }
 
 .action-button {
     cursor: link;

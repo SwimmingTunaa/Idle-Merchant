@@ -13,7 +13,7 @@ public class MilestoneTracker : MonoBehaviour
     [Tooltip("Row template (MilestoneCard.uxml): torn-paper card with progress, reward and claim button.")]
     [SerializeField] private VisualTreeAsset cardTemplate;
 
-    [Tooltip("Icon for the contract card when the ask has no item icon (hunt/patronage/board teaser)")]
+    [Tooltip("Icon for the contract card when the ask has no item icon (hunt/patronage)")]
     [SerializeField] private Sprite contractIcon;
 
     [Header("Settings")]
@@ -46,14 +46,10 @@ public class MilestoneTracker : MonoBehaviour
     private Coroutine refreshCoroutine;
     private Coroutine accordionCoroutine;
     private MilestoneProgressEvents progressEvents;
-    private VisualElement contractRow;   // the active contract (or a board teaser), sorted with the milestones
+    private VisualElement contractRow;   // the active contract, pinned in the left HUD column (MainUI contract-tracker)
     private Label contractSealLabel;
     private VisualElement starRow;       // the last star's fanfare trace (ProgressionManager.unseenStar), sorted first until Seen
     private int starRowBound;
-    private VisualElement noteRow;       // the tutorial's first-contact note (TutorialManager), pinned above everything while shown
-    private Button noteShowMe;
-    private System.Action noteShowMeAction, noteDismiss;
-    private bool noteShown;
 
     // Coin shower: UI elements over the whole HUD; each banks its share on landing
     private const float CoinSize = 26f;
@@ -97,8 +93,9 @@ public class MilestoneTracker : MonoBehaviour
         GameSignals.OnSealsChanged += OnSealsChanged;
 
         contractRow = CreateContractRow();
+        // The card lives outside the tracker, so it keeps its CloneTree container: that is what carries MilestoneCard.uxml's stylesheets
+        uiDocument.rootVisualElement.Q<VisualElement>("contract-tracker")?.Add(contractRow.parent);
         starRow = CreateStarRow();
-        noteRow = CreateNoteRow();
         Refresh();
 
         isExpanded = startExpanded;
@@ -174,9 +171,7 @@ public class MilestoneTracker : MonoBehaviour
 
         list.Clear();
         rows.Clear();
-        if (contractRow != null) list.Add(contractRow);   // RefreshProgress slots it in
         if (starRow != null) list.Add(starRow);
-        if (noteRow != null) list.Add(noteRow);
 
         int currentStars = ProgressionManager.Instance.GetCurrentStars();
         int nextStar     = currentStars + 1;
@@ -205,26 +200,21 @@ public class MilestoneTracker : MonoBehaviour
         if (pm == null) return;
 
         int claimed = 0;
-        bool firstOpen = true;   // the tutorial's hint line lives on the first unreached card only
+        bool firstOpen = true;
+        bool oneByOne = pm.GetCurrentStars() == 0;   // 1★: only the first open card shows; the next appears when it's reached
         foreach (var (def, row) in rows)
         {
             RefreshCard(row, def);
             bool reached = pm.IsMilestoneReached(def);
-            var hint = row.Q<VisualElement>("card-hint");
-            if (hint != null) hint.style.display = !reached && firstOpen && TutorialManager.TipsOn ? DisplayStyle.Flex : DisplayStyle.None;
+            row.style.display = oneByOne && !reached && !firstOpen ? DisplayStyle.None : DisplayStyle.Flex;
             if (!reached) firstOpen = false;
             if (pm.IsMilestoneClaimed(def)) claimed++;
         }
 
+        RefreshContractRow();
+
         // Claimable → in progress → claimed. Stable: rows stays in asset order, we only move DOM children.
-        // The contract card leads its group (claimable when complete or ready to fulfil).
-        int contractGroup = RefreshContractRow();
         int slot = 0;
-        if (noteShown)          // group −2: the tutorial note tops the list
-        {
-            if (list.IndexOf(noteRow) != 0) list.Insert(0, noteRow);
-            slot = 1;
-        }
         if (RefreshStarRow())   // group −1: above the milestones
         {
             if (list.IndexOf(starRow) != slot) list.Insert(slot, starRow);
@@ -232,11 +222,6 @@ public class MilestoneTracker : MonoBehaviour
         }
         for (int group = 0; group < 3; group++)
         {
-            if (contractGroup == group)
-            {
-                if (list.IndexOf(contractRow) != slot) list.Insert(slot, contractRow);
-                slot++;
-            }
             foreach (var (def, row) in rows)
             {
                 int g = pm.IsMilestoneClaimed(def) ? 2 : pm.IsMilestoneReached(def) ? 0 : 1;
@@ -248,7 +233,7 @@ public class MilestoneTracker : MonoBehaviour
 
         UpdateCountLabel(claimed, rows.Count);
 
-        int claimable = pm.ClaimableCount + (contractGroup == 0 ? 1 : 0);
+        int claimable = pm.ClaimableCount;
         if (claimBadge != null) claimBadge.text = claimable.ToString();
         UIManager.SetBoardBadge(claimBadge, claimable > 0, claimable > 0);
     }
@@ -262,7 +247,9 @@ public class MilestoneTracker : MonoBehaviour
 
     private VisualElement CreateContractRow()
     {
-        var row = cardTemplate.CloneTree().Q<VisualElement>("card-root");
+        var tree = cardTemplate.CloneTree();
+        tree.pickingMode = PickingMode.Ignore;
+        var row = tree.Q<VisualElement>("card-root");
         var reward = row.Q<VisualElement>("card-reward");
         var seal = new VisualElement { pickingMode = PickingMode.Ignore };
         seal.AddToClassList("btn-seal");
@@ -282,7 +269,7 @@ public class MilestoneTracker : MonoBehaviour
             if (cm.Active.complete)
             {
                 claim.SetEnabled(false);   // re-enabled when the next contract shows
-                cm.Claim(BurstOrigin(row), (count, land) => LaunchCoins(claim, count, land));
+                cm.Claim(BurstOrigin(row, +80f), (count, land) => LaunchCoins(claim, count, land));   // left column: burst to its right
             }
             else cm.Fulfil();
             RefreshProgress();
@@ -296,11 +283,11 @@ public class MilestoneTracker : MonoBehaviour
         return row;
     }
 
-    /// <summary>Binds the contract card; returns its sort group (0 claimable, 1 in progress, -1 hidden).</summary>
-    private int RefreshContractRow()
+    /// <summary>Binds the contract card (hidden without an active contract).</summary>
+    private void RefreshContractRow()
     {
         var cm = ContractManager.Instance;
-        if (contractRow == null || cm == null) return -1;
+        if (contractRow == null || cm == null) return;
 
         var row = contractRow;
         var a = cm.Active;
@@ -309,17 +296,7 @@ public class MilestoneTracker : MonoBehaviour
         row.Q<VisualElement>("card-icon").style.backgroundImage =
             new StyleBackground(a?.itemDef != null && a.itemDef.icon != null ? a.itemDef.icon : contractIcon);
 
-        if (a == null)
-        {
-            int offers = 0;
-            for (int i = 0; i < ContractManager.OfferSlots; i++) if (cm.GetOffer(i) != null) offers++;
-            row.style.display = offers > 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            row.RemoveFromClassList("mt-card--claimable");
-            row.Q<Label>("card-name").text = "Guild Contracts";
-            row.Q<Label>("card-desc").text = $"{offers} offer{(offers == 1 ? "" : "s")} on the board — take one";
-            bar.style.display = reward.style.display = DisplayStyle.None;
-            return offers > 0 ? 1 : -1;
-        }
+        if (a == null) { row.style.display = DisplayStyle.None; return; }
 
         int progress = cm.ProgressOf(a);
         bool claimable = a.complete || cm.CanFulfil;
@@ -337,7 +314,6 @@ public class MilestoneTracker : MonoBehaviour
         row.Q<Label>("card-claim-amount").text = a.complete ? $"+{AnimatedNumberUITK.Abbrev(a.gold)}" : "";
         claim.Q<VisualElement>(className: "mt-card-claim-coin").style.display = a.complete ? DisplayStyle.Flex : DisplayStyle.None;
         claim.SetEnabled(true);
-        return claimable ? 0 : 1;
     }
 
     // ═════════════════════════════════════════════
@@ -392,56 +368,6 @@ public class MilestoneTracker : MonoBehaviour
         starRow.schedule.Execute(() => starRow.RemoveFromClassList("mt-card--enter")).ExecuteLater(30);
     }
 
-    // ═════════════════════════════════════════════
-    // TUTORIAL NOTE (same markup: title, one line, Show me in the claim button's place, ✕)
-    // ═════════════════════════════════════════════
-
-    private VisualElement CreateNoteRow()
-    {
-        var row = cardTemplate.CloneTree().Q<VisualElement>("card-root");
-        row.AddToClassList("mt-card--note");
-        row.Q<VisualElement>(className: "mt-card-bar").style.display = DisplayStyle.None;
-        row.Q<VisualElement>("card-reward").style.display = DisplayStyle.None;
-        row.Q<Label>("card-claim-amount").style.display = DisplayStyle.None;
-
-        noteShowMe = row.Q<Button>("card-claim");
-        noteShowMe.RemoveFromClassList("btn-success");
-        noteShowMe.AddToClassList("btn-secondary");
-        noteShowMe.Q<VisualElement>(className: "mt-card-claim-coin").style.display = DisplayStyle.None;
-        noteShowMe.clicked += () => { SfxManager.Instance?.Play(SfxId.UiTick); noteShowMeAction?.Invoke(); };
-
-        var close = new Button { text = "✕" };
-        close.AddToClassList("mt-note-close");
-        close.clicked += () => { SfxManager.Instance?.Play(SfxId.UiTick); noteDismiss?.Invoke(); };
-        row.Add(close);
-
-        row.style.display = DisplayStyle.None;
-        return row;
-    }
-
-    /// <summary>Pins a tutorial note atop the list (one at a time; TutorialManager owns the queue). showMe null = no button.</summary>
-    public void ShowNote(string title, string copy, string showMeLabel, System.Action showMe, System.Action dismiss)
-    {
-        if (noteRow == null) return;
-        noteRow.Q<Label>("card-name").text = title;
-        noteRow.Q<Label>("card-desc").text = copy;
-        noteShowMe.style.display = showMe == null ? DisplayStyle.None : DisplayStyle.Flex;
-        noteShowMe.Q<Label>().text = showMeLabel ?? "Show me";
-        noteShowMeAction = showMe;
-        noteDismiss = dismiss;
-        noteShown = true;
-        noteRow.style.display = DisplayStyle.Flex;
-        noteRow.AddToClassList("mt-card--enter");
-        noteRow.schedule.Execute(() => noteRow.RemoveFromClassList("mt-card--enter")).ExecuteLater(30);
-        RefreshProgress();
-    }
-
-    public void HideNote()
-    {
-        noteShown = false;
-        if (noteRow != null) noteRow.style.display = DisplayStyle.None;
-    }
-
     private void UpdateCountLabel(int completed, int total)
     {
         if (countLabel != null)
@@ -468,27 +394,6 @@ public class MilestoneTracker : MonoBehaviour
         var row = cardTemplate.CloneTree().Q<VisualElement>("card-root");
         BindCard(row, def, LaunchCoins);
 
-        // Tutorial hint line (+ Show me) under the bar; RefreshProgress shows it on the first unreached card
-        var h = TutorialManager.Instance?.HintFor(def.name);
-        if (h != null)
-        {
-            var box = new VisualElement { name = "card-hint", style = { display = DisplayStyle.None } };
-            box.AddToClassList("mt-card-hint");
-            var copy = new Label(h.copy);
-            copy.AddToClassList("mt-card-hint-copy");
-            box.Add(copy);
-            if (h.showMe != null)
-            {
-                var showMe = new Button(() => { SfxManager.Instance?.Play(SfxId.UiTick); h.showMe(); });
-                showMe.AddToClassList("btn-secondary");
-                showMe.AddToClassList("mt-card-showme");
-                var label = new Label("Show me") { pickingMode = PickingMode.Ignore };
-                label.AddToClassList("btn-label");
-                showMe.Add(label);
-                box.Add(showMe);
-            }
-            row.Q<VisualElement>(className: "mt-card-info").Add(box);
-        }
         return row;
     }
 
@@ -540,14 +445,14 @@ public class MilestoneTracker : MonoBehaviour
             row.Q<Label>("card-reward-label").text = $"Reward: {AnimatedNumberUITK.Abbrev(def.goldReward)} - collected";
     }
 
-    // Panel point → world point (z=0) just LEFT of the card: world sprites draw under UI Toolkit,
-    // so a burst at the button itself would fly hidden behind the tracker column.
-    public static Vector3 BurstOrigin(VisualElement element)
+    // Panel point → world point (z=0) just beside the card (side: −80 = left, +80 = right): world sprites draw
+    // under UI Toolkit, so a burst at the button itself would fly hidden behind the tracker column.
+    public static Vector3 BurstOrigin(VisualElement element, float side = -80f)
     {
         Camera cam = Camera.main;
         if (cam == null || element.panel == null) return Vector3.zero;
 
-        Vector2 center = new Vector2(element.worldBound.xMin - 80f, element.worldBound.center.y);
+        Vector2 center = new Vector2(side < 0 ? element.worldBound.xMin + side : element.worldBound.xMax + side, element.worldBound.center.y);
         // Card may be half scrolled out of view — keep the origin inside the visible list.
         var view = element.GetFirstAncestorOfType<ScrollView>();
         if (view != null) center.y = Mathf.Clamp(center.y, view.worldBound.yMin, view.worldBound.yMax);

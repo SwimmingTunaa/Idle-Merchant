@@ -169,6 +169,7 @@ public class CounterService : MonoBehaviour
                 }
                 else Inventory.Instance.AddGold(tip);
                 if (clicker != null) clicker.Serves++;
+                GameSignals.RaiseCustomerServedByHand();
             }
         }
 

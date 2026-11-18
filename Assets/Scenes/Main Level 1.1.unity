@@ -20082,12 +20082,16 @@ MonoBehaviour:
   royalSoloChance: 0.3
   baseSpawnsPerMinute: 5
   spawnRatePerStar: 2
+  cheapBudget: 1000
   spawnRatePerSaleItem: 0.5
   spawnRatePerLayer: 1
   spawnRatePerShelfRank: 0.15
   minSpawnsPerMinute: 1
   maxSpawnsPerMinute: 60
   showDebugLogs: 0
+  wordPerSale: 0.15
+  wordMaxBoost: 2
+  wordDecaySeconds: 180
 --- !u!1 &621733067
 GameObject:
   m_ObjectHideFlags: 0

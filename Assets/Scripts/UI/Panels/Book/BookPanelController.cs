@@ -30,6 +30,7 @@ public class BookPanelController : BasePanelController
     private readonly VisualElement[] pageContainers = new VisualElement[TAB_COUNT];
 
     private VisualElement inventoryFilterBar;
+    private const int CraftingTab = 3;   // bookmark hidden until a station is owned
 
     private MonoBehaviour[] _pages;
     private int lastActiveTab = 0;
@@ -59,6 +60,7 @@ public class BookPanelController : BasePanelController
     protected override void OnDestroy()
     {
         GameSignals.OnAdventurerPromoted -= OnAdventurerPromotedForBadge;
+        ProgressionManager.OnUpgradePurchased -= OnUpgradeForCraftingTab;
         GameSignals.OnAdventurerFocusRequested -= OnAdventurerFocusRequested;
         base.OnDestroy();
     }
@@ -124,6 +126,17 @@ public class BookPanelController : BasePanelController
     private void WireBadgeSignals()
     {
         GameSignals.OnAdventurerPromoted += OnAdventurerPromotedForBadge;
+        ProgressionManager.OnUpgradePurchased += OnUpgradeForCraftingTab;
+    }
+
+    private void OnUpgradeForCraftingTab(GuildUpgradeDef _) => RefreshCraftingTab();
+
+    // The Crafting bookmark only shows once there's a station to craft at (the Guild page sells them)
+    private void RefreshCraftingTab()
+    {
+        var pm = ProgressionManager.Instance;
+        bool any = pm != null && (pm.HasUpgrade(UpgradeType.ForgingStation) || pm.HasUpgrade(UpgradeType.Smithy) || pm.HasUpgrade(UpgradeType.ArcaneWorkshop));
+        if (tabButtons[CraftingTab] != null) tabButtons[CraftingTab].style.display = any ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private void OnAdventurerPromotedForBadge(EntityBase entity, string oldRole, string newRole)
@@ -143,6 +156,7 @@ public class BookPanelController : BasePanelController
         State = PanelState.Opening;
         if (panel.parent != null) panel.parent.style.display = DisplayStyle.Flex;
         SetTopNavBookmarksVisible(false);
+        RefreshCraftingTab();
         SwitchToTab(lastActiveTab);
         State = PanelState.Open;
         SfxManager.Instance?.Play(SfxId.PageFlip);
@@ -201,7 +215,6 @@ public class BookPanelController : BasePanelController
     private void SwitchToTab(int index)
     {
         if (index < 0 || index >= TAB_COUNT) return;
-        TutorialManager.Flag("tab" + index);
 
         // Hide previous page
         (_pages[lastActiveTab] as IBookPage)?.OnPageHidden();

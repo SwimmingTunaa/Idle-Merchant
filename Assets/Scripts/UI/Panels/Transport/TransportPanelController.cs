@@ -13,7 +13,7 @@ public class TransportPanelController : BasePanelController
 
     private TransportPoint point;
     private VisualElement rows;
-    private Label title, sub;
+    private Label title;
 
     void Awake()
     {
@@ -50,7 +50,6 @@ public class TransportPanelController : BasePanelController
 
         rows = panel.Q("tp-rows");
         title = panel.Q<Label>("tp-title");
-        sub = panel.Q<Label>("tp-sub");
         panel.Q<Button>("tp-close").clicked += () => UIManager.Instance.ClosePanel(this);
         panel.RegisterCallback<PointerDownEvent>(e => { if (e.target == panel && State == PanelState.Open) UIManager.Instance.ClosePanel(this); });   // backdrop: a press that starts while open (the opening click's own release lands here too — ClickEvent would close it as it opens)
     }
@@ -87,9 +86,6 @@ public class TransportPanelController : BasePanelController
         bool teleport = point.transportType == TransportType.Teleporter;
         bool lift = point.transportType == TransportType.Elevator;
         title.text = $"Depth {point.sourceLayer} {(teleport ? "teleport pad" : lift ? "lift" : "ladder")}";
-        sub.text = teleport ? "Porters blink to the floor above."
-                 : lift ? "Porters ride this lift in a second."
-                 : "Porters climb this ladder at walking pace.";
 
         rows.Clear();
         var all = Resources.LoadAll<GuildUpgradeDef>("Guild Upgrades");

@@ -197,12 +197,7 @@ public class HireController : BasePanelController
         }
         BuildStack();
         UpdateLayerSelector();
-        // First open ever: the restock note explains the pile instead of counting it (tutorial)
-        if (TutorialManager.Instance != null && !TutorialManager.Instance.BoardOpened)
-        {
-            TutorialManager.Instance.Mark("board");
-            if (noticeLabel != null) noticeLabel.text = "Pull the tack for the next poster";
-        }
+        TutorialManager.Instance?.Mark("board");   // the sign's LMB cue stops once the board has been opened
 
         OnOpenStart();
         StartCoroutine(OpenAnimation());

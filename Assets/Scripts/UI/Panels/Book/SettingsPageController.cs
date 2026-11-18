@@ -4,12 +4,14 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Settings page — category list on the left, that category's controls on the right.
 /// Implements IBookPage; lives inside BookPanelController as tab 4 (the book's `settingsPage` field).
-/// Audio = SfxManager volumes; Tips = the tutorial's switch (TutorialManager.ShowTips) and a reset.
+/// Audio = SfxManager volumes (Master / Effects / Music, each a labelled slider + percent readout; the Effects
+/// slider ticks as it moves so the level is audible); Tips = the pointer switch (TutorialManager.ShowTips) and a reset.
+/// Styled by the .settings-* rules in BookPanel.uss.
 /// </summary>
 public class SettingsPageController : MonoBehaviour, IBookPage
 {
     private VisualElement categoryList;
-    private Label contentLabel;
+    private VisualElement rightPage;
     private VisualElement content;
     private string selectedCategory = "Audio";
 
@@ -24,7 +26,7 @@ public class SettingsPageController : MonoBehaviour, IBookPage
     public void OnPageShown(VisualElement leftPage, VisualElement rightPage)
     {
         categoryList = leftPage.Q<VisualElement>("category-list");
-        contentLabel = rightPage.Q<Label>("settings-content-label");
+        this.rightPage = rightPage;
 
         BuildCategoryList();
         ShowCategory(selectedCategory);
@@ -35,7 +37,7 @@ public class SettingsPageController : MonoBehaviour, IBookPage
         content?.RemoveFromHierarchy();
         content = null;
         categoryList = null;
-        contentLabel = null;
+        rightPage = null;
     }
 
     // ═════════════════════════════════════════════
@@ -51,11 +53,10 @@ public class SettingsPageController : MonoBehaviour, IBookPage
 
         foreach (var category in Categories)
         {
-            var btn = new Button();
-            btn.text = category;
+            var btn = new Button { text = category };
             btn.AddToClassList("settings-category-button");
             string captured = category;
-            btn.clicked += () => ShowCategory(captured);
+            btn.clicked += () => { SfxManager.Instance?.Play(SfxId.UiTick); ShowCategory(captured); };
             categoryList.Add(btn);
         }
     }
@@ -63,11 +64,12 @@ public class SettingsPageController : MonoBehaviour, IBookPage
     private void ShowCategory(string category)
     {
         selectedCategory = category;
-        if (contentLabel == null) return;
+        if (rightPage == null) return;
 
         content?.RemoveFromHierarchy();
-        content = new VisualElement { style = { marginTop = 12 } };
-        contentLabel.parent.Add(content);
+        content = new VisualElement();
+        content.AddToClassList("settings-content");
+        rightPage.Add(content);
         if (category == "Audio") BuildAudio(); else BuildTips();
 
         if (categoryList == null) return;
@@ -80,32 +82,41 @@ public class SettingsPageController : MonoBehaviour, IBookPage
 
     private void BuildAudio()
     {
-        contentLabel.text = "Volume";
         var sfx = SfxManager.Instance;
-        AddSlider("Master", sfx != null ? sfx.MasterVolume : 0.8f, v => { if (sfx != null) sfx.MasterVolume = v; });
-        AddSlider("Effects", sfx != null ? sfx.SfxVolume : 1f, v => { if (sfx != null) sfx.SfxVolume = v; });
-        AddSlider("Music", sfx != null ? sfx.MusicVolume : 1f, v => { if (sfx != null) sfx.MusicVolume = v; });
+        AddSlider("Master",  sfx != null ? sfx.MasterVolume : 0.8f, v => { if (sfx != null) sfx.MasterVolume = v; });
+        AddSlider("Effects", sfx != null ? sfx.SfxVolume    : 1f,   v => { if (sfx != null) { sfx.SfxVolume = v; sfx.Play(SfxId.UiTick); } });
+        AddSlider("Music",   sfx != null ? sfx.MusicVolume  : 1f,   v => { if (sfx != null) sfx.MusicVolume = v; });
     }
 
+    // label · slider · "80%" on one row; the readout follows the knob
     private void AddSlider(string label, float value, System.Action<float> set)
     {
-        var s = new Slider(label, 0f, 1f) { value = value, style = { fontSize = 20, color = Ink, marginBottom = 8 } };
-        s.RegisterValueChangedCallback(e => set(e.newValue));
-        content.Add(s);
+        var row = new VisualElement();
+        row.AddToClassList("settings-row");
+        var name = new Label(label);
+        name.AddToClassList("settings-row-label");
+        var s = new Slider(0f, 1f) { value = value };
+        s.AddToClassList("settings-slider");
+        var pct = new Label(Percent(value));
+        pct.AddToClassList("settings-row-value");
+        s.RegisterValueChangedCallback(e => { set(e.newValue); pct.text = Percent(e.newValue); });
+        row.Add(name); row.Add(s); row.Add(pct);
+        content.Add(row);
     }
 
-    // Tutorial: pointers, hint lines and first-contact notes; Reset replays them from the start
+    private static string Percent(float v) => $"{Mathf.RoundToInt(v * 100f)}%";
+
+    // Tutorial pointers; Reset brings them back
     private void BuildTips()
     {
         var tm = TutorialManager.Instance;
-        contentLabel.text = "Pointers and first-time notes on the progress tracker.";
-        var toggle = new Toggle("Show tips") { value = tm == null || tm.ShowTips, style = { fontSize = 20, color = Ink } };
-        toggle.RegisterValueChangedCallback(e => { if (tm != null) tm.ShowTips = e.newValue; });
+        var toggle = new Toggle("Show tips") { value = tm == null || tm.ShowTips };
+        toggle.AddToClassList("settings-toggle");
+        toggle.RegisterValueChangedCallback(e => { if (tm != null) tm.ShowTips = e.newValue; SfxManager.Instance?.Play(SfxId.UiTick); });
         content.Add(toggle);
-        var reset = new Button(() => { tm?.ResetAll(); SfxManager.Instance?.Play(SfxId.UiTick); })
-            { text = "Reset tips", style = { alignSelf = Align.FlexStart, marginTop = 10, fontSize = 18 } };
+        var reset = new Button(() => { tm?.ResetAll(); SfxManager.Instance?.Play(SfxId.UiTick); }) { text = "Reset tips" };
+        reset.AddToClassList("settings-category-button");
+        reset.AddToClassList("settings-reset-button");
         content.Add(reset);
     }
-
-    private static readonly Color Ink = new Color(0.27f, 0.18f, 0.08f);
 }

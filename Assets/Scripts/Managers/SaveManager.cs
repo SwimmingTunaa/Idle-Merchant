@@ -190,6 +190,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
         d.economy.gold = inv.Gold + goldInFlight;
         d.economy.floors = inv.FloorsToSave();
+        d.economy.ceilings = inv.CeilingsToSave();
         foreach (var row in inv.SnapshotAll()) Bank(d, row.item, row.qty);
         // §4: loot on the ground and in porters' arms banks into the saved stock — items are never dropped
         foreach (var loot in FindObjectsByType<Loot>()) Bank(d, loot.GetItemDef(), loot.GetQuantity());
@@ -390,6 +391,7 @@ public class SaveManager : PersistentSingleton<SaveManager>
         }
 
         inv.LoadFloors(d.economy.floors, items);
+        inv.LoadCeilings(d.economy.ceilings, items);
 
         // Crafting chunk restores slots (+ caps, running jobs; pre-3b "enabled" recipes migrate into free slots);
         // a save from before the chunk falls back to pinning every unlocked recipe with default settings.
@@ -424,6 +426,8 @@ public class SaveManager : PersistentSingleton<SaveManager>
 
     /// <summary>Porter deposits are the loot pipeline that keeps running "while away" (click pickups don't count).</summary>
     public void RecordPorterDelivery(int qty) => tickLoot += qty;
+    /// <summary>Caravan export (stock above a ceiling, sold at a discount as the wagon leaves) — passive gold, no OnItemSold.</summary>
+    public void RecordExportGold(int gold) => tickGold += gold;
 
     // Customer sales only (SalesManager + CounterService) — never click gold, milestone claims, hiring refunds or debug.
     private void OnItemSold(ResourceStack sale) => tickGold += sale.sellValue;
@@ -665,6 +669,7 @@ public class EconomySave
     public int gold;
     public Dictionary<string, int> stock = new Dictionary<string, int>(); // ItemDef asset name → qty
     public Dictionary<string, int> floors = new Dictionary<string, int>(); // ItemDef asset name → "keep at least N"
+    public Dictionary<string, int> ceilings = new Dictionary<string, int>(); // ItemDef asset name → "ship above N" (caravan export)
 }
 
 public class CaravanSave
@@ -717,7 +722,7 @@ public class ProgressionSave
     public int stars = 1;
     public int maxUnlockedLayer = 1;
     public int goldEarned, mobsKilled, unitsHired, adventurersHired, portersHired, lootCollected,
-               itemsCrafted, craftedItemsSold, customersServed, adventurersRankedUp;
+               itemsCrafted, craftedItemsSold, customersServed, adventurersRankedUp, handServes, contractsCompleted;
     public List<string> craftedItemTypes = new List<string>();   // ItemDef names (CraftedItemsSold tracking)
     public List<string> reachedMilestones = new List<string>();  // StarMilestoneDef names
     public List<string> claimedMilestones = new List<string>();

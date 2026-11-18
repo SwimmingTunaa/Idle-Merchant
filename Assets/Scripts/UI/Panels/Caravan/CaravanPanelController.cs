@@ -11,7 +11,7 @@ public class CaravanPanelController : BasePanelController
     public override string PanelID => "CaravanPanel";
 
     private VisualElement hero, icon, panIcon, scale, fuseFill, fuseSpark;
-    private Label want, seals, leaves, error, say, hold, panQty, panSeals;
+    private Label want, seals, leaves, error, say, hold, panQty, panSeals, haul;
     private IVisualElementScheduledItem tick;
 
     // the driver's patter, one line per visit ({item} = the lot's name, {n} = the seals)
@@ -66,6 +66,7 @@ public class CaravanPanelController : BasePanelController
         hold = panel.Q<Label>("cv-hold");
         panQty = panel.Q<Label>("cv-pan-qty");
         panSeals = panel.Q<Label>("cv-pan-seals");
+        haul = panel.Q<Label>("cv-haul");
         panel.Q<Button>("cv-close").clicked += () => UIManager.Instance.ClosePanel(this);
         var accept = panel.Q<Button>("cv-accept");
         accept.clicked += () =>
@@ -83,7 +84,6 @@ public class CaravanPanelController : BasePanelController
     protected override void OnOpenStart()
     {
         GameSignals.OnCaravanChanged += Refresh;
-        TutorialManager.Flag("caravan");
         error.text = "";
         Refresh();
         tick.Resume();
@@ -128,6 +128,8 @@ public class CaravanPanelController : BasePanelController
     {
         var c = CaravanManager.Instance;
         if (c == null || !c.Present) return;
+        var (lots, gold) = c.Export(false);   // live: stock moves while the wagon waits
+        haul.text = lots > 0 ? $"{lots} lot{(lots == 1 ? "" : "s")} over ceiling · {gold:N0} g" : "nothing over a ceiling";
         int s = Mathf.CeilToInt(c.LeaveIn);
         leaves.text = $"{s / 60}:{s % 60:00}";
         float f = Mathf.Clamp01(c.LeaveIn / CaravanManager.StayFor) * 100f;

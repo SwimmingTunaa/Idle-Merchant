@@ -29,7 +29,7 @@
                 <ui:VisualElement name="deco-underline 1" style="width: 415px; height: 40px; -unity-background-scale-mode: stretch-to-fill; background-image: url(&quot;project://database/Assets/Sprites/UI/Book%20UI/Content/Titles%20and%20Underlying/deco-underline.png?fileID=2800000&amp;guid=0ae5cfc3aea744660aaf241e3f2c6ea9&amp;type=3#deco-underline&quot;); margin-top: 8px;" />
             </ui:VisualElement>
             <ui:VisualElement name="active-slot" class="contracts-list" />
-            <ui:Label name="active-empty" text="No contract in hand. Take one from the board." class="contracts-note contracts-empty" />
+            <ui:Label name="active-empty" text="No contract in hand." class="contracts-note contracts-empty" />
             <ui:VisualElement class="contracts-shop-header">
                 <ui:Label text="Seal Shop" class="contracts-shop-title" />
                 <ui:VisualElement class="contracts-balance">

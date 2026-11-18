@@ -33,7 +33,7 @@ public class EventTracker : MonoBehaviour
     {
         var card = new Button { name = "ev-card" };
         card.AddToClassList("ev-card");
-        card.clicked += () => { TutorialManager.Flag("evcard"); onClick(); };
+        card.clicked += onClick;
         var iconEl = new VisualElement(); iconEl.AddToClassList("ev-icon");
         if (icon != null) iconEl.style.backgroundImage = new StyleBackground(icon);
         card.Add(iconEl);

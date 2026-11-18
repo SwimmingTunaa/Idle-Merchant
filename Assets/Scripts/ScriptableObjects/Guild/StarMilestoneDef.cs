@@ -19,6 +19,8 @@ public class StarMilestoneDef : ScriptableObject
     [Tooltip("Which star tier does this milestone count toward? (2★ = 2, 3★ = 3, etc.)")]
     [Range(1, 5)]
     public int starLevel = 1;
+    [Tooltip("Order within the tier on the tracker (lower first, ties by asset name). Players work top-down, so put the enabling step first.")]
+    public int sortOrder;
 
     [Header("Milestone Type")]
     [Tooltip("What action does this milestone track?")]
@@ -87,4 +89,8 @@ public enum MilestoneType
 
     // Adventurer progression
     AdventurerRankedUp,   // Rank up X adventurers
+
+    // Appended (serialized ints): customers served by click-to-serve only — the 1★ First Sale teaches the click
+    CustomersServedByHand,
+    ContractsCompleted,   // Guild contracts brought to Claim (OnContractCompleted)
 }

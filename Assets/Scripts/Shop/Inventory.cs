@@ -28,6 +28,7 @@ public class Inventory : PersistentSingleton<Inventory>
     private readonly Dictionary<ItemDef, int> craftedInventory = new();
     private readonly Dictionary<ItemDef, int> luxuryInventory  = new();
     private readonly Dictionary<ItemDef, int> itemFloors = new();   // "keep at least N": sales and crafting stop here
+    private readonly Dictionary<ItemDef, int> itemCeilings = new(); // "ship above N": the caravan hauls the excess off when it leaves (0 = off)
 
     protected override void Awake() 
     {
@@ -97,6 +98,28 @@ public class Inventory : PersistentSingleton<Inventory>
     }
 
     public Dictionary<string, int> FloorsToSave() => itemFloors.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.name, kv => kv.Value);
+
+    /// <summary>"Ship above N" — the floor's mirror. Whatever sits above it (and above the floor) goes on the caravan when it
+    /// departs, at <see cref="CaravanManager.ExportPrice"/> of sell price (passive income). 0 = no ceiling.</summary>
+    public void SetCeiling(ItemDef item, int amount)
+    {
+        if (item == null) return;
+        amount = Mathf.Max(0, amount);
+        if (amount == 0) itemCeilings.Remove(item);
+        else itemCeilings[item] = amount;
+    }
+
+    public int GetCeiling(ItemDef item) => item != null && itemCeilings.TryGetValue(item, out int qty) ? qty : 0;
+    public IReadOnlyDictionary<ItemDef, int> Ceilings => itemCeilings;
+    public Dictionary<string, int> CeilingsToSave() => itemCeilings.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.name, kv => kv.Value);
+
+    public void LoadCeilings(Dictionary<string, int> ceilings, Dictionary<string, ItemDef> items)
+    {
+        itemCeilings.Clear();
+        if (ceilings == null) return;
+        foreach (var kv in ceilings)
+            if (items.TryGetValue(kv.Key, out var item) && kv.Value > 0) itemCeilings[item] = kv.Value;
+    }
 
     public void LoadFloors(Dictionary<string, int> floors, Dictionary<string, ItemDef> items)
     {

@@ -4,7 +4,10 @@ using UnityEngine;
 /// <summary>
 /// The Caravan: a trader wagon that pulls up outside the guild every <see cref="VisitEvery"/> s of game time and
 /// offers flat Guild Seals for a bulk lot of ONE raw item — the one with the most gold value above its floor,
-/// 70 % of that surplus. A stock valve, not income: no gold, no OnItemSold, never feeds offline rates.
+/// 70 % of that surplus. The seal trade is a stock valve, not income: no gold, no OnItemSold, never feeds offline rates.
+/// When it drives off (accepted, declined or timed out) it also hauls everything above each item's ceiling
+/// (<see cref="Inventory.SetCeiling"/>) at <see cref="ExportPrice"/> of sell price — gold, passive (SaveManager.RecordExportGold),
+/// no OnItemSold so no milestone progress and no sale sfx.
 /// Lives on the wagon prop itself (scene singleton): timer, offer, slide in/out with turning wheels, hover, save chunk.
 /// </summary>
 [RequireComponent(typeof(SpriteRenderer), typeof(Collider2D))]
@@ -14,6 +17,7 @@ public class CaravanManager : MonoBehaviour
     public const float StayFor = 90f;       // the offer stays open this long (parked in the opening camera view)
     public const int SealReward = 5;
     public const int MinQty = 20;           // a smaller best lot = no visit this time
+    public const float ExportPrice = 0.5f;  // the export haul pays this share of sell price
     // Drives in from past the camera's left bound (minX −50 − half a 17-ortho view) and back out the same way.
     private const float SlideDistance = 75f, SlideTime = 6f, WheelFps = 10f;
 
@@ -114,12 +118,39 @@ public class CaravanManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>Decline / timeout / after Accept: drive off; next visit in VisitEvery.</summary>
+    /// <summary>Decline / timeout / after Accept: haul the export lots, drive off; next visit in VisitEvery.</summary>
     public void Leave()
     {
         if (!Present) return;
+        var (lots, gold) = Export(true);
+        if (lots > 0 && DamageNumberManager.Instance != null) DamageNumberManager.Instance.ShowText($"Hauled {lots} lot{(lots == 1 ? "" : "s")} · +{gold:N0}g", transform);
         (Present, Item, Qty, nextIn) = (false, null, 0, VisitEvery);
         GameSignals.RaiseCaravanChanged();
+    }
+
+    /// <summary>Everything above each item's ceiling (never below its floor) at ExportPrice. <paramref name="take"/> = sell it now
+    /// (gold banked, passive rate credited); false = preview for the manifest.</summary>
+    public (int lots, int gold) Export(bool take)
+    {
+        var inv = Inventory.Instance;
+        int lots = 0, gold = 0;
+        // ponytail: the wagon only comes for a raw seal lot ≥ MinQty, so crafted-only overflow waits for one to bring it
+        foreach (var kv in new List<KeyValuePair<ItemDef, int>>(inv.Ceilings))
+        {
+            var it = kv.Key;
+            int qty = inv.Get(it.itemCategory, it) - Mathf.Max(kv.Value, inv.GetFloor(it));
+            if (qty <= 0) continue;
+            int pay = Mathf.FloorToInt(qty * it.sellPrice * ExportPrice);
+            if (take && !inv.TryRemove(inv.GetInventoryType(it.itemCategory), it, qty)) continue;
+            lots++; gold += pay;
+        }
+        if (take && gold > 0)
+        {
+            inv.AddGold(gold);
+            inv.InventoryDebugUi();
+            if (SaveManager.Instance != null) SaveManager.Instance.RecordExportGold(gold);
+        }
+        return (lots, gold);
     }
 
     public void SetHover(bool on) =>

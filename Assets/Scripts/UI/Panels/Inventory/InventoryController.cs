@@ -47,6 +47,9 @@ public class InventoryController : MonoBehaviour, IBookPage
     private Label reserveCountLabel;
     private VisualElement reserveUpButton;
     private VisualElement reserveDownButton;
+    private Label shipCountLabel;                 // "ship above N" ceiling — the caravan hauls the excess off (0 = off)
+    private VisualElement shipUpButton, shipDownButton;
+    private int holdReps;
     private IVisualElementScheduledItem reserveHoldRepeat;
     private const int ReserveHoldInitialDelayMs = 350;
     private const int ReserveHoldIntervalMs = 70;
@@ -92,6 +95,21 @@ public class InventoryController : MonoBehaviour, IBookPage
         reserveCountLabel = rightPage.Q<Label>("reserve-count");
         reserveUpButton = rightPage.Q<VisualElement>("reserve-up");
         reserveDownButton = rightPage.Q<VisualElement>("reserve-down");
+        shipCountLabel = rightPage.Q<Label>("ship-count");
+        shipUpButton = rightPage.Q<VisualElement>("ship-up");
+        shipDownButton = rightPage.Q<VisualElement>("ship-down");
+        if (shipUpButton != null)
+        {
+            shipUpButton.RegisterCallback<PointerDownEvent>(OnShipUpPointerDown);
+            shipUpButton.RegisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            shipUpButton.RegisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
+        if (shipDownButton != null)
+        {
+            shipDownButton.RegisterCallback<PointerDownEvent>(OnShipDownPointerDown);
+            shipDownButton.RegisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            shipDownButton.RegisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
 
         if (reserveUpButton != null)
         {
@@ -157,11 +175,23 @@ public class InventoryController : MonoBehaviour, IBookPage
             reserveDownButton.UnregisterCallback<PointerUpEvent>(OnReservePointerRelease);
             reserveDownButton.UnregisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
         }
+        if (shipUpButton != null)
+        {
+            shipUpButton.UnregisterCallback<PointerDownEvent>(OnShipUpPointerDown);
+            shipUpButton.UnregisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            shipUpButton.UnregisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
+        if (shipDownButton != null)
+        {
+            shipDownButton.UnregisterCallback<PointerDownEvent>(OnShipDownPointerDown);
+            shipDownButton.UnregisterCallback<PointerUpEvent>(OnReservePointerRelease);
+            shipDownButton.UnregisterCallback<PointerLeaveEvent>(OnReservePointerRelease);
+        }
         StopReserveHold();
         forsaleStamp?.Stop();
         stampAnim?.Stop();
         forsaleBadge = null; forsaleLabel = null; forsaleStamp = null; stampAnim = null; itemValueLabel = null; reserveCountLabel = null;
-        reserveUpButton = null; reserveDownButton = null;
+        reserveUpButton = null; reserveDownButton = null; shipCountLabel = null; shipUpButton = null; shipDownButton = null;
         itemSlots.Clear();
         selectedItem = null;
     }
@@ -291,11 +321,12 @@ public class InventoryController : MonoBehaviour, IBookPage
         selectedItem = null;
         if (detailIcon != null) detailIcon.style.backgroundImage = null;
         if (detailName != null) detailName.text = "Select an item";
-        if (detailDescription != null) detailDescription.text = "Select an item to view details.";
+        if (detailDescription != null) detailDescription.text = "";
         if (forsaleLabel != null) { forsaleLabel.text = "Not For Sale"; forsaleLabel.style.display = DisplayStyle.Flex; }
         if (forsaleStamp != null) forsaleStamp.style.display = DisplayStyle.None;
         if (itemValueLabel != null) itemValueLabel.text = "—";
         if (reserveCountLabel != null) reserveCountLabel.text = "0";
+        if (shipCountLabel != null) shipCountLabel.text = "—";
         foreach (var kvp in itemSlots) kvp.Value.RemoveFromClassList("item-slot-selected");
     }
 
@@ -426,6 +457,8 @@ public class InventoryController : MonoBehaviour, IBookPage
         if (forsaleStamp != null) forsaleStamp.style.display = isForSale ? DisplayStyle.Flex : DisplayStyle.None;
         if (itemValueLabel != null) itemValueLabel.text = $"{item.sellPrice}";
         if (reserveCountLabel != null) reserveCountLabel.text = $"{reserved}";
+        int ceiling = Inventory.Instance.GetCeiling(item);
+        if (shipCountLabel != null) shipCountLabel.text = ceiling > 0 ? $"{ceiling}" : "—";
     }
 
     // ═════════════════════════════════════════════
@@ -469,21 +502,23 @@ public class InventoryController : MonoBehaviour, IBookPage
         }
     }
 
-    // Floor (keep-N) stepper — supports hold-to-repeat. PointerDown fires StepReserve once,
-    // then after a short delay starts auto-repeating until pointer is released or leaves.
-    private void OnReserveUpPointerDown(PointerDownEvent evt) => StartReserveHold(+1);
-    private void OnReserveDownPointerDown(PointerDownEvent evt) => StartReserveHold(-1);
+    // KEEP (floor) and SHIP ABOVE (ceiling) steppers — hold-to-repeat: PointerDown steps once, then auto-repeats
+    // after a short delay until the pointer is released or leaves; ×10 steps after about a second held.
+    private void OnReserveUpPointerDown(PointerDownEvent evt) => StartHold(+1, false);
+    private void OnReserveDownPointerDown(PointerDownEvent evt) => StartHold(-1, false);
+    private void OnShipUpPointerDown(PointerDownEvent evt) => StartHold(+1, true);
+    private void OnShipDownPointerDown(PointerDownEvent evt) => StartHold(-1, true);
     private void OnReservePointerRelease(EventBase evt) => StopReserveHold();
 
-    private void StartReserveHold(int delta)
+    private void StartHold(int delta, bool ship)
     {
         StopReserveHold();
-        StepReserve(delta); // immediate first step on press
-        // Then after the initial delay, auto-repeat. Use detailPanel as a stable schedule host.
+        holdReps = 0;
+        Step(delta, ship); // immediate first step on press
         var host = detailPanel ?? reserveUpButton;
         if (host == null) return;
         reserveHoldRepeat = host.schedule
-            .Execute(() => StepReserve(delta))
+            .Execute(() => Step(++holdReps >= 14 ? delta * 10 : delta, ship))
             .StartingIn(ReserveHoldInitialDelayMs)
             .Every(ReserveHoldIntervalMs);
     }
@@ -494,15 +529,15 @@ public class InventoryController : MonoBehaviour, IBookPage
         reserveHoldRepeat = null;
     }
 
-    private void StepReserve(int delta)
+    private void Step(int delta, bool ship)
     {
         if (selectedItem == null) return;
-        int totalStock = SalesManager.Instance.GetTotalStock(selectedItem);
-        int current = Inventory.Instance.GetFloor(selectedItem);
-        int next = Mathf.Clamp(current + delta, 0, totalStock);
-        if (next == current) return; // already at bound — no work
-        Inventory.Instance.SetFloor(selectedItem, next);
-        // Refresh the slot badge + detail labels for the changed item
+        var inv = Inventory.Instance;
+        int current = ship ? inv.GetCeiling(selectedItem) : inv.GetFloor(selectedItem);
+        // a ceiling may sit above today's stock ("ship once it passes 200"); a floor can't exceed it
+        int next = ship ? Mathf.Max(0, current + delta) : Mathf.Clamp(current + delta, 0, SalesManager.Instance.GetTotalStock(selectedItem));
+        if (next == current) return;
+        if (ship) inv.SetCeiling(selectedItem, next); else inv.SetFloor(selectedItem, next);
         IncrementalUpdateItem(selectedItem);
     }
 

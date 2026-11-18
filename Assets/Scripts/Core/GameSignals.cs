@@ -41,6 +41,7 @@ public static class GameSignals
 
     // Customers
     public static event Action OnCustomerServed;
+    public static event Action OnCustomerServedByHand;   // the click-to-serve subset: milestones + Patronage contracts count only these
 
     //Hiring
     public static event Action<EntityDef, HireRole> OnUnitHired;
@@ -79,6 +80,7 @@ public static class GameSignals
     public static void RaiseMilestoneClaimed(StarMilestoneDef milestone) => OnMilestoneClaimed?.Invoke(milestone);
     public static void RaiseMarkedForSaleChanged() => OnMarkedForSaleChanged?.Invoke();
     public static void RaiseCustomerServed() => OnCustomerServed?.Invoke();
+    public static void RaiseCustomerServedByHand() => OnCustomerServedByHand?.Invoke();
     public static void RaiseUnitHired(EntityDef unitDef, HireRole role) => OnUnitHired?.Invoke(unitDef, role);
     public static void RaiseClickUpgradePurchased(int newLevel) => OnClickUpgradePurchased?.Invoke(newLevel);
     public static void RaiseContractAccepted(Contract c) => OnContractAccepted?.Invoke(c);
@@ -114,6 +116,7 @@ public static class GameSignals
         OnMilestoneClaimed = null;
         OnMarkedForSaleChanged = null;
         OnCustomerServed = null;
+        OnCustomerServedByHand = null;
         OnClickUpgradePurchased = null;
         OnContractAccepted = null;
         OnContractCompleted = null;

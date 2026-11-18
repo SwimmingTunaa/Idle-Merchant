@@ -50,7 +50,6 @@ public class WorkshopPanelController : BasePanelController
         if (p == null || panel == null) return;
         prop = p;
         station = p.Station;
-        TutorialManager.Flag("workshop");
         if (State == PanelState.Open) Rebuild();
         else UIManager.Instance.OpenPanel(this);
     }
@@ -135,7 +134,7 @@ public class WorkshopPanelController : BasePanelController
         buyButton = null;
         slotRow.style.display = owned ? DisplayStyle.Flex : DisplayStyle.None;
         lockedMsg.style.display = owned ? DisplayStyle.None : DisplayStyle.Flex;
-        lockedMsg.text = $"Buy the {CraftingController.StationName(station)} in the Guild book to start crafting";
+        lockedMsg.text = $"{CraftingController.StationName(station)} required";
         if (owned)
         {
             var slots = cm.GetSlots(station);

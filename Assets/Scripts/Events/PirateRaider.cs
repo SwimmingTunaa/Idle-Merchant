@@ -106,7 +106,6 @@ public class PirateRaider : MonoBehaviour
     public void Kill()
     {
         if (phase == Phase.Dying) return;
-        TutorialManager.Flag("piratekilled");
         Drop();
         phase = Phase.Dying;
         if (anim != null) anim.SetFloat(AnimHash.Velocity, 0f);

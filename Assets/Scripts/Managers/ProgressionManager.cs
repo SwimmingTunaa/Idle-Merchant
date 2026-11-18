@@ -58,6 +58,8 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private int totalItemsCrafted = 0;
     private int totalCraftedItemsSold = 0;
     private int totalCustomersServed = 0;
+    private int totalHandServes = 0;   // click-to-serve only (CustomersServedByHand milestones)
+    private int totalContractsCompleted = 0;
     private int totalAdventurersRankedUp = 0;
     // Item types the player has crafted — a sale of one counts toward CraftedItemsSold
     private readonly HashSet<ItemDef> craftedItemDefs = new HashSet<ItemDef>();
@@ -106,6 +108,8 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnProductCrafted += HandleProductCrafted;
         GameSignals.OnUnitHired += HandleUnitHired;
         GameSignals.OnCustomerServed += HandleCustomerServed;
+        GameSignals.OnCustomerServedByHand += HandleHandServe;
+        GameSignals.OnContractCompleted += HandleContractCompleted;
         GameSignals.OnAdventurerPromoted += HandleAdventurerPromoted;
         GameSignals.OnItemSold += HandleItemSold;
     }
@@ -119,6 +123,8 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
         GameSignals.OnProductCrafted -= HandleProductCrafted;
         GameSignals.OnUnitHired -= HandleUnitHired;
         GameSignals.OnCustomerServed -= HandleCustomerServed;
+        GameSignals.OnCustomerServedByHand -= HandleHandServe;
+        GameSignals.OnContractCompleted -= HandleContractCompleted;
         GameSignals.OnAdventurerPromoted -= HandleAdventurerPromoted;
         GameSignals.OnItemSold -= HandleItemSold;
     }
@@ -160,6 +166,18 @@ public class ProgressionManager : PersistentSingleton<ProgressionManager>
     private void HandleCustomerServed()
     {
         IncrementCustomersServed(1);
+    }
+
+    private void HandleHandServe()
+    {
+        totalHandServes++;
+        milestoneCheckPending = true;
+    }
+
+    private void HandleContractCompleted(Contract _)
+    {
+        totalContractsCompleted++;
+        milestoneCheckPending = true;
     }
 
     private void HandleAdventurerPromoted(EntityBase entity, string oldRole, string newRole)
@@ -516,7 +534,7 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
     /// </summary>
     public List<StarMilestoneDef> GetMilestonesForStar(int star)
     {
-        return allMilestones.Where(m => m != null && m.starLevel == star).ToList();
+        return allMilestones.Where(m => m != null && m.starLevel == star).OrderBy(m => m.sortOrder).ThenBy(m => m.name).ToList();
     }
 
     /// <summary>
@@ -559,6 +577,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
             MilestoneType.ItemsCrafted => totalItemsCrafted,
             MilestoneType.CraftedItemsSold => totalCraftedItemsSold,
             MilestoneType.CustomersServed => totalCustomersServed,
+            MilestoneType.CustomersServedByHand => totalHandServes,
+            MilestoneType.ContractsCompleted => totalContractsCompleted,
             MilestoneType.UpgradePurchased => ownedUpgrades.Contains(milestone.requiredUpgrade) ? 1 : 0,
             // Only adventurers promote (rank up), so "units promoted" is the same counter
             MilestoneType.AdventurerRankedUp or MilestoneType.UnitsPromoted => totalAdventurersRankedUp,
@@ -911,6 +931,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         itemsCrafted = totalItemsCrafted,
         craftedItemsSold = totalCraftedItemsSold,
         customersServed = totalCustomersServed,
+        handServes = totalHandServes,
+        contractsCompleted = totalContractsCompleted,
         adventurersRankedUp = totalAdventurersRankedUp,
         craftedItemTypes = craftedItemDefs.Where(d => d != null).Select(d => d.name).ToList(),
         reachedMilestones = reachedMilestones.Where(m => m != null).Select(m => m.name).ToList(),
@@ -938,6 +960,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         totalItemsCrafted = p.itemsCrafted;
         totalCraftedItemsSold = p.craftedItemsSold;
         totalCustomersServed = p.customersServed;
+        totalHandServes = p.handServes;
+        totalContractsCompleted = p.contractsCompleted;
         totalAdventurersRankedUp = p.adventurersRankedUp;
 
         craftedItemDefs.Clear();
@@ -1089,6 +1113,8 @@ private void GrantMilestoneReward(StarMilestoneDef milestone)
         totalItemsCrafted = 0;
         totalCraftedItemsSold = 0;
         totalCustomersServed = 0;
+        totalHandServes = 0;
+        totalContractsCompleted = 0;
         RebuildAvailableItemsCache();
         Debug.Log("[ProgressionManager] Reset to 1★, layer 1");
     }
